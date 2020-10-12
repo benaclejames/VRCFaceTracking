@@ -38,26 +38,12 @@ namespace EyeTrack
             VRCExpressionParameters.Parameter[] parameters = new VRCExpressionParameters.Parameter[0];
 
             if (VRCPlayer
-                .field_Internal_Static_VRCPlayer_0 != null)
+                .field_Internal_Static_VRCPlayer_0?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0?.expressionParameters?.parameters != null)
             {
-                if (VRCPlayer
+                parameters = VRCPlayer
                     .field_Internal_Static_VRCPlayer_0
-                    .prop_VRCAvatarManager_0 != null)
-                    if (VRCPlayer
-                        .field_Internal_Static_VRCPlayer_0
-                        .prop_VRCAvatarManager_0.prop_VRCAvatarDescriptor_0 != null)
-                        if (VRCPlayer
-                            .field_Internal_Static_VRCPlayer_0
-                            .prop_VRCAvatarManager_0.prop_VRCAvatarDescriptor_0.expressionParameters != null)
-                            if (VRCPlayer
-                                    .field_Internal_Static_VRCPlayer_0
-                                    .prop_VRCAvatarManager_0.prop_VRCAvatarDescriptor_0.expressionParameters
-                                    .parameters !=
-                                null)
-                                parameters = VRCPlayer
-                                    .field_Internal_Static_VRCPlayer_0
-                                    .prop_VRCAvatarManager_0.prop_VRCAvatarDescriptor_0.expressionParameters
-                                    .parameters;
+                    .prop_VRCAvatarManager_0.prop_VRCAvatarDescriptor_0.expressionParameters
+                    .parameters;
 
             }
             else
@@ -95,8 +81,7 @@ namespace EyeTrack
             {
                 try
                 {
-                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0 == null || VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        .field_Private_VRC_AnimationController_0 == null)
+                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0 == null)
                         break;
 
                     AvatarPlayableController controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
@@ -133,14 +118,10 @@ namespace EyeTrack
             for (;;)
             {
                 AvatarAnimParamController controller = null;
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0 != null)
+                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0?.
+                    field_Private_AvatarAnimParamController_0 != null)
                 {
-                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        .field_Private_VRC_AnimationController_0 != null)
-                        if (VRCPlayer.field_Internal_Static_VRCPlayer_0
-                            .field_Private_VRC_AnimationController_0
-                            .field_Private_AvatarAnimParamController_0)
-                            controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
+                    controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
                                 .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0;
                 }
                 else
