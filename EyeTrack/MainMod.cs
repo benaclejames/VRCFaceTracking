@@ -79,27 +79,19 @@ namespace EyeTrack
         {
             for (;;)
             {
-                try
-                {
-                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0 == null)
-                        break;
-
-                    AvatarPlayableController controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        .field_Private_VRC_AnimationController_0
-                        .field_Private_AvatarAnimParamController_0
-                        .field_Private_AvatarPlayableController_0;
-
-                    SetPriority(controller, true, "EyesX");
-                    SetPriority(controller, true, "EyesY");
-                    SetPriority(controller, true, "LeftEyeLid");
-                    SetPriority(controller, true, "RightEyeLid");
-                }
-                catch
-                {
-                    MelonLogger.LogError("Error occured upgrading parameter priority");
-                }
-
                 yield return new WaitForSeconds(3);
+                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0?.field_Private_AvatarAnimParamController_0?.field_Private_AvatarPlayableController_0 == null)
+                    continue;
+                
+                AvatarPlayableController controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
+                    .field_Private_VRC_AnimationController_0
+                    .field_Private_AvatarAnimParamController_0
+                    .field_Private_AvatarPlayableController_0;
+
+                SetPriority(controller, true, "EyesX");
+                SetPriority(controller, true, "EyesY");
+                SetPriority(controller, true, "LeftEyeLid");
+                SetPriority(controller, true, "RightEyeLid");
             }
         }
 
