@@ -1,4 +1,5 @@
-﻿using ViveSR.anipal.Eye;
+﻿using System.Collections.Generic;
+using ViveSR.anipal.Eye;
 using MelonLoader;
 using UnityEngine;
 using ViveSR.anipal;
@@ -10,14 +11,26 @@ public class SRanipalTrack
 
     private readonly SRanipal_Eye_Framework _framework = new SRanipal_Eye_Framework();
 
-    public Vector3 GazeDirectionCombinedLocal;
-    public float LeftOpenness;
-    public float RightOpenness;
-    public float Diameter;
-    public float CombinedWiden;
+    float CurrentDiameter;
 
     public float MaxOpen;
     public float MinOpen = 999;
+    
+    public Dictionary<string, float> SRanipalData = new Dictionary<string, float>
+    {
+        {"EyesX", 0},
+        {"EyesY", 0},
+        {"LeftEyeLid", 0},
+        {"RightEyeLid", 0},
+        {"EyesWiden", 0},
+        {"EyesDilation", 0},
+        {"LeftEyeX", 0},
+        {"LeftEyeY", 0},
+        {"RightEyeX", 0},
+        {"RightEyeY", 0},
+        {"RightEyeWiden", 0},
+        {"LeftEyeWiden", 0},
+    };
     
     private EyeData_v2 _latestEyeData;
 
@@ -37,7 +50,7 @@ public class SRanipalTrack
         _framework.StopFramework();
     }
 
-    public IEnumerator Update()
+    private IEnumerator Update()
     {
         for (;;)
         {
@@ -46,35 +59,51 @@ public class SRanipalTrack
                 yield return new WaitForSeconds(0.05f);
 
             SRanipal_Eye_API.GetEyeData_v2(ref _latestEyeData);
+            Vector3 CombinedEyeReverse = Vector3.Scale(
+                _latestEyeData.verbose_data.combined.eye_data.gaze_direction_normalized,
+                new Vector3(-1, 1, 1));
+            Vector3 LeftEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.left.gaze_direction_normalized,
+                new Vector3(-1, 1, 1));
+            Vector3 RightEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.right.gaze_direction_normalized,
+                new Vector3(-1, 1, 1));
 
-            Vector3 unused;
-            /*Vector3 tempDirection;
-            if (SRanipal_Eye.GetGazeRay(GazeIndex.COMBINE, out unused, out tempDirection)) { }
-            else if (SRanipal_Eye.GetGazeRay(GazeIndex.LEFT, out unused, out tempDirection)) { }
-            else if (SRanipal_Eye.GetGazeRay(GazeIndex.RIGHT, out unused, out tempDirection)) { }*/
-            Vector3 reverseGaze = new Vector3(-1f, 1f, 1f);
-           // GazeDirectionCombinedLocal = _latestEyeData.verbose_data.combined.eye_data.gaze_direction_normalized;
-           SRanipal_Eye.GetGazeRay(GazeIndex.COMBINE, out unused, out GazeDirectionCombinedLocal);
+            if (CombinedEyeReverse != new Vector3(1.0f, -1.0f, -1.0f))
+            {
+                SRanipalData["EyesX"] = CombinedEyeReverse.x;
+                SRanipalData["EyesY"] = CombinedEyeReverse.y;
+                
+                SRanipalData["LeftEyeX"] = LeftEyeReverse.x;
+                SRanipalData["LeftEyeY"] = LeftEyeReverse.y;
+                
+                SRanipalData["RightEyeX"] = RightEyeReverse.x;
+                SRanipalData["RightEyeY"] = RightEyeReverse.y;
+            }
 
-            LeftOpenness = _latestEyeData.verbose_data.left.eye_openness;
-            RightOpenness = _latestEyeData.verbose_data.right.eye_openness;
+            SRanipalData["LeftEyeLid"] = _latestEyeData.verbose_data.left.eye_openness;
+            SRanipalData["RightEyeLid"] = _latestEyeData.verbose_data.right.eye_openness;
 
             if (_latestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
-                Diameter = _latestEyeData.verbose_data.right.pupil_diameter_mm;
+                CurrentDiameter = _latestEyeData.verbose_data.right.pupil_diameter_mm;
                 if (_latestEyeData.verbose_data.right.eye_openness >= 1f)
-                    UpdateMinMaxDilation(Diameter);
+                    UpdateMinMaxDilation(_latestEyeData.verbose_data.right.pupil_diameter_mm);
             } else if (_latestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
                 .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
-                Diameter = _latestEyeData.verbose_data.left.pupil_diameter_mm;
+                CurrentDiameter = _latestEyeData.verbose_data.left.pupil_diameter_mm;
                 if (_latestEyeData.verbose_data.left.eye_openness >= 1f)
-                    UpdateMinMaxDilation(Diameter);
+                    UpdateMinMaxDilation(_latestEyeData.verbose_data.left.pupil_diameter_mm);
             }
+            
+            float normalizedFloat = (CurrentDiameter / MinOpen) / (MaxOpen - MinOpen);
+            SRanipalData["EyesDilation"] = Mathf.Clamp(normalizedFloat, 0, 1);
 
-            CombinedWiden = _latestEyeData.expression_data.left.eye_wide > _latestEyeData.expression_data.right.eye_wide
+            SRanipalData["EyesWiden"] = _latestEyeData.expression_data.left.eye_wide > _latestEyeData.expression_data.right.eye_wide
                 ? _latestEyeData.expression_data.left.eye_wide
                 : _latestEyeData.expression_data.right.eye_wide;
+
+            SRanipalData["LeftEyeWiden"] = _latestEyeData.expression_data.left.eye_wide;
+            SRanipalData["RightEyeWiden"] = _latestEyeData.expression_data.right.eye_wide;
 
             yield return new WaitForSeconds(0.005f);
         }
