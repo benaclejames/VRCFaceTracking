@@ -3,7 +3,7 @@
 Provides real eye tracking in VRChat via the HTC Vive Pro Eye's eye tracking SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers. 
 
 # 🚫 ATTENTION
-At the time of writing this, the latest VRChat update has broken the sync of parameters between clients. This makes the eye tracking not appear in the same way on remote clients. I would currently reccomend not using this mod until I can confirm the issues have been fixed.
+At the time of writing this, the latest VRChat update has broken the sync of parameters between clients. This makes the eye tracking not appear in the same way on remote clients. This means other players may not be able to see your eyes move in the same way as you do.
 
 ## 💾 Installation
 
