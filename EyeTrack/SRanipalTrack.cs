@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
-using ViveSR.anipal.Eye;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using MelonLoader;
 using UnityEngine;
 using ViveSR.anipal;
-using IEnumerator = System.Collections.IEnumerator;
-using IntPtr = System.IntPtr;
+using ViveSR.anipal.Eye;
 
 public class SRanipalTrack
 {
-
     private readonly SRanipal_Eye_Framework _framework = new SRanipal_Eye_Framework();
 
-    float CurrentDiameter;
+    private EyeData_v2 _latestEyeData;
+
+    private float CurrentDiameter;
 
     public float MaxOpen;
     public float MinOpen = 999;
-    
+
     public Dictionary<string, float> SRanipalData = new Dictionary<string, float>
     {
         {"EyesX", 0},
@@ -29,10 +30,8 @@ public class SRanipalTrack
         {"RightEyeX", 0},
         {"RightEyeY", 0},
         {"RightEyeWiden", 0},
-        {"LeftEyeWiden", 0},
+        {"LeftEyeWiden", 0}
     };
-    
-    private EyeData_v2 _latestEyeData;
 
     public void Start()
     {
@@ -59,22 +58,22 @@ public class SRanipalTrack
                 yield return new WaitForSeconds(0.05f);
 
             SRanipal_Eye_API.GetEyeData_v2(ref _latestEyeData);
-            Vector3 CombinedEyeReverse = Vector3.Scale(
+            var CombinedEyeReverse = Vector3.Scale(
                 _latestEyeData.verbose_data.combined.eye_data.gaze_direction_normalized,
                 new Vector3(-1, 1, 1));
-            Vector3 LeftEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.left.gaze_direction_normalized,
+            var LeftEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.left.gaze_direction_normalized,
                 new Vector3(-1, 1, 1));
-            Vector3 RightEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.right.gaze_direction_normalized,
+            var RightEyeReverse = Vector3.Scale(_latestEyeData.verbose_data.right.gaze_direction_normalized,
                 new Vector3(-1, 1, 1));
 
             if (CombinedEyeReverse != new Vector3(1.0f, -1.0f, -1.0f))
             {
                 SRanipalData["EyesX"] = CombinedEyeReverse.x;
                 SRanipalData["EyesY"] = CombinedEyeReverse.y;
-                
+
                 SRanipalData["LeftEyeX"] = LeftEyeReverse.x;
                 SRanipalData["LeftEyeY"] = LeftEyeReverse.y;
-                
+
                 SRanipalData["RightEyeX"] = RightEyeReverse.x;
                 SRanipalData["RightEyeY"] = RightEyeReverse.y;
             }
@@ -82,23 +81,26 @@ public class SRanipalTrack
             SRanipalData["LeftEyeLid"] = _latestEyeData.verbose_data.left.eye_openness;
             SRanipalData["RightEyeLid"] = _latestEyeData.verbose_data.right.eye_openness;
 
-            if (_latestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
+            if (_latestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity
+                .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
                 CurrentDiameter = _latestEyeData.verbose_data.right.pupil_diameter_mm;
                 if (_latestEyeData.verbose_data.right.eye_openness >= 1f)
                     UpdateMinMaxDilation(_latestEyeData.verbose_data.right.pupil_diameter_mm);
-            } else if (_latestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
+            }
+            else if (_latestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
                 .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
                 CurrentDiameter = _latestEyeData.verbose_data.left.pupil_diameter_mm;
                 if (_latestEyeData.verbose_data.left.eye_openness >= 1f)
                     UpdateMinMaxDilation(_latestEyeData.verbose_data.left.pupil_diameter_mm);
             }
-            
-            float normalizedFloat = (CurrentDiameter / MinOpen) / (MaxOpen - MinOpen);
+
+            var normalizedFloat = CurrentDiameter / MinOpen / (MaxOpen - MinOpen);
             SRanipalData["EyesDilation"] = Mathf.Clamp(normalizedFloat, 0, 1);
 
-            SRanipalData["EyesWiden"] = _latestEyeData.expression_data.left.eye_wide > _latestEyeData.expression_data.right.eye_wide
+            SRanipalData["EyesWiden"] = _latestEyeData.expression_data.left.eye_wide >
+                                        _latestEyeData.expression_data.right.eye_wide
                 ? _latestEyeData.expression_data.left.eye_wide
                 : _latestEyeData.expression_data.right.eye_wide;
 
@@ -111,7 +113,6 @@ public class SRanipalTrack
 
     private void UpdateMinMaxDilation(float readDilation)
     {
-
         if (readDilation > MaxOpen)
             MaxOpen = readDilation;
         if (readDilation < MinOpen)
