@@ -23,12 +23,15 @@ For this mod to work, you'll need to be using an avatar with the correct paramet
 |`RightEyeLid`|Eyelid Open|Right|
 |`EyesWiden`|Eye Widen|Combined|
 |`EyesDilation`|Pupil Dilation|Combined|
+|`EyesSqueeze`|Eyelid Squeeze|Combined|
 |`LeftEyeX`|Gaze Direction X|Left|
 |`LeftEyeY`|Gaze Direction Y|Left|
 |`RightEyeX`|Gaze Direction X|Right|
 |`RightEyeY`|Gaze Direction Y|Right|
 |`LeftEyeWiden`|Eye Widen|Left|
 |`RightEyeWiden`|Eye Widen|Right|
+|`LeftEyeSqueeze`|Eyelid Squeeze|Left|
+|`RightEyeSqueeze`|Eyelid Squeeze|Right|
 
 It's not required to use all of these parameters. Similar to the setup of parameters with Unity Animation Controllers, these are all case-sensitive and must be copied **EXACTLY** as shown into your Avatar's base parameters. A typical setup might look something like this:<br>
 ![](https://i.imgur.com/KZRweT7.png)

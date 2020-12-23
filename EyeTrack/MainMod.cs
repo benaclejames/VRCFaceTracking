@@ -4,7 +4,7 @@ using EyeTrack;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.1.1", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.0", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -14,8 +14,6 @@ namespace EyeTrack
     {
         // Param Names
         public static List<AV3Parameter> eyeTrackParams = EmptyList();
-
-        private readonly SRanipalTrack _tracker = new SRanipalTrack();
 
         public static List<AV3Parameter> EmptyList()
         {
@@ -32,13 +30,15 @@ namespace EyeTrack
                 new AV3Parameter {ParamName = "RightEyeX", Prioritize = true},
                 new AV3Parameter {ParamName = "RightEyeY", Prioritize = true},
                 new AV3Parameter {ParamName = "LeftEyeWiden"},
-                new AV3Parameter {ParamName = "RightEyeWiden"}
+                new AV3Parameter {ParamName = "RightEyeWiden"},
+                new AV3Parameter {ParamName = "LeftEyeSqueeze"},
+                new AV3Parameter {ParamName = "RightEyeSqueeze"}
             };
         }
 
         public override void VRChat_OnUiManagerInit()
         {
-            _tracker.Start();
+            SRanipalTrack.Start();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdatePriority());
             MelonCoroutines.Start(UpdateParams());
@@ -47,13 +47,13 @@ namespace EyeTrack
 
         public override void OnApplicationQuit()
         {
-            _tracker.Stop();
+            SRanipalTrack.Stop();
         }
 
         public override void OnLevelWasInitialized(int level)
         {
-            _tracker.MinOpen = 999;
-            _tracker.MaxOpen = 0;
+            SRanipalTrack.MinOpen = 999;
+            SRanipalTrack.MaxOpen = 0;
         }
 
         private static void SetPriority(AvatarPlayableController controller, bool priority,
@@ -73,39 +73,40 @@ namespace EyeTrack
             for (;;)
             {
                 yield return new WaitForSeconds(5);
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0
-                    ?.field_Private_AvatarAnimParamController_0?.field_Private_AvatarPlayableController_0 == null)
-                    continue;
+                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0
+                        ?.field_Private_AvatarAnimParamController_0?.field_Private_AvatarPlayableController_0 == null)
+                        continue;
 
-                var controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                    .field_Private_VRC_AnimationController_0
-                    .field_Private_AvatarAnimParamController_0
-                    .field_Private_AvatarPlayableController_0;
+                    var controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
+                        .field_Private_VRC_AnimationController_0
+                        .field_Private_AvatarAnimParamController_0
+                        .field_Private_AvatarPlayableController_0;
 
-                foreach (var param in eyeTrackParams)
-                    if (param.Prioritize)
-                        SetPriority(controller, true, param.ParamEnum);
+                    foreach (var param in eyeTrackParams.ToArray())
+                        if (param.Prioritize)
+                            SetPriority(controller, true, param.ParamEnum);
             }
         }
 
-        private IEnumerator UpdateParams()
+        private static IEnumerator UpdateParams()
         {
             for (;;)
             {
                 AvatarAnimParamController controller = null;
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0
-                    ?.field_Private_AvatarAnimParamController_0 != null)
-                    controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0;
-                else
-                    yield return new WaitForSeconds(2);
-                if (controller == null)
-                    yield return new WaitForSeconds(2);
+                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0
+                        ?.field_Private_AvatarAnimParamController_0 != null)
+                        controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
+                            .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0;
+                    if (controller == null)
+                    {
+                        yield return new WaitForSeconds(0.3f);
+                        continue;
+                    }
 
-                foreach (var param in eyeTrackParams)
-                    ParameterHelper.SetParameter(controller, param, _tracker.SRanipalData[param.ParamName]);
+                    foreach (var param in eyeTrackParams.ToArray())
+                        ParameterHelper.SetParameter(controller, param, SRanipalTrack.SRanipalData[param.ParamName]);
 
-                yield return new WaitForFixedUpdate();
+                yield return new WaitForSeconds(0.01f);
             }
         }
 
@@ -119,7 +120,7 @@ namespace EyeTrack
 
         public static void ScanForParamEnums()
         {
-            for (var i = 0; i < eyeTrackParams.Count; i++)
+            for (var i = 0; i < eyeTrackParams.ToArray().Length; i++)
             {
                 var param = eyeTrackParams[i];
                 param.ParamEnum = GetParam(param.ParamName);
