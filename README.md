@@ -4,9 +4,8 @@ Provides real eye tracking in VRChat via the HTC Vive Pro Eye's eye tracking SDK
 
 ## 💾 Installation
 
-Installation of the mod may be slightly different to most MelonLoader mods due to SRanipal's requirement for additional dependency DLLs.
-**The DLLs included in the "Extras" folder of the zip need to be in the same folder as VRChat.exe**<br>
-As standard, the main "EyeTrack.dll" file will need to be put in your Mods folder
+Make Shure Melon Loader is installed and working.
+Drag and drop the Mods Folder and the dll files into the VRCHAT directory.
 
 ## 🛠 Avatar Setup
 
