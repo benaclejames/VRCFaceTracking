@@ -4,6 +4,9 @@ using EyeTrack;
 using MelonLoader;
 using UnityEngine;
 
+[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.1.1", "Benaclejames",
+    "https://github.com/benaclejames/VRCEyeTracking")]
+[assembly: MelonGame("VRChat", "VRChat")]
 
 namespace EyeTrack
 {
