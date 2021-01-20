@@ -46,17 +46,8 @@ namespace EyeTrack
             //paramSingle.field_Private_Boolean_0;
 
 
-            GetParam(controller, param.ParamIndex).prop_Single_0 = value;
-        }
-
-        public static ObjectPublicAnStInObLi1BoInSiBoUnique GetParam(AvatarAnimParamController controller, int index)
-        {
-            if (controller == null || controller.field_Private_AvatarPlayableController_0 == null || index == -1)
-              return null;
-            
-            return controller.field_Private_AvatarPlayableController_0
-                .field_Private_ArrayOf_ObjectNPublicInObInPaInUnique_0[index]
-                .field_Public_ObjectPublicAnStInObLi1BoInSiBoUnique_0;
+            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_0(param.ParamIndex,
+                value);
         }
     }
 }
