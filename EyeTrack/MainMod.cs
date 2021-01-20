@@ -64,8 +64,8 @@ namespace EyeTrack
             if (paramIndex == -1)
                 return;
 
-            var param = ParameterHelper.GetParam(VRCPlayer.field_Internal_Static_VRCPlayer_0
-                .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0, paramIndex);
+            //var param = ParameterHelper.GetParam(VRCPlayer.field_Internal_Static_VRCPlayer_0
+                //.field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0, paramIndex);
 
             /*param.prop_Boolean_0 = true;
             param.field_Private_Boolean_0 = true;
