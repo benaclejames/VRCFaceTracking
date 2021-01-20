@@ -34,10 +34,29 @@ namespace EyeTrack
             MainMod.AV3Parameter param, float value)
         {
             if (controller == null || controller.field_Private_AvatarPlayableController_0 == null ||
-                param.ParamEnum == AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique.None)
+                param.ParamIndex == -1)
                 return;
-            controller.field_Private_AvatarPlayableController_0
-                .Method_Public_Void_EnumNPublicSealedvaStNoSt18StStStStStUnique_Single_0(param.ParamEnum, value);
+
+            /*var paramsList = controller.field_Private_AvatarPlayableController_0
+                .field_Private_ArrayOf_ObjectNPublicInObInPaInUnique_0;
+
+            var paramSingle = paramsList[0].field_Public_ObjectPublicAnStInObLi1BoInSiBoUnique_0;
+            var paramName = paramSingle.prop_String_0;
+            var paramCurrentValue = paramSingle.field_Private_Single_0;*/
+            //paramSingle.field_Private_Boolean_0;
+
+
+            GetParam(controller, param.ParamIndex).prop_Single_0 = value;
+        }
+
+        public static ObjectPublicAnStInObLi1BoInSiBoUnique GetParam(AvatarAnimParamController controller, int index)
+        {
+            if (controller == null || controller.field_Private_AvatarPlayableController_0 == null || index == -1)
+              return null;
+            
+            return controller.field_Private_AvatarPlayableController_0
+                .field_Private_ArrayOf_ObjectNPublicInObInPaInUnique_0[index]
+                .field_Public_ObjectPublicAnStInObLi1BoInSiBoUnique_0;
         }
     }
 }

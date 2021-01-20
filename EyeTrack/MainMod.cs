@@ -56,16 +56,20 @@ namespace EyeTrack
             SRanipalTrack.MaxOpen = 0;
         }
 
+        //EnumNPublicSealedvaUnBoInFl5vUnique
+        
         private static void SetPriority(AvatarPlayableController controller, bool priority,
-            AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique paramEnum)
+            int paramIndex)
         {
-            if (paramEnum == AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique.None)
+            if (paramIndex == -1)
                 return;
 
-            controller.Method_Public_Void_Int32_Boolean_0((int) paramEnum, priority);
-            controller.Method_Public_Boolean_Int32_Boolean_PDM_0((int) paramEnum, priority);
-            controller.Method_Public_Void_Int32_Boolean_1((int) paramEnum, priority);
-            controller.Method_Public_Void_Int32_Boolean_2((int) paramEnum, priority);
+            var param = ParameterHelper.GetParam(VRCPlayer.field_Internal_Static_VRCPlayer_0
+                .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0, paramIndex);
+
+            /*param.prop_Boolean_0 = true;
+            param.field_Private_Boolean_0 = true;
+            param.field_Public_Boolean_0 = true;*/
         }
 
         private static IEnumerator UpdatePriority()
@@ -84,7 +88,7 @@ namespace EyeTrack
 
                     foreach (var param in eyeTrackParams.ToArray())
                         if (param.Prioritize)
-                            SetPriority(controller, true, param.ParamEnum);
+                            SetPriority(controller, true, param.ParamIndex);
             }
         }
 
@@ -110,20 +114,12 @@ namespace EyeTrack
             }
         }
 
-        private static AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique GetParam(string name)
-        {
-            var paramIndex = ParameterHelper.GetParamIndex(name);
-            return paramIndex != -1
-                ? (AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique) paramIndex
-                : AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique.None;
-        }
-
         public static void ScanForParamEnums()
         {
             for (var i = 0; i < eyeTrackParams.ToArray().Length; i++)
             {
                 var param = eyeTrackParams[i];
-                param.ParamEnum = GetParam(param.ParamName);
+                param.ParamIndex = ParameterHelper.GetParamIndex(param.ParamName);
                 eyeTrackParams[i] = param;
             }
         }
@@ -131,7 +127,7 @@ namespace EyeTrack
         public struct AV3Parameter
         {
             public string ParamName;
-            public AvatarPlayableController.EnumNPublicSealedvaStNoSt18StStStStStUnique ParamEnum;
+            public int ParamIndex;
             public bool Prioritize;
         }
     }
