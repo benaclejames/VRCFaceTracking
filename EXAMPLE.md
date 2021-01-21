@@ -40,6 +40,8 @@ This guide will setup blinking on both eyes by controlling it with just the left
 
 5. You can keep the threshold values at `0` and `1., or you can experiment to find out what works best for your eyes. These values control at what point the animations begin to blend into one another, and you'll likely want some deadzone so your eyes aren't fluttering. I set it mine to `0.4` and `0.9`.
 
+> **TIP** You can view the current values returned by the eye-tracking API by opening the Debug menu in VRChat and viewing the parameters live.
+
 ## Eye Movement
 
 1. Create animation files for each eye or for both eyes. I created:
@@ -85,3 +87,16 @@ I also recommend playing with these values as mentioned above with blinking. I u
 |anim_left_eye_default|0|0|
 
 Repeat the same thing for the right eye, or haver the `anim` clips control both eyes at the same time.
+
+## Other Eye Controls
+
+Pupil dilation, eyes widening, etc., are all setup similar to the above: they either use a "1D" Blend Tree or a "2D Freeform Directional" Blend Tree. In each case you'll need to first create animation clips that manipulate bones or blendshapes to produce the desired effect, then map them to parmeters in an animation layer in your FX object using a Blend Tree state.
+
+I found good pupil dilation values to be:
+
+|Motion|Threshold
+|---|---|
+|anim_eyes_pupil_constrict|0.38
+|anim_eyes_pupil_dilate|0.58
+
+But you may want to use VRChat's Debug window to view your own values.
