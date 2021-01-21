@@ -30,7 +30,7 @@ Set the layers' weight to `1`
 
 This guide will setup blinking on both eyes by controlling it with just the left one. You can instead repeat the below commands for just left/right eyes to do independent blinking, or use it as the basis of dynamically linking/unlinking the eyes using a gesture or control.
 
-1. Create two new animations: `anim_blink` and `anim_unblink`. These animations should control the blendshape(s) to fully blink/unblink your avatar's eyes
+1. Create two new animations: `anim_blink` and `anim_unblink`. These animations should control the blendshape(s) or the bones to fully blink/unblink your avatar's eyes
 
 2. Create a new Blend Tree as the default state in the blinking layer. It should be the only state and Entry should automatically transition to it 
 
