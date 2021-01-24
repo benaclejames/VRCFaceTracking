@@ -45,9 +45,25 @@ namespace EyeTrack
             var paramCurrentValue = paramSingle.field_Private_Single_0;*/
             //paramSingle.field_Private_Boolean_0;
 
+			var param = GetParam(controller, param.ParamIndex);
+			controller.field_Private_AvatarPlayableController_0.Method_Public_Void_Int32_Single_Boolean_0(param.prop_Int32_0, value);
+            MelonLoader.MelonCoroutines.Start(UpdateParameters(controller));
+        }
+		
+		public static ObjectPublicAnStInObLi1BoInSiBoUnique GetParam(AvatarAnimParamController controller, int index)
+        {
+            if (controller == null || controller.field_Private_AvatarPlayableController_0 == null || index == -1)
+                return null;
 
-            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_0(param.ParamIndex,
-                value);
+            return controller.field_Private_AvatarPlayableController_0
+                .field_Private_ArrayOf_ObjectNPublicInObInPaInUnique_0[index]
+                .field_Public_ObjectPublicAnStInObLi1BoInSiBoUnique_0;
+        }
+		
+		public static IEnumerator UpdateParameters(AvatarAnimParamController controller)
+        {
+            yield return new WaitForEndOfFrame(); // Needs a frame to update internally
+            controller.field_Private_AvatarPlayableController_0.field_Private_Boolean_3 = true; // marks the parameters to be resynced over the network
         }
     }
 }
