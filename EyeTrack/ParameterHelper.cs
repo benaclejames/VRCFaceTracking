@@ -37,17 +37,16 @@ namespace EyeTrack
                 param.ParamIndex == -1)
                 return;
 
-            /*var paramsList = controller.field_Private_AvatarPlayableController_0
-                .field_Private_ArrayOf_ObjectNPublicInObInPaInUnique_0;
-
-            var paramSingle = paramsList[0].field_Public_ObjectPublicAnStInObLi1BoInSiBoUnique_0;
-            var paramName = paramSingle.prop_String_0;
-            var paramCurrentValue = paramSingle.field_Private_Single_0;*/
-            //paramSingle.field_Private_Boolean_0;
-
-
             controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_0(param.ParamIndex,
                 value);
+        }
+
+        public static void PrioritizeParameter(AvatarPlayableController controller, int paramIndex)
+        {
+            if (controller == null || paramIndex == -1)
+                return;
+            
+            controller.Method_Public_Void_Int32_0(paramIndex);
         }
     }
 }

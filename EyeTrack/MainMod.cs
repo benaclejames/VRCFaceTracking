@@ -4,7 +4,7 @@ using EyeTrack;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.1", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.2", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -56,22 +56,6 @@ namespace EyeTrack
             SRanipalTrack.MaxOpen = 0;
         }
 
-        //EnumNPublicSealedvaUnBoInFl5vUnique
-        
-        private static void SetPriority(AvatarPlayableController controller, bool priority,
-            int paramIndex)
-        {
-            if (paramIndex == -1)
-                return;
-
-            //var param = ParameterHelper.GetParam(VRCPlayer.field_Internal_Static_VRCPlayer_0
-                //.field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0, paramIndex);
-
-            /*param.prop_Boolean_0 = true;
-            param.field_Private_Boolean_0 = true;
-            param.field_Public_Boolean_0 = true;*/
-        }
-
         private static IEnumerator UpdatePriority()
         {
             for (;;)
@@ -88,7 +72,7 @@ namespace EyeTrack
 
                     foreach (var param in eyeTrackParams.ToArray())
                         if (param.Prioritize)
-                            SetPriority(controller, true, param.ParamIndex);
+                            ParameterHelper.PrioritizeParameter(controller, param.ParamIndex);
             }
         }
 
