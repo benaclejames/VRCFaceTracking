@@ -35,6 +35,8 @@ It's not required to use all of these parameters. Similar to the setup of parame
 
 **Please make sure you disable the built in simulated eye tracking in your avatar descriptor**. This will almost certainly mess with things if left on. Personally, I've also had some issues with blink blendshapes being overrided by my gesture layer so if you can see your eyes fine but others see them half closed, I would reccomend removing your Additive layer so the default is not applied. It should say "None (Runtime Animator Controller)" if it's removed correctly.
 
+> Should you need more guidance on setting up your avatar, feel free to consult [the wiki](https://github.com/benaclejames/VRCEyeTracking/wiki/Avatar-Setup)!
+
 ## 📜 Disclaimer
 
 As with all VRChat mods, modifying the game client can result in account termination, be it temporary or permanent. While this mod doesn't ruin the experience for others, using it may still be a bannable offence.<br>
