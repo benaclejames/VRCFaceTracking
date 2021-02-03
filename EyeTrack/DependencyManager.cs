@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
 
-namespace EyeTrack
+namespace VRCEyeTracking
 {
     public static class DependencyManager
     {

@@ -5,7 +5,7 @@ using MelonLoader;
 using VRC.Core;
 using VRC.SDKBase;
 
-namespace EyeTrack
+namespace VRCEyeTracking
 {
     public class Hooking
     {

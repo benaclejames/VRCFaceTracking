@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using EyeTrack;
+using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.3", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.3", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
-namespace EyeTrack
+namespace VRCEyeTracking
 {
     public class MainMod : MelonMod
     {

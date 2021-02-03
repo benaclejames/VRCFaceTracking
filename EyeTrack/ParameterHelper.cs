@@ -1,6 +1,6 @@
 ﻿using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace EyeTrack
+namespace VRCEyeTracking
 {
     public static class ParameterHelper
     {
