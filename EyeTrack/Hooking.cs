@@ -38,7 +38,7 @@ namespace EyeTrack
             }
             catch (Exception ex)
             {
-                MelonLogger.Log("Patch Failed " + ex);
+                MelonLogger.Msg("Patch Failed " + ex);
             }
         }
 
@@ -57,7 +57,7 @@ namespace EyeTrack
             }
             catch (Exception e)
             {
-                MelonLogger.LogError("Error on Avatar Switch: " + e);
+                MelonLogger.Error("Error on Avatar Switch: " + e);
             }
 
             avatarSwitch(@this, test1, string1, float1, ptr1);
@@ -78,7 +78,7 @@ namespace EyeTrack
             }
             catch (Exception e)
             {
-                MelonLogger.LogError(e.ToString());
+                MelonLogger.Error(e.ToString());
             }
         }
 

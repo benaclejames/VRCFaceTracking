@@ -128,7 +128,7 @@ public class SRanipalTrack
             catch (Exception e)
             {
                 if (!(e.InnerException is ThreadAbortException))
-                    MelonLogger.LogError("Threading error occured in SRanipalTrack.Update: "+e.Message);
+                    MelonLogger.Error("Threading error occured in SRanipalTrack.Update: "+e.Message);
             }
 
             Thread.Sleep(5);

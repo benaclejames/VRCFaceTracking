@@ -4,7 +4,7 @@ using EyeTrack;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.2", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "EyeTrack", "1.2.3", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -42,7 +42,7 @@ namespace EyeTrack
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdatePriority());
             MelonCoroutines.Start(UpdateParams());
-            MelonLogger.Log("SRanipal SDK Started. Eye Tracking Active");
+            MelonLogger.Msg("SRanipal SDK Started. Eye Tracking Active");
         }
 
         public override void OnApplicationQuit()

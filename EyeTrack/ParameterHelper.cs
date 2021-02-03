@@ -37,7 +37,7 @@ namespace EyeTrack
                 param.ParamIndex == -1)
                 return;
 
-            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_0(param.ParamIndex,
+            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_3(param.ParamIndex,
                 value);
         }
 
@@ -46,7 +46,7 @@ namespace EyeTrack
             if (controller == null || paramIndex == -1)
                 return;
             
-            controller.Method_Public_Void_Int32_0(paramIndex);
+            controller.Method_Public_Void_Int32_2(paramIndex);
         }
     }
 }
