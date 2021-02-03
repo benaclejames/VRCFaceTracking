@@ -1,5 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using EyeTrack;
 using MelonLoader;
 using UnityEngine;
@@ -12,7 +16,6 @@ namespace EyeTrack
 {
     public class MainMod : MelonMod
     {
-        // Param Names
         public static List<AV3Parameter> eyeTrackParams = EmptyList();
 
         public static List<AV3Parameter> EmptyList()
@@ -35,6 +38,8 @@ namespace EyeTrack
                 new AV3Parameter {ParamName = "RightEyeSqueeze"}
             };
         }
+
+        public override void OnApplicationStart() => DependencyManager.Init();
 
         public override void VRChat_OnUiManagerInit()
         {
