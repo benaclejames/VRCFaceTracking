@@ -11,18 +11,18 @@ namespace VRCEyeTracking
     public static class DependencyManager
     {
         // Because SRanipal.dll needs to be loaded last.. Too lazy to automate moving it to back of load queue
-        private static List<string> requiredToLoad = new List<string>
+        private static readonly List<string> RequiredToLoad = new List<string>
         {
-            "EyeTrack.SRanipal.libHTC_License.dll",
-            "EyeTrack.SRanipal.nanomsg.dll",
-            "EyeTrack.SRanipal.SRWorks_Log.dll",
-            "EyeTrack.SRanipal.ViveSR_Client.dll",
-            "EyeTrack.SRanipal.SRanipal.dll"
+            "VRCEyeTracking.SRanipal.libHTC_License.dll",
+            "VRCEyeTracking.SRanipal.nanomsg.dll",
+            "VRCEyeTracking.SRanipal.SRWorks_Log.dll",
+            "VRCEyeTracking.SRanipal.ViveSR_Client.dll",
+            "VRCEyeTracking.SRanipal.SRanipal.dll"
         };
         
         public static void Init()
         {
-            var dllPaths = ExtractDLLs(requiredToLoad.ToArray());
+            var dllPaths = ExtractDLLs(RequiredToLoad.ToArray());
             foreach (var path in dllPaths)
                 LoadDLL(path);
         }
@@ -49,6 +49,7 @@ namespace VRCEyeTracking
                             var buf = new byte[sz];
                             while (true)
                             {
+                                if (stm == null) continue;
                                 var nRead = stm.Read(buf, 0, sz);
                                 if (nRead < 1)
                                     break;

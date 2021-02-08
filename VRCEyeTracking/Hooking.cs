@@ -7,10 +7,10 @@ using VRC.SDKBase;
 
 namespace VRCEyeTracking
 {
-    public class Hooking
+    public static class Hooking
     {
-        private static AvatarInstantiatedDelegate onAvatarInstantiatedDelegate;
-        private static OnAvatarSwitchDelegate avatarSwitch;
+        private static AvatarInstantiatedDelegate _onAvatarInstantiatedDelegate;
+        private static OnAvatarSwitchDelegate _avatarSwitch;
 
 
         public static unsafe void SetupHooking()
@@ -24,7 +24,7 @@ namespace VRCEyeTracking
                 Imports.Hook(intPtr,
                     new Action<IntPtr, IntPtr, IntPtr, bool>(OnAvatarInstantiated).Method.MethodHandle
                         .GetFunctionPointer());
-                onAvatarInstantiatedDelegate =
+                _onAvatarInstantiatedDelegate =
                     Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
 
                 intPtr = (IntPtr) typeof(VRCAvatarManager)
@@ -34,7 +34,7 @@ namespace VRCEyeTracking
                 Imports.Hook(intPtr,
                     new Action<IntPtr, IntPtr, string, float, IntPtr>(OnAvatarSwitch).Method.MethodHandle
                         .GetFunctionPointer());
-                avatarSwitch = Marshal.GetDelegateForFunctionPointer<OnAvatarSwitchDelegate>(*(IntPtr*) (void*) intPtr);
+                _avatarSwitch = Marshal.GetDelegateForFunctionPointer<OnAvatarSwitchDelegate>(*(IntPtr*) (void*) intPtr);
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace VRCEyeTracking
                     if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer != IntPtr.Zero &&
                         avatar.Pointer != IntPtr.Zero && avatar.Pointer ==
                         VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer)
-                        MainMod.eyeTrackParams = MainMod.EmptyList();
+                        MainMod.EyeTrackParams = MainMod.EmptyList();
                 }
             }
             catch (Exception e)
@@ -60,13 +60,13 @@ namespace VRCEyeTracking
                 MelonLogger.Error("Error on Avatar Switch: " + e);
             }
 
-            avatarSwitch(@this, test1, string1, float1, ptr1);
+            _avatarSwitch(@this, test1, string1, float1, ptr1);
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded)
         {
-            onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, true);
+            _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, true);
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
@@ -74,7 +74,8 @@ namespace VRCEyeTracking
                         ?.prop_VRCAvatarDescriptor_0 !=
                     null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
                         .prop_VRCAvatarDescriptor_0)
-                    MainMod.ScanForParamEnums();
+
+                    MainMod.EyeTrackParams = MainMod.EmptyList();
             }
             catch (Exception e)
             {
