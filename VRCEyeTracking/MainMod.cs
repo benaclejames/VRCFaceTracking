@@ -9,7 +9,7 @@ using MelonLoader;
 using UnityEngine;
 using VRCEyeTracking.ParamLib;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.3", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.4", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 

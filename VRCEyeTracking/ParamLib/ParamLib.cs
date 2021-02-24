@@ -19,7 +19,7 @@ namespace VRCEyeTracking.ParamLib
             var controller = GetLocalPlayableController();
             if (controller == null) return false;
             
-            controller.Method_Public_Void_Int32_2(paramIndex);
+            controller.Method_Public_Void_Int32_0(paramIndex);
             return true;
         }
         
@@ -54,7 +54,7 @@ namespace VRCEyeTracking.ParamLib
             var controller = GetLocalAnimParamController();
             if (controller?.field_Private_AvatarPlayableController_0 == null) return false;
 
-            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_3(paramIndex, value);
+            controller.field_Private_AvatarPlayableController_0.Method_Public_Boolean_Int32_Single_1(paramIndex, value);
             return true;
         }
     }
