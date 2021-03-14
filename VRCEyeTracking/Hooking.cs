@@ -52,7 +52,7 @@ namespace VRCEyeTracking
                     if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer != IntPtr.Zero &&
                         avatar.Pointer != IntPtr.Zero && avatar.Pointer ==
                         VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer)
-                        MainMod.EyeTrackParams = MainMod.EmptyList();
+                        MainMod.ResetParams();
                 }
             }
             catch (Exception e)
@@ -75,7 +75,7 @@ namespace VRCEyeTracking
                     null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
                         .prop_VRCAvatarDescriptor_0)
 
-                    MainMod.EyeTrackParams = MainMod.EmptyList();
+                    MainMod.ResetParams();
             }
             catch (Exception e)
             {

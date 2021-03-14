@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
-using VRCEyeTracking.ParamLib;
+using VRCEyeTracking.SRParam;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.4", "Benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
@@ -13,30 +13,9 @@ namespace VRCEyeTracking
 {
     public class MainMod : MelonMod
     {
-        public static List<FloatParam> EyeTrackParams = new List<FloatParam>();
+        public static void ResetParams() => EyeTrackParams.ForEach(param => param.ResetParam());
 
-        public static List<FloatParam> EmptyList()
-        {
-            return new List<FloatParam>
-            {
-                new FloatParam("EyesX", true),
-                new FloatParam("EyesY", true),
-                new FloatParam("LeftEyeLid", true),
-                new FloatParam("RightEyeLid", true),
-                new FloatParam("EyesWiden"),
-                new FloatParam("EyesDilation"),
-                new FloatParam("LeftEyeX", true),
-                new FloatParam("LeftEyeY", true),
-                new FloatParam("RightEyeX", true),
-                new FloatParam("RightEyeY", true),
-                new FloatParam("LeftEyeWiden"),
-                new FloatParam("RightEyeWiden"),
-                new FloatParam("LeftEyeSqueeze"),
-                new FloatParam("RightEyeSqueeze")
-            };
-        }
-
-        /*public static List<ISRanipalParam> NewEyeTrackParams = new List<ISRanipalParam>
+        private static readonly List<ISRanipalParam> EyeTrackParams = new List<ISRanipalParam>
         {
             new SRanipalXYEyeParameter(v2 => Vector3.Scale(
                 v2.verbose_data.combined.eye_data.gaze_direction_normalized,
@@ -49,7 +28,7 @@ namespace VRCEyeTracking
             
             new SRanipalGeneralEyeParameter(v2 =>
             {
-                var normalizedFloat = SRanipalTrack._currentDiameter / SRanipalTrack.MinOpen / (SRanipalTrack.MaxOpen - SRanipalTrack.MinOpen);
+                var normalizedFloat = SRanipalTrack.CurrentDiameter / SRanipalTrack.MinOpen / (SRanipalTrack.MaxOpen - SRanipalTrack.MinOpen);
                 return Mathf.Clamp(normalizedFloat, 0, 1);
             }, "EyesDilation"),
             
@@ -69,7 +48,7 @@ namespace VRCEyeTracking
             
             new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "LeftEyeSqueeze"),
             new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "RightEyeSqueeze"),
-        };*/
+        };
 
         public override void OnApplicationStart() => DependencyManager.Init();
 
@@ -77,7 +56,6 @@ namespace VRCEyeTracking
         {
             SRanipalTrack.Start();
             Hooking.SetupHooking();
-            MelonCoroutines.Start(UpdatePriority());
             MelonCoroutines.Start(UpdateParams());
             MelonLogger.Msg("SRanipal SDK Started. Eye Tracking Active");
         }
@@ -87,42 +65,18 @@ namespace VRCEyeTracking
             SRanipalTrack.Stop();
         }
 
-        public override void OnLevelWasInitialized(int level)
+        public override void OnSceneWasLoaded(int level, string levelName)
         {
             SRanipalTrack.MinOpen = 999;
             SRanipalTrack.MaxOpen = 0;
-        }
-
-        private static IEnumerator UpdatePriority()
-        {
-            for (;;)
-            {
-                yield return new WaitForSeconds(5);
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0 != null) continue;
-
-                foreach (var param in EyeTrackParams.ToArray())
-                    if (param.Prioritised)
-                        param.Prioritised = true;
-            }
         }
 
         private static IEnumerator UpdateParams()
         {
             for (;;)
             {
-                AvatarAnimParamController controller = null;
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRC_AnimationController_0
-                    ?.field_Private_AvatarAnimParamController_0 != null)
-                    controller = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0;
-                if (controller == null)
-                {
-                    yield return new WaitForSeconds(0.3f);
-                    continue;
-                }
-
                 foreach (var param in EyeTrackParams.ToArray())
-                    param.ParamValue = SRanipalTrack.SRanipalData[param.ParamName];
+                    param.RefreshParam(SRanipalTrack.LatestEyeData, null);
 
                 yield return new WaitForSeconds(0.01f);
             }
