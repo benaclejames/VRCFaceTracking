@@ -5,6 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
+using ViveSR.anipal.Lip;
 
 namespace VRCEyeTracking
 {
@@ -14,7 +15,7 @@ namespace VRCEyeTracking
 
         private static EyeData_v2 _latestEyeData;
 
-        private static float _currentDiameter;
+        public static float _currentDiameter;
 
         public static float MaxOpen;
         public static float MinOpen = 999;
@@ -48,6 +49,7 @@ namespace VRCEyeTracking
             Framework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version1;
             Framework.StartFramework();
             SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+            SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
             Updater.Start();
         }
 

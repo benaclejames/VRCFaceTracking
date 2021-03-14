@@ -1,4 +1,6 @@
-﻿namespace VRCEyeTracking.ParamLib
+﻿using UnityEngine;
+
+namespace VRCEyeTracking.ParamLib
 {
     public class ParamType
     {
@@ -7,8 +9,10 @@
             _paramIndex = ParamLib.GetParamIndex(paramName);
             ParamName = paramName;
         }
-        
-        public double ParamValue
+
+        public void ResetParam() => ParamLib.GetParamIndex(ParamName);
+
+        protected double ParamValue
         {
             get => _paramValue;
             set
@@ -50,9 +54,34 @@
                 _prioritised = value;
             }
         }
-
         private bool _prioritised;
 
         public FloatParam(string paramName, bool prioritised = false) : base(paramName) => Prioritised = prioritised;
+    }
+
+    public class XYParam
+    {
+        private FloatParam X, Y;
+
+        protected Vector2 ParamValue
+        {
+            set
+            {
+                X.ParamValue = value.x;
+                Y.ParamValue = value.y;
+            }
+        }
+
+        protected XYParam(FloatParam x, FloatParam y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        protected void ResetParams()
+        {
+            X.ResetParam();
+            Y.ResetParam();
+        }
     }
 }

@@ -21,6 +21,7 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,7 +46,7 @@
       <Compile Include="MainMod.cs" />
       <Compile Include="ParamLib\ParamLib.cs" />
       <Compile Include="ParamLib\ParamType.cs" />
-      <Compile Include="SRanipalTrack.cs" />
+      <Compile Include="SRanipalTrackingInterface.cs" />
       <Compile Include="SRanipal\Eye\SRanipal_Eye.cs" />
       <Compile Include="SRanipal\Eye\SRanipal_EyeData.cs" />
       <Compile Include="SRanipal\Eye\SRanipal_EyeDataType_v1.cs" />
@@ -53,9 +54,19 @@
       <Compile Include="SRanipal\Eye\SRanipal_Eye_API.cs" />
       <Compile Include="SRanipal\Eye\SRanipal_Eye_Framework.cs" />
       <Compile Include="SRanipal\Eye\SRanipal_Eye_v2.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_Lip.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_LipData_v1.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_LipData_v2.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_LipShapeTableDrawer.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_LipShapeTableDrawer_v2.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_Lip_API.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_Lip_Framework.cs" />
+      <Compile Include="SRanipal\Lip\SRanipal_Lip_v2.cs" />
       <Compile Include="SRanipal\SRanipal_API.cs" />
       <Compile Include="SRanipal\SRanipal_Enums.cs" />
       <Compile Include="SRanipal\SRWorks_Enums.cs" />
+      <Compile Include="SRParam\SRanipalEyeParameter.cs" />
+      <Compile Include="SRParam\SRanipalParameter.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="Assembly-CSharp, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
