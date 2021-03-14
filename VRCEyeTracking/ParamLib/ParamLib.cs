@@ -1,26 +1,26 @@
-﻿using VRC.SDK3.Avatars.ScriptableObjects;
+﻿using MelonLoader;
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace VRCEyeTracking.ParamLib
 {
     public static class ParamLib
     {
         private static AvatarPlayableController GetLocalPlayableController() => VRCPlayer.field_Internal_Static_VRCPlayer_0
-            .field_Private_VRC_AnimationController_0
-            .field_Private_AvatarAnimParamController_0
-            .field_Private_AvatarPlayableController_0;
+            ?.field_Private_VRC_AnimationController_0
+            ?.field_Private_AvatarAnimParamController_0
+            ?.field_Private_AvatarPlayableController_0;
         
         private static AvatarAnimParamController GetLocalAnimParamController() => VRCPlayer.field_Internal_Static_VRCPlayer_0
-            .field_Private_VRC_AnimationController_0.field_Private_AvatarAnimParamController_0;
+            ?.field_Private_VRC_AnimationController_0?.field_Private_AvatarAnimParamController_0;
         
-        public static bool PrioritizeParameter(int paramIndex)
+        public static void PrioritizeParameter(int paramIndex)
         {
-            if (paramIndex == -1) return false;
+            if (paramIndex == -1) return;
             
             var controller = GetLocalPlayableController();
-            if (controller == null) return false;
+            if (controller == null) return;
             
             controller.Method_Public_Void_Int32_0(paramIndex);
-            return true;
         }
         
         public static int GetParamIndex(string paramName)

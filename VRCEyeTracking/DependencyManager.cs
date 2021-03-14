@@ -27,7 +27,7 @@ namespace VRCEyeTracking
                 LoadDLL(path);
         }
 
-        private static List<string> ExtractDLLs(string[] resourceNames)
+        private static IEnumerable<string> ExtractDLLs(IEnumerable<string> resourceNames)
         {
             var extractedPaths = new List<string>();
 
@@ -76,13 +76,13 @@ namespace VRCEyeTracking
         }
         
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        static extern IntPtr LoadLibrary(string lpFileName);
+        private static extern IntPtr LoadLibrary(string lpFileName);
 
         private static void LoadDLL(string path)
         {
-            IntPtr h = LoadLibrary(path);
+            var h = LoadLibrary(path);
             if (h == IntPtr.Zero)
-                MelonLogger.Msg("Unable to load library " + path);
+                MelonLogger.Error("Unable to load library " + path);
         }
     }
 }

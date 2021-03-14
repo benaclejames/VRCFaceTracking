@@ -1,4 +1,8 @@
-﻿namespace VRCEyeTracking.ParamLib
+﻿using System.Collections;
+using MelonLoader;
+using UnityEngine;
+
+namespace VRCEyeTracking.ParamLib
 {
     public class ParamType
     {
@@ -7,8 +11,10 @@
             _paramIndex = ParamLib.GetParamIndex(paramName);
             ParamName = paramName;
         }
-        
-        public double ParamValue
+
+        public void ResetParam() => _paramIndex = ParamLib.GetParamIndex(ParamName);
+
+        protected double ParamValue
         {
             get => _paramValue;
             set
@@ -50,9 +56,50 @@
                 _prioritised = value;
             }
         }
-
         private bool _prioritised;
 
-        public FloatParam(string paramName, bool prioritised = false) : base(paramName) => Prioritised = prioritised;
+        public FloatParam(string paramName, bool prioritised = false) : base(paramName)
+        {
+            if (!prioritised) return;
+            
+            Prioritised = true;
+            MelonCoroutines.Start(KeepParamPrioritised());
+        } 
+        
+        private IEnumerator KeepParamPrioritised()
+        {
+            for (;;)
+            {
+                yield return new WaitForSeconds(5);
+                if (!Prioritised) continue;
+                ParamLib.PrioritizeParameter(_paramIndex);
+            }
+        }
+    }
+
+    public class XYParam
+    {
+        private FloatParam X, Y;
+
+        protected Vector2 ParamValue
+        {
+            set
+            {
+                X.ParamValue = value.x;
+                Y.ParamValue = value.y;
+            }
+        }
+
+        protected XYParam(FloatParam x, FloatParam y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        protected void ResetParams()
+        {
+            X.ResetParam();
+            Y.ResetParam();
+        }
     }
 }
