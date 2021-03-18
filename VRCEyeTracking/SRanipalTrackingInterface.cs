@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
-using UnityEngine;
+using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
-using ViveSR.anipal.Lip;
-using VRCEyeTracking.SRParam;
 
 namespace VRCEyeTracking
 {
     public static class SRanipalTrack
     {
-        private static readonly SRanipal_Eye_Framework Framework = new SRanipal_Eye_Framework();
+        private static SRanipal_Eye_Framework _eyeFramework;
 
         public static EyeData_v2 LatestEyeData;
 
@@ -26,20 +23,36 @@ namespace VRCEyeTracking
 
         public static void Start()
         {
-            Framework.EnableEye = true;
-            Framework.EnableEyeDataCallback = false;
-            Framework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version1;
-            Framework.StartFramework();
-            SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
-            SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            MelonLogger.Msg("Initializing SRanipal...");
+
+            var eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+            if (eyeError != Error.WORK)
+                MelonLogger.Error($"SRanipal Eye Init failed with Error: {eyeError}. Eye Tracking will be unavailable for this session.");
+            
+            //SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);   Soon™
+            
+            UpdateConfigs(eyeError != Error.WORK);
             Updater.Start();
+        }
+
+        private static void UpdateConfigs(bool eyeError = true)
+        {
+            if (!eyeError)
+            {
+                _eyeFramework = new SRanipal_Eye_Framework();
+                _eyeFramework.EnableEye = true;
+                _eyeFramework.EnableEyeDataCallback = false;
+                _eyeFramework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version2;
+                _eyeFramework.StartFramework();
+            }
         }
 
         public static void Stop()
         {
             _trackingActive = false;
             Updater.Abort();
-            Framework.StopFramework();
+            
+            _eyeFramework?.StopFramework();
         }
 
         private static void Update()
