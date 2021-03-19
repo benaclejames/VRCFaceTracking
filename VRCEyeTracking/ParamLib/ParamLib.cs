@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using VRC.SDK3.Avatars.ScriptableObjects;
+﻿using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace VRCEyeTracking.ParamLib
 {
