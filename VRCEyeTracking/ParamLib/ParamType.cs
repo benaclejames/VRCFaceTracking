@@ -24,11 +24,11 @@ namespace VRCEyeTracking.ParamLib
             }
         }
 
-        public int ParamIndex => _paramIndex;
+        public int? ParamIndex => _paramIndex;
 
         internal string ParamName;
         protected double _paramValue;
-        protected int _paramIndex;
+        protected int? _paramIndex;
     }
 
     
