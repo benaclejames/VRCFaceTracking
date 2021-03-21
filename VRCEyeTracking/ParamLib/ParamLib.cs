@@ -1,4 +1,5 @@
-﻿using VRC.SDK3.Avatars.ScriptableObjects;
+﻿using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace VRCEyeTracking.ParamLib
 {
@@ -25,7 +26,7 @@ namespace VRCEyeTracking.ParamLib
         public static int? GetParamIndex(string paramName)
         {
             VRCExpressionParameters.Parameter[] parameters = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0?.expressionParameters
+                ?.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0?.prop_VRCAvatarDescriptor_0?.expressionParameters
                 ?.parameters;
 
             if (parameters == null)

@@ -4,36 +4,36 @@ using UnityEngine;
 
 namespace VRCEyeTracking.ParamLib
 {
-    public class ParamType
+    public class BaseParam
     {
-        protected ParamType(string paramName)
+        protected BaseParam(string paramName)
         {
-            _paramIndex = ParamLib.GetParamIndex(paramName);
-            ParamName = paramName;
+            ParamIndex = ParamLib.GetParamIndex(paramName);
+            _paramName = paramName;
         }
 
-        public void ResetParam() => _paramIndex = ParamLib.GetParamIndex(ParamName);
+        public void ResetParams() => ParamIndex = ParamLib.GetParamIndex(_paramName);
 
         protected double ParamValue
         {
             get => _paramValue;
             set
             {
-                if (ParamLib.SetParameter(_paramIndex, (float) value))
+                if (ParamLib.SetParameter(ParamIndex, (float) value))
                     _paramValue = value;
             }
         }
 
-        public int? ParamIndex => _paramIndex;
-
-        internal string ParamName;
+        public int? ParamIndex;
+        
+        private readonly string _paramName;
         protected double _paramValue;
-        protected int? _paramIndex;
+        
     }
 
     
     
-    public class FloatParam : ParamType
+    public class FloatBaseParam : BaseParam
     {
         public new float ParamValue
         {
@@ -45,20 +45,20 @@ namespace VRCEyeTracking.ParamLib
             }
         }
 
-        public bool Prioritised
+        private bool Prioritised
         {
             get => _prioritised;
             set
             {
                 if (value)
-                    ParamLib.PrioritizeParameter(_paramIndex);
+                    ParamLib.PrioritizeParameter(ParamIndex);
                 
                 _prioritised = value;
             }
         }
         private bool _prioritised;
 
-        public FloatParam(string paramName, bool prioritised = false) : base(paramName)
+        public FloatBaseParam(string paramName, bool prioritised = false) : base(paramName)
         {
             if (!prioritised) return;
             
@@ -72,14 +72,14 @@ namespace VRCEyeTracking.ParamLib
             {
                 yield return new WaitForSeconds(5);
                 if (!Prioritised) continue;
-                ParamLib.PrioritizeParameter(_paramIndex);
+                ParamLib.PrioritizeParameter(ParamIndex);
             }
         }
     }
 
     public class XYParam
     {
-        private FloatParam X, Y;
+        private FloatBaseParam X, Y;
 
         protected Vector2 ParamValue
         {
@@ -90,7 +90,7 @@ namespace VRCEyeTracking.ParamLib
             }
         }
 
-        protected XYParam(FloatParam x, FloatParam y)
+        protected XYParam(FloatBaseParam x, FloatBaseParam y)
         {
             X = x;
             Y = y;
@@ -98,8 +98,14 @@ namespace VRCEyeTracking.ParamLib
 
         protected void ResetParams()
         {
-            X.ResetParam();
-            Y.ResetParam();
+            X.ResetParams();
+            Y.ResetParams();
+        }
+
+        protected void ZeroParams()
+        {
+            X.ParamIndex = null;
+            Y.ParamIndex = null;
         }
     }
 }

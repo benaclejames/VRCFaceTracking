@@ -5,7 +5,7 @@ using MelonLoader;
 using UnityEngine;
 using VRCEyeTracking.SRParam;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.5", "Benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.6", "benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -14,6 +14,7 @@ namespace VRCEyeTracking
     public class MainMod : MelonMod
     {
         public static void ResetParams() => EyeTrackParams.ForEach(param => param.ResetParam());
+        public static void ZeroParams() => EyeTrackParams.ForEach(param => param.ZeroParam());
 
         private static readonly List<ISRanipalParam> EyeTrackParams = new List<ISRanipalParam>
         {

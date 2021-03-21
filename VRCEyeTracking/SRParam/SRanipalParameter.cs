@@ -7,5 +7,6 @@ namespace VRCEyeTracking.SRParam
     {
         void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData);
         void ResetParam();
+        void ZeroParam();
     }
 }

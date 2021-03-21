@@ -17,21 +17,21 @@ namespace VRCEyeTracking
         {
             try
             {
-                var intPtr = (IntPtr) typeof(VRCAvatarManager.MulticastDelegateNPublicSealedVoGaVRBoUnique)
+                var intPtr = (IntPtr) typeof(MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique.MulticastDelegateNPublicSealedVoGaVRBoUnique)
                     .GetField(
                         "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                Imports.Hook(intPtr,
+                MelonUtils.NativeHookAttach(intPtr,
                     new Action<IntPtr, IntPtr, IntPtr, bool>(OnAvatarInstantiated).Method.MethodHandle
                         .GetFunctionPointer());
                 _onAvatarInstantiatedDelegate =
                     Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
 
-                intPtr = (IntPtr) typeof(VRCAvatarManager)
+                intPtr = (IntPtr) typeof(MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique)
                     .GetField(
                         "NativeMethodInfoPtr_Method_Public_Boolean_ApiAvatar_String_Single_MulticastDelegateNPublicSealedVoGaVRBoUnique_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                Imports.Hook(intPtr,
+                MelonUtils.NativeHookAttach(intPtr,
                     new Action<IntPtr, IntPtr, string, float, IntPtr>(OnAvatarSwitch).Method.MethodHandle
                         .GetFunctionPointer());
                 _avatarSwitch = Marshal.GetDelegateForFunctionPointer<OnAvatarSwitchDelegate>(*(IntPtr*) (void*) intPtr);
@@ -52,7 +52,7 @@ namespace VRCEyeTracking
                     if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer != IntPtr.Zero &&
                         avatar.Pointer != IntPtr.Zero && avatar.Pointer ==
                         VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer)
-                        MainMod.ResetParams();
+                        MainMod.ZeroParams();
                 }
             }
             catch (Exception e)
@@ -70,9 +70,9 @@ namespace VRCEyeTracking
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_VRCAvatarManager_0
+                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0
                         ?.prop_VRCAvatarDescriptor_0 !=
-                    null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
+                    null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0
                         .prop_VRCAvatarDescriptor_0)
 
                     MainMod.ResetParams();

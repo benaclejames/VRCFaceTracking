@@ -6,7 +6,7 @@ using VRCEyeTracking.ParamLib;
 
 namespace VRCEyeTracking.SRParam
 {
-    public class SRanipalGeneralEyeParameter : FloatParam, ISRanipalParam
+    public class SRanipalGeneralEyeParameter : FloatBaseParam, ISRanipalParam
     {
         private readonly Func<EyeData_v2, float> _getSRanipalParam;
         
@@ -14,7 +14,8 @@ namespace VRCEyeTracking.SRParam
             : base(paramName, prioritised) => _getSRanipalParam = getValueFunc;
         
         public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData) => ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
-        void ISRanipalParam.ResetParam() => ResetParam();
+        void ISRanipalParam.ResetParam() => ResetParams();
+        public void ZeroParam() => ParamIndex = null;
     }
 
     public class SRanipalXYEyeParameter : XYParam, ISRanipalParam
@@ -22,10 +23,11 @@ namespace VRCEyeTracking.SRParam
         private readonly Func<EyeData_v2, Vector2> _getSRanipalParam;
 
         public SRanipalXYEyeParameter(Func<EyeData_v2, Vector2> getValueFunc, string xParamName, string yParamName)
-            : base(new FloatParam(xParamName, true), new FloatParam(yParamName, true))
+            : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
             => _getSRanipalParam = getValueFunc;
 
         public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData) => ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
         void ISRanipalParam.ResetParam() => ResetParams();
+        public void ZeroParam() => ZeroParams();
     }
 }
