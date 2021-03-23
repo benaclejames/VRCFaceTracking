@@ -26,7 +26,7 @@ namespace VRCEyeTracking.ParamLib
         public static int? GetParamIndex(string paramName)
         {
             VRCExpressionParameters.Parameter[] parameters = VRCPlayer.field_Internal_Static_VRCPlayer_0
-                ?.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0?.prop_VRCAvatarDescriptor_0?.expressionParameters
+                ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0?.expressionParameters
                 ?.parameters;
 
             if (parameters == null)

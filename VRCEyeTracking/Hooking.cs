@@ -17,7 +17,7 @@ namespace VRCEyeTracking
         {
             try
             {
-                var intPtr = (IntPtr) typeof(MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique.MulticastDelegateNPublicSealedVoGaVRBoUnique)
+                var intPtr = (IntPtr) typeof(VRCAvatarManager.MulticastDelegateNPublicSealedVoGaVRBoUnique)
                     .GetField(
                         "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
@@ -27,7 +27,7 @@ namespace VRCEyeTracking
                 _onAvatarInstantiatedDelegate =
                     Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
 
-                intPtr = (IntPtr) typeof(MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique)
+                intPtr = (IntPtr) typeof(VRCAvatarManager)
                     .GetField(
                         "NativeMethodInfoPtr_Method_Public_Boolean_ApiAvatar_String_Single_MulticastDelegateNPublicSealedVoGaVRBoUnique_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
@@ -70,9 +70,9 @@ namespace VRCEyeTracking
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0
+                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_VRCAvatarManager_0
                         ?.prop_VRCAvatarDescriptor_0 !=
-                    null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_MonoBehaviourPublicInSiGaApGaMaBoGaLiBoUnique_0
+                    null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
                         .prop_VRCAvatarDescriptor_0)
 
                     MainMod.ResetParams();

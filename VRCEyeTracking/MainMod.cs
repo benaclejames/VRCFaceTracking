@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
+using VRCEyeTracking.QuickMenu;
 using VRCEyeTracking.SRParam;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.2.6", "benaclejames",
@@ -68,6 +69,9 @@ namespace VRCEyeTracking
 
         public override void OnSceneWasLoaded(int level, string levelName)
         {
+            if (level == -1 && !QuickModeMenu.HasInitMenu)
+                QuickModeMenu.InitializeMenu();
+            
             SRanipalTrack.MinOpen = 999;
             SRanipalTrack.MaxOpen = 0;
         }
