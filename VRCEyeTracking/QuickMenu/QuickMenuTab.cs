@@ -25,11 +25,12 @@ namespace VRCEyeTracking.QuickMenu
                 _buttonText = value.GetComponentInChildren<Text>();
                 _alertSprite = value.transform.Find("Text/NewBadge").gameObject;
                 _tabButton = value.GetComponent<Button>();
+                _tabButton.onClick.RemoveAllListeners();
                 _tabObject = value;
             }
         }
 
-        private string TabName
+        public string TabName
         {
             get => _tabName;
             set
@@ -54,6 +55,12 @@ namespace VRCEyeTracking.QuickMenu
             }
         }
 
+        private string UIToolTip
+        {
+            get => TabObject.GetComponent<UiTooltip>().field_Public_String_0;
+            set => TabObject.GetComponent<UiTooltip>().field_Public_String_0 = value;
+        }
+
         private bool AlertEnabled
         {
             get => _alertEnabled;
@@ -66,12 +73,21 @@ namespace VRCEyeTracking.QuickMenu
             }
         }
 
-        public QuickMenuTab(GameObject tabObject, string tabName, string tabDisplayName = null)
+        public bool TabEnabled
+        {
+            get => _tabObject.active;
+            set => _tabObject.active = value;
+        }
+        
+        public QuickMenuTab(GameObject tabObject, string tabName, string tabDescription, string tabDisplayName = null)
         {
             TabObject = tabObject;
             TabName = tabName;
 
-            SetupAppearance(tabDisplayName);
+            SetupAppearance(tabDescription, tabDisplayName);
+            
+            // Set visibility to false to avoid false visibility for uninitialized modules
+            TabEnabled = false;
         }
 
         private static void SanitizeTab(GameObject gameObject)
@@ -80,8 +96,9 @@ namespace VRCEyeTracking.QuickMenu
             Object.Destroy(gameObject.GetComponent<MonoBehaviourPublicObTeGaBuSiStSiStStUnique>());
         }
 
-        private void SetupAppearance(string tabDisplayName = null)
+        private void SetupAppearance(string tabDescription, string tabDisplayName = null)
         {
+            UIToolTip = tabDescription;
             ButtonDisplayText = tabDisplayName ?? TabName;
             _tabObject.GetComponentInChildren<Image>().color =
                 new Color(0.03137255f, 0.3764706f, 0.3921569f, 1);

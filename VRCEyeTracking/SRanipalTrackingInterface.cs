@@ -5,11 +5,14 @@ using MelonLoader;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
+using VRCEyeTracking.QuickMenu;
 
 namespace VRCEyeTracking
 {
     public static class SRanipalTrack
     {
+        public static bool EyeEnabled, LipEnabled;
+        
         private static SRanipal_Eye_Framework _eyeFramework;
 
         public static EyeData_v2 LatestEyeData;
@@ -45,6 +48,11 @@ namespace VRCEyeTracking
                 _eyeFramework.EnableEyeDataCallback = false;
                 _eyeFramework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version2;
                 _eyeFramework.StartFramework();
+
+                if (QuickModeMenu.HasInitMenu && QuickModeMenu.EyeTab != null)
+                    QuickModeMenu.EyeTab.TabEnabled = true;
+                
+                EyeEnabled = true;
             }
         }
 
