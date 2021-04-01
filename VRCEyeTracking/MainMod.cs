@@ -69,8 +69,8 @@ namespace VRCEyeTracking
 
         public override void OnSceneWasLoaded(int level, string levelName)
         {
-            if (level == -1 && !QuickModeMenu.HasInitMenu)
-                QuickModeMenu.InitializeMenu();
+            //if (level == -1 && !QuickModeMenu.HasInitMenu)
+            //    QuickModeMenu.InitializeMenu();
             
             SRanipalTrack.MinOpen = 999;
             SRanipalTrack.MaxOpen = 0;
