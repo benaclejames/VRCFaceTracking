@@ -1,4 +1,4 @@
-﻿//========= Copyright 2019, HTC Corporation. All rights reserved. ===========
+﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
@@ -8,10 +8,10 @@ namespace ViveSR
 {
     namespace anipal
     {
-        namespace Lip
+        namespace Eye
         {
-            [CustomPropertyDrawer(typeof(LipShapeTable_v2))]
-            public class SRanipal_LipShapeTableDrawer_v2 : PropertyDrawer
+            [CustomPropertyDrawer(typeof(EyeShapeTable_v2))]
+            public class SRanipal_EyeShapeTableDrawer_v2 : PropertyDrawer
             {
                 public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
                 {
@@ -21,38 +21,38 @@ namespace ViveSR
                     newFieldPosition.height = EditorGUIUtility.singleLineHeight;
                     Rect newLabelPosition = position;
                     newLabelPosition.width -= newFieldPosition.width;
-					newLabelPosition.height = newFieldPosition.height;
-					SerializedProperty propSkinedMesh = property.FindPropertyRelative("skinnedMeshRenderer");
-                    SerializedProperty propLipShapes = property.FindPropertyRelative("lipShapes");
+
+                    SerializedProperty propSkinedMesh = property.FindPropertyRelative("skinnedMeshRenderer");
+                    SerializedProperty propEyeShapes = property.FindPropertyRelative("eyeShapes");
                     EditorGUI.PropertyField(newFieldPosition, propSkinedMesh, GUIContent.none);
                     newFieldPosition.y += EditorGUIUtility.singleLineHeight;
 
                     SkinnedMeshRenderer skinnedMesh = propSkinedMesh.objectReferenceValue as SkinnedMeshRenderer;
                     if (skinnedMesh != null && skinnedMesh.sharedMesh.blendShapeCount > 0)
                     {
-                        if (propLipShapes.arraySize != skinnedMesh.sharedMesh.blendShapeCount)
+                        if (propEyeShapes.arraySize != skinnedMesh.sharedMesh.blendShapeCount)
                         {
-                            propLipShapes.arraySize = skinnedMesh.sharedMesh.blendShapeCount;
+                            propEyeShapes.arraySize = skinnedMesh.sharedMesh.blendShapeCount;
                             for (int i = 0; i < skinnedMesh.sharedMesh.blendShapeCount; ++i)
                             {
-                                SerializedProperty propLipShape = propLipShapes.GetArrayElementAtIndex(i);
+                                SerializedProperty propEyeShape = propEyeShapes.GetArrayElementAtIndex(i);
                                 string elementName = skinnedMesh.sharedMesh.GetBlendShapeName(i);
 
-                                propLipShape.intValue = (int)LipShape_v2.None;
-                                foreach (LipShape_v2 lipShape in (LipShape_v2[])Enum.GetValues(typeof(LipShape_v2)))
+                                propEyeShape.intValue = (int)EyeShape_v2.None;
+                                foreach (EyeShape_v2 EyeShape in (EyeShape_v2[])Enum.GetValues(typeof(EyeShape_v2)))
                                 {
-                                    if (elementName == lipShape.ToString())
-                                        propLipShape.intValue = (int)lipShape;
+                                    if (elementName == EyeShape.ToString())
+                                        propEyeShape.intValue = (int)EyeShape;
                                 }
                             }
                         }
                         for (int i = 0; i < skinnedMesh.sharedMesh.blendShapeCount; ++i)
                         {
-                            SerializedProperty propLipShape = propLipShapes.GetArrayElementAtIndex(i);
+                            SerializedProperty propEyeShape = propEyeShapes.GetArrayElementAtIndex(i);
                             newLabelPosition.y = newFieldPosition.y;
                             string elementName = skinnedMesh.sharedMesh.GetBlendShapeName(i);
                             EditorGUI.LabelField(newLabelPosition, "  " + elementName);
-                            EditorGUI.PropertyField(newFieldPosition, propLipShape, GUIContent.none);
+                            EditorGUI.PropertyField(newFieldPosition, propEyeShape, GUIContent.none);
                             newFieldPosition.y += EditorGUIUtility.singleLineHeight;
                         }
                     }

@@ -31,7 +31,10 @@ namespace VRCEyeTracking
         {
             var extractedPaths = new List<string>();
 
-            var dirName = Path.Combine(Path.GetTempPath(), "VRCEyeTracking");
+            var melonInfo = Assembly.GetExecutingAssembly().CustomAttributes.ToList()
+                .Find(a => a.AttributeType == typeof(MelonInfoAttribute));
+            
+            var dirName = Path.Combine(Path.GetTempPath(), melonInfo.ConstructorArguments[1].Value.ToString());
             if (!Directory.Exists(dirName))
                 Directory.CreateDirectory(dirName);
 

@@ -296,6 +296,7 @@ namespace ViveSR
                             {
                                 origin = eyesData[(int)gazeIndex].gaze_origin_mm * 0.001f;
                                 direction = eyesData[(int)gazeIndex].gaze_direction_normalized;
+                                origin.x *= -1;
                                 direction.x *= -1;
                             }
                         }
@@ -364,6 +365,31 @@ namespace ViveSR
                 /// <param name="focusableLayer">A layer id that is used to selectively ignore object.</param>
                 /// <param name="eye_data">ViveSR.anipal.Eye.EyeData. </param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float radius, float maxDistance, int focusableLayer, EyeData eye_data)
+                {
+                    bool valid = GetGazeRay(index, out ray, eye_data);
+                    if (valid)
+                    {
+                        Ray rayGlobal = new Ray(Camera.main.transform.position, Camera.main.transform.TransformDirection(ray.direction));
+                        RaycastHit hit;
+                        if (radius == 0) valid = Physics.Raycast(rayGlobal, out hit, maxDistance, focusableLayer);
+                        else valid = Physics.SphereCast(rayGlobal, radius, out hit, maxDistance, focusableLayer);
+                        focusInfo = new FocusInfo
+                        {
+                            point = hit.point,
+                            normal = hit.normal,
+                            distance = hit.distance,
+                            collider = hit.collider,
+                            rigidbody = hit.rigidbody,
+                            transform = hit.transform
+                        };
+                    }
+                    else
+                    {
+                        focusInfo = new FocusInfo();
+                    }
+                    return valid;
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders.
@@ -375,6 +401,11 @@ namespace ViveSR
                 /// <param name="maxDistance">The max length of the ray.</param>
                 /// <param name="focusableLayer">A layer id that is used to selectively ignore object.</param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float radius, float maxDistance, int focusableLayer)
+                {
+                    UpdateData();
+                    return Focus(index, out ray, out focusInfo, radius, maxDistance, focusableLayer, EyeData_);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders.
@@ -386,6 +417,10 @@ namespace ViveSR
                 /// <param name="maxDistance">The max length of the ray.</param>
                 /// <param name="eye_data">ViveSR.anipal.Eye.EyeData. </param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float radius, float maxDistance, EyeData eye_data)
+                {
+                    return Focus(index, out ray, out focusInfo, radius, maxDistance, -1, eye_data);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders.
@@ -396,6 +431,11 @@ namespace ViveSR
                 /// <param name="radius">The radius of the gaze ray</param>
                 /// <param name="maxDistance">The max length of the ray.</param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float radius, float maxDistance)
+                {
+                    UpdateData();
+                    return Focus(index, out ray, out focusInfo, radius, maxDistance, EyeData_);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders when enable eye callback function.
@@ -406,6 +446,10 @@ namespace ViveSR
                 /// <param name="maxDistance">The max length of the ray.</param>
                 /// <param name="eye_data">ViveSR.anipal.Eye.EyeData. </param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float maxDistance, EyeData eye_data)
+                {
+                    return Focus(index, out ray, out focusInfo, 0, float.MaxValue, -1, eye_data);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders.
@@ -415,6 +459,11 @@ namespace ViveSR
                 /// <param name="focusInfo">Information about where the ray focused on.</param>
                 /// <param name="maxDistance">The max length of the ray.</param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, float maxDistance)
+                {
+                    UpdateData();
+                    return Focus(index, out ray, out focusInfo, maxDistance, EyeData_);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders when enable eye callback function.
@@ -424,6 +473,10 @@ namespace ViveSR
                 /// <param name="focusInfo">Information about where the ray focused on.</param>
                 /// <param name="eye_data">ViveSR.anipal.Eye.EyeData. </param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo, EyeData eye_data)
+                {
+                    return Focus(index, out ray, out focusInfo, 0, float.MaxValue, -1, eye_data);
+                }
 
                 /// <summary>
                 /// Casts a ray against all colliders.
@@ -432,6 +485,11 @@ namespace ViveSR
                 /// <param name="ray">The starting point and direction of the ray.</param>
                 /// <param name="focusInfo">Information about where the ray focused on.</param>
                 /// <returns>Indicates whether the ray hits a collider.</returns>
+                public static bool Focus(GazeIndex index, out Ray ray, out FocusInfo focusInfo)
+                {
+                    UpdateData();
+                    return Focus(index, out ray, out focusInfo, EyeData_);
+                }
 
                 /// <summary>
                 /// Gets the 2D position of a selected pupil when enable eye callback function.

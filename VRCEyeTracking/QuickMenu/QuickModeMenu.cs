@@ -127,7 +127,7 @@ namespace VRCEyeTracking.QuickMenu
                         break;
                     case "FriendRequestsTab":
                         MouthTab = new QuickMenuTab(tab.gameObject, "Mouth Tracking", "View the Mouth Tracking Menu");
-                        MouthTab.TabEnabled = SRanipalTrack.LipEnabled; // Catch up with SRanipal
+                        MouthTab.TabEnabled = SRanipalTrack.FaceEnabled; // Catch up with SRanipal
                         break;
                     default:
                         Object.Destroy(tab.gameObject);

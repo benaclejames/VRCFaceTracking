@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
-using VRCEyeTracking.QuickMenu;
+using ViveSR.anipal.Lip;
 using VRCEyeTracking.SRParam;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.3.0", "benaclejames",
@@ -14,11 +15,13 @@ namespace VRCEyeTracking
 {
     public class MainMod : MelonMod
     {
-        public static void ResetParams() => EyeTrackParams.ForEach(param => param.ResetParam());
-        public static void ZeroParams() => EyeTrackParams.ForEach(param => param.ZeroParam());
+        public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
+        public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
 
-        private static readonly List<ISRanipalParam> EyeTrackParams = new List<ISRanipalParam>
+        private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>
         {
+            #region EyeTracking
+            
             new SRanipalXYEyeParameter(v2 => Vector3.Scale(
                 v2.verbose_data.combined.eye_data.gaze_direction_normalized,
                 new Vector3(-1, 1, 1)), "EyesX", "EyesY"),
@@ -50,16 +53,31 @@ namespace VRCEyeTracking
             
             new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "LeftEyeSqueeze"),
             new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "RightEyeSqueeze"),
+            
+            #endregion
         };
 
-        public override void OnApplicationStart() => DependencyManager.Init();
+        public override void OnApplicationStart()
+        {
+            DependencyManager.Init();
+            AppendLipParams();
+        }
 
+        private static void AppendLipParams()
+        {
+            foreach (int blendShape in Enum.GetValues(typeof(LipShape_v2)))
+            {
+                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2.prediction_data.blend_shape_weight[blendShape], 
+                    ((LipShape_v2)blendShape).ToString(), true));
+            }
+                
+        }
+        
         public override void VRChat_OnUiManagerInit()
         {
-            SRanipalTrack.Start();
+            SRanipalTrack.Initialize();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdateParams());
-            MelonLogger.Msg("SRanipal SDK Started. Eye Tracking Active");
         }
 
         public override void OnApplicationQuit()
@@ -80,8 +98,8 @@ namespace VRCEyeTracking
         {
             for (;;)
             {
-                foreach (var param in EyeTrackParams.ToArray())
-                    param.RefreshParam(SRanipalTrack.LatestEyeData, null);
+                foreach (var param in SRanipalTrackParams.ToArray())
+                    param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
 
                 yield return new WaitForSeconds(0.01f);
             }

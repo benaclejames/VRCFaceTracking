@@ -1,5 +1,10 @@
-﻿using VRC.SDK3.Avatars.Components;
+﻿using System.Linq;
+using Il2CppSystem.Runtime.InteropServices;
+using MelonLoader;
+using UnhollowerRuntimeLib.XrefScans;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
+using Marshal = System.Runtime.InteropServices.Marshal;
 
 namespace VRCEyeTracking.ParamLib
 {

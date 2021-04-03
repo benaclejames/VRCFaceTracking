@@ -11,20 +11,20 @@ namespace ViveSR
             public enum LipShape_v2
             {
                 None = -1,
-                Jaw_Right = 0, //1
+                Jaw_Right = 0,
                 Jaw_Left = 1,
-                Jaw_Forward = 2, //2
-                Jaw_Open = 3, //3
+                Jaw_Forward = 2,
+                Jaw_Open = 3,
                 Mouth_Ape_Shape = 4,
-                Mouth_Upper_Right = 5, //4
+                Mouth_Upper_Right = 5,
                 Mouth_Upper_Left = 6,
-                Mouth_Lower_Right = 7, //5
+                Mouth_Lower_Right = 7,
                 Mouth_Lower_Left = 8,
                 Mouth_Upper_Overturn = 9,
                 Mouth_Lower_Overturn = 10,
-                Mouth_Pout = 11, //6
-                Mouth_Smile_Right = 12, //7
-                Mouth_Smile_Left = 13, //8
+                Mouth_Pout = 11,
+                Mouth_Smile_Right = 12,
+                Mouth_Smile_Left = 13,
                 Mouth_Sad_Right = 14,
                 Mouth_Sad_Left = 15,
                 Cheek_Puff_Right = 16,
