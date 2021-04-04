@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using MelonLoader;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.ParamLib;
+using ParamLib;
 
 namespace VRCEyeTracking.SRParam
 {
@@ -22,7 +21,7 @@ namespace VRCEyeTracking.SRParam
             if (newParamValue.HasValue) ParamValue = newParamValue.Value;
         }
 
-        void ISRanipalParam.ResetParam() => ResetParams();
+        void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
     }
 }

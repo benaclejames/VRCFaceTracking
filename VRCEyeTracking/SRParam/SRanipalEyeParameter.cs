@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.ParamLib;
+using ParamLib;
 
 namespace VRCEyeTracking.SRParam
 {
@@ -20,7 +20,7 @@ namespace VRCEyeTracking.SRParam
             ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
         }
 
-        void ISRanipalParam.ResetParam() => ResetParams();
+        void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
     }
 
