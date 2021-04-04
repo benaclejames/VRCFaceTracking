@@ -67,10 +67,10 @@ namespace VRCEyeTracking
         {
             foreach (int blendShape in Enum.GetValues(typeof(LipShape_v2)))
             {
-                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2.prediction_data.blend_shape_weight[blendShape], 
-                    ((LipShape_v2)blendShape).ToString(), true));
+                var parsedLipShapeEnum = (LipShape_v2) blendShape;
+                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2[parsedLipShapeEnum], 
+                    parsedLipShapeEnum.ToString(), true));
             }
-                
         }
         
         public override void VRChat_OnUiManagerInit()

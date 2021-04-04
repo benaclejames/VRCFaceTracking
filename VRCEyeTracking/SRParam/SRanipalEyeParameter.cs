@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
@@ -13,7 +14,7 @@ namespace VRCEyeTracking.SRParam
         public SRanipalGeneralEyeParameter(Func<EyeData_v2, float> getValueFunc, string paramName, bool prioritised = false) 
             : base(paramName, prioritised) => _getSRanipalParam = getValueFunc;
         
-        public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData)
+        public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
         {
             if (eyeData == null) return;
             ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
@@ -31,7 +32,7 @@ namespace VRCEyeTracking.SRParam
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
             => _getSRanipalParam = getValueFunc;
 
-        public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData)
+        public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
         {
             if (eyeData == null) return;
             ParamValue = _getSRanipalParam.Invoke(eyeData.Value);

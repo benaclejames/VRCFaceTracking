@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using MelonLoader;
@@ -18,7 +19,7 @@ namespace VRCEyeTracking
         private static SRanipal_Lip_Framework _lipFramework;
 
         public static EyeData_v2 LatestEyeData;
-        public static LipData_v2 LatestLipData;
+        public static Dictionary<LipShape_v2, float> LatestLipData;
 
         public static float CurrentDiameter;
 
@@ -151,7 +152,7 @@ namespace VRCEyeTracking
 
         private static void UpdateMouth()
         {
-            SRanipal_Lip_API.GetLipData_v2(ref LatestLipData);
+            SRanipal_Lip_v2.GetLipWeightings(out LatestLipData);
         }
 
         #endregion
