@@ -1,3 +1,3 @@
-[submodule "VRCEyeTracking/ParamLib"]
-	path = VRCEyeTracking/ParamLib
+[submodule "VRCEyeTracking\\ParamLib"]
+	path = VRCEyeTracking\\ParamLib
 	url = https://github.com/benaclejames/ParamLib
