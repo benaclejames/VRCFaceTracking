@@ -23,9 +23,9 @@ namespace VRCEyeTracking
         public static float MinOpen = 999;
 
         public static readonly Thread Initializer = new Thread(Initialize);
-        private static readonly Thread SRanipalWorker = new Thread(() => Update(cancellationToken.Token));
+        private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
         
-        private static CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED;
 
@@ -46,8 +46,8 @@ namespace VRCEyeTracking
                 MelonLogger.Warning($"Eye Tracking will be unavailable for this session. ({eyeError})");
             else if (eyeError == Error.WORK)
             {
+                MainMod.AppendEyeParams();
                 EyeEnabled = true;
-                MainMod.AppendLipParams();
                 MelonLogger.Msg("SRanipal Eye Initialized!");
             }
 
@@ -55,6 +55,7 @@ namespace VRCEyeTracking
                 MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
             else if (faceError == Error.WORK)
             {
+                MainMod.AppendLipParams();
                 FaceEnabled = true;
                 MelonLogger.Msg("SRanipal Lip Initialized!");
             }
@@ -62,12 +63,12 @@ namespace VRCEyeTracking
 
         public static void Stop()
         {
-            cancellationToken.Cancel();
+            CancellationToken.Cancel();
             
             if (EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
             if (FaceEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
             
-            cancellationToken.Dispose();
+            CancellationToken.Dispose();
         }
 
         private static void Update(CancellationToken token)

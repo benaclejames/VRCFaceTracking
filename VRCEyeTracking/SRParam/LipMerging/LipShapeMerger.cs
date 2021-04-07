@@ -32,7 +32,7 @@ namespace VRCEyeTracking.SRParam.LipMerging
 
         public static IEnumerable<SRanipalLipParameter> GetOptimizedLipParameters() => OptimizedLipShapes
             .Select(optimizedShape => new SRanipalLipParameter(v2 
-                => optimizedShape.Value.GetBlendedLipShape(v2), optimizedShape.Key.ToString()));
+                => optimizedShape.Value.GetBlendedLipShape(v2), optimizedShape.Key.ToString(), true));
 
         public static IEnumerable<LipShape_v2> GetUnoptimizedLipShapes()
         {
