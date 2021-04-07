@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
-using ViveSR.anipal.Lip;
 using VRCEyeTracking.SRParam;
+using VRCEyeTracking.SRParam.LipMerging;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.3.0", "benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
@@ -59,12 +58,13 @@ namespace VRCEyeTracking
         
         private static void AppendLipParams()
         {
-            foreach (int blendShape in Enum.GetValues(typeof(LipShape_v2)))
-            {
-                var parsedLipShapeEnum = (LipShape_v2) blendShape;
-                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2[parsedLipShapeEnum], 
-                    parsedLipShapeEnum.ToString(), true));
-            }
+            // Add optimized shapes
+            SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
+            
+            // Add unoptimized shapes in case someone wants to use em
+            foreach (var unoptimizedShape in LipShapeMerger.GetUnoptimizedLipShapes())
+                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2[unoptimizedShape], 
+                    unoptimizedShape.ToString()));
         }
 
         public override void OnApplicationStart()

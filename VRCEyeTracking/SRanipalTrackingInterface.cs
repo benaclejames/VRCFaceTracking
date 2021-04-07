@@ -42,7 +42,7 @@ namespace VRCEyeTracking
 
         private static void HandleErrors(Error eyeError, Error faceError)
         {
-            if (eyeError != Error.UNDEFINED && eyeError != Error.WORK)
+            if (eyeError.IsRealError())
                 MelonLogger.Warning($"Eye Tracking will be unavailable for this session. ({eyeError})");
             else if (eyeError == Error.WORK)
             {
@@ -50,7 +50,7 @@ namespace VRCEyeTracking
                 MelonLogger.Msg("SRanipal Eye Initialized!");
             }
 
-            if (faceError != Error.UNDEFINED && faceError != Error.WORK)
+            if (faceError.IsRealError())
                 MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
             else if (faceError == Error.WORK)
             {
