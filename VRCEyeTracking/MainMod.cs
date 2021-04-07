@@ -56,13 +56,7 @@ namespace VRCEyeTracking
             
             #endregion
         };
-
-        public override void OnApplicationStart()
-        {
-            DependencyManager.Init();
-            AppendLipParams();
-        }
-
+        
         private static void AppendLipParams()
         {
             foreach (int blendShape in Enum.GetValues(typeof(LipShape_v2)))
@@ -72,10 +66,16 @@ namespace VRCEyeTracking
                     parsedLipShapeEnum.ToString(), true));
             }
         }
-        
+
+        public override void OnApplicationStart()
+        {
+            DependencyManager.Init();
+            AppendLipParams();
+        }
+
         public override void VRChat_OnUiManagerInit()
         {
-            SRanipalTrack.Initialize();
+            SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdateParams());
         }

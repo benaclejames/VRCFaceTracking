@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using MelonLoader;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.QuickMenu;
 
 namespace VRCEyeTracking
 {
@@ -15,8 +13,6 @@ namespace VRCEyeTracking
     {
         public static bool EyeEnabled, FaceEnabled;
         
-        private static SRanipal_Eye_Framework _eyeFramework;
-        private static SRanipal_Lip_Framework _lipFramework;
 
         public static EyeData_v2 LatestEyeData;
         public static Dictionary<LipShape_v2, float> LatestLipData;
@@ -26,11 +22,14 @@ namespace VRCEyeTracking
         public static float MaxOpen;
         public static float MinOpen = 999;
 
-        private static readonly Thread Updater = new Thread(Update);
+        public static readonly Thread Initializer = new Thread(Initialize);
+        private static readonly Thread SRanipalWorker = new Thread(() => Update(cancellationToken.Token));
+        
+        private static CancellationTokenSource cancellationToken = new CancellationTokenSource();
         
         private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED;
 
-        public static void Initialize()
+        private static void Initialize()
         {
             MelonLogger.Msg($"Initializing SRanipal...");
             
@@ -38,8 +37,7 @@ namespace VRCEyeTracking
             var faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             HandleErrors(eyeError, faceError);
-            UpdateConfigs(eyeError.IsRealError(), faceError.IsRealError());
-            Updater.Start();
+            SRanipalWorker.Start();
         }
 
         private static void HandleErrors(Error eyeError, Error faceError)
@@ -47,62 +45,36 @@ namespace VRCEyeTracking
             if (eyeError != Error.UNDEFINED && eyeError != Error.WORK)
                 MelonLogger.Warning($"Eye Tracking will be unavailable for this session. ({eyeError})");
             else if (eyeError == Error.WORK)
+            {
+                EyeEnabled = true;
                 MelonLogger.Msg("SRanipal Eye Initialized!");
-            
+            }
+
             if (faceError != Error.UNDEFINED && faceError != Error.WORK)
                 MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
             else if (faceError == Error.WORK)
+            {
+                FaceEnabled = true;
                 MelonLogger.Msg("SRanipal Lip Initialized!");
-        }
-
-        private static void UpdateConfigs(bool eyeError = true, bool faceError = true)
-        {
-            // Init Eye Framework
-            _eyeFramework = new SRanipal_Eye_Framework();
-            _eyeFramework.EnableEye = !eyeError;
-            _eyeFramework.EnableEyeDataCallback = false;
-            _eyeFramework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version2;
-            if (!eyeError) _eyeFramework.StartFramework();
-
-            if (QuickModeMenu.HasInitMenu && QuickModeMenu.EyeTab != null && !eyeError)
-                QuickModeMenu.EyeTab.TabEnabled = true;
-
-            EyeEnabled = !eyeError;
-            
-            
-            
-            // Init Lip Framework
-            _lipFramework = new SRanipal_Lip_Framework();
-            _lipFramework.EnableLip = !faceError;
-            _lipFramework.EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
-            if (!faceError) _lipFramework.StartFramework();
-
-            FaceEnabled = !faceError;
+            }
         }
 
         public static void Stop()
         {
-            EyeEnabled = false;
-            FaceEnabled = false;
-            Updater.Abort();
+            cancellationToken.Cancel();
             
-            _eyeFramework?.StopFramework();
-            _lipFramework?.StopFramework();
+            if (EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+            if (FaceEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            
+            cancellationToken.Dispose();
         }
 
-        private static void Update()
+        private static void Update(CancellationToken token)
         {
-            while (EyeEnabled || FaceEnabled)
+            while (!token.IsCancellationRequested && (EyeEnabled || FaceEnabled))
             {
                 try
                 {
-                    if (SRanipal_Eye_Framework.Status != SRanipal_Eye_Framework.FrameworkStatus.WORKING &&
-                        SRanipal_Eye_Framework.Status != SRanipal_Eye_Framework.FrameworkStatus.NOT_SUPPORT)
-                    {
-                        Thread.Sleep(50);
-                        continue;
-                    }
-
                     if (EyeEnabled) UpdateEye();
                     if (FaceEnabled) UpdateMouth();
                 }
