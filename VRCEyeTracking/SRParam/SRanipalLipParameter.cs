@@ -23,5 +23,6 @@ namespace VRCEyeTracking.SRParam
 
         void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
+        public bool IsParamValid() => ParamIndex.HasValue;
     }
 }

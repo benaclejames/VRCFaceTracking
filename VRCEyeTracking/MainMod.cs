@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
@@ -56,7 +57,7 @@ namespace VRCEyeTracking
             #endregion
         };
         
-        private static void AppendLipParams()
+        public static void AppendLipParams()
         {
             // Add optimized shapes
             SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
@@ -70,7 +71,6 @@ namespace VRCEyeTracking
         public override void OnApplicationStart()
         {
             DependencyManager.Init();
-            AppendLipParams();
         }
 
         public override void VRChat_OnUiManagerInit()
@@ -98,7 +98,7 @@ namespace VRCEyeTracking
         {
             for (;;)
             {
-                foreach (var param in SRanipalTrackParams.ToArray())
+                foreach (var param in SRanipalTrackParams.Where(param => param.IsParamValid()))
                     param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
 
                 yield return new WaitForSeconds(0.01f);

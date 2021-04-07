@@ -47,6 +47,7 @@ namespace VRCEyeTracking
             else if (eyeError == Error.WORK)
             {
                 EyeEnabled = true;
+                MainMod.AppendLipParams();
                 MelonLogger.Msg("SRanipal Eye Initialized!");
             }
 
