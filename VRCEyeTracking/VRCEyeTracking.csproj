@@ -69,6 +69,9 @@
     <Compile Include="SRanipal\SRanipal_API.cs" />
     <Compile Include="SRanipal\SRanipal_Enums.cs" />
     <Compile Include="SRanipal\SRWorks_Enums.cs" />
+    <Compile Include="SRParam\EyeTrackingParams.cs" />
+    <Compile Include="SRParam\LipMerging\LipShapeConversion.cs" />
+    <Compile Include="SRParam\LipMerging\LipShapeMerger.cs" />
     <Compile Include="SRParam\SRanipalEyeParameter.cs" />
     <Compile Include="SRParam\SRanipalLipParameter.cs" />
     <Compile Include="SRParam\SRanipalParameter.cs" />

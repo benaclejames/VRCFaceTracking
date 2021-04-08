@@ -18,7 +18,7 @@ namespace VRCEyeTracking
         public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
 
-        private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
+        public static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
         
         public static void AppendLipParams()
         {
@@ -27,7 +27,11 @@ namespace VRCEyeTracking
             
             // Add unoptimized shapes in case someone wants to use em
             foreach (var unoptimizedShape in LipShapeMerger.GetUnoptimizedLipShapes())
-                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 => v2[unoptimizedShape], 
+                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 =>
+                    {
+                        if (v2.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
+                        return null;
+                    }, 
                     unoptimizedShape.ToString()));
         }
 
@@ -42,7 +46,6 @@ namespace VRCEyeTracking
         {
             SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
-            MelonCoroutines.Start(UpdateParams());
         }
 
         public override void OnApplicationQuit()
@@ -57,17 +60,6 @@ namespace VRCEyeTracking
             
             SRanipalTrack.MinOpen = 999;
             SRanipalTrack.MaxOpen = 0;
-        }
-
-        private static IEnumerator UpdateParams()
-        {
-            for (;;)
-            {
-                foreach (var param in SRanipalTrackParams.Where(param => param.IsParamValid()))
-                    param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
-
-                yield return new WaitForSeconds(0.01f);
-            }
         }
     }
 }

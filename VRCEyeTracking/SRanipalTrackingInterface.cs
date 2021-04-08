@@ -79,14 +79,16 @@ namespace VRCEyeTracking
                 {
                     if (EyeEnabled) UpdateEye();
                     if (FaceEnabled) UpdateMouth();
+                    
+                    MainMod.SRanipalTrackParams.ForEach(param => param.RefreshParam(LatestEyeData, LatestLipData));
+                        
                 }
                 catch (Exception e)
                 {
                     if (e.InnerException.GetType() != typeof(ThreadAbortException))
                         MelonLogger.Error("Threading error occured in SRanipalTrack.Update: "+e+": "+e.InnerException);
                 }
-
-                Thread.Sleep(5);
+                Thread.Sleep(10);
             }
         }
         

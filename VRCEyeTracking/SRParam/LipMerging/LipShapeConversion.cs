@@ -11,8 +11,7 @@ namespace VRCEyeTracking.SRParam.LipMerging
             PositiveShape = positiveShape;
             NegativeShape = negativeShape;
         }
-
-
+        
         public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
         {
             float positiveValue=0f, negativeValue=0f;

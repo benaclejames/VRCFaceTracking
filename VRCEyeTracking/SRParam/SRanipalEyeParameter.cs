@@ -22,7 +22,6 @@ namespace VRCEyeTracking.SRParam
 
         void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
-        public bool IsParamValid() => ParamIndex.HasValue;
     }
 
     public class SRanipalXYEyeParameter : XYParam, ISRanipalParam
@@ -41,6 +40,5 @@ namespace VRCEyeTracking.SRParam
 
         void ISRanipalParam.ResetParam() => ResetParams();
         public void ZeroParam() => ZeroParams();
-        public bool IsParamValid() => X.ParamIndex.HasValue || Y.ParamIndex.HasValue;   // Some users might want to use both I guess
     }
 }

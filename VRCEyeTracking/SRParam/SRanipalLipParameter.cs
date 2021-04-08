@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MelonLoader;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using ParamLib;
@@ -17,12 +18,12 @@ namespace VRCEyeTracking.SRParam
         public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
         {
             if (lipData == null) return;
+            
             var newParamValue = _getSRanipalParam.Invoke(lipData);
             if (newParamValue.HasValue) ParamValue = newParamValue.Value;
         }
 
         void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
-        public bool IsParamValid() => ParamIndex.HasValue;
     }
 }
