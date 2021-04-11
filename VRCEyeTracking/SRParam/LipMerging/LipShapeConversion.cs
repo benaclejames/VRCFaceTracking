@@ -6,6 +6,8 @@ namespace VRCEyeTracking.SRParam.LipMerging
     public class PositiveNegativeShape
     {
         public readonly LipShape_v2 PositiveShape, NegativeShape;
+        private float _positiveCache, _negativeCache;
+        
         public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape)
         {
             PositiveShape = positiveShape;
@@ -14,10 +16,10 @@ namespace VRCEyeTracking.SRParam.LipMerging
         
         public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
         {
-            float positiveValue=0f, negativeValue=0f;
-            if (inputMap.ContainsKey(PositiveShape)) positiveValue = inputMap[PositiveShape];
-            if (inputMap.ContainsKey(NegativeShape)) negativeValue = inputMap[NegativeShape] * -1;
-            return positiveValue + negativeValue;
+            if (inputMap.ContainsKey(PositiveShape)) _positiveCache = inputMap[PositiveShape];
+            if (inputMap.ContainsKey(NegativeShape)) _negativeCache = inputMap[NegativeShape]*-1;
+
+            return _positiveCache + _negativeCache;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
@@ -18,7 +17,7 @@ namespace VRCEyeTracking
         public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
 
-        public static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
+        private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
         
         public static void AppendLipParams()
         {
@@ -46,6 +45,7 @@ namespace VRCEyeTracking
         {
             SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
+            MelonCoroutines.Start(UpdateParams());
         }
 
         public override void OnApplicationQuit()
@@ -60,6 +60,17 @@ namespace VRCEyeTracking
             
             SRanipalTrack.MinOpen = 999;
             SRanipalTrack.MaxOpen = 0;
+        }
+        
+        // Refreshing in main thread to avoid threading errors
+        private static IEnumerator UpdateParams()
+        {
+            for (;;)
+            {
+                SRanipalTrackParams.ForEach(param => param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData));
+
+                yield return new WaitForSeconds(0.01f);
+            }
         }
     }
 }

@@ -79,9 +79,6 @@ namespace VRCEyeTracking
                 {
                     if (EyeEnabled) UpdateEye();
                     if (FaceEnabled) UpdateMouth();
-                    
-                    MainMod.SRanipalTrackParams.ForEach(param => param.RefreshParam(LatestEyeData, LatestLipData));
-                        
                 }
                 catch (Exception e)
                 {
