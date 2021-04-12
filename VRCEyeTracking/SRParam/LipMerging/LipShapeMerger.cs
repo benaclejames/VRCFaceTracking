@@ -32,7 +32,8 @@ namespace VRCEyeTracking.SRParam.LipMerging
 
         public static IEnumerable<SRanipalLipParameter> GetOptimizedLipParameters() => OptimizedLipShapes
             .Select(optimizedShape => new SRanipalLipParameter(v2 
-                => optimizedShape.Value.GetBlendedLipShape(v2), optimizedShape.Key.ToString(), true));
+                => optimizedShape.Value.GetBlendedLipShape(v2)
+            , optimizedShape.Key.ToString(), true));
 
         public static IEnumerable<LipShape_v2> GetUnoptimizedLipShapes()
         {
@@ -43,6 +44,14 @@ namespace VRCEyeTracking.SRParam.LipMerging
                 unoptimizedShapes.Remove(optimization.Value.NegativeShape);
             }
             return unoptimizedShapes;
+        }
+        
+        public static void ResetLipShapeMinMaxThresholds()
+        {
+            foreach (var positiveNegativeShape in OptimizedLipShapes)
+            {
+                positiveNegativeShape.Value.ResetMinMaxRange();
+            }
         }
     }
 }

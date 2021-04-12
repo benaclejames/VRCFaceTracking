@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
+using VRCEyeTracking.QuickMenu;
 using VRCEyeTracking.SRParam;
 using VRCEyeTracking.SRParam.LipMerging;
 
@@ -55,11 +56,10 @@ namespace VRCEyeTracking
 
         public override void OnSceneWasLoaded(int level, string levelName)
         {
-            //if (level == -1 && !QuickModeMenu.HasInitMenu)
-            //    QuickModeMenu.InitializeMenu();
+            if (level == -1 && !QuickModeMenu.HasInitMenu)
+                QuickModeMenu.InitializeMenu();
             
-            SRanipalTrack.MinOpen = 999;
-            SRanipalTrack.MaxOpen = 0;
+            SRanipalTrack.ResetTrackingThresholds();
         }
         
         // Refreshing in main thread to avoid threading errors

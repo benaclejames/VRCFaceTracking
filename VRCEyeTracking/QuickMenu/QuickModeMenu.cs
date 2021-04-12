@@ -79,6 +79,10 @@ namespace VRCEyeTracking.QuickMenu
             
             newTab.transform.FindChild("Badge").gameObject.SetActive(false);
 
+            // Allow invite menu to instantiate
+            quickModeMenus.Find("QuickModeNotificationsMenu").gameObject.SetActive(true);
+            quickModeMenus.Find("QuickModeNotificationsMenu").gameObject.SetActive(false);
+
             return (newTab, newMenu);
         }
 

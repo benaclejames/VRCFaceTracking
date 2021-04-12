@@ -6,6 +6,7 @@ using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCEyeTracking.SRParam.LipMerging;
 
 namespace VRCEyeTracking
 {
@@ -19,8 +20,8 @@ namespace VRCEyeTracking
 
         public static float CurrentDiameter;
 
-        public static float MaxOpen;
-        public static float MinOpen = 999;
+        public static float MaxDilation;
+        public static float MinDilation = 999;
 
         public static readonly Thread Initializer = new Thread(Initialize);
         private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
@@ -99,24 +100,22 @@ namespace VRCEyeTracking
                 .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
                 CurrentDiameter = LatestEyeData.verbose_data.right.pupil_diameter_mm;
-                if (LatestEyeData.verbose_data.right.eye_openness >= 1f)
-                    UpdateMinMaxDilation(LatestEyeData.verbose_data.right.pupil_diameter_mm);
+                UpdateMinMaxDilation(LatestEyeData.verbose_data.right.pupil_diameter_mm);
             }
             else if (LatestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
                 .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
             {
                 CurrentDiameter = LatestEyeData.verbose_data.left.pupil_diameter_mm;
-                if (LatestEyeData.verbose_data.left.eye_openness >= 1f)
-                    UpdateMinMaxDilation(LatestEyeData.verbose_data.left.pupil_diameter_mm);
+                UpdateMinMaxDilation(LatestEyeData.verbose_data.left.pupil_diameter_mm);
             }
         }
 
         private static void UpdateMinMaxDilation(float readDilation)
         {
-            if (readDilation > MaxOpen)
-                MaxOpen = readDilation;
-            if (readDilation < MinOpen)
-                MinOpen = readDilation;
+            if (readDilation > MaxDilation)
+                MaxDilation = readDilation;
+            if (readDilation < MinDilation)
+                MinDilation = readDilation;
         }
         
         #endregion
@@ -129,5 +128,13 @@ namespace VRCEyeTracking
         }
 
         #endregion
+
+        public static void ResetTrackingThresholds()
+        {
+            MinDilation = 999;
+            MaxDilation = 0;
+            
+            LipShapeMerger.ResetLipShapeMinMaxThresholds();
+        }
     }
 }

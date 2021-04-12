@@ -18,8 +18,8 @@ namespace VRCEyeTracking.SRParam
 
             new SRanipalGeneralEyeParameter(v2 =>
             {
-                var normalizedFloat = SRanipalTrack.CurrentDiameter / SRanipalTrack.MinOpen /
-                                      (SRanipalTrack.MaxOpen - SRanipalTrack.MinOpen);
+                var normalizedFloat = SRanipalTrack.CurrentDiameter / SRanipalTrack.MinDilation /
+                                      (SRanipalTrack.MaxDilation - SRanipalTrack.MinDilation);
                 return Mathf.Clamp(normalizedFloat, 0, 1);
             }, "EyesDilation"),
 
