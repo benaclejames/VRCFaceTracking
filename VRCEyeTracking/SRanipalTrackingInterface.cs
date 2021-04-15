@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
+using UnityEngine.SceneManagement;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCEyeTracking.QuickMenu;
 using VRCEyeTracking.SRParam.LipMerging;
 
 namespace VRCEyeTracking
@@ -38,7 +40,10 @@ namespace VRCEyeTracking
             var faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             HandleErrors(eyeError, faceError);
-            SRanipalWorker.Start();
+           if (SceneManager.GetActiveScene().buildIndex == -1)
+                MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
+
+           SRanipalWorker.Start();
         }
 
         private static void HandleErrors(Error eyeError, Error faceError)
