@@ -38,20 +38,18 @@ namespace VRCEyeTracking.SRParam.LipMerging
         public static IEnumerable<LipShape_v2> GetUnoptimizedLipShapes()
         {
             var unoptimizedShapes = ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList();
-            foreach (var optimization in OptimizedLipShapes)
+            /*foreach (var optimization in OptimizedLipShapes)
             {
                 unoptimizedShapes.Remove(optimization.Value.PositiveShape);
                 unoptimizedShapes.Remove(optimization.Value.NegativeShape);
-            }
+            }*/
             return unoptimizedShapes;
         }
         
         public static void ResetLipShapeMinMaxThresholds()
         {
             foreach (var positiveNegativeShape in OptimizedLipShapes)
-            {
                 positiveNegativeShape.Value.ResetMinMaxRange();
-            }
         }
     }
 }
