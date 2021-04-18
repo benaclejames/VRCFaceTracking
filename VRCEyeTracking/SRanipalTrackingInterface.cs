@@ -30,7 +30,7 @@ namespace VRCEyeTracking
         
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
-        private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED;
+        private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != (Error) 1051;
 
         private static void Initialize()
         {
@@ -40,10 +40,11 @@ namespace VRCEyeTracking
             var faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             HandleErrors(eyeError, faceError);
-           if (SceneManager.GetActiveScene().buildIndex == -1)
+            
+            if (SceneManager.GetActiveScene().buildIndex == -1)
                 MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
-
-           SRanipalWorker.Start();
+            
+            SRanipalWorker.Start();
         }
 
         private static void HandleErrors(Error eyeError, Error faceError)
@@ -59,7 +60,10 @@ namespace VRCEyeTracking
 
             if (faceError.IsRealError())
                 MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
-            else if (faceError == Error.WORK)
+            else if (faceError == (Error) 1051)
+                while (faceError == (Error) 1051)
+                    faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            if (faceError == Error.WORK)
             {
                 MainMod.AppendLipParams();
                 FaceEnabled = true;
