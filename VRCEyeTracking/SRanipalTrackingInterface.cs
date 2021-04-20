@@ -81,8 +81,8 @@ namespace VRCEyeTracking
 
             if (faceError.IsRealError())
                 MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
-            else if (faceError == (Error) 1051)
-                while (faceError == (Error) 1051)
+            else if (faceError == (Error) 1051 || faceError == Error.UNDEFINED)
+                while (faceError == (Error) 1051 || faceError == Error.UNDEFINED)
                     faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
             if (faceError == Error.WORK)
             {
