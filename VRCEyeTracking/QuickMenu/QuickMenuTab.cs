@@ -16,7 +16,7 @@ namespace VRCEyeTracking.QuickMenu
         private bool _alertEnabled = true;
 
 
-        private GameObject TabObject
+        public GameObject TabObject
         {
             get => _tabObject;
             set
@@ -79,7 +79,7 @@ namespace VRCEyeTracking.QuickMenu
             set => _tabObject.active = value;
         }
         
-        public QuickMenuTab(GameObject tabObject, string tabName, string tabDescription, string tabDisplayName = null)
+        public QuickMenuTab(GameObject tabObject, string tabName, string tabDescription, string tabDisplayName = null, Action onPress = null)
         {
             TabObject = tabObject;
             TabName = tabName;
@@ -88,6 +88,8 @@ namespace VRCEyeTracking.QuickMenu
             
             // Set visibility to false to avoid false visibility for uninitialized modules
             TabEnabled = false;
+
+            Bind(onPress);
         }
 
         private static void SanitizeTab(GameObject gameObject)

@@ -25,26 +25,47 @@ namespace VRCEyeTracking
         public static float MaxDilation;
         public static float MinDilation = 999;
 
-        public static readonly Thread Initializer = new Thread(Initialize);
+        public static readonly Thread Initializer = new Thread(() => Initialize());
         private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
         
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != (Error) 1051;
 
-        private static void Initialize()
+        public static void Initialize(bool eye = true, bool lip = true)
         {
             MelonLogger.Msg($"Initializing SRanipal...");
-            
-            var eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
-            var faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+
+            Error eyeError = Error.UNDEFINED, faceError = Error.UNDEFINED;
+
+            if (eye)
+            {
+                if (EyeEnabled)
+                {
+                    MelonLogger.Msg("Releasing previously initialized eye module...");
+                    SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+                }
+
+                eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+            }
+
+            /*if (lip)
+            {
+                if (FaceEnabled)
+                {
+                    MelonLogger.Msg("Releasing previously initialized lip module...");
+                    SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+                }
+                
+                faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            }*/
 
             HandleErrors(eyeError, faceError);
             
-            if (SceneManager.GetActiveScene().buildIndex == -1)
-                MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
+            //if (SceneManager.GetActiveScene().buildIndex == -1)
+            //    MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
             
-            SRanipalWorker.Start();
+            if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
         }
 
         private static void HandleErrors(Error eyeError, Error faceError)

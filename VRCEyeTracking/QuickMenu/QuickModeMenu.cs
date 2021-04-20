@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using MelonLoader;
 using UnhollowerRuntimeLib;
 using UnityEngine;
@@ -110,6 +111,9 @@ namespace VRCEyeTracking.QuickMenu
 
         private static void HandleMenuTabCreation(Transform newMenu)
         {
+            if (EyeTab != null) Object.Destroy(EyeTab.TabObject);
+            if (MouthTab != null) Object.Destroy(MouthTab.TabObject);
+            
             var newTabs =
                 Object.Instantiate(OriginalTabsObject, OriginalTabsObject.transform.parent, true);
 
@@ -127,11 +131,13 @@ namespace VRCEyeTracking.QuickMenu
                 switch (tab.gameObject.name)
                 {
                     case "InvitesTab":
-                        EyeTab = new QuickMenuTab(tab.gameObject, "Eye Tracking", "View the Eye Tracking Menu");
+                        EyeTab = new QuickMenuTab(tab.gameObject, "Eye Tracking", "View the Eye Tracking Menu", null,
+                            () => new Thread(() => SRanipalTrack.Initialize(true, false)).Start());
                         EyeTab.TabEnabled = SRanipalTrack.EyeEnabled; // Catch up with SRanipal
                         break;
                     case "FriendRequestsTab":
-                        MouthTab = new QuickMenuTab(tab.gameObject, "Mouth Tracking", "View the Mouth Tracking Menu");
+                        MouthTab = new QuickMenuTab(tab.gameObject, "Mouth Tracking", "View the Mouth Tracking Menu", null,
+                            () => SRanipalTrack.Initialize(false, true));
                         MouthTab.TabEnabled = SRanipalTrack.FaceEnabled; // Catch up with SRanipal
                         break;
                     default:
@@ -142,13 +148,12 @@ namespace VRCEyeTracking.QuickMenu
 
             newTabs.transform.parent = newMenu;
             
-            if (EyeTab.TabEnabled)
-                HandlePageCreation(EyeTab, newMenu);
+            //if (EyeTab.TabEnabled)
+                //HandlePageCreation(EyeTab, newMenu);
         }
 
         private static void HandlePageCreation(QuickMenuTab menuTab, Transform menuObject)
         {
-            MelonLogger.Msg("Create page");
             var newPage = new QuickMenuPage(menuTab, menuObject);
             newPage.CreateMenuButton("DoAThing", new Vector2(0, 0), () => MelonLogger.Msg("BUTTON PRESS"));
 

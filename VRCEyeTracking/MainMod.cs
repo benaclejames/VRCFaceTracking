@@ -48,7 +48,7 @@ namespace VRCEyeTracking
             SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdateParams());
-            MelonCoroutines.Start(CheckExecutionQueue());
+            //MelonCoroutines.Start(CheckExecutionQueue());
         }
 
         public override void OnApplicationQuit()
@@ -56,13 +56,13 @@ namespace VRCEyeTracking
             SRanipalTrack.Stop();
         }
 
-        public override void OnSceneWasLoaded(int level, string levelName)
+        /*public override void OnSceneWasLoaded(int level, string levelName)
         {
             if (level == -1)
                 QuickModeMenu.CheckIfShouldInit();
             
             SRanipalTrack.ResetTrackingThresholds();
-        }
+        }*/
         
 
         // Refreshing in main thread to avoid threading errors
@@ -76,9 +76,9 @@ namespace VRCEyeTracking
             }
         }
         
-        public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
+        //public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
 
-        private static IEnumerator CheckExecutionQueue()
+        /*private static IEnumerator CheckExecutionQueue()
         {
             for (;;)
             {
@@ -90,6 +90,6 @@ namespace VRCEyeTracking
 
                 yield return new WaitForSeconds(5f);
             } 
-        }
+        }*/
     }
 }
