@@ -118,6 +118,21 @@ namespace ViveSR
             };
             #endregion
 
+            #region FocusInfo
+            /// <summary>
+            /// The data structure to indicate Focus information
+            /// </summary>
+            public struct FocusInfo
+            {
+                public Vector3 point;
+                public Vector3 normal;
+                public float distance;
+                public Collider collider;
+                public Rigidbody rigidbody;
+                public Transform transform;
+            }
+            #endregion
+
             #region CalibrationResult
             public enum CalibrationResult
             {

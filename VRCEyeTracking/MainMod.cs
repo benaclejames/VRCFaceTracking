@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using VRCEyeTracking;
 using MelonLoader;
 using UnityEngine;
 using VRCEyeTracking.QuickMenu;
 using VRCEyeTracking.SRParam;
+using VRCEyeTracking.SRParam.LipMerging;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.3.0", "benaclejames",
     "https://github.com/benaclejames/VRCEyeTracking")]
@@ -14,52 +16,39 @@ namespace VRCEyeTracking
 {
     public class MainMod : MelonMod
     {
-        public static void ResetParams() => EyeTrackParams.ForEach(param => param.ResetParam());
-        public static void ZeroParams() => EyeTrackParams.ForEach(param => param.ZeroParam());
+        public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
+        public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
 
-        private static readonly List<ISRanipalParam> EyeTrackParams = new List<ISRanipalParam>
+        private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
+        
+        public static void AppendLipParams()
         {
-            new SRanipalXYEyeParameter(v2 => Vector3.Scale(
-                v2.verbose_data.combined.eye_data.gaze_direction_normalized,
-                new Vector3(-1, 1, 1)), "EyesX", "EyesY"),
+            // Add optimized shapes
+            SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
             
-            new SRanipalGeneralEyeParameter(v2 => v2.expression_data.left.eye_wide >
-                                                  v2.expression_data.right.eye_wide
-                ? v2.expression_data.left.eye_wide
-                : v2.expression_data.right.eye_wide, "EyesWiden"),
-            
-            new SRanipalGeneralEyeParameter(v2 =>
-            {
-                var normalizedFloat = SRanipalTrack.CurrentDiameter / SRanipalTrack.MinOpen / (SRanipalTrack.MaxOpen - SRanipalTrack.MinOpen);
-                return Mathf.Clamp(normalizedFloat, 0, 1);
-            }, "EyesDilation"),
-            
-            new SRanipalXYEyeParameter(v2 => Vector3.Scale(
-                v2.verbose_data.left.gaze_direction_normalized,
-                new Vector3(-1, 1, 1)), "LeftEyeX", "LeftEyeY"),
-            
-            new SRanipalXYEyeParameter(v2 => Vector3.Scale(
-                v2.verbose_data.right.gaze_direction_normalized,
-                new Vector3(-1, 1, 1)), "RightEyeX", "RightEyeY"),
-            
-            new SRanipalGeneralEyeParameter(v2 => v2.verbose_data.left.eye_openness, "LeftEyeLid", true),
-            new SRanipalGeneralEyeParameter(v2 => v2.verbose_data.right.eye_openness, "RightEyeLid", true),
-            
-            new SRanipalGeneralEyeParameter(v2 => v2.expression_data.left.eye_wide, "LeftEyeWiden"),
-            new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_wide, "RightEyeWiden"),
-            
-            new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "LeftEyeSqueeze"),
-            new SRanipalGeneralEyeParameter(v2 => v2.expression_data.right.eye_squeeze, "RightEyeSqueeze"),
-        };
+            // Add unoptimized shapes in case someone wants to use em
+            foreach (var unoptimizedShape in LipShapeMerger.GetUnoptimizedLipShapes())
+                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 =>
+                    {
+                        if (v2.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
+                        return null;
+                    }, 
+                    unoptimizedShape.ToString()));
+        }
 
-        public override void OnApplicationStart() => DependencyManager.Init();
+        public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
+
+        public override void OnApplicationStart()
+        {
+            DependencyManager.Init();
+        }
 
         public override void VRChat_OnUiManagerInit()
         {
-            SRanipalTrack.Start();
+            SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdateParams());
-            MelonLogger.Msg("SRanipal SDK Started. Eye Tracking Active");
+            //MelonCoroutines.Start(CheckExecutionQueue());
         }
 
         public override void OnApplicationQuit()
@@ -67,24 +56,40 @@ namespace VRCEyeTracking
             SRanipalTrack.Stop();
         }
 
-        public override void OnSceneWasLoaded(int level, string levelName)
+        /*public override void OnSceneWasLoaded(int level, string levelName)
         {
-            //if (level == -1 && !QuickModeMenu.HasInitMenu)
-            //    QuickModeMenu.InitializeMenu();
+            if (level == -1)
+                QuickModeMenu.CheckIfShouldInit();
             
-            SRanipalTrack.MinOpen = 999;
-            SRanipalTrack.MaxOpen = 0;
-        }
+            SRanipalTrack.ResetTrackingThresholds();
+        }*/
+        
 
+        // Refreshing in main thread to avoid threading errors
         private static IEnumerator UpdateParams()
         {
             for (;;)
             {
-                foreach (var param in EyeTrackParams.ToArray())
-                    param.RefreshParam(SRanipalTrack.LatestEyeData, null);
+                SRanipalTrackParams.ForEach(param => param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData));
 
                 yield return new WaitForSeconds(0.01f);
             }
         }
+        
+        //public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
+
+        /*private static IEnumerator CheckExecutionQueue()
+        {
+            for (;;)
+            {
+                if (MainThreadExecutionQueue.Count > 0)
+                {
+                    MainThreadExecutionQueue[0].Invoke();
+                    MainThreadExecutionQueue.RemoveAt(0);
+                } 
+
+                yield return new WaitForSeconds(5f);
+            } 
+        }*/
     }
 }

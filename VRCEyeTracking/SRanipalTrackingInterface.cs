@@ -1,115 +1,170 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
+using UnityEngine.SceneManagement;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
+using ViveSR.anipal.Lip;
 using VRCEyeTracking.QuickMenu;
+using VRCEyeTracking.SRParam.LipMerging;
 
 namespace VRCEyeTracking
 {
     public static class SRanipalTrack
     {
-        public static bool EyeEnabled, LipEnabled;
+        public static bool EyeEnabled, FaceEnabled;
         
-        private static SRanipal_Eye_Framework _eyeFramework;
 
         public static EyeData_v2 LatestEyeData;
+        public static Dictionary<LipShape_v2, float> LatestLipData;
 
         public static float CurrentDiameter;
 
-        public static float MaxOpen;
-        public static float MinOpen = 999;
+        public static float MaxDilation;
+        public static float MinDilation = 999;
 
-        private static readonly Thread Updater = new Thread(Update);
-        private static bool _trackingActive = true;
+        public static readonly Thread Initializer = new Thread(() => Initialize());
+        private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
+        
+        private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
+        
+        private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != (Error) 1051;
 
-        public static void Start()
+        public static void Initialize(bool eye = true, bool lip = true)
         {
-            MelonLogger.Msg("Initializing SRanipal...");
+            MelonLogger.Msg($"Initializing SRanipal...");
 
-            var eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
-            if (eyeError != Error.WORK)
-                MelonLogger.Error($"SRanipal Eye Init failed with Error: {eyeError}. Eye Tracking will be unavailable for this session.");
+            Error eyeError = Error.UNDEFINED, faceError = Error.UNDEFINED;
+
+            if (eye)
+            {
+                if (EyeEnabled)
+                {
+                    MelonLogger.Msg("Releasing previously initialized eye module...");
+                    SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+                }
+
+                eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+            }
+
+            /*if (lip)
+            {
+                if (FaceEnabled)
+                {
+                    MelonLogger.Msg("Releasing previously initialized lip module...");
+                    SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+                }
+                
+                faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            }*/
+
+            HandleErrors(eyeError, faceError);
             
-            //SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);   Soon™
+            //if (SceneManager.GetActiveScene().buildIndex == -1)
+            //    MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
             
-            UpdateConfigs(eyeError != Error.WORK);
-            Updater.Start();
+            if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
         }
 
-        private static void UpdateConfigs(bool eyeError = true)
+        private static void HandleErrors(Error eyeError, Error faceError)
         {
-            if (!eyeError)
+            if (eyeError.IsRealError())
+                MelonLogger.Warning($"Eye Tracking will be unavailable for this session. ({eyeError})");
+            else if (eyeError == Error.WORK)
             {
-                _eyeFramework = new SRanipal_Eye_Framework();
-                _eyeFramework.EnableEye = true;
-                _eyeFramework.EnableEyeDataCallback = false;
-                _eyeFramework.EnableEyeVersion = SRanipal_Eye_Framework.SupportedEyeVersion.version2;
-                _eyeFramework.StartFramework();
-
-                if (QuickModeMenu.HasInitMenu && QuickModeMenu.EyeTab != null)
-                    QuickModeMenu.EyeTab.TabEnabled = true;
-                
+                MainMod.AppendEyeParams();
                 EyeEnabled = true;
+                MelonLogger.Msg("SRanipal Eye Initialized!");
+            }
+
+            if (faceError.IsRealError())
+                MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
+            else if (faceError == (Error) 1051)
+                while (faceError == (Error) 1051)
+                    faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            if (faceError == Error.WORK)
+            {
+                MainMod.AppendLipParams();
+                FaceEnabled = true;
+                MelonLogger.Msg("SRanipal Lip Initialized!");
             }
         }
 
         public static void Stop()
         {
-            _trackingActive = false;
-            Updater.Abort();
+            CancellationToken.Cancel();
             
-            _eyeFramework?.StopFramework();
+            if (EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+            if (FaceEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            
+            CancellationToken.Dispose();
         }
 
-        private static void Update()
+        private static void Update(CancellationToken token)
         {
-            while (_trackingActive)
+            while (!token.IsCancellationRequested && (EyeEnabled || FaceEnabled))
             {
                 try
                 {
-                    if (SRanipal_Eye_Framework.Status != SRanipal_Eye_Framework.FrameworkStatus.WORKING &&
-                        SRanipal_Eye_Framework.Status != SRanipal_Eye_Framework.FrameworkStatus.NOT_SUPPORT)
-                    {
-                        Thread.Sleep(50);
-                        continue;
-                    }
-
-                    SRanipal_Eye_API.GetEyeData_v2(ref LatestEyeData);
-
-                    if (LatestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity
-                        .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
-                    {
-                        CurrentDiameter = LatestEyeData.verbose_data.right.pupil_diameter_mm;
-                        if (LatestEyeData.verbose_data.right.eye_openness >= 1f)
-                            UpdateMinMaxDilation(LatestEyeData.verbose_data.right.pupil_diameter_mm);
-                    }
-                    else if (LatestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
-                        .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
-                    {
-                        CurrentDiameter = LatestEyeData.verbose_data.left.pupil_diameter_mm;
-                        if (LatestEyeData.verbose_data.left.eye_openness >= 1f)
-                            UpdateMinMaxDilation(LatestEyeData.verbose_data.left.pupil_diameter_mm);
-                    }
+                    if (EyeEnabled) UpdateEye();
+                    if (FaceEnabled) UpdateMouth();
                 }
                 catch (Exception e)
                 {
-                    if (!(e.InnerException is ThreadAbortException))
-                        MelonLogger.Error("Threading error occured in SRanipalTrack.Update: "+e);
+                    if (e.InnerException.GetType() != typeof(ThreadAbortException))
+                        MelonLogger.Error("Threading error occured in SRanipalTrack.Update: "+e+": "+e.InnerException);
                 }
+                Thread.Sleep(10);
+            }
+        }
+        
+        #region EyeUpdate
 
-                Thread.Sleep(5);
+        private static void UpdateEye()
+        {
+            SRanipal_Eye_API.GetEyeData_v2(ref LatestEyeData);
+
+            if (LatestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity
+                .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
+            {
+                CurrentDiameter = LatestEyeData.verbose_data.right.pupil_diameter_mm;
+                UpdateMinMaxDilation(LatestEyeData.verbose_data.right.pupil_diameter_mm);
+            }
+            else if (LatestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
+                .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
+            {
+                CurrentDiameter = LatestEyeData.verbose_data.left.pupil_diameter_mm;
+                UpdateMinMaxDilation(LatestEyeData.verbose_data.left.pupil_diameter_mm);
             }
         }
 
         private static void UpdateMinMaxDilation(float readDilation)
         {
-            if (readDilation > MaxOpen)
-                MaxOpen = readDilation;
-            if (readDilation < MinOpen)
-                MinOpen = readDilation;
+            if (readDilation > MaxDilation)
+                MaxDilation = readDilation;
+            if (readDilation < MinDilation)
+                MinDilation = readDilation;
+        }
+        
+        #endregion
+
+        #region MouthUpdate
+
+        private static void UpdateMouth()
+        {
+            SRanipal_Lip_v2.GetLipWeightings(out LatestLipData);
+        }
+
+        #endregion
+
+        public static void ResetTrackingThresholds()
+        {
+            MinDilation = 999;
+            MaxDilation = 0;
+            
+            LipShapeMerger.ResetLipShapeMinMaxThresholds();
         }
     }
 }

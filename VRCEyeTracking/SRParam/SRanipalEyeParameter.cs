@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.ParamLib;
+using ParamLib;
 
 namespace VRCEyeTracking.SRParam
 {
@@ -13,8 +14,13 @@ namespace VRCEyeTracking.SRParam
         public SRanipalGeneralEyeParameter(Func<EyeData_v2, float> getValueFunc, string paramName, bool prioritised = false) 
             : base(paramName, prioritised) => _getSRanipalParam = getValueFunc;
         
-        public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData) => ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
-        void ISRanipalParam.ResetParam() => ResetParams();
+        public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
+        {
+            if (eyeData == null) return;
+            ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
+        }
+
+        void ISRanipalParam.ResetParam() => ResetParam();
         public void ZeroParam() => ParamIndex = null;
     }
 
@@ -26,7 +32,12 @@ namespace VRCEyeTracking.SRParam
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
             => _getSRanipalParam = getValueFunc;
 
-        public void RefreshParam(EyeData_v2? eyeData, LipData_v2? lipData) => ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
+        public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
+        {
+            if (eyeData == null) return;
+            ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
+        }
+
         void ISRanipalParam.ResetParam() => ResetParams();
         public void ZeroParam() => ZeroParams();
     }
