@@ -26,16 +26,17 @@ namespace VRCEyeTracking.SRParam
 
     public class SRanipalXYEyeParameter : XYParam, ISRanipalParam
     {
-        private readonly Func<EyeData_v2, Vector2> _getSRanipalParam;
+        private readonly Func<EyeData_v2, Vector2?> _getSRanipalParam;  // Can be null cus blinking messes with eye look validity
 
-        public SRanipalXYEyeParameter(Func<EyeData_v2, Vector2> getValueFunc, string xParamName, string yParamName)
+        public SRanipalXYEyeParameter(Func<EyeData_v2, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
             => _getSRanipalParam = getValueFunc;
 
         public void RefreshParam(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
         {
             if (eyeData == null) return;
-            ParamValue = _getSRanipalParam.Invoke(eyeData.Value);
+            var newValue = _getSRanipalParam.Invoke(eyeData.Value);
+            if (newValue.HasValue) ParamValue = newValue.Value;
         }
 
         void ISRanipalParam.ResetParam() => ResetParams();
