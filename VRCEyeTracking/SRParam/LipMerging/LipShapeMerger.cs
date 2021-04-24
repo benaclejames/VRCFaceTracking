@@ -15,7 +15,9 @@ namespace VRCEyeTracking.SRParam.LipMerging
             SmileSadRight,
             SmileSadLeft,
             TongueY,
-            TongueX
+            TongueX,
+            PuffSuckRight,
+            PuffSuckLeft
         }
 
         private static readonly Dictionary<OptimizedLipShape, PositiveNegativeShape> OptimizedLipShapes =
@@ -28,6 +30,8 @@ namespace VRCEyeTracking.SRParam.LipMerging
                 {OptimizedLipShape.SmileSadLeft, new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSadLeft)},
                 {OptimizedLipShape.TongueY, new PositiveNegativeShape(LipShape_v2.TongueUp, LipShape_v2.TongueDown)},
                 {OptimizedLipShape.TongueX, new PositiveNegativeShape(LipShape_v2.TongueRight, LipShape_v2.TongueLeft)},
+                {OptimizedLipShape.PuffSuckRight, new PositiveNegativeShape(LipShape_v2.CheekPuffRight, LipShape_v2.CheekSuck)},
+                {OptimizedLipShape.PuffSuckLeft, new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
             };
 
         public static IEnumerable<SRanipalLipParameter> GetOptimizedLipParameters() => OptimizedLipShapes

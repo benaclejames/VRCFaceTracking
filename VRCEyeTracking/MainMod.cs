@@ -70,7 +70,8 @@ namespace VRCEyeTracking
         {
             for (;;)
             {
-                SRanipalTrackParams.ForEach(param => param.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData));
+                foreach (var sRanipalParam in SRanipalTrackParams.ToArray())
+                    sRanipalParam.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
 
                 yield return new WaitForSeconds(0.01f);
             }

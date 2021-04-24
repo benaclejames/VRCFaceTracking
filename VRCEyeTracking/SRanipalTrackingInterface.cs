@@ -71,7 +71,8 @@ namespace VRCEyeTracking
         private static void HandleErrors(Error eyeError, Error faceError)
         {
             if (eyeError.IsRealError())
-                MelonLogger.Warning($"Eye Tracking will be unavailable for this session. ({eyeError})");
+                // Msg instead of Warning under the assumption most people will be using only lip tracking
+                MelonLogger.Msg($"Eye Tracking will be unavailable for this session. ({eyeError})");
             else if (eyeError == Error.WORK)
             {
                 MainMod.AppendEyeParams();
