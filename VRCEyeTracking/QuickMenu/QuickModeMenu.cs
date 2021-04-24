@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using MelonLoader;
 using UnhollowerRuntimeLib;
@@ -21,8 +22,8 @@ namespace VRCEyeTracking.QuickMenu
         {
             if (!HasInitMenu)
                 InitializeMenu();
-            else
-                HandleMenuTabCreation(GameObject.Find("UserInterface/QuickMenu/QuickModeMenus/VRCSRanipalMenu").transform);
+            //else
+                //HandleMenuTabCreation(GameObject.Find("UserInterface/QuickMenu/QuickModeMenus/VRCSRanipalMenu").transform);
         }
 
         private static void InitializeMenu()
@@ -69,7 +70,15 @@ namespace VRCEyeTracking.QuickMenu
             newMenu.anchoredPosition = new Vector2(0, 200f);
             newMenu.gameObject.SetActive(false);
             
-            HandleMenuTabCreation(newMenu);
+            var bundle = AssetBundle.LoadFromMemory(ExtractAb());
+            var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
+            var menuObject = Object.Instantiate(menuPrefab);
+            menuObject.transform.parent = newMenu;
+            menuObject.transform.localPosition = Vector3.zero;
+            menuObject.transform.localScale = Vector3.oneVector;
+            menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
+
+            //HandleMenuTabCreation(newMenu);
 
             // Tab interaction
             var tabButton = newTab.GetComponent<Button>();
@@ -107,6 +116,18 @@ namespace VRCEyeTracking.QuickMenu
             var s = Sprite.CreateSprite_Injected(t, ref rect, ref pivot, 100.0f, 0, SpriteMeshType.Tight, ref border, false);
 
             return s;
+        }
+
+        private static byte[] ExtractAb()
+        {
+            var a = Assembly.GetExecutingAssembly();
+            using (var resFilestream = a.GetManifestResourceStream("VRCEyeTracking.VRCFaceTracking"))
+            {
+                if (resFilestream == null) return null;
+                var ba = new byte[resFilestream.Length];
+                resFilestream.Read(ba, 0, ba.Length);
+                return ba;
+            }
         }
 
         private static void HandleMenuTabCreation(Transform newMenu)

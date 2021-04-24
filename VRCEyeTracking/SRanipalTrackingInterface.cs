@@ -49,7 +49,7 @@ namespace VRCEyeTracking
                 eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
             }
 
-            /*if (lip)
+            if (lip)
             {
                 if (FaceEnabled)
                 {
@@ -58,7 +58,7 @@ namespace VRCEyeTracking
                 }
                 
                 faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
-            }*/
+            }
 
             HandleErrors(eyeError, faceError);
             

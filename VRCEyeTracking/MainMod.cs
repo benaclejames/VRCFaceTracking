@@ -33,7 +33,7 @@ namespace VRCEyeTracking
                         if (v2.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
                         return null;
                     }, 
-                    unoptimizedShape.ToString()));
+                    unoptimizedShape.ToString(), true));
         }
 
         public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
@@ -56,13 +56,13 @@ namespace VRCEyeTracking
             SRanipalTrack.Stop();
         }
 
-        /*public override void OnSceneWasLoaded(int level, string levelName)
+        public override void OnSceneWasLoaded(int level, string levelName)
         {
-            if (level == -1)
-                QuickModeMenu.CheckIfShouldInit();
+            //if (level == -1)
+             //   QuickModeMenu.CheckIfShouldInit();
             
             SRanipalTrack.ResetTrackingThresholds();
-        }*/
+        }
         
 
         // Refreshing in main thread to avoid threading errors

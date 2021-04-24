@@ -9,25 +9,25 @@ namespace VRCEyeTracking.SRParam.LipMerging
     {
         private enum OptimizedLipShape
         {
-            Jaw_X,
-            Mouth_Upper,
-            Mouth_Lower,
-            Smile_Sad_Right,
-            Smile_Sad_Left,
-            Tongue_Y,
-            Tongue_X
+            JawX,
+            MouthUpper,
+            MouthLower,
+            SmileSadRight,
+            SmileSadLeft,
+            TongueY,
+            TongueX
         }
 
         private static readonly Dictionary<OptimizedLipShape, PositiveNegativeShape> OptimizedLipShapes =
             new Dictionary<OptimizedLipShape, PositiveNegativeShape>
             {
-                {OptimizedLipShape.Jaw_X, new PositiveNegativeShape(LipShape_v2.Jaw_Right, LipShape_v2.Jaw_Left)},
-                {OptimizedLipShape.Mouth_Upper, new PositiveNegativeShape(LipShape_v2.Mouth_Upper_Right, LipShape_v2.Mouth_Upper_Left)},
-                {OptimizedLipShape.Mouth_Lower, new PositiveNegativeShape(LipShape_v2.Mouth_Lower_Right, LipShape_v2.Mouth_Lower_Left)},
-                {OptimizedLipShape.Smile_Sad_Right, new PositiveNegativeShape(LipShape_v2.Mouth_Smile_Right, LipShape_v2.Mouth_Sad_Right)},
-                {OptimizedLipShape.Smile_Sad_Left, new PositiveNegativeShape(LipShape_v2.Mouth_Smile_Left, LipShape_v2.Mouth_Sad_Left)},
-                {OptimizedLipShape.Tongue_Y, new PositiveNegativeShape(LipShape_v2.Tongue_Up, LipShape_v2.Tongue_Down)},
-                {OptimizedLipShape.Tongue_X, new PositiveNegativeShape(LipShape_v2.Tongue_Right, LipShape_v2.Tongue_Left)},
+                {OptimizedLipShape.JawX, new PositiveNegativeShape(LipShape_v2.JawRight, LipShape_v2.Jaw_Left)},
+                {OptimizedLipShape.MouthUpper, new PositiveNegativeShape(LipShape_v2.MouthUpperRight, LipShape_v2.MouthUpperLeft)},
+                {OptimizedLipShape.MouthLower, new PositiveNegativeShape(LipShape_v2.MouthLowerRight, LipShape_v2.MouthLowerLeft)},
+                {OptimizedLipShape.SmileSadRight, new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthSadRight)},
+                {OptimizedLipShape.SmileSadLeft, new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSadLeft)},
+                {OptimizedLipShape.TongueY, new PositiveNegativeShape(LipShape_v2.TongueUp, LipShape_v2.TongueDown)},
+                {OptimizedLipShape.TongueX, new PositiveNegativeShape(LipShape_v2.TongueRight, LipShape_v2.TongueLeft)},
             };
 
         public static IEnumerable<SRanipalLipParameter> GetOptimizedLipParameters() => OptimizedLipShapes
@@ -37,13 +37,13 @@ namespace VRCEyeTracking.SRParam.LipMerging
 
         public static IEnumerable<LipShape_v2> GetUnoptimizedLipShapes()
         {
-            var unoptimizedShapes = ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList();
+            return ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList();
             /*foreach (var optimization in OptimizedLipShapes)
             {
                 unoptimizedShapes.Remove(optimization.Value.PositiveShape);
                 unoptimizedShapes.Remove(optimization.Value.NegativeShape);
             }*/
-            return unoptimizedShapes;
+            //return unoptimizedShapes;
         }
         
         public static void ResetLipShapeMinMaxThresholds()
