@@ -62,8 +62,8 @@ namespace VRCEyeTracking
 
             HandleErrors(eyeError, faceError);
             
-            //if (SceneManager.GetActiveScene().buildIndex == -1)
-            //    MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
+            if (SceneManager.GetActiveScene().buildIndex == -1)
+                MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
             
             if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
         }

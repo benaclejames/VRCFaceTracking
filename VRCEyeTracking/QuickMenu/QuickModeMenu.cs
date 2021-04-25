@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using MelonLoader;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +11,7 @@ namespace VRCEyeTracking.QuickMenu
     public static class QuickModeMenu
     {
         private static bool HasInitMenu;
-        public static QuickMenuTab EyeTab, MouthTab;
+        public static FaceTrackingMenu MainMenu;
 
         private static GameObject OriginalTabsObject =>
             GameObject.Find("UserInterface/QuickMenu/QuickModeMenus/QuickModeNotificationsMenu/NotificationTabs");
@@ -22,8 +20,6 @@ namespace VRCEyeTracking.QuickMenu
         {
             if (!HasInitMenu)
                 InitializeMenu();
-            //else
-                //HandleMenuTabCreation(GameObject.Find("UserInterface/QuickMenu/QuickModeMenus/VRCSRanipalMenu").transform);
         }
 
         private static void InitializeMenu()
@@ -69,16 +65,8 @@ namespace VRCEyeTracking.QuickMenu
             newMenu.pivot = new Vector2(0.5f, 0.5f);
             newMenu.anchoredPosition = new Vector2(0, 200f);
             newMenu.gameObject.SetActive(false);
-            
-            var bundle = AssetBundle.LoadFromMemory(ExtractAb());
-            var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
-            var menuObject = Object.Instantiate(menuPrefab);
-            menuObject.transform.parent = newMenu;
-            menuObject.transform.localPosition = Vector3.zero;
-            menuObject.transform.localScale = Vector3.oneVector;
-            menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
 
-            //HandleMenuTabCreation(newMenu);
+            MainMenu = new FaceTrackingMenu(newMenu);
 
             // Tab interaction
             var tabButton = newTab.GetComponent<Button>();
@@ -116,68 +104,6 @@ namespace VRCEyeTracking.QuickMenu
             var s = Sprite.CreateSprite_Injected(t, ref rect, ref pivot, 100.0f, 0, SpriteMeshType.Tight, ref border, false);
 
             return s;
-        }
-
-        private static byte[] ExtractAb()
-        {
-            var a = Assembly.GetExecutingAssembly();
-            using (var resFilestream = a.GetManifestResourceStream("VRCEyeTracking.VRCFaceTracking"))
-            {
-                if (resFilestream == null) return null;
-                var ba = new byte[resFilestream.Length];
-                resFilestream.Read(ba, 0, ba.Length);
-                return ba;
-            }
-        }
-
-        private static void HandleMenuTabCreation(Transform newMenu)
-        {
-            if (EyeTab != null) Object.Destroy(EyeTab.TabObject);
-            if (MouthTab != null) Object.Destroy(MouthTab.TabObject);
-            
-            var newTabs =
-                Object.Instantiate(OriginalTabsObject, OriginalTabsObject.transform.parent, true);
-
-            newTabs.name = "SRanipalTabs";
-
-            newTabs.transform.localScale = OriginalTabsObject.transform.localScale;
-            newTabs.transform.localPosition = OriginalTabsObject.transform.localPosition;
-            newTabs.transform.localRotation = OriginalTabsObject.transform.localRotation;
-
-            //Strip away notification menu scripts and instantiate top buttons
-            for (var i=0; i < newTabs.transform.GetChildCount(); i++)
-            {
-                var tab = newTabs.transform.GetChild(i).gameObject;
-
-                switch (tab.gameObject.name)
-                {
-                    case "InvitesTab":
-                        EyeTab = new QuickMenuTab(tab.gameObject, "Eye Tracking", "View the Eye Tracking Menu", null,
-                            () => new Thread(() => SRanipalTrack.Initialize(true, false)).Start());
-                        EyeTab.TabEnabled = SRanipalTrack.EyeEnabled; // Catch up with SRanipal
-                        break;
-                    case "FriendRequestsTab":
-                        MouthTab = new QuickMenuTab(tab.gameObject, "Mouth Tracking", "View the Mouth Tracking Menu", null,
-                            () => SRanipalTrack.Initialize(false, true));
-                        MouthTab.TabEnabled = SRanipalTrack.FaceEnabled; // Catch up with SRanipal
-                        break;
-                    default:
-                        Object.Destroy(tab.gameObject);
-                        continue;
-                }
-            }
-
-            newTabs.transform.parent = newMenu;
-            
-            //if (EyeTab.TabEnabled)
-                //HandlePageCreation(EyeTab, newMenu);
-        }
-
-        private static void HandlePageCreation(QuickMenuTab menuTab, Transform menuObject)
-        {
-            var newPage = new QuickMenuPage(menuTab, menuObject);
-            newPage.CreateMenuButton("DoAThing", new Vector2(0, 0), () => MelonLogger.Msg("BUTTON PRESS"));
-
         }
     }
 }
