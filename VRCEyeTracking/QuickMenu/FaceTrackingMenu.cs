@@ -9,7 +9,7 @@ namespace VRCEyeTracking.QuickMenu
 {
     public class FaceTrackingMenu
     {
-        private EyeTrackingMenu _eyeTrackingMenu;
+        private readonly EyeTrackingMenu _eyeTrackingMenu;
         
         public FaceTrackingMenu(Transform parentMenuTransform)
         {
@@ -22,6 +22,17 @@ namespace VRCEyeTracking.QuickMenu
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
 
             _eyeTrackingMenu = new EyeTrackingMenu(menuObject.transform.Find("Pages/EyeTracking"));
+            
+            foreach (var sprite in Resources.FindObjectsOfTypeAll<Sprite>())
+                switch (sprite.name)
+                {
+                    case "UI_ButtonToggleBottom_Bifrost":
+                        ToggleButton.ToggleDown = sprite;
+                        break;
+                    case "UI_ButtonToggleTop_Bifrost":
+                        ToggleButton.ToggleUp = sprite;
+                        break;
+                }
         }
         
         private static byte[] ExtractAb()

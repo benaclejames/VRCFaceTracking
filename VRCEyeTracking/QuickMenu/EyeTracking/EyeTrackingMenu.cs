@@ -1,4 +1,5 @@
 ﻿using System;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
@@ -8,7 +9,7 @@ namespace VRCEyeTracking.QuickMenu.EyeTracking
     public class EyeTrackingMenu
     {
         private readonly XYVisualizer _leftEyeVisualizer, _rightEyeVisualizer;
-        private readonly TrackingImprovementsList _trackingImprovementsList;
+        private readonly ToggleButton _trackingToggle;
         
         public readonly GameObject Root;
         
@@ -20,7 +21,9 @@ namespace VRCEyeTracking.QuickMenu.EyeTracking
             
             _leftEyeVisualizer = new XYVisualizer(leftEye.Find("X"), leftEye.Find("Y"));
             _rightEyeVisualizer = new XYVisualizer(rightEye.Find("X"), rightEye.Find("Y"));
-            _trackingImprovementsList = new TrackingImprovementsList(pageRoot.Find("TrackingImprovements/TrackingImprovementsList"));
+
+            _trackingToggle = new ToggleButton(pageRoot.Find("UtilButtons/ToggleActive"));
+            _trackingToggle.OnToggle += b => SRanipalTrack.EyeEnabled = b;
             
             pageRoot.Find("UtilButtons/Recalibrate").GetComponent<Button>().onClick.AddListener((Action)(() => SRanipal_Eye_v2.LaunchEyeCalibration()));
         }
@@ -32,8 +35,6 @@ namespace VRCEyeTracking.QuickMenu.EyeTracking
                 new Vector3(-1, 1, 1)), Vector3.Scale(
                 eyeData.verbose_data.right.gaze_direction_normalized,
                 new Vector3(-1, 1, 1)));
-            
-            _trackingImprovementsList.UpdateImprovements(eyeData.verbose_data.tracking_improvements);   
         }
 
         private void UpdateXY(Vector2 leftEye, Vector2 rightEye)

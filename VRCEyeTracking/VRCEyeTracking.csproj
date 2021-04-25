@@ -46,10 +46,11 @@
     <Compile Include="MainMod.cs" />
     <Compile Include="ParamLib\ParamLib.cs" />
     <Compile Include="ParamLib\BaseParam.cs" />
-    <Compile Include="QuickMenu\QuickMenuButton.cs" />
-    <Compile Include="QuickMenu\QuickMenuPage.cs" />
-    <Compile Include="QuickMenu\QuickMenuTab.cs" />
+    <Compile Include="QuickMenu\EyeTracking\EyeTrackingMenu.cs" />
+    <Compile Include="QuickMenu\EyeTracking\XYVisualizer.cs" />
+    <Compile Include="QuickMenu\FaceTrackingMenu.cs" />
     <Compile Include="QuickMenu\QuickModeMenu.cs" />
+    <Compile Include="QuickMenu\ToggleButton.cs" />
     <Compile Include="SRanipalTrackingInterface.cs" />
     <Compile Include="SRanipal\Eye\SRanipal_Eye.cs" />
     <Compile Include="SRanipal\Eye\SRanipal_EyeData.cs" />
@@ -91,6 +92,9 @@
     </Reference>
     <Reference Include="UnityEngine, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
@@ -161,6 +165,9 @@
     <Reference Include="VRCSDKBase, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\..\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="VRCFaceTracking" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

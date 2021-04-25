@@ -105,7 +105,7 @@ namespace VRCEyeTracking
 
         private static void Update(CancellationToken token)
         {
-            while (!token.IsCancellationRequested && (EyeEnabled || FaceEnabled))
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
