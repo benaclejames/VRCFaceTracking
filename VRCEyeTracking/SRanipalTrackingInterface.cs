@@ -15,7 +15,6 @@ namespace VRCEyeTracking
     public static class SRanipalTrack
     {
         public static bool EyeEnabled, FaceEnabled;
-        
 
         public static EyeData_v2 LatestEyeData;
         public static Dictionary<LipShape_v2, float> LatestLipData;
@@ -62,8 +61,8 @@ namespace VRCEyeTracking
 
             HandleErrors(eyeError, faceError);
             
-            if (SceneManager.GetActiveScene().buildIndex == -1)
-                MainMod.MainThreadExecutionQueue.Add(QuickModeMenu.CheckIfShouldInit);
+            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
+                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, FaceEnabled));
             
             if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
         }

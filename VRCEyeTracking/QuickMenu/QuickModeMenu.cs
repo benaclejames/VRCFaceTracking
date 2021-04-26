@@ -13,9 +13,6 @@ namespace VRCEyeTracking.QuickMenu
         private static bool HasInitMenu;
         public static FaceTrackingMenu MainMenu;
 
-        private static GameObject OriginalTabsObject =>
-            GameObject.Find("UserInterface/QuickMenu/QuickModeMenus/QuickModeNotificationsMenu/NotificationTabs");
-
         public static void CheckIfShouldInit()
         {
             if (!HasInitMenu)

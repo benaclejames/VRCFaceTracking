@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCEyeTracking.QuickMenu.EyeTracking;
+using Object = UnityEngine.Object;
 
 namespace VRCEyeTracking.QuickMenu
 {
     public class FaceTrackingMenu
     {
         private readonly EyeTrackingMenu _eyeTrackingMenu;
-        
+        private readonly GameObject _eyeTab, _lipTab;
+
         public FaceTrackingMenu(Transform parentMenuTransform)
         {
             var bundle = AssetBundle.LoadFromMemory(ExtractAb());
@@ -33,6 +37,16 @@ namespace VRCEyeTracking.QuickMenu
                         ToggleButton.ToggleUp = sprite;
                         break;
                 }
+            
+            _eyeTab = menuObject.transform.Find("Tabs/Buttons/Eye Tracking").gameObject;
+            _eyeTab.GetComponent<Button>().onClick.AddListener((Action)(() =>
+            {
+                _eyeTrackingMenu.Root.SetActive(true);
+            }));
+            
+            _lipTab = menuObject.transform.Find("Tabs/Buttons/Lip Tracking").gameObject;
+            
+            UpdateEnabledTabs(SRanipalTrack.EyeEnabled, SRanipalTrack.FaceEnabled);
         }
         
         private static byte[] ExtractAb()
@@ -45,6 +59,16 @@ namespace VRCEyeTracking.QuickMenu
                 resFilestream.Read(ba, 0, ba.Length);
                 return ba;
             }
+        }
+
+        public void UpdateEnabledTabs(bool eye = false, bool lip = false)
+        {
+            _eyeTab.SetActive(eye);
+            _lipTab.SetActive(lip);
+            
+            if (eye)
+                _eyeTrackingMenu.Root.SetActive(true);
+            //else if (lip)
         }
 
         public void UpdateParams(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
