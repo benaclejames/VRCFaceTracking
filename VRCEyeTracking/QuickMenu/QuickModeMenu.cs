@@ -28,6 +28,8 @@ namespace VRCEyeTracking.QuickMenu
 
         private static void CreateNotificationTab(string name, string text, Color color, string imageDataBase64 = null)
         {
+            var bundle = AssetBundle.LoadFromMemory(ExtractAb());
+            
             var existingTabs = Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0].field_Public_ArrayOf_GameObject_0.ToList();
 
             var quickMenu = Resources.FindObjectsOfTypeAll<global::QuickMenu>()[0];
@@ -46,10 +48,7 @@ namespace VRCEyeTracking.QuickMenu
 
             Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0].field_Public_ArrayOf_GameObject_0 = existingTabs.ToArray();
 
-            if (imageDataBase64 != null)
-                newTab.Find("Icon").GetComponent<Image>().sprite = CreateSpriteFromBase64(imageDataBase64);
-            else
-                newTab.Find("Icon").gameObject.SetActive(false);
+            newTab.Find("Icon").GetComponent<Image>().sprite = LoadQmSprite(bundle);
 
             // Menu
 
@@ -63,7 +62,7 @@ namespace VRCEyeTracking.QuickMenu
             newMenu.anchoredPosition = new Vector2(0, 200f);
             newMenu.gameObject.SetActive(false);
 
-            MainMenu = new FaceTrackingMenu(newMenu);
+            MainMenu = new FaceTrackingMenu(newMenu, bundle);
 
             // Tab interaction
             var tabButton = newTab.GetComponent<Button>();
@@ -90,17 +89,26 @@ namespace VRCEyeTracking.QuickMenu
         }
 
 
-        private static Sprite CreateSpriteFromBase64(string data)
+        private static Sprite LoadQmSprite(AssetBundle bundle)
         {
-            var t = new Texture2D(2, 2);
-            ImageConversion.LoadImage(t, Convert.FromBase64String(data));
+            var t = bundle.LoadAsset<Texture2D>("sranipal");
             var rect = new Rect(0.0f, 0.0f, t.width, t.height);
             var pivot = new Vector2(0.5f, 0.5f);
             var border = Vector4.zero;
 
-            var s = Sprite.CreateSprite_Injected(t, ref rect, ref pivot, 100.0f, 0, SpriteMeshType.Tight, ref border, false);
-
-            return s;
+            return Sprite.CreateSprite_Injected(t, ref rect, ref pivot, 100.0f, 0, SpriteMeshType.Tight, ref border, false);
+        }
+        
+        private static byte[] ExtractAb()
+        {
+            var a = Assembly.GetExecutingAssembly();
+            using (var resFilestream = a.GetManifestResourceStream("VRCEyeTracking.VRCFaceTracking"))
+            {
+                if (resFilestream == null) return null;
+                var ba = new byte[resFilestream.Length];
+                resFilestream.Read(ba, 0, ba.Length);
+                return ba;
+            }
         }
     }
 }

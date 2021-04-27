@@ -15,9 +15,8 @@ namespace VRCEyeTracking.QuickMenu
         private readonly EyeTrackingMenu _eyeTrackingMenu;
         private readonly GameObject _eyeTab, _lipTab;
 
-        public FaceTrackingMenu(Transform parentMenuTransform)
+        public FaceTrackingMenu(Transform parentMenuTransform, AssetBundle bundle)
         {
-            var bundle = AssetBundle.LoadFromMemory(ExtractAb());
             var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
             var menuObject = Object.Instantiate(menuPrefab);
             menuObject.transform.parent = parentMenuTransform;
@@ -47,18 +46,6 @@ namespace VRCEyeTracking.QuickMenu
             _lipTab = menuObject.transform.Find("Tabs/Buttons/Lip Tracking").gameObject;
             
             UpdateEnabledTabs(SRanipalTrack.EyeEnabled, SRanipalTrack.FaceEnabled);
-        }
-        
-        private static byte[] ExtractAb()
-        {
-            var a = Assembly.GetExecutingAssembly();
-            using (var resFilestream = a.GetManifestResourceStream("VRCEyeTracking.VRCFaceTracking"))
-            {
-                if (resFilestream == null) return null;
-                var ba = new byte[resFilestream.Length];
-                resFilestream.Read(ba, 0, ba.Length);
-                return ba;
-            }
         }
 
         public void UpdateEnabledTabs(bool eye = false, bool lip = false)
