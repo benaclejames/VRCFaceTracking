@@ -6,18 +6,18 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
 
-namespace VRCEyeTracking
+namespace VRCFaceTracking
 {
     public static class DependencyManager
     {
         // Because SRanipal.dll needs to be loaded last.. Too lazy to automate moving it to back of load queue
         private static readonly List<string> RequiredToLoad = new List<string>
         {
-            "VRCEyeTracking.SRanipal.libHTC_License.dll",
-            "VRCEyeTracking.SRanipal.nanomsg.dll",
-            "VRCEyeTracking.SRanipal.SRWorks_Log.dll",
-            "VRCEyeTracking.SRanipal.ViveSR_Client.dll",
-            "VRCEyeTracking.SRanipal.SRanipal.dll"
+            "VRCFaceTracking.SRanipal.libHTC_License.dll",
+            "VRCFaceTracking.SRanipal.nanomsg.dll",
+            "VRCFaceTracking.SRanipal.SRWorks_Log.dll",
+            "VRCFaceTracking.SRanipal.ViveSR_Client.dll",
+            "VRCFaceTracking.SRanipal.SRanipal.dll"
         };
         
         public static void Init()

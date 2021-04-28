@@ -5,7 +5,7 @@ using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using ParamLib;
 
-namespace VRCEyeTracking.SRParam
+namespace VRCFaceTracking.SRParam
 {
     public class SRanipalGeneralEyeParameter : FloatBaseParam, ISRanipalParam
     {

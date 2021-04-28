@@ -2,7 +2,7 @@
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 
-namespace VRCEyeTracking.SRParam
+namespace VRCFaceTracking.SRParam
 {
     public interface ISRanipalParam
     {

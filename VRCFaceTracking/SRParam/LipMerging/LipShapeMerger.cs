@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ViveSR.anipal.Lip;
 
-namespace VRCEyeTracking.SRParam.LipMerging
+namespace VRCFaceTracking.SRParam.LipMerging
 {
     public static class LipShapeMerger
     {

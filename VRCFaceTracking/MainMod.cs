@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using VRCEyeTracking;
+using VRCFaceTracking;
 using MelonLoader;
 using UnityEngine;
-using VRCEyeTracking.QuickMenu;
-using VRCEyeTracking.SRParam;
-using VRCEyeTracking.SRParam.LipMerging;
+using VRCFaceTracking.QuickMenu;
+using VRCFaceTracking.SRParam;
+using VRCFaceTracking.SRParam.LipMerging;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCEyeTracking", "1.3.1", "benaclejames",
-    "https://github.com/benaclejames/VRCEyeTracking")]
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.0.1", "benaclejames",
+    "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
-namespace VRCEyeTracking
+namespace VRCFaceTracking
 {
     public class MainMod : MelonMod
     {
@@ -72,7 +72,7 @@ namespace VRCEyeTracking
                 foreach (var sRanipalParam in SRanipalTrackParams.ToArray())
                     sRanipalParam.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
                 
-                if (QuickModeMenu.MainMenu != null) QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
+                if (QuickModeMenu.MainMenu != null) QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipImage);
 
                 yield return new WaitForSeconds(0.01f);
             }

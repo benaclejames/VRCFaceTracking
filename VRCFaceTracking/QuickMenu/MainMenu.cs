@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using JetBrains.Annotations;
+using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.QuickMenu.EyeTracking;
+using VRCFaceTracking.QuickMenu.EyeTracking;
+using VRCFaceTracking.QuickMenu.LipTracking;
 using Object = UnityEngine.Object;
 
-namespace VRCEyeTracking.QuickMenu
+namespace VRCFaceTracking.QuickMenu
 {
-    public class FaceTrackingMenu
+    public class MainMenu
     {
         private readonly EyeTrackingMenu _eyeTrackingMenu;
-        private readonly GameObject _eyeTab, _lipTab;
+        private readonly LipTrackingMenu _lipTrackingMenu;
 
-        public FaceTrackingMenu(Transform parentMenuTransform, AssetBundle bundle)
+        public MainMenu(Transform parentMenuTransform, AssetBundle bundle)
         {
             var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
             var menuObject = Object.Instantiate(menuPrefab);
@@ -24,7 +26,8 @@ namespace VRCEyeTracking.QuickMenu
             menuObject.transform.localScale = Vector3.oneVector;
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
 
-            _eyeTrackingMenu = new EyeTrackingMenu(menuObject.transform.Find("Pages/EyeTracking"));
+            _eyeTrackingMenu = new EyeTrackingMenu(menuObject.transform.Find("Pages/Eye Tracking"), menuObject.transform.Find("Tabs/Buttons/Eye Tracking"));
+            _lipTrackingMenu = new LipTrackingMenu(menuObject.transform.Find("Pages/Lip Tracking"), menuObject.transform.Find("Tabs/Buttons/Lip Tracking"));
             
             foreach (var sprite in Resources.FindObjectsOfTypeAll<Sprite>())
                 switch (sprite.name)
@@ -37,30 +40,24 @@ namespace VRCEyeTracking.QuickMenu
                         break;
                 }
             
-            _eyeTab = menuObject.transform.Find("Tabs/Buttons/Eye Tracking").gameObject;
-            _eyeTab.GetComponent<Button>().onClick.AddListener((Action)(() =>
-            {
-                _eyeTrackingMenu.Root.SetActive(true);
-            }));
-            
-            _lipTab = menuObject.transform.Find("Tabs/Buttons/Lip Tracking").gameObject;
-            
-            UpdateEnabledTabs(SRanipalTrack.EyeEnabled, SRanipalTrack.FaceEnabled);
+            UpdateEnabledTabs(SRanipalTrack.EyeEnabled, SRanipalTrack.LipEnabled);
         }
 
         public void UpdateEnabledTabs(bool eye = false, bool lip = false)
         {
-            _eyeTab.SetActive(eye);
-            _lipTab.SetActive(lip);
+            _eyeTrackingMenu.TabObject.SetActive(eye);
+            _lipTrackingMenu.TabObject.SetActive(lip);
             
             if (eye)
                 _eyeTrackingMenu.Root.SetActive(true);
-            //else if (lip)
+            else if (lip)
+                _lipTrackingMenu.Root.SetActive(true);
         }
 
-        public void UpdateParams(EyeData_v2? eyeData, Dictionary<LipShape_v2, float> lipData = null)
+        public void UpdateParams(EyeData_v2? eyeData, Texture2D lipImage)
         {
             if (_eyeTrackingMenu.Root.active && eyeData.HasValue) _eyeTrackingMenu.UpdateEyeTrack(eyeData.Value);
+            if (_lipTrackingMenu.Root.active && lipImage != null) _lipTrackingMenu.UpdateImage(lipImage);
         }
     }
 }

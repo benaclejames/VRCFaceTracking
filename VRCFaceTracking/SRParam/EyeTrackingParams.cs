@@ -2,7 +2,7 @@
 using UnityEngine;
 using ViveSR.anipal.Eye;
 
-namespace VRCEyeTracking.SRParam
+namespace VRCFaceTracking.SRParam
 {
     public static class EyeTrackingParams
     {

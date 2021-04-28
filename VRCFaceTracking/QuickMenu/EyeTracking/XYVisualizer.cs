@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace VRCEyeTracking.QuickMenu.EyeTracking
+namespace VRCFaceTracking.QuickMenu.EyeTracking
 {
 	public class XYVisualizer
 	{

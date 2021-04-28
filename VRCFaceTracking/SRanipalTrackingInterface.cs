@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
-using VRCEyeTracking.QuickMenu;
-using VRCEyeTracking.SRParam.LipMerging;
+using VRCFaceTracking.QuickMenu;
+using VRCFaceTracking.SRParam.LipMerging;
 
-namespace VRCEyeTracking
+namespace VRCFaceTracking
 {
     public static class SRanipalTrack
     {
-        public static bool EyeEnabled, FaceEnabled;
+        public static bool EyeEnabled, LipEnabled;
 
         public static EyeData_v2 LatestEyeData;
         public static Dictionary<LipShape_v2, float> LatestLipData;
+        public static Texture2D LatestLipImage;
 
         public static float CurrentDiameter;
 
@@ -31,11 +33,11 @@ namespace VRCEyeTracking
         
         private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != (Error) 1051;
 
-        public static void Initialize(bool eye = true, bool lip = true)
+        private static void Initialize(bool eye = true, bool lip = true)
         {
             MelonLogger.Msg($"Initializing SRanipal...");
 
-            Error eyeError = Error.UNDEFINED, faceError = Error.UNDEFINED;
+            Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
             if (eye)
             {
@@ -50,24 +52,24 @@ namespace VRCEyeTracking
 
             if (lip)
             {
-                if (FaceEnabled)
+                if (LipEnabled)
                 {
                     MelonLogger.Msg("Releasing previously initialized lip module...");
                     SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
                 }
                 
-                faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+                lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
             }
 
-            HandleErrors(eyeError, faceError);
+            HandleErrors(eyeError, lipError);
             
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, FaceEnabled));
+                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
             
             if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
         }
 
-        private static void HandleErrors(Error eyeError, Error faceError)
+        private static void HandleErrors(Error eyeError, Error lipError)
         {
             if (eyeError.IsRealError())
                 // Msg instead of Warning under the assumption most people will be using only lip tracking
@@ -79,15 +81,15 @@ namespace VRCEyeTracking
                 MelonLogger.Msg("SRanipal Eye Initialized!");
             }
 
-            if (faceError.IsRealError())
-                MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({faceError})");
-            else if (faceError == (Error) 1051)
-                while (faceError == (Error) 1051)
-                    faceError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
-            if (faceError == Error.WORK)
+            if (lipError.IsRealError())
+                MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({lipError})");
+            else if (lipError == (Error) 1051)
+                while (lipError == (Error) 1051)
+                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            if (lipError == Error.WORK)
             {
                 MainMod.AppendLipParams();
-                FaceEnabled = true;
+                LipEnabled = true;
                 MelonLogger.Msg("SRanipal Lip Initialized!");
             }
         }
@@ -97,7 +99,7 @@ namespace VRCEyeTracking
             CancellationToken.Cancel();
             
             if (EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
-            if (FaceEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            if (LipEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
             
             CancellationToken.Dispose();
         }
@@ -109,7 +111,7 @@ namespace VRCEyeTracking
                 try
                 {
                     if (EyeEnabled) UpdateEye();
-                    if (FaceEnabled) UpdateMouth();
+                    if (LipEnabled) UpdateMouth();
                 }
                 catch (Exception e)
                 {
@@ -155,6 +157,7 @@ namespace VRCEyeTracking
         private static void UpdateMouth()
         {
             SRanipal_Lip_v2.GetLipWeightings(out LatestLipData);
+            SRanipal_Lip_v2.GetLipImage(ref LatestLipImage);
         }
 
         #endregion

@@ -3,26 +3,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
 
-namespace VRCEyeTracking.QuickMenu.EyeTracking
+namespace VRCFaceTracking.QuickMenu.EyeTracking
 {
-    public class EyeTrackingMenu
+    public class EyeTrackingMenu : SRanipalTrackingMenu
     {
         private readonly XYVisualizer _leftEyeVisualizer, _rightEyeVisualizer;
-        private readonly ToggleButton _trackingToggle;
-        
-        public readonly GameObject Root;
-        
-        public EyeTrackingMenu(Transform pageRoot)
+
+        public EyeTrackingMenu(Transform pageRoot, Transform eyeTab) : base(pageRoot, eyeTab.gameObject)
         {
-            Root = pageRoot.gameObject;
             var leftEye = pageRoot.Find("EyeIndicators/LeftEye/Mask/XYLines");
             var rightEye = pageRoot.Find("EyeIndicators/RightEye/Mask/XYLines");
             
             _leftEyeVisualizer = new XYVisualizer(leftEye.Find("X"), leftEye.Find("Y"));
             _rightEyeVisualizer = new XYVisualizer(rightEye.Find("X"), rightEye.Find("Y"));
 
-            _trackingToggle = new ToggleButton(pageRoot.Find("UtilButtons/ToggleActive"));
-            _trackingToggle.OnToggle += b => SRanipalTrack.EyeEnabled = b;
+            TrackingToggle.OnToggle += b => SRanipalTrack.EyeEnabled = b;
             
             pageRoot.Find("UtilButtons/Recalibrate").GetComponent<Button>().onClick.AddListener((Action)(() => SRanipal_Eye_v2.LaunchEyeCalibration()));
         }

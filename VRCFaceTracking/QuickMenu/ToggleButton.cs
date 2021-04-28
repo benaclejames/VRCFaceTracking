@@ -3,7 +3,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace VRCEyeTracking.QuickMenu
+namespace VRCFaceTracking.QuickMenu
 {
     public class ToggleButton
     {
