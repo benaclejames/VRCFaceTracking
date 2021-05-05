@@ -1,10 +1,10 @@
-# 👀 VRCEyeTracking
+# 👀 VRCFaceTracking
 
-Provides real eye tracking in VRChat via the HTC Vive Pro Eye's eye tracking SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers. 
+Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers and/or Lip Tracker. 
 
 ## 💾 Installation
 
-As is standard, just drag the `VRCEyeTracking.dll` into your mods folder!
+As is standard, just drag the `VRCFaceTracking.dll` into your mods folder!
 
 ## 🛠 Avatar Setup
 
@@ -33,7 +33,7 @@ It's not required to use all of these parameters. Similar to the setup of parame
 
 **Please make sure you disable the built in simulated eye tracking in your avatar descriptor**. This will almost certainly mess with things if left on. Personally, I've also had some issues with blink blendshapes being overrided by my gesture layer so if you can see your eyes fine but others see them half closed, I would reccomend removing your Additive layer so the default is not applied. It should say "None (Runtime Animator Controller)" if it's removed correctly.
 
-> Should you need more guidance on setting up your avatar, feel free to consult [the wiki](https://github.com/benaclejames/VRCEyeTracking/wiki/Avatar-Setup)!
+> Should you need more guidance on setting up your avatar, feel free to consult [the wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup)!
 
 ## 📜 Disclaimer
 
