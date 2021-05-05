@@ -72,7 +72,7 @@ namespace VRCFaceTracking
                 foreach (var sRanipalParam in SRanipalTrackParams.ToArray())
                     sRanipalParam.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
                 
-                if (QuickModeMenu.MainMenu != null) QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipImage);
+                if (QuickModeMenu.MainMenu != null) QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData);
 
                 yield return new WaitForSeconds(0.01f);
             }

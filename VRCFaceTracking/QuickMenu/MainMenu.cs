@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using MelonLoader;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using ViveSR.anipal.Eye;
-using ViveSR.anipal.Lip;
 using VRCFaceTracking.QuickMenu.EyeTracking;
-using VRCFaceTracking.QuickMenu.LipTracking;
 using Object = UnityEngine.Object;
 
 namespace VRCFaceTracking.QuickMenu
@@ -15,7 +8,7 @@ namespace VRCFaceTracking.QuickMenu
     public class MainMenu
     {
         private readonly EyeTrackingMenu _eyeTrackingMenu;
-        private readonly LipTrackingMenu _lipTrackingMenu;
+        //private readonly LipTrackingMenu _lipTrackingMenu;
 
         public MainMenu(Transform parentMenuTransform, AssetBundle bundle)
         {
@@ -27,7 +20,7 @@ namespace VRCFaceTracking.QuickMenu
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
 
             _eyeTrackingMenu = new EyeTrackingMenu(menuObject.transform.Find("Pages/Eye Tracking"), menuObject.transform.Find("Tabs/Buttons/Eye Tracking"));
-            _lipTrackingMenu = new LipTrackingMenu(menuObject.transform.Find("Pages/Lip Tracking"), menuObject.transform.Find("Tabs/Buttons/Lip Tracking"));
+            //_lipTrackingMenu = new LipTrackingMenu(menuObject.transform.Find("Pages/Lip Tracking"), menuObject.transform.Find("Tabs/Buttons/Lip Tracking"));
             
             foreach (var sprite in Resources.FindObjectsOfTypeAll<Sprite>())
                 switch (sprite.name)
@@ -46,18 +39,18 @@ namespace VRCFaceTracking.QuickMenu
         public void UpdateEnabledTabs(bool eye = false, bool lip = false)
         {
             _eyeTrackingMenu.TabObject.SetActive(eye);
-            _lipTrackingMenu.TabObject.SetActive(lip);
+            //_lipTrackingMenu.TabObject.SetActive(lip);
             
             if (eye)
                 _eyeTrackingMenu.Root.SetActive(true);
-            else if (lip)
-                _lipTrackingMenu.Root.SetActive(true);
+            //else if (lip)
+                //_lipTrackingMenu.Root.SetActive(true);
         }
 
-        public void UpdateParams(EyeData_v2? eyeData, Texture2D lipImage)
+        public void UpdateParams(EyeData_v2? eyeData)
         {
             if (_eyeTrackingMenu.Root.active && eyeData.HasValue) _eyeTrackingMenu.UpdateEyeTrack(eyeData.Value);
-            if (_lipTrackingMenu.Root.active && lipImage != null) _lipTrackingMenu.UpdateImage(lipImage);
+            //if (_lipTrackingMenu.Root.active && lipImage != null) _lipTrackingMenu.UpdateImage(lipImage);
         }
     }
 }

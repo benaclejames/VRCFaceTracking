@@ -19,7 +19,7 @@ namespace VRCFaceTracking
 
         public static EyeData_v2 LatestEyeData;
         public static Dictionary<LipShape_v2, float> LatestLipData;
-        public static Texture2D LatestLipImage;
+        //public static Texture2D LatestLipImage;
 
         public static float CurrentDiameter;
 
@@ -157,7 +157,7 @@ namespace VRCFaceTracking
         private static void UpdateMouth()
         {
             SRanipal_Lip_v2.GetLipWeightings(out LatestLipData);
-            SRanipal_Lip_v2.GetLipImage(ref LatestLipImage);
+            //SRanipal_Lip_v2.GetLipImage(ref LatestLipImage);
         }
 
         #endregion
