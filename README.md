@@ -8,7 +8,9 @@ As is standard, just drag the `VRCFaceTracking.dll` into your mods folder!
 
 ## 🛠 Avatar Setup
 
-For this mod to work, you'll need to be using an avatar with the correct parameters. The system is designed to control your avatar's eyes via simple blend states but what the parameters control is completely up to you. The mod searches for the following float parameters to modify:
+For this mod to work, you'll need to be using an avatar with the correct parameters. The system is designed to control your avatar's eyes and lips via simple blend states but what the parameters control is completely up to you. The mod searches for the following float parameters to modify:
+
+### Eye Parameters
 
 |Parameter Name (**Case Sensitive**)|Description|Eye|
 |---------|-----------|---|
@@ -33,7 +35,74 @@ It's not required to use all of these parameters. Similar to the setup of parame
 
 **Please make sure you disable the built in simulated eye tracking in your avatar descriptor**. This will almost certainly mess with things if left on. Personally, I've also had some issues with blink blendshapes being overrided by my gesture layer so if you can see your eyes fine but others see them half closed, I would reccomend removing your Additive layer so the default is not applied. It should say "None (Runtime Animator Controller)" if it's removed correctly.
 
-> Should you need more guidance on setting up your avatar, feel free to consult [the wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup)!
+### Lip Parameters
+
+There are a large number of parameters you can use for lip tracking. Consult the wiki for more information about what they do: [Avatar Setup](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup).
+
+You can also refer to this visual guide from NeosVR on what the following API parameters do: https://casuallydotcat.wordpress.com/2020/02/10/the-ultimate-neos-blend-shape-guide-february-2020/
+
+|Parameter Name (**Case Sensitive**)|Description|Range|
+|---|---|---|
+|`JawRight`|Jaw translation right|0.0 - 1.0|
+|`JawLeft`|Jaw translation left|0.0 - 1.0|
+|`JawForward`|Jaw translation jutting out|0.0 - 1.0|
+|`JawOpen`|Jaw open|0.0 - 1.0|
+|`MouthApeShape`|Jaw open, lips sealed closed|0.0 - 1.0|
+|`MouthUpperRight`|Upper lip translate right, and not showing teeth|0.0 - 1.0|
+|`MouthUpperLeft`|Upper lip translate left, and not showing teeth|0.0 - 1.0|
+|`MouthLowerRight`|Lower lip translate right|0.0 - 1.0|
+|`MouthLowerLeft`|Lower lip translate left|0.0 - 1.0|
+|`MouthUpperOverturn`|Pushing top lip out|0.0 - 1.0|
+|`MouthLowerOverturn`|Pouting out lower lip|0.0 - 1.0|
+|`MouthPout`|Both lips pouting forward|0.0 - 1.0|
+|`MouthSmileRight`|Smile right<sup>1</sup>|0.0 - 1.0|
+|`MouthSmileLeft`|Smile left<sup>1</sup>|0.0 - 1.0|
+|`MouthSadRight`|Sad Right<sup>1</sup>|0.0 - 1.0|
+|`MouthSadLeft`|Sad Left<sup>1</sup>|0.0 - 1.0|
+|`CheekPuffRight`|Cheek puffed out, right|0.0 - 1.0|
+|`CheekPuffLeft`|Cheek puffed out, left|0.0 - 1.0|
+|`CheekSuck`|Both cheeks sucked in|0.0 - 1.0|
+|`MouthUpperUpRight`|Upper right lip drawn up to show teeth|0.0 - 1.0|
+|`MouthUpperUpLeft`|Upper left lip drawn up to show teeth|0.0 - 1.0|
+|`MouthLowerDownRight`|Bottom right lip drawn down to show teeth|0.0 - 1.0|
+|`MouthLowerDownLeft`|Bottom left lip drawn down to show teeth|0.0 - 1.0|
+|`MouthUpperInside`|Upper lip bitten by lower teeth|0.0 - 1.0|
+|`MouthLowerInside`|Bottom lip bitten by upper teeth|0.0 - 1.0|
+|`MouthLowerOverlay`|Upper lip out and over lower|0.0 - 1.0|
+|`TongueLongStep1`|Seems to be an intermediate out|0.0 - 1.0|
+|`TongueLongStep2`|Seems to be an intermediate out|0.0 - 1.0|
+|`TongueDown`|Tongue tip angled down|0.0 - 1.0|
+|`TongueUp`|Tongue tip angled up|0.0 - 1.0|
+|`TongueRight`|Tongue tip angled right|0.0 - 1.0|
+|`TongueLeft`|Tongue tip angled left|0.0 - 1.0|
+|`TongueRoll`|Both sides of tongue brought up into "v"|0.0 - 1.0|
+|`TongueUpLeftMorph`|Seems to deform upper left of tongue out of mouth|0.0 - 1.0|
+|`TongueUpRightMorph`|Seems to deform upper right of tongue out of mouth|0.0 - 1.0|
+|`TongueDownLeftMorph`|Seems to deform lower left of tongue out of mouth |0.0 - 1.0|
+|`TongueDownRightMorph`|Seems to deform lower right of tongue out of mouth |0.0 - 1.0|
+
+Additionally, the mod provides computed parameters that combine some of the above parameters, to save space:
+
+|Parameter Name (**Case Sensitive**)|Description|Range|
+|--|--|--|
+|`JawX`|Jaw translation fully left to fully right|-1.0 - 1.0|
+|`MouthUpper`|Top lip deflection (MouthUpperLeft/Right) full left to full right, with 0 being neutral|-1.0 - 1.0|
+|`MouthLower`|Bottom lip deflection (MouthLowerLeft/Right) full left to full right, with 0 being neutral|-1.0 - 1.0|
+|`MouthUpperUp`|Bottom lip deflection **with teeth** (MouthUpperUpLeft/Right) full left to full right, with 0 being neutral<sup>2</sup>|-1.0 - 1.0|
+|`MouthLowerDown`|Bottom lip deflection **with teeth** (MouthLowerDownLeft/Right) full left to full right, with 0 being neutral<sup>2</sup>|-1.0 - 1.0|
+|`SmileSadRight`|Left side full smile or full sad, with 0 being neutral<sup>1</sup>|-1.0 - 1.0|
+|`SmileSadLeft`|Left side full smile or full sad, with 0 being neutral<sup>1</sup>|-1.0 - 1.0|
+|`TongueY`|Tongue tip fully up to fully down, with 0 being neutral|-1.0 - 1.0|
+|`TongueX`|Tongue tip fully left to fully right, with 0 being neutral|-1.0 - 1.0|
+
+<sup>1</sup> **Note:** These computed parameters don't seem to work well in practice, at least in my experience (-InconsolableCellist)
+
+<sup>2</sup> **Note:** **TODO:** Not yet implemented 5/4/21
+
+
+### Setup Guide
+
+The wiki contains a fully avatar setup guide: [wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup).
 
 ## 📜 Disclaimer
 
