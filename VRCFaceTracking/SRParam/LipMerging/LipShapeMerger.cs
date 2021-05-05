@@ -23,7 +23,7 @@ namespace VRCFaceTracking.SRParam.LipMerging
         private static readonly Dictionary<OptimizedLipShape, PositiveNegativeShape> OptimizedLipShapes =
             new Dictionary<OptimizedLipShape, PositiveNegativeShape>
             {
-                {OptimizedLipShape.JawX, new PositiveNegativeShape(LipShape_v2.JawRight, LipShape_v2.Jaw_Left)},
+                {OptimizedLipShape.JawX, new PositiveNegativeShape(LipShape_v2.JawRight, LipShape_v2.JawLeft)},
                 {OptimizedLipShape.MouthUpper, new PositiveNegativeShape(LipShape_v2.MouthUpperRight, LipShape_v2.MouthUpperLeft)},
                 {OptimizedLipShape.MouthLower, new PositiveNegativeShape(LipShape_v2.MouthLowerRight, LipShape_v2.MouthLowerLeft)},
                 {OptimizedLipShape.SmileSadRight, new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthSadRight)},

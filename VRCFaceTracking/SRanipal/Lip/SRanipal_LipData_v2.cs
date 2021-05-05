@@ -12,7 +12,7 @@ namespace ViveSR
             {
                 None = -1,
                 JawRight = 0, // +JawX
-                Jaw_Left = 1, // -JawX
+                JawLeft = 1, // -JawX
                 JawForward = 2,
                 JawOpen = 3,
                 MouthApeShape = 4,
