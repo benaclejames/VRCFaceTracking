@@ -18,6 +18,9 @@ namespace VRCFaceTracking
     {
         public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
+        public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
+        public override void OnApplicationStart() => DependencyManager.Init();
+        public override void OnApplicationQuit() => SRanipalTrack.Stop();
 
         private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
         
@@ -36,25 +39,13 @@ namespace VRCFaceTracking
                     unoptimizedShape.ToString(), true));
         }
 
-        public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
-        public override void OnApplicationStart()
-        {
-            DependencyManager.Init();
-        }
-
         public override void VRChat_OnUiManagerInit()
         {
             SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
             MelonCoroutines.Start(UpdateParams());
-            MelonCoroutines.Start(CheckExecutionQueue());
         }
-
-        public override void OnApplicationQuit()
-        {
-            SRanipalTrack.Stop();
-        }
-
+        
         public override void OnSceneWasLoaded(int level, string levelName)
         {
             if (level == -1)
@@ -80,18 +71,12 @@ namespace VRCFaceTracking
         
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
 
-        private static IEnumerator CheckExecutionQueue()
+        public override void OnUpdate()
         {
-            for (;;)
-            {
-                if (MainThreadExecutionQueue.Count > 0)
-                {
-                    MainThreadExecutionQueue[0].Invoke();
-                    MainThreadExecutionQueue.RemoveAt(0);
-                } 
-
-                yield return new WaitForSeconds(5f);
-            } 
+            if (MainThreadExecutionQueue.Count <= 0) return;
+            
+            MainThreadExecutionQueue[0].Invoke();
+            MainThreadExecutionQueue.RemoveAt(0);
         }
     }
 }

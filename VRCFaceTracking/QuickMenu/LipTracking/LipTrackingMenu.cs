@@ -12,6 +12,7 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
             _lipImage = pageRoot.Find("LipImage/Image").GetComponent<Image>();
             
             TrackingToggle.OnToggle += b => SRanipalTrack.LipEnabled = b;
+            OnModuleReInitPress += () => SRanipalTrack.Initialize(false, true);
         }
 
         public void UpdateImage(Texture2D latestImage)

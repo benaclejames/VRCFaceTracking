@@ -8,6 +8,7 @@ namespace VRCFaceTracking.QuickMenu
     {
         internal readonly ToggleButton TrackingToggle;
 
+        internal Action OnModuleReInitPress = () => { };
         private static Action<GameObject> _onMenuTabPress = o => { };
         public readonly GameObject Root, TabObject;
 
@@ -17,6 +18,7 @@ namespace VRCFaceTracking.QuickMenu
             TabObject = tabObject;
             
             TrackingToggle = new ToggleButton(pageRoot.Find("UtilButtons/ToggleActive"));
+            pageRoot.Find("UtilButtons/ForceReInit").GetComponent<Button>().onClick.AddListener((Action) (() => {OnModuleReInitPress.Invoke();}));
 
             _onMenuTabPress += o => Root.SetActive(o == Root);
             TabObject.GetComponent<Button>().onClick.AddListener((Action) (() => { _onMenuTabPress.Invoke(Root); }));
