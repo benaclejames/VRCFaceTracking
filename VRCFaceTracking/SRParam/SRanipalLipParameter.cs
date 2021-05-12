@@ -23,6 +23,5 @@ namespace VRCFaceTracking.SRParam
         }
 
         void ISRanipalParam.ResetParam() => ResetParam();
-        public void ZeroParam() => ParamIndex = null;
     }
 }
