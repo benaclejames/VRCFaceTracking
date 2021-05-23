@@ -71,22 +71,19 @@ namespace VRCFaceTracking
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
                 if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_VRCAvatarManager_0
-                        ?.prop_VRCAvatarDescriptor_0 !=
-                    null && avatarDescriptor == VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
-                        .prop_VRCAvatarDescriptor_0)
-
-                    MainMod.ResetParams();
+                    ?.prop_VRCAvatarDescriptor_0 == null || avatarDescriptor != VRCPlayer
+                    .field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
+                    .prop_VRCAvatarDescriptor_0) return;
+                
+                MainMod.ZeroParams();
+                MainMod.ResetParams();
             }
-            catch (Exception e)
-            {
-                MelonLogger.Error(e.ToString());
-            }
+            catch (Exception e) { MelonLogger.Error(e.ToString()); }
         }
 
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded);
-
-
+        
         private delegate void OnAvatarSwitchDelegate(IntPtr @this, IntPtr test1, string string1, float float1,
             IntPtr ptr1);
     }

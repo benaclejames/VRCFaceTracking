@@ -25,7 +25,7 @@ namespace ViveSR
                 public const int WeightingCount = (int)LipShape_v2.Max;
                 private static int LastUpdateFrame = -1;
                 private static Error LastUpdateResult = Error.FAILED;
-                private static LipData_v2 LipData;
+                public static LipData_v2 LipData;
                 private static Dictionary<LipShape_v2, float> Weightings;
 
                 static SRanipal_Lip_v2()

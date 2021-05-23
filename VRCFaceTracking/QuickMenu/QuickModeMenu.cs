@@ -11,6 +11,10 @@ namespace VRCFaceTracking.QuickMenu
     public static class QuickModeMenu
     {
         private static bool _hasInitMenu;
+        private static MonoBehaviourPublicObCoGaCoObCoObCoUnique _qmTabManager;
+        private static int _tabIndex;
+        
+        public static bool IsMenuShown => (int)_qmTabManager.field_Private_EnumNPublicSealedvaHoNoPl4vUnique_0 == _tabIndex;
         public static MainMenu MainMenu;
 
         public static void CheckIfShouldInit()
@@ -28,9 +32,8 @@ namespace VRCFaceTracking.QuickMenu
         private static void CreateNotificationTab(string name, string text, Color color)
         {
             var bundle = AssetBundle.LoadFromMemory(ExtractAb());
-            
-            var existingTabs = Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0].field_Public_ArrayOf_GameObject_0.ToList();
-
+            _qmTabManager = Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0];
+            var existingTabs = _qmTabManager.field_Public_ArrayOf_GameObject_0.ToList();
             var quickMenu = Resources.FindObjectsOfTypeAll<global::QuickMenu>()[0];
 
             // Tab
@@ -43,16 +46,17 @@ namespace VRCFaceTracking.QuickMenu
             newTab.Find("Badge").GetComponent<RawImage>().color = color;
             newTab.Find("Badge/NotificationsText").GetComponent<Text>().text = text;
 
+            _tabIndex = existingTabs.Count;
             existingTabs.Add(newTab.gameObject);
 
-            Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0].field_Public_ArrayOf_GameObject_0 = existingTabs.ToArray();
+            _qmTabManager.field_Public_ArrayOf_GameObject_0 = existingTabs.ToArray();
 
             newTab.Find("Icon").GetComponent<Image>().sprite = LoadQmSprite(bundle);
 
             // Menu
 
             var quickModeMenus = quickMenu.transform.Find("QuickModeMenus");
-            var newMenu = new GameObject(name + "Menu", new Il2CppSystem.Type[] { Il2CppType.Of<RectTransform>() }).GetComponent<RectTransform>();
+            var newMenu = new GameObject(name + "Menu", new[] { Il2CppType.Of<RectTransform>() }).GetComponent<RectTransform>();
             newMenu.SetParent(quickModeMenus, false);
             newMenu.anchorMin = new Vector2(0, 1);
             newMenu.anchorMax = new Vector2(0, 1);
@@ -86,7 +90,6 @@ namespace VRCFaceTracking.QuickMenu
 
             tabDescriptor.GetIl2CppType().GetFields().First(f => f.FieldType.IsEnum).SetValue(tabDescriptor, new Il2CppSystem.Int32 { m_value = (int)value }.BoxIl2CppObject());
         }
-
 
         private static Sprite LoadQmSprite(AssetBundle bundle)
         {
