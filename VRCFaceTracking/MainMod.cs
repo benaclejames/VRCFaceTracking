@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using VRCFaceTracking;
 using MelonLoader;
-using UnityEngine;
+using ViveSR.anipal.Eye;
+using ViveSR.anipal.Lip;
 using VRCFaceTracking.QuickMenu;
 using VRCFaceTracking.SRParam;
 using VRCFaceTracking.SRParam.LipMerging;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.0.1", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -23,27 +23,31 @@ namespace VRCFaceTracking
         public override void OnApplicationQuit() => SRanipalTrack.Stop();
 
         private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
+
+        public static Action<EyeData_v2?, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
         
         public static void AppendLipParams()
         {
             // Add optimized shapes
             SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
             
+            // Add viseme mirroring shapes
+            SRanipalTrackParams.AddRange(LipShapeMerger.VisemeShapes);
+            
             // Add unoptimized shapes in case someone wants to use em
-            foreach (var unoptimizedShape in LipShapeMerger.GetUnoptimizedLipShapes())
-                SRanipalTrackParams.Add(new SRanipalLipParameter(v2 =>
+            foreach (var unoptimizedShape in LipShapeMerger.GetAllLipShapes())
+                SRanipalTrackParams.Add(new SRanipalLipParameter(unoptimizedShape.ToString(), 
+                    (eye, lip) =>
                     {
-                        if (v2.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
+                        if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
                         return null;
-                    }, 
-                    unoptimizedShape.ToString(), true));
+                    }));
         }
 
         public override void VRChat_OnUiManagerInit()
         {
             SRanipalTrack.Initializer.Start();
             Hooking.SetupHooking();
-            MelonCoroutines.Start(UpdateParams());
         }
         
         public override void OnSceneWasLoaded(int level, string levelName)
@@ -53,26 +57,16 @@ namespace VRCFaceTracking
             
             SRanipalTrack.ResetTrackingThresholds();
         }
-        
 
-        // Refreshing in main thread to avoid threading errors
-        private static IEnumerator UpdateParams()
-        {
-            for (;;)
-            {
-                foreach (var sRanipalParam in SRanipalTrackParams.ToArray())
-                    sRanipalParam.RefreshParam(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData);
-                
-                if (QuickModeMenu.MainMenu != null) QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData);
-
-                yield return new WaitForSeconds(0.01f);
-            }
-        }
-        
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
-
+        
         public override void OnUpdate()
         {
+            OnSRanipalParamsUpdated.Invoke(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData.prediction_data.blend_shape_weight, SRanipalTrack.LatestLipShapes);
+                
+            if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
+                QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData, SRanipalTrack.UpdateLipTexture());
+            
             if (MainThreadExecutionQueue.Count <= 0) return;
             
             MainThreadExecutionQueue[0].Invoke();

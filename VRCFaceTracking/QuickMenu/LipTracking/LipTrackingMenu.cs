@@ -5,11 +5,11 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
 {
     public class LipTrackingMenu : SRanipalTrackingMenu
     {
-        private readonly Image _lipImage;
+        private readonly RawImage _lipImage;
         
         public LipTrackingMenu(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
         {
-            _lipImage = pageRoot.Find("LipImage/Image").GetComponent<Image>();
+            _lipImage = pageRoot.Find("LipImage/Image").GetComponent<RawImage>();
             
             TrackingToggle.OnToggle += b => SRanipalTrack.LipEnabled = b;
             OnModuleReInitPress += () => SRanipalTrack.Initialize(false, true);
@@ -19,11 +19,7 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
         {
             if (_lipImage == null) return;
             
-            var rect = new Rect(0.0f, 0.0f, latestImage.width, latestImage.height);
-            var pivot = new Vector2(0.5f, 0.5f);
-            var border = Vector4.zero;
-
-            _lipImage.sprite = Sprite.CreateSprite_Injected(latestImage, ref rect, ref pivot, 100.0f, 0, SpriteMeshType.Tight, ref border, false);
+            _lipImage.texture = latestImage;
         }
     }
 }

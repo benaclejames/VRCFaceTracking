@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using ViveSR;
 using ViveSR.anipal;
@@ -17,8 +18,8 @@ namespace VRCFaceTracking
         public static bool EyeEnabled, LipEnabled;
 
         public static EyeData_v2 LatestEyeData;
-        public static Dictionary<LipShape_v2, float> LatestLipData;
-        //public static Texture2D LatestLipImage;
+        public static LipData_v2 LatestLipData;
+        public static Dictionary<LipShape_v2, float> LatestLipShapes;
 
         public static float CurrentDiameter;
 
@@ -162,8 +163,14 @@ namespace VRCFaceTracking
 
         private static void UpdateMouth()
         {
-            SRanipal_Lip_v2.GetLipWeightings(out LatestLipData);
-            //SRanipal_Lip_v2.GetLipImage(ref LatestLipImage);
+            SRanipal_Lip_API.GetLipData_v2(ref LatestLipData);
+            SRanipal_Lip_v2.GetLipWeightings(out LatestLipShapes);
+        }
+
+        public static Texture2D UpdateLipTexture()
+        {
+            var lipTexture = new Texture2D(800, 400, TextureFormat.Alpha8, false);
+            return SRanipal_Lip_v2.GetLipImage(ref lipTexture) ? lipTexture : null;
         }
 
         #endregion

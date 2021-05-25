@@ -6,13 +6,13 @@ namespace VRCFaceTracking.SRParam.LipMerging
 {
     public class PositiveNegativeShape
     {
-        public readonly LipShape_v2 PositiveShape, NegativeShape;
+        private readonly LipShape_v2 _positiveShape, _negativeShape;
         private float _positiveCache, _negativeCache, _positiveMax, _negativeMax;
         
         public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape)
         {
-            PositiveShape = positiveShape;
-            NegativeShape = negativeShape;
+            _positiveShape = positiveShape;
+            _negativeShape = negativeShape;
         }
 
         public void ResetMinMaxRange()
@@ -24,8 +24,8 @@ namespace VRCFaceTracking.SRParam.LipMerging
         public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
         {
             float currentPositive = _positiveCache, currentNegative = _negativeCache;   // Initialize currents with last known values in case SRanipal doesn't return them this frame
-            if (inputMap.ContainsKey(PositiveShape)) currentPositive = inputMap[PositiveShape];
-            if (inputMap.ContainsKey(NegativeShape)) currentNegative = inputMap[NegativeShape];
+            if (inputMap.ContainsKey(_positiveShape)) currentPositive = inputMap[_positiveShape];
+            if (inputMap.ContainsKey(_negativeShape)) currentNegative = inputMap[_negativeShape];
 
             // Make sure floats are not negative
             currentPositive = ClampFloat(currentPositive);
