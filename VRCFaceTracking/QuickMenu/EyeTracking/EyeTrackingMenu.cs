@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu.EyeTracking
 {
@@ -18,8 +18,8 @@ namespace VRCFaceTracking.QuickMenu.EyeTracking
             _leftEyeVisualizer = new XYVisualizer(leftEye.Find("X"), leftEye.Find("Y"));
             _rightEyeVisualizer = new XYVisualizer(rightEye.Find("X"), rightEye.Find("Y"));
 
-            TrackingToggle.OnToggle += b => SRanipalTrack.EyeEnabled = b;
-            OnModuleReInitPress += () => SRanipalTrack.Initialize(true, false);
+            TrackingToggle.OnToggle += b => UnifiedLibManager.EyeEnabled = b;
+            OnModuleReInitPress += () => new Thread(() => UnifiedLibManager.Initialize(true, false)).Start();
             
             pageRoot.Find("UtilButtons/Recalibrate").GetComponent<Button>().onClick.AddListener((Action)(() => SRanipal_Eye_v2.LaunchEyeCalibration()));
         }

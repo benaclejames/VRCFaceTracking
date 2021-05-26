@@ -14,13 +14,12 @@ namespace VRCFaceTracking.Params
 
             new FloatEyeParameter(v2 =>
             {
-                var normalizedFloat = v2.EyesDilation / SRanipalTrack.MinDilation /
-                                      (SRanipalTrack.MaxDilation - SRanipalTrack.MinDilation);
+                var normalizedFloat = v2.EyesDilation / SRanipalTrackingInterface.MinDilation /
+                                      (SRanipalTrackingInterface.MaxDilation - SRanipalTrackingInterface.MinDilation);
                 return Mathf.Clamp(normalizedFloat, 0, 1);
             }, "EyesDilation"),
 
             new XYEyeParameter(v2 => v2.Left, "LeftEyeX", "LeftEyeY"),
-
             new XYEyeParameter(v2 => v2.Right, "RightEyeX", "RightEyeY"),
 
             new FloatEyeParameter(v2 => v2.Left, "LeftEyeLid", true),

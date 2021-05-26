@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using ViveSR.anipal.Eye;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -34,7 +32,7 @@ namespace VRCFaceTracking.QuickMenu
                         break;
                 }
             
-            UpdateEnabledTabs(SRanipalTrack.EyeEnabled, SRanipalTrack.LipEnabled);
+            UpdateEnabledTabs(UnifiedLibManager.EyeEnabled, UnifiedLibManager.LipEnabled);
         }
 
         public void UpdateEnabledTabs(bool eye = false, bool lip = false)

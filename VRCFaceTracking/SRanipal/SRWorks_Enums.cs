@@ -51,5 +51,6 @@ namespace ViveSR
         RUNTIME_NO_RESPONSE = 1036,
         OPENCL_NOT_SUPPORT  = 1037,
         NOT_SUPPORT_EYE_TRACKING = 1038,
+        FOXIP_SO = 1051
     };
 }

@@ -1,46 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using MelonLoader;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params.LipMerging;
-using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking.SRanipal
 {
-    public static class SRanipalTrack
+    public static class SRanipalTrackingInterface
     {
-        public static bool EyeEnabled, LipEnabled;
-
         public static float MaxDilation;
         public static float MinDilation = 999;
-
-        public static readonly Thread Initializer = new Thread(() => Initialize());
-        private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
+        
+        public static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
         
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
-        private static bool _isInitializing;
-        
-        private static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != (Error) 1051;
+        public static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != Error.FOXIP_SO;
 
-        public static void Initialize(bool eye = true, bool lip = true)
+        public static (Error eyeError, Error lipError) Initialize(bool eye = true, bool lip = true)
         {
-            if (_isInitializing) return;
-            _isInitializing = true;
-            
             MelonLogger.Msg($"Initializing VRCFaceTracking...");
 
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
             if (eye)
             {
-                if (EyeEnabled)
+                if (UnifiedLibManager.EyeEnabled)
                 {
                     MelonLogger.Msg("Releasing previously initialized eye module...");
                     SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
@@ -52,7 +41,7 @@ namespace VRCFaceTracking.SRanipal
 
             if (lip)
             {
-                if (LipEnabled)
+                if (UnifiedLibManager.LipEnabled)
                 {
                     MelonLogger.Msg("Releasing previously initialized lip module...");
                     SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
@@ -62,49 +51,15 @@ namespace VRCFaceTracking.SRanipal
                 lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
             }
 
-            HandleErrors(eyeError, lipError);
-            
-            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
-            
-            if (!SRanipalWorker.IsAlive) SRanipalWorker.Start();
-            _isInitializing = false;
-        }
-
-        private static void HandleErrors(Error eyeError, Error lipError)
-        {
-            // First check to see if we're even using SRanipal
-            //if (eyeError == Error.RUNTIME_NOT_FOUND || lipError == Error.RUNTIME_NOT_FOUND)
-                
-            
-            if (eyeError.IsRealError())
-                // Msg instead of Warning under the assumption most people will be using only lip tracking
-                MelonLogger.Msg($"Eye Tracking will be unavailable for this session. ({eyeError})");
-            else if (eyeError == Error.WORK)
-            {
-                MainMod.AppendEyeParams();
-                EyeEnabled = true;
-                MelonLogger.Msg("SRanipal Eye Initialized!");
-            }
-
-            if (lipError.IsRealError())
-                MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({lipError})");
-            else if (lipError == (Error) 1051)
-                while (lipError == (Error) 1051)
-                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
-            if (lipError != Error.WORK) return;
-            
-            MainMod.AppendLipParams();
-            LipEnabled = true;
-            MelonLogger.Msg("SRanipal Lip Initialized!");
+            return (eyeError, lipError);
         }
 
         public static void Stop()
         {
             CancellationToken.Cancel();
             
-            if (EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
-            if (LipEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            if (UnifiedLibManager.EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+            if (UnifiedLibManager.LipEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
             
             CancellationToken.Dispose();
         }
@@ -115,13 +70,13 @@ namespace VRCFaceTracking.SRanipal
             {
                 try
                 {
-                    if (EyeEnabled) UpdateEye();
-                    if (LipEnabled) UpdateMouth();
+                    if (UnifiedLibManager.EyeEnabled) UpdateEye();
+                    if (UnifiedLibManager.LipEnabled) UpdateMouth();
                 }
                 catch (Exception e)
                 {
                     if (e.InnerException.GetType() != typeof(ThreadAbortException))
-                        MelonLogger.Error("Threading error occured in SRanipalTrack.Update: "+e+": "+e.InnerException);
+                        MelonLogger.Error("Threading error occured in SRanipalTrackingInterface Update: "+e+": "+e.InnerException);
                 }
                 Thread.Sleep(10);
             }

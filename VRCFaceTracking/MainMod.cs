@@ -20,7 +20,7 @@ namespace VRCFaceTracking
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
         public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
         public override void OnApplicationStart() => DependencyManager.Init();
-        public override void OnApplicationQuit() => SRanipalTrack.Stop();
+        public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
         private static readonly List<IParameter> SRanipalTrackParams = new List<IParameter>();
 
@@ -43,7 +43,7 @@ namespace VRCFaceTracking
 
         public override void VRChat_OnUiManagerInit()
         {
-            SRanipalTrack.Initializer.Start();
+            UnifiedLibManager.Initializer.Start();
             Hooking.SetupHooking();
         }
         
@@ -52,7 +52,7 @@ namespace VRCFaceTracking
             if (level == -1)
                 QuickModeMenu.CheckIfShouldInit();
             
-            SRanipalTrack.ResetTrackingThresholds();
+            SRanipalTrackingInterface.ResetTrackingThresholds();
         }
 
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
@@ -62,7 +62,7 @@ namespace VRCFaceTracking
             OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
-                QuickModeMenu.MainMenu.UpdateParams(UnifiedTrackingData.LatestEyeData, SRanipalTrack.UpdateLipTexture());
+                QuickModeMenu.MainMenu.UpdateParams(UnifiedTrackingData.LatestEyeData, SRanipalTrackingInterface.UpdateLipTexture());
             
             if (MainThreadExecutionQueue.Count <= 0) return;
             

@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Threading;
+using UnityEngine;
 using UnityEngine.UI;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu.LipTracking
 {
@@ -12,8 +12,8 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
         {
             _lipImage = pageRoot.Find("LipImage/Image").GetComponent<RawImage>();
             
-            TrackingToggle.OnToggle += b => SRanipalTrack.LipEnabled = b;
-            OnModuleReInitPress += () => SRanipalTrack.Initialize(false, true);
+            TrackingToggle.OnToggle += b => UnifiedLibManager.LipEnabled = b;
+            OnModuleReInitPress += () => new Thread(() => UnifiedLibManager.Initialize(false)).Start();
         }
 
         public void UpdateImage(Texture2D latestImage)
