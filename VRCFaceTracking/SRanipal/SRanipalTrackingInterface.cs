@@ -8,20 +8,14 @@ using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
-using VRCFaceTracking.SRParam.LipMerging;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking.SRanipal
 {
     public static class SRanipalTrack
     {
         public static bool EyeEnabled, LipEnabled;
-
-        public static EyeData_v2 LatestEyeData;
-        public static LipData_v2 LatestLipData;
-        public static Dictionary<LipShape_v2, float> LatestLipShapes;
-
-        public static float CurrentDiameter;
 
         public static float MaxDilation;
         public static float MinDilation = 999;
@@ -40,7 +34,7 @@ namespace VRCFaceTracking
             if (_isInitializing) return;
             _isInitializing = true;
             
-            MelonLogger.Msg($"Initializing SRanipal...");
+            MelonLogger.Msg($"Initializing VRCFaceTracking...");
 
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
@@ -79,6 +73,10 @@ namespace VRCFaceTracking
 
         private static void HandleErrors(Error eyeError, Error lipError)
         {
+            // First check to see if we're even using SRanipal
+            //if (eyeError == Error.RUNTIME_NOT_FOUND || lipError == Error.RUNTIME_NOT_FOUND)
+                
+            
             if (eyeError.IsRealError())
                 // Msg instead of Warning under the assumption most people will be using only lip tracking
                 MelonLogger.Msg($"Eye Tracking will be unavailable for this session. ({eyeError})");
@@ -133,23 +131,14 @@ namespace VRCFaceTracking
 
         private static void UpdateEye()
         {
-            SRanipal_Eye_API.GetEyeData_v2(ref LatestEyeData);
-
-            if (LatestEyeData.verbose_data.right.GetValidity(SingleEyeDataValidity
-                .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
-            {
-                CurrentDiameter = LatestEyeData.verbose_data.right.pupil_diameter_mm;
-                UpdateMinMaxDilation(LatestEyeData.verbose_data.right.pupil_diameter_mm);
-            }
-            else if (LatestEyeData.verbose_data.left.GetValidity(SingleEyeDataValidity
-                .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
-            {
-                CurrentDiameter = LatestEyeData.verbose_data.left.pupil_diameter_mm;
-                UpdateMinMaxDilation(LatestEyeData.verbose_data.left.pupil_diameter_mm);
-            }
+            EyeData_v2 eyeData = default;
+            
+            SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
+            
+            UnifiedTrackingData.LatestEyeData = eyeData;
         }
 
-        private static void UpdateMinMaxDilation(float readDilation)
+        public static void UpdateMinMaxDilation(float readDilation)
         {
             if (readDilation > MaxDilation)
                 MaxDilation = readDilation;
@@ -163,8 +152,13 @@ namespace VRCFaceTracking
 
         private static void UpdateMouth()
         {
-            SRanipal_Lip_API.GetLipData_v2(ref LatestLipData);
-            SRanipal_Lip_v2.GetLipWeightings(out LatestLipShapes);
+            LipData_v2 lipData = default;
+
+            SRanipal_Lip_API.GetLipData_v2(ref lipData);
+            SRanipal_Lip_v2.GetLipWeightings(out var lipWeightings);
+
+            UnifiedTrackingData.LatestLipData = lipData;
+            UnifiedTrackingData.LatestLipShapes = lipWeightings;
         }
 
         public static Texture2D UpdateLipTexture()

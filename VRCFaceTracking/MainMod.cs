@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using VRCFaceTracking;
 using MelonLoader;
-using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking.Params;
+using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
-using VRCFaceTracking.SRParam;
-using VRCFaceTracking.SRParam.LipMerging;
+using VRCFaceTracking.SRanipal;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
@@ -22,21 +22,18 @@ namespace VRCFaceTracking
         public override void OnApplicationStart() => DependencyManager.Init();
         public override void OnApplicationQuit() => SRanipalTrack.Stop();
 
-        private static readonly List<ISRanipalParam> SRanipalTrackParams = new List<ISRanipalParam>();
+        private static readonly List<IParameter> SRanipalTrackParams = new List<IParameter>();
 
-        public static Action<EyeData_v2?, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
+        public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
         
         public static void AppendLipParams()
         {
             // Add optimized shapes
             SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
             
-            // Add viseme mirroring shapes
-            SRanipalTrackParams.AddRange(LipShapeMerger.VisemeShapes);
-            
             // Add unoptimized shapes in case someone wants to use em
             foreach (var unoptimizedShape in LipShapeMerger.GetAllLipShapes())
-                SRanipalTrackParams.Add(new SRanipalLipParameter(unoptimizedShape.ToString(), 
+                SRanipalTrackParams.Add(new LipParameter(unoptimizedShape.ToString(), 
                     (eye, lip) =>
                     {
                         if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
@@ -62,10 +59,10 @@ namespace VRCFaceTracking
         
         public override void OnUpdate()
         {
-            OnSRanipalParamsUpdated.Invoke(SRanipalTrack.LatestEyeData, SRanipalTrack.LatestLipData.prediction_data.blend_shape_weight, SRanipalTrack.LatestLipShapes);
+            OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
-                QuickModeMenu.MainMenu.UpdateParams(SRanipalTrack.LatestEyeData, SRanipalTrack.UpdateLipTexture());
+                QuickModeMenu.MainMenu.UpdateParams(UnifiedTrackingData.LatestEyeData, SRanipalTrack.UpdateLipTexture());
             
             if (MainThreadExecutionQueue.Count <= 0) return;
             

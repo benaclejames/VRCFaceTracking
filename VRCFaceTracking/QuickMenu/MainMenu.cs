@@ -2,6 +2,7 @@
 using ViveSR.anipal.Eye;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
+using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -47,9 +48,9 @@ namespace VRCFaceTracking.QuickMenu
                 _lipTrackingMenu.Root.SetActive(true);
         }
 
-        public void UpdateParams(EyeData_v2? eyeData, Texture2D lipImage)
+        public void UpdateParams(EyeTrackingData eyeData, Texture2D lipImage)
         {
-            if (_eyeTrackingMenu.Root.active && eyeData.HasValue) _eyeTrackingMenu.UpdateEyeTrack(eyeData.Value);
+            if (_eyeTrackingMenu.Root.active) _eyeTrackingMenu.UpdateEyeTrack(eyeData);
             if (_lipTrackingMenu.Root.active && lipImage != null) _lipTrackingMenu.UpdateImage(lipImage);
         }
     }

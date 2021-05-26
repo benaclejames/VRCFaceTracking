@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu.LipTracking
 {
