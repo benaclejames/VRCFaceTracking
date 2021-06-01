@@ -10,51 +10,50 @@ using VRCFaceTracking.Params.LipMerging;
 
 namespace VRCFaceTracking.SRanipal
 {
-    public static class SRanipalTrackingInterface
+    public class SRanipalTrackingInterface : ITrackingModule
     {
         public static float MaxDilation;
         public static float MinDilation = 999;
-        
-        public static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
+
+        private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
         
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
-        public static bool IsRealError(this Error error) => error != Error.WORK && error != Error.UNDEFINED && error != Error.FOXIP_SO;
-
-        public static (Error eyeError, Error lipError) Initialize(bool eye = true, bool lip = true)
+        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
-            MelonLogger.Msg($"Initializing VRCFaceTracking...");
-
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
             if (eye)
-            {
-                if (UnifiedLibManager.EyeEnabled)
-                {
-                    MelonLogger.Msg("Releasing previously initialized eye module...");
-                    SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
-                    Thread.Sleep(5000); // Give SRanipal a chance to finish restarting
-                }
-
                 eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
-            }
 
             if (lip)
-            {
-                if (UnifiedLibManager.LipEnabled)
-                {
-                    MelonLogger.Msg("Releasing previously initialized lip module...");
-                    SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
-                    Thread.Sleep(5000); // Give SRanipal a chance to finish restarting
-                }
-                
                 lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
-            }
 
-            return (eyeError, lipError);
+            var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
+            
+            if ((eyeEnabled || lipEnabled) && !SRanipalWorker.IsAlive) SRanipalWorker.Start();
+            
+            return (eyeEnabled, lipEnabled);
         }
 
-        public static void Stop()
+        private static (bool eyeSuccess, bool lipSuccess) HandleSrErrors(Error eyeError, Error lipError)
+        {
+            bool eyeEnabled = false, lipEnabled = false;
+            
+            if (eyeError == Error.WORK)
+                eyeEnabled = true;
+
+            if (lipError == Error.FOXIP_SO)
+                while (lipError == Error.FOXIP_SO)
+                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            
+            if (lipError == Error.WORK)
+                lipEnabled = true;
+
+            return (eyeEnabled, lipEnabled);
+        }
+        
+        public void Teardown()
         {
             CancellationToken.Cancel();
             

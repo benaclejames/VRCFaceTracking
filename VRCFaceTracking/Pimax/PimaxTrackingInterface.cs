@@ -3,19 +3,24 @@ using System.Threading;
 using MelonLoader;
 
 namespace VRCFaceTracking.Pimax
-{
-    public class PimaxTrackingInterface
+{ 
+    public class PimaxTrackingInterface : ITrackingModule
     {
-        public static readonly Thread PimaxWorker = new Thread(() => Update(CancellationToken.Token));
+        private static readonly Thread PimaxWorker = new Thread(() => Update(CancellationToken.Token));
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool _needsUpdate;
         
-        public static bool Initialize()
+        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
-            return PimaxTracker.Start();
+
+            var success = PimaxTracker.Start();
+            if (success && !PimaxWorker.IsAlive) PimaxWorker.Start();
+            return (success, false);
         }
+
+        public void Teardown() => PimaxTracker.Stop();
 
         private static void Update(CancellationToken token)
         {

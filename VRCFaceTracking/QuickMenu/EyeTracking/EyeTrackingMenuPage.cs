@@ -6,11 +6,11 @@ using ViveSR.anipal.Eye;
 
 namespace VRCFaceTracking.QuickMenu.EyeTracking
 {
-    public class EyeTrackingMenu : SRanipalTrackingMenu
+    public class EyeTrackingMenuPage : MenuPage
     {
         private readonly XYVisualizer _leftEyeVisualizer, _rightEyeVisualizer;
 
-        public EyeTrackingMenu(Transform pageRoot, Transform eyeTab) : base(pageRoot, eyeTab.gameObject)
+        public EyeTrackingMenuPage(Transform pageRoot, Transform eyeTab) : base(pageRoot, eyeTab.gameObject)
         {
             var leftEye = pageRoot.Find("EyeIndicators/LeftEye/Mask/XYLines");
             var rightEye = pageRoot.Find("EyeIndicators/RightEye/Mask/XYLines");
@@ -19,7 +19,6 @@ namespace VRCFaceTracking.QuickMenu.EyeTracking
             _rightEyeVisualizer = new XYVisualizer(rightEye.Find("X"), rightEye.Find("Y"));
 
             TrackingToggle.OnToggle += b => UnifiedLibManager.EyeEnabled = b;
-            OnModuleReInitPress += () => new Thread(() => UnifiedLibManager.Initialize(true, false)).Start();
             
             pageRoot.Find("UtilButtons/Recalibrate").GetComponent<Button>().onClick.AddListener((Action)(() => SRanipal_Eye_v2.LaunchEyeCalibration()));
         }

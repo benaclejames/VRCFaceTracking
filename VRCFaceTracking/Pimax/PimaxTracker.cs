@@ -10,6 +10,9 @@ namespace VRCFaceTracking.Pimax
 		public EyeState Recommended = new EyeState(PimaxTracker.GetRecommendedEye());
 	}
 	
+	
+	// Mad props to NGenesis for these bindings <3
+	
 	public enum EyeParameter {
 		GazeX, // Gaze point on the X axis (not working!)
 		GazeY, // Gaze point on then Y axis (not working!)
@@ -56,71 +59,64 @@ namespace VRCFaceTracking.Pimax
 		Update
 	}
 
-	public struct EyeExpressionState
+	public readonly struct EyeExpressionState
 	{
-		public Eye Eye { get; }
-		public Vector2 PupilCenter { get; }
-		public float Openness { get; }
-		public bool Blink { get; }
+		private readonly Vector2 _pupilCenter;
+		private readonly float _openness;
+		private readonly bool _blink;
 
 		public EyeExpressionState(Eye eyeType)
 		{
-			Eye = eyeType;
-			PupilCenter = new Vector2(PimaxTracker.GetEyeExpression(Eye, EyeExpression.PupilCenterX),
-				PimaxTracker.GetEyeExpression(Eye, EyeExpression.PupilCenterY));
-			Openness = PimaxTracker.GetEyeExpression(Eye, EyeExpression.Openness);
-			Blink = PimaxTracker.GetEyeExpression(Eye, EyeExpression.Blink) != 0.0f;
+			_pupilCenter = new Vector2(PimaxTracker.GetEyeExpression(eyeType, EyeExpression.PupilCenterX),
+				PimaxTracker.GetEyeExpression(eyeType, EyeExpression.PupilCenterY));
+			_openness = PimaxTracker.GetEyeExpression(eyeType, EyeExpression.Openness);
+			_blink = PimaxTracker.GetEyeExpression(eyeType, EyeExpression.Blink) != 0.0f;
 		}
 	}
 
-	public struct EyeState
+	public readonly struct EyeState
 	{
-		public Eye Eye { get; }
-		public Vector2 Gaze { get; }
-		public Vector2 GazeRaw { get; }
-		public Vector2 GazeSmooth { get; }
-		public Vector3 GazeOrigin { get; }
-		public Vector3 GazeDirection { get; }
-		public float GazeReliability { get; }
-		public Vector2 PupilCenter { get; }
-		public float PupilDistance { get; }
-		public float PupilMajorDiameter { get; }
-		public float PupilMajorUnitDiameter { get; }
-		public float PupilMinorDiameter { get; }
-		public float PupilMinorUnitDiameter { get; }
-		public float Blink { get; }
-		public float Openness { get; }
-		public float UpperEyelid { get; }
-		public float LowerEyelid { get; }
-		public EyeExpressionState Expression { get; }
+		public readonly Vector2 Gaze, GazeRaw, GazeSmooth, GazeOrigin, GazeDirection, PupilCenter;
+		
+		public readonly float PupilDistance,
+			PupilMajorDiameter,
+			PupilMajorUnitDiameter,
+			PupilMinorDiameter,
+			PupilMinorUnitDiameter,
+			GazeReliability,
+			Blink,
+			UpperEyelid,
+			LowerEyelid,
+			Openness;
+
+		public readonly EyeExpressionState Expression;
 
 		public EyeState(Eye eyeType)
 		{
-			Eye = eyeType;
-			Gaze = new Vector2(PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeY));
-			GazeRaw = new Vector2(PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeRawX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeRawY));
-			GazeSmooth = new Vector2(PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeSmoothX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeSmoothY));
-			GazeOrigin = new Vector3(PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeOriginX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeOriginY),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeOriginZ));
-			GazeDirection = new Vector3(PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeDirectionX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeDirectionY),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeDirectionZ));
-			GazeReliability = PimaxTracker.GetEyeParameter(Eye, EyeParameter.GazeReliability);
-			PupilDistance = PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilDistance);
-			PupilMajorDiameter = PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilMajorDiameter);
-			PupilMajorUnitDiameter = PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilMajorUnitDiameter);
-			PupilMinorDiameter = PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilMinorDiameter);
-			PupilMinorUnitDiameter = PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilMinorUnitDiameter);
-			Blink = PimaxTracker.GetEyeParameter(Eye, EyeParameter.Blink);
-			UpperEyelid = PimaxTracker.GetEyeParameter(Eye, EyeParameter.UpperEyelid);
-			LowerEyelid = PimaxTracker.GetEyeParameter(Eye, EyeParameter.LowerEyelid);
-			Openness = PimaxTracker.GetEyeParameter(Eye, EyeParameter.Openness);
-			PupilCenter = new Vector2(PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilCenterX),
-				PimaxTracker.GetEyeParameter(Eye, EyeParameter.PupilCenterY));
+			Gaze = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeY));
+			GazeRaw = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeRawX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeRawY));
+			GazeSmooth = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeSmoothX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeSmoothY));
+			GazeOrigin = new Vector3(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeOriginX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeOriginY),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeOriginZ));
+			GazeDirection = new Vector3(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeDirectionX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeDirectionY),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeDirectionZ));
+			GazeReliability = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeReliability);
+			PupilDistance = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilDistance);
+			PupilMajorDiameter = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilMajorDiameter);
+			PupilMajorUnitDiameter = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilMajorUnitDiameter);
+			PupilMinorDiameter = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilMinorDiameter);
+			PupilMinorUnitDiameter = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilMinorUnitDiameter);
+			Blink = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.Blink);
+			UpperEyelid = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.UpperEyelid);
+			LowerEyelid = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.LowerEyelid);
+			Openness = PimaxTracker.GetEyeParameter(eyeType, EyeParameter.Openness);
+			PupilCenter = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilCenterX),
+				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.PupilCenterY));
 			Expression = new EyeExpressionState(eyeType);
 
 			// Convert range from 0...1 to -1...1, defaulting eyes to center (0) when unavailable
@@ -151,10 +147,11 @@ namespace VRCFaceTracking.Pimax
 	    /// </summary>
 		[DllImport("PimaxEyeTracker", EntryPoint = "Stop")] public static extern void Stop();
 	    
-	    
-		[DllImport("PimaxEyeTracker", EntryPoint = "IsActive")] private static extern bool IsActive();
-		[DllImport("PimaxEyeTracker", EntryPoint = "GetTimestamp")] private static extern System.Int64 GetTimestamp();
+	    /// <summary>
+	    /// Query aSeeVR for the eye it's most confident tracking
+	    /// </summary>
 		[DllImport("PimaxEyeTracker", EntryPoint = "GetRecommendedEye")] public static extern Eye GetRecommendedEye();
+	    
 		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeParameter")] public static extern float GetEyeParameter(Eye eye, EyeParameter param);
 		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeExpression")] public static extern float GetEyeExpression(Eye eye, EyeExpression expression);
     }

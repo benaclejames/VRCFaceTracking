@@ -18,15 +18,16 @@ namespace VRCFaceTracking
     {
         public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
-        public static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
         public override void OnApplicationStart() => DependencyManager.Init();
         public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
         private static readonly List<IParameter> SRanipalTrackParams = new List<IParameter>();
 
         public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
+
+        private static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
         
-        public static void AppendLipParams()
+        private static void AppendLipParams()
         {
             // Add optimized shapes
             SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
@@ -43,10 +44,13 @@ namespace VRCFaceTracking
 
         public override void VRChat_OnUiManagerInit()
         {
-            UnifiedLibManager.Initializer.Start();
+            AppendEyeParams();
+            AppendLipParams();
+            
+            UnifiedLibManager.Initialize();
             Hooking.SetupHooking();
         }
-        
+
         public override void OnSceneWasLoaded(int level, string levelName)
         {
             if (level == -1)

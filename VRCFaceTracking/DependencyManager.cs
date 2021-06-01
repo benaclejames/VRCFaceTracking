@@ -11,8 +11,7 @@ namespace VRCFaceTracking
     public static class DependencyManager
     {
         // Because SRanipal.dll needs to be loaded last.. Too lazy to automate moving it to back of load queue
-        private static readonly List<string> RequiredToLoad = new List<string>
-        {
+        private static readonly string[] AssembliesToLoad = {
             "VRCFaceTracking.SRanipal.libHTC_License.dll",
             "VRCFaceTracking.SRanipal.nanomsg.dll",
             "VRCFaceTracking.SRanipal.SRWorks_Log.dll",
@@ -20,15 +19,15 @@ namespace VRCFaceTracking
             "VRCFaceTracking.SRanipal.SRanipal.dll",
             "VRCFaceTracking.Pimax.PimaxEyeTracker.dll"
         };
-        
+
         public static void Init()
         {
-            var dllPaths = ExtractDLLs(RequiredToLoad.ToArray());
+            var dllPaths = ExtractAssemblies(AssembliesToLoad);
             foreach (var path in dllPaths)
-                LoadDLL(path);
+                LoadAssembly(path);
         }
 
-        private static IEnumerable<string> ExtractDLLs(IEnumerable<string> resourceNames)
+        private static IEnumerable<string> ExtractAssemblies(IEnumerable<string> resourceNames)
         {
             var extractedPaths = new List<string>();
 
@@ -41,7 +40,7 @@ namespace VRCFaceTracking
 
             foreach (var dll in resourceNames)
             {
-                var dllPath = Path.Combine(dirName, GetDLLNameFromPath(dll));
+                var dllPath = Path.Combine(dirName, GetAssemblyNameFromPath(dll));
 
                 using (var stm = Assembly.GetExecutingAssembly().GetManifestResourceStream(dll))
                 {
@@ -63,16 +62,16 @@ namespace VRCFaceTracking
 
                         extractedPaths.Add(dllPath);
                     }
-                    catch
+                    catch(Exception e)
                     {
-                        MelonLogger.Error($"Failed to get DLL: ");
+                        MelonLogger.Error($"Failed to get DLL: " + e.Message);
                     }
                 }
             }
             return extractedPaths; 
         }
 
-        private static string GetDLLNameFromPath(string path)
+        private static string GetAssemblyNameFromPath(string path)
         {
             var splitPath = path.Split('.').ToList();
             splitPath.Reverse();
@@ -82,7 +81,7 @@ namespace VRCFaceTracking
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadLibrary(string lpFileName);
 
-        private static void LoadDLL(string path)
+        private static void LoadAssembly(string path)
         {
             var h = LoadLibrary(path);
             if (h == IntPtr.Zero)

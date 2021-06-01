@@ -1,19 +1,17 @@
-﻿using System.Threading;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace VRCFaceTracking.QuickMenu.LipTracking
 {
-    public class LipTrackingMenu : SRanipalTrackingMenu
+    public class LipTrackingMenuPage : MenuPage
     {
         private readonly RawImage _lipImage;
         
-        public LipTrackingMenu(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
+        public LipTrackingMenuPage(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
         {
             _lipImage = pageRoot.Find("LipImage/Image").GetComponent<RawImage>();
             
             TrackingToggle.OnToggle += b => UnifiedLibManager.LipEnabled = b;
-            OnModuleReInitPress += () => new Thread(() => UnifiedLibManager.Initialize(false)).Start();
         }
 
         public void UpdateImage(Texture2D latestImage)

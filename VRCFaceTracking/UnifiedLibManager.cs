@@ -1,84 +1,74 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using MelonLoader;
 using UnityEngine.SceneManagement;
-using ViveSR;
-using ViveSR.anipal;
-using ViveSR.anipal.Lip;
-using VRCFaceTracking.Pimax;
 using VRCFaceTracking.QuickMenu;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking
 {
+    public interface ITrackingModule
+    {
+        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+
+        void Teardown();
+    }
+
     public static class UnifiedLibManager
     {
-        private static bool _isUsingSRanipal;
         public static bool EyeEnabled, LipEnabled;
-        private static bool _isInitializing;
+        private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
         
-        public static readonly Thread Initializer = new Thread(() => Initialize());
-        private static bool ShouldUsePimax(Error eyeError) => eyeError == Error.RUNTIME_NOT_FOUND;
-        
-        
+        private static Thread _initializeWorker;
+
         public static void Initialize(bool eye = true, bool lip = true)
         {
-            if (_isInitializing) return;
-            _isInitializing = true;
+            if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
+            _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
+            _initializeWorker.Start();
+        }
 
-            var (eyeError, lipError) = SRanipalTrackingInterface.Initialize(eye, lip);
-            _isUsingSRanipal = !ShouldUsePimax(eyeError);
-            
-            if (_isUsingSRanipal)
+        private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
+        {
+            var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
+
+            foreach (var module in trackingModules)
             {
-                HandleSrErrors(eyeError, lipError);
-                if (!SRanipalTrackingInterface.SRanipalWorker.IsAlive) 
-                    SRanipalTrackingInterface.SRanipalWorker.Start();
-            }
-            else
-            {
-                if (eye)
-                    EyeEnabled = PimaxTrackingInterface.Initialize();
+                var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
+                var (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
+
+                if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
+                    UsefulModules.Add(module, moduleObj);
                 
-                if (EyeEnabled && !PimaxTrackingInterface.PimaxWorker.IsAlive) 
-                    PimaxTrackingInterface.PimaxWorker.Start();
+                if (eyeSuccess) EyeEnabled = true;
+                if (lipSuccess) LipEnabled = true;
+
+                if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
             }
-            
-            
-            if (EyeEnabled) MainMod.AppendEyeParams();
-            if (LipEnabled) MainMod.AppendLipParams();
+
+            if (eye)
+                MelonLogger.Msg(EyeEnabled
+                    ? "Eye Tracking Initialized"
+                    : "Eye Tracking will be unavailable for this session.");
+
+            if (lip)
+            {
+                if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
+                else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
+            }
+
 
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
-
-            _isInitializing = false;
         }
 
         public static void Teardown()
         {
-            if (_isUsingSRanipal) SRanipalTrackingInterface.Stop();
-        }
-
-        private static void HandleSrErrors(Error eyeError, Error lipError)
-        {
-            if (eyeError.IsRealError())
-                // Msg instead of Warning under the assumption most people will be using only lip tracking
-                MelonLogger.Msg($"Eye Tracking will be unavailable for this session. ({eyeError})");
-            else if (eyeError == Error.WORK)
-            {
-                EyeEnabled = true;
-                MelonLogger.Msg("SRanipal Eye Initialized!");
-            }
-
-            if (lipError.IsRealError())
-                MelonLogger.Warning($"Lip Tracking will be unavailable for this session. ({lipError})");
-            else if (lipError == Error.FOXIP_SO)
-                while (lipError == Error.FOXIP_SO)
-                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
-            if (lipError != Error.WORK) return;
-            
-            LipEnabled = true;
-            MelonLogger.Msg("SRanipal Lip Initialized!");
+            foreach (var module in UsefulModules)
+                module.Value.Teardown();
         }
     }
 }
