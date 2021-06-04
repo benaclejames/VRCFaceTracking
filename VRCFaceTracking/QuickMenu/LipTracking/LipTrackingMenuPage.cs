@@ -3,16 +3,15 @@ using UnityEngine.UI;
 
 namespace VRCFaceTracking.QuickMenu.LipTracking
 {
-    public class LipTrackingMenu : SRanipalTrackingMenu
+    public class LipTrackingMenuPage : MenuPage
     {
         private readonly RawImage _lipImage;
         
-        public LipTrackingMenu(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
+        public LipTrackingMenuPage(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
         {
             _lipImage = pageRoot.Find("LipImage/Image").GetComponent<RawImage>();
             
-            TrackingToggle.OnToggle += b => SRanipalTrack.LipEnabled = b;
-            OnModuleReInitPress += () => SRanipalTrack.Initialize(false, true);
+            TrackingToggle.OnToggle += b => UnifiedLibManager.LipEnabled = b;
         }
 
         public void UpdateImage(Texture2D latestImage)

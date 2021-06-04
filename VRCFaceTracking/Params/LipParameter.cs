@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using ViveSR.anipal.Lip;
 using ParamLib;
+using ViveSR.anipal.Lip;
 
-namespace VRCFaceTracking.SRParam
+namespace VRCFaceTracking.Params
 {
-    public class SRanipalLipParameter : FloatBaseParam, ISRanipalParam
+    public class LipParameter : FloatBaseParam, IParameter
     {
-        public SRanipalLipParameter(string paramName, Func<Dictionary<LipShape_v2, float>, float[], float?> getValueFunc,
+        public LipParameter(string paramName, Func<Dictionary<LipShape_v2, float>, float[], float?> getValueFunc,
             bool prioritised = false)
             : base(paramName, prioritised)
         {
@@ -19,7 +19,5 @@ namespace VRCFaceTracking.SRParam
                 if (newParamValue.HasValue) ParamValue = newParamValue.Value;
             };
         }
-
-        void ISRanipalParam.ResetParam() => ResetParam();
     }
 }

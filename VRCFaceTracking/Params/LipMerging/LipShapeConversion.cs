@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ViveSR.anipal.Lip;
 
-namespace VRCFaceTracking.SRParam.LipMerging
+namespace VRCFaceTracking.Params.LipMerging
 {
     public class PositiveNegativeShape
     {
