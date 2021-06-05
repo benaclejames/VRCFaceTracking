@@ -37,7 +37,7 @@ It's not required to use all of these parameters. Similar to the setup of parame
 
 ### Lip Parameters
 
-There are a large number of parameters you can use for lip tracking. Consult the wiki for more information about what they do: [Avatar Setup](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup).
+There are a large number of parameters you can use for lip tracking. Consult the wiki for more information about what they do: [Avatar Setup](https://github.com/benaclejames/VRCFaceTracking/wiki/Lip-Tracking-Setup).
 
 You can also refer to this visual guide from NeosVR on what the following API parameters do: https://casuallydotcat.wordpress.com/2020/02/10/the-ultimate-neos-blend-shape-guide-february-2020/
 
