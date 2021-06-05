@@ -66,7 +66,7 @@ namespace VRCFaceTracking
             OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
-                QuickModeMenu.MainMenu.UpdateParams(UnifiedTrackingData.LatestEyeData, SRanipalTrackingInterface.UpdateLipTexture());
+                QuickModeMenu.MainMenu.UpdateParams();
             
             if (MainThreadExecutionQueue.Count <= 0) return;
             
