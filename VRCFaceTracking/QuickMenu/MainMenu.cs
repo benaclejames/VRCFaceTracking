@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
+using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -46,10 +47,10 @@ namespace VRCFaceTracking.QuickMenu
                 _lipTrackingMenuPage.Root.SetActive(true);
         }
 
-        public void UpdateParams(EyeTrackingData eyeData, Texture2D lipImage)
+        public void UpdateParams()
         {
-            if (_eyeTrackingMenuPage.Root.active) _eyeTrackingMenuPage.UpdateEyeTrack(eyeData);
-            if (_lipTrackingMenuPage.Root.active && lipImage != null) _lipTrackingMenuPage.UpdateImage(lipImage);
+            if (_eyeTrackingMenuPage.Root.active) _eyeTrackingMenuPage.UpdateEyeTrack(UnifiedTrackingData.LatestEyeData);
+            if (_lipTrackingMenuPage.Root.active) _lipTrackingMenuPage.UpdateImage(SRanipalTrackingInterface.UpdateLipTexture());
         }
     }
 }
