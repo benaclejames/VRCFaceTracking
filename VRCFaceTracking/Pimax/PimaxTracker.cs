@@ -134,25 +134,25 @@ namespace VRCFaceTracking.Pimax
 	    /// <summary>
 	    /// Registers callbacks for the tracker to notify when it's finished initializing, when it has new data available and when the module is stopped.
 	    /// </summary>
-        [DllImport("PimaxEyeTracker", EntryPoint = "RegisterCallback")] public static extern void RegisterCallback(CallbackType type, EyeTrackerEventHandler callback);
+        [DllImport("PimaxEyeTracker", EntryPoint = "register_callback")] public static extern void RegisterCallback(CallbackType type, EyeTrackerEventHandler callback);
 	    
 	    /// <summary>
 	    /// Initializes the module.
 	    /// </summary>
 	    /// <returns>Initialization Successful</returns>
-		[DllImport("PimaxEyeTracker", EntryPoint = "Start")] public static extern bool Start();
+		[DllImport("PimaxEyeTracker", EntryPoint = "start")] public static extern bool Start();
 	    
 	    /// <summary>
 	    /// Stops the eye tracking module and disconnects the server
 	    /// </summary>
-		[DllImport("PimaxEyeTracker", EntryPoint = "Stop")] public static extern void Stop();
+		[DllImport("PimaxEyeTracker", EntryPoint = "stop")] public static extern void Stop();
 	    
 	    /// <summary>
 	    /// Query aSeeVR for the eye it's most confident tracking
 	    /// </summary>
-		[DllImport("PimaxEyeTracker", EntryPoint = "GetRecommendedEye")] public static extern Eye GetRecommendedEye();
+		[DllImport("PimaxEyeTracker", EntryPoint = "get_recommended_eye")] public static extern Eye GetRecommendedEye();
 	    
-		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeParameter")] public static extern float GetEyeParameter(Eye eye, EyeParameter param);
-		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeExpression")] public static extern float GetEyeExpression(Eye eye, EyeExpression expression);
+		[DllImport("PimaxEyeTracker", EntryPoint = "get_eye_parameter")] public static extern float GetEyeParameter(Eye eye, EyeParameter param);
+		[DllImport("PimaxEyeTracker", EntryPoint = "get_eye_expression")] public static extern float GetEyeExpression(Eye eye, EyeExpression expression);
     }
 }

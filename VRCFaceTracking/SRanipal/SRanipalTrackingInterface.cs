@@ -19,6 +19,9 @@ namespace VRCFaceTracking.SRanipal
         
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
+        public bool SupportsEye => true;
+        public bool SupportsLip => true;
+
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;

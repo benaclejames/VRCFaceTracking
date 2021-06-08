@@ -11,8 +11,10 @@ namespace VRCFaceTracking
 {
     public interface ITrackingModule
     {
-        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+        bool SupportsEye { get; }
+        bool SupportsLip { get; }
 
+        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
         void Teardown();
     }
 
@@ -37,8 +39,10 @@ namespace VRCFaceTracking
 
             foreach (var module in trackingModules)
             {
+                bool eyeSuccess = false, lipSuccess = false;
                 var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
-                var (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
+                if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
+                    (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
 
                 if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
                     UsefulModules.Add(module, moduleObj);
