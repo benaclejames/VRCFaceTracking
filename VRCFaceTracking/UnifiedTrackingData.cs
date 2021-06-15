@@ -34,8 +34,8 @@ namespace VRCFaceTracking
 
         public Eye(EyeState eyeState)
         {
-            _look = eyeState.PupilCenter;
-            _openness = eyeState.Openness;
+            _look = eyeState.Expression.PupilCenter;
+            _openness = eyeState.Expression.Openness;
             Widen = 0;
             Squeeze = 0;
         }

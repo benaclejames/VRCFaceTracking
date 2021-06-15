@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace VRCFaceTracking.Pimax
@@ -7,7 +8,7 @@ namespace VRCFaceTracking.Pimax
 	{
 		public EyeState Left = new EyeState(Eye.Left);
 		public EyeState Right = new EyeState(Eye.Right);
-		public EyeState Recommended = new EyeState(PimaxTracker.GetRecommendedEye());
+		public EyeState Recommended = new EyeState(Eye.Any);
 	}
 	
 	
@@ -61,15 +62,15 @@ namespace VRCFaceTracking.Pimax
 
 	public readonly struct EyeExpressionState
 	{
-		private readonly Vector2 _pupilCenter;
-		private readonly float _openness;
+		public readonly Vector2 PupilCenter;
+		public readonly float Openness;
 		private readonly bool _blink;
 
 		public EyeExpressionState(Eye eyeType)
 		{
-			_pupilCenter = new Vector2(PimaxTracker.GetEyeExpression(eyeType, EyeExpression.PupilCenterX),
+			PupilCenter = new Vector2(PimaxTracker.GetEyeExpression(eyeType, EyeExpression.PupilCenterX),
 				PimaxTracker.GetEyeExpression(eyeType, EyeExpression.PupilCenterY));
-			_openness = PimaxTracker.GetEyeExpression(eyeType, EyeExpression.Openness);
+			Openness = PimaxTracker.GetEyeExpression(eyeType, EyeExpression.Openness);
 			_blink = PimaxTracker.GetEyeExpression(eyeType, EyeExpression.Blink) != 0.0f;
 		}
 	}
@@ -91,8 +92,11 @@ namespace VRCFaceTracking.Pimax
 
 		public readonly EyeExpressionState Expression;
 
+		public readonly Eye Eye;
+
 		public EyeState(Eye eyeType)
 		{
+			Eye = eyeType;
 			Gaze = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeX),
 				PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeY));
 			GazeRaw = new Vector2(PimaxTracker.GetEyeParameter(eyeType, EyeParameter.GazeRawX),
@@ -134,25 +138,25 @@ namespace VRCFaceTracking.Pimax
 	    /// <summary>
 	    /// Registers callbacks for the tracker to notify when it's finished initializing, when it has new data available and when the module is stopped.
 	    /// </summary>
-        [DllImport("PimaxEyeTracker", EntryPoint = "register_callback")] public static extern void RegisterCallback(CallbackType type, EyeTrackerEventHandler callback);
+        [DllImport("PimaxEyeTracker", EntryPoint = "RegisterCallback")] public static extern void RegisterCallback(CallbackType type, EyeTrackerEventHandler callback);
 	    
 	    /// <summary>
 	    /// Initializes the module.
 	    /// </summary>
 	    /// <returns>Initialization Successful</returns>
-		[DllImport("PimaxEyeTracker", EntryPoint = "start")] public static extern bool Start();
+		[DllImport("PimaxEyeTracker", EntryPoint = "Start")] public static extern bool Start();
 	    
 	    /// <summary>
 	    /// Stops the eye tracking module and disconnects the server
 	    /// </summary>
-		[DllImport("PimaxEyeTracker", EntryPoint = "stop")] public static extern void Stop();
+		[DllImport("PimaxEyeTracker", EntryPoint = "Stop")] public static extern void Stop();
 	    
 	    /// <summary>
 	    /// Query aSeeVR for the eye it's most confident tracking
 	    /// </summary>
-		[DllImport("PimaxEyeTracker", EntryPoint = "get_recommended_eye")] public static extern Eye GetRecommendedEye();
+		[DllImport("PimaxEyeTracker", EntryPoint = "GetRecommendedEye")] public static extern Eye GetRecommendedEye();
 	    
-		[DllImport("PimaxEyeTracker", EntryPoint = "get_eye_parameter")] public static extern float GetEyeParameter(Eye eye, EyeParameter param);
-		[DllImport("PimaxEyeTracker", EntryPoint = "get_eye_expression")] public static extern float GetEyeExpression(Eye eye, EyeExpression expression);
+		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeParameter")] public static extern float GetEyeParameter(Eye eye, EyeParameter param);
+		[DllImport("PimaxEyeTracker", EntryPoint = "GetEyeExpression")] public static extern float GetEyeExpression(Eye eye, EyeExpression expression);
     }
 }

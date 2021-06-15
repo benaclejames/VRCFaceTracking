@@ -10,8 +10,7 @@ namespace VRCFaceTracking.Pimax
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool _needsUpdate;
-
-
+        
         public bool SupportsEye => true;
         public bool SupportsLip => false;
 

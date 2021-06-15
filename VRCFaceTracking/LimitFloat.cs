@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace VRCFaceTracking
 {
-    public class AverageFloat
+    public class LimitFloat
     {
         public float Value
         {
@@ -21,10 +21,10 @@ namespace VRCFaceTracking
         private int _currListIndex;
         private readonly int _maxCachedValues;
 
-        public AverageFloat(TimeSpan updateInterval, int maxCache)
+        public LimitFloat(TimeSpan updateInterval, int maxCachedValues)
         {
             _updateInterval = updateInterval;
-            _maxCachedValues = maxCache;
+            _maxCachedValues = maxCachedValues;
         }
 
         private void UpdateCache(float newValue)

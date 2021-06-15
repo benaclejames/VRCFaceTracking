@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using VRCFaceTracking;
 using MelonLoader;
+using UnityEngine;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.LipMerging;
+using VRCFaceTracking.Pimax;
 using VRCFaceTracking.QuickMenu;
 using VRCFaceTracking.SRanipal;
 
@@ -18,10 +22,23 @@ namespace VRCFaceTracking
     {
         public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
         public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
-        public override void OnApplicationStart() => DependencyManager.Init();
+        public override void OnApplicationStart()
+        {
+            DependencyManager.Init();
+
+            _assemblyCSharp = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(assembly => assembly.GetName().Name == "Assembly-CSharp");
+            _shouldCheckUiManager = typeof(MelonMod).GetMethod("VRChat_OnUiManagerInit") == null;
+        }
+
         public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
         private static readonly List<IParameter> SRanipalTrackParams = new List<IParameter>();
+
+        private Assembly _assemblyCSharp;
+        private Type _uiManager;
+        private MethodInfo _uiManagerInstance;
+        private bool _shouldCheckUiManager;
 
         public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
 
@@ -42,14 +59,17 @@ namespace VRCFaceTracking
                     }));
         }
 
-        public override void VRChat_OnUiManagerInit()
+        public override void VRChat_OnUiManagerInit() => UiManagerInit();
+
+        private static void UiManagerInit()
         {
             AppendEyeParams();
             AppendLipParams();
-            
+
             UnifiedLibManager.Initialize();
             Hooking.SetupHooking();
         }
+
 
         public override void OnSceneWasLoaded(int level, string levelName)
         {
@@ -63,6 +83,8 @@ namespace VRCFaceTracking
         
         public override void OnUpdate()
         {
+            if (_shouldCheckUiManager) CheckUiManager();
+            
             OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
@@ -72,6 +94,31 @@ namespace VRCFaceTracking
             
             MainThreadExecutionQueue[0].Invoke();
             MainThreadExecutionQueue.RemoveAt(0);
+        }
+
+        private void CheckUiManager()
+        {
+            if (_assemblyCSharp == null) return;
+            
+            if (_uiManager == null) _uiManager = _assemblyCSharp.GetType("VRCUiManager");
+            if (_uiManager == null) {
+                _shouldCheckUiManager = false;
+                return;
+            }
+            
+            if (_uiManagerInstance == null)
+                _uiManagerInstance = _uiManager.GetMethods().First(x => x.ReturnType == _uiManager);
+            if (_uiManagerInstance == null)
+            {
+                _shouldCheckUiManager = false;
+                return;
+            }
+
+            if (_uiManagerInstance.Invoke(null, new object[0]) == null)
+                return;
+
+            _shouldCheckUiManager = false;
+            UiManagerInit();
         }
     }
 }

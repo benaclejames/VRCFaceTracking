@@ -118,12 +118,6 @@ namespace VRCFaceTracking.SRanipal
             UnifiedTrackingData.LatestLipShapes = lipWeightings;
         }
 
-        public static Texture2D UpdateLipTexture()
-        {
-            var lipTexture = new Texture2D(800, 400, TextureFormat.Alpha8, false);
-            return SRanipal_Lip_v2.GetLipImage(ref lipTexture) ? lipTexture : null;
-        }
-
         #endregion
 
         public static void ResetTrackingThresholds()

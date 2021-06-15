@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -13,8 +12,7 @@ namespace VRCFaceTracking.QuickMenu
         public MainMenu(Transform parentMenuTransform, AssetBundle bundle)
         {
             var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
-            var menuObject = Object.Instantiate(menuPrefab);
-            menuObject.transform.parent = parentMenuTransform;
+            var menuObject = Object.Instantiate(menuPrefab, parentMenuTransform, true);
             menuObject.transform.localPosition = Vector3.zero;
             menuObject.transform.localScale = Vector3.oneVector;
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
@@ -50,7 +48,6 @@ namespace VRCFaceTracking.QuickMenu
         public void UpdateParams()
         {
             if (_eyeTrackingMenuPage.Root.active) _eyeTrackingMenuPage.UpdateEyeTrack(UnifiedTrackingData.LatestEyeData);
-            if (_lipTrackingMenuPage.Root.active) _lipTrackingMenuPage.UpdateImage(SRanipalTrackingInterface.UpdateLipTexture());
         }
     }
 }

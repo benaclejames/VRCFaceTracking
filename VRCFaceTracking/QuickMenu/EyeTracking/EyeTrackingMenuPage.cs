@@ -25,7 +25,7 @@ namespace VRCFaceTracking.QuickMenu.EyeTracking
 
         public void UpdateEyeTrack(EyeTrackingData eyeData)
         {
-            UpdateLook(eyeData.Right, eyeData.Left);
+            UpdateLook(eyeData.Left, eyeData.Right);
         }
 
         private void UpdateLook(Vector2? leftEye, Vector2? rightEye)
