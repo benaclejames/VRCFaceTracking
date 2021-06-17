@@ -29,10 +29,10 @@ namespace VRCFaceTracking
 
                 intPtr = (IntPtr) typeof(VRCAvatarManager)
                     .GetField(
-                        "NativeMethodInfoPtr_Method_Public_Boolean_ApiAvatar_String_Single_MulticastDelegateNPublicSealedVoGaVRBoUnique_0",
+                        "NativeMethodInfoPtr_Method_Internal_Void_MulticastDelegateNPublicSealedVoGaVRBoUnique_PDM_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
                 MelonUtils.NativeHookAttach(intPtr,
-                    new Action<IntPtr, IntPtr, string, float, IntPtr>(OnAvatarSwitch).Method.MethodHandle
+                    new Action<IntPtr, IntPtr, IntPtr>(OnAvatarSwitch).Method.MethodHandle
                         .GetFunctionPointer());
                 _avatarSwitch = Marshal.GetDelegateForFunctionPointer<OnAvatarSwitchDelegate>(*(IntPtr*) (void*) intPtr);
             }
@@ -42,7 +42,7 @@ namespace VRCFaceTracking
             }
         }
 
-        private static void OnAvatarSwitch(IntPtr @this, IntPtr test1, string string1, float float1, IntPtr ptr1)
+        private static void OnAvatarSwitch(IntPtr @this, IntPtr test1, IntPtr ptr1)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace VRCFaceTracking
                 MelonLogger.Error("Error on Avatar Switch: " + e);
             }
 
-            _avatarSwitch(@this, test1, string1, float1, ptr1);
+            _avatarSwitch(@this, test1, ptr1);
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
@@ -84,7 +84,6 @@ namespace VRCFaceTracking
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded);
         
-        private delegate void OnAvatarSwitchDelegate(IntPtr @this, IntPtr test1, string string1, float float1,
-            IntPtr ptr1);
+        private delegate void OnAvatarSwitchDelegate(IntPtr @this, IntPtr test1, IntPtr ptr1);
     }
 }

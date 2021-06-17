@@ -12,7 +12,7 @@ using VRCFaceTracking.Pimax;
 using VRCFaceTracking.QuickMenu;
 using VRCFaceTracking.SRanipal;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.2", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.5", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
