@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using MelonLoader;
-using UnityEngine;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
@@ -68,11 +68,12 @@ namespace VRCFaceTracking.SRanipal
 
         private static void Update(CancellationToken token)
         {
+            SRanipal_Eye_v2.WrapperRegisterEyeDataCallback(Marshal.GetFunctionPointerForDelegate((SRanipal_Eye_v2.CallbackBasic)UpdateEye));
+
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    if (UnifiedLibManager.EyeEnabled) UpdateEye();
                     if (UnifiedLibManager.LipEnabled) UpdateMouth();
                 }
                 catch (Exception e)
@@ -86,12 +87,9 @@ namespace VRCFaceTracking.SRanipal
         
         #region EyeUpdate
 
-        private static void UpdateEye()
+        private static void UpdateEye(ref EyeData_v2 eyeData)
         {
-            EyeData_v2 eyeData = default;
-            
-            SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
-            
+            if (!UnifiedLibManager.EyeEnabled) return;
             UnifiedTrackingData.LatestEyeData = eyeData;
         }
 

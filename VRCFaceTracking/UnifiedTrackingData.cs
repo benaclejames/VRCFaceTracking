@@ -32,10 +32,10 @@ namespace VRCFaceTracking
             Squeeze = expression.Value.eye_squeeze;
         }
 
-        public Eye(EyeState eyeState)
+        public Eye(EyeExpressionState eyeState)
         {
-            _look = eyeState.Expression.PupilCenter;
-            _openness = eyeState.Expression.Openness;
+            _look = new Vector2(eyeState.PupilCenterX, eyeState.PupilCenterY);
+            _openness = eyeState.Openness;
             Widen = 0;
             Squeeze = 0;
         }

@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
-using VRC.Core;
 using VRC.SDKBase;
 
 namespace VRCFaceTracking
@@ -10,7 +9,6 @@ namespace VRCFaceTracking
     public static class Hooking
     {
         private static AvatarInstantiatedDelegate _onAvatarInstantiatedDelegate;
-        private static OnAvatarSwitchDelegate _avatarSwitch;
 
 
         public static unsafe void SetupHooking()
@@ -26,41 +24,11 @@ namespace VRCFaceTracking
                         .GetFunctionPointer());
                 _onAvatarInstantiatedDelegate =
                     Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
-
-                intPtr = (IntPtr) typeof(VRCAvatarManager)
-                    .GetField(
-                        "NativeMethodInfoPtr_Method_Internal_Void_MulticastDelegateNPublicSealedVoGaVRBoUnique_PDM_0",
-                        BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                MelonUtils.NativeHookAttach(intPtr,
-                    new Action<IntPtr, IntPtr, IntPtr>(OnAvatarSwitch).Method.MethodHandle
-                        .GetFunctionPointer());
-                _avatarSwitch = Marshal.GetDelegateForFunctionPointer<OnAvatarSwitchDelegate>(*(IntPtr*) (void*) intPtr);
             }
             catch (Exception ex)
             {
                 MelonLogger.Msg("Patch Failed " + ex);
             }
-        }
-
-        private static void OnAvatarSwitch(IntPtr @this, IntPtr test1, IntPtr ptr1)
-        {
-            try
-            {
-                if (test1 != IntPtr.Zero)
-                {
-                    var avatar = new ApiAvatar(test1);
-                    if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer != IntPtr.Zero &&
-                        avatar.Pointer != IntPtr.Zero && avatar.Pointer ==
-                        VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_ApiAvatar_0?.Pointer)
-                        MainMod.ZeroParams();
-                }
-            }
-            catch (Exception e)
-            {
-                MelonLogger.Error("Error on Avatar Switch: " + e);
-            }
-
-            _avatarSwitch(@this, test1, ptr1);
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
@@ -83,7 +51,5 @@ namespace VRCFaceTracking
 
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded);
-        
-        private delegate void OnAvatarSwitchDelegate(IntPtr @this, IntPtr test1, IntPtr ptr1);
     }
 }
