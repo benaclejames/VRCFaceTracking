@@ -1,6 +1,6 @@
 # 👀 VRCFaceTracking
 
-Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers and/or Lip Tracker. 
+Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers and/or Lip Tracker.
 
 ## 💾 Installation
 
@@ -34,6 +34,8 @@ It's not required to use all of these parameters. Similar to the setup of parame
 ![](https://i.imgur.com/KZRweT7.png)
 
 **Please make sure you disable the built in simulated eye tracking in your avatar descriptor**. This will almost certainly mess with things if left on. Personally, I've also had some issues with blink blendshapes being overrided by my gesture layer so if you can see your eyes fine but others see them half closed, I would reccomend removing your Additive layer so the default is not applied. It should say "None (Runtime Animator Controller)" if it's removed correctly.
+
+Feel free to [consult the wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Eye-Tracking-Setup) for a setup guide and more info as to what each parameter does
 
 ### Lip Parameters
 
@@ -99,10 +101,9 @@ Additionally, the mod provides computed parameters that combine some of the abov
 
 <sup>2</sup> **Note:** **TODO:** Not yet implemented 5/4/21
 
-
 ### Setup Guide
 
-The wiki contains a fully avatar setup guide: [wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Avatar-Setup).
+The wiki contains a full avatar setup guide: [wiki](https://github.com/benaclejames/VRCFaceTracking/wiki).
 
 ## 📜 Disclaimer
 
@@ -113,3 +114,5 @@ As with all VRChat mods, modifying the game client can result in account termina
 
 * [HerpDerpinstine/MelonLoader](https://github.com/HerpDerpinstine/MelonLoader)
 * [VIVE](https://www.vive.com/) for the SRanipal SDK and their awesome hardware! ❤
+
+![](https://i.imgur.com/Bt8lguw.png)
