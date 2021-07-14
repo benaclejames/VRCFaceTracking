@@ -19,22 +19,21 @@ namespace VRCFaceTracking
                     .GetField(
                         "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                MelonUtils.NativeHookAttach(intPtr,
-                    new Action<IntPtr, IntPtr, IntPtr, bool>(OnAvatarInstantiated).Method.MethodHandle
+                MelonUtils.NativeHookAttach(intPtr, typeof(Hooking).GetMethod(nameof(OnAvatarInstantiated), BindingFlags.Static | BindingFlags.NonPublic).MethodHandle
                         .GetFunctionPointer());
                 _onAvatarInstantiatedDelegate =
                     Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
             }
             catch (Exception ex)
             {
-                MelonLogger.Msg("Patch Failed " + ex);
+                MelonLogger.Error("Patch Failed " + ex);
             }
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded)
         {
-            _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, true);
+            _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, loaded);
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
