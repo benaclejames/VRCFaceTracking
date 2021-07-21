@@ -27,11 +27,5 @@ namespace VRCFaceTracking.Params.LipMerging
                 shape.Value.GetBlendedLipShape(eye), true)).ToList();
 
         public static IEnumerable<LipShape_v2> GetAllLipShapes() => ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList();
-        
-        public static void ResetLipShapeMinMaxThresholds()
-        {
-            foreach (var positiveNegativeShape in MergedShapes)
-                positiveNegativeShape.Value.ResetMinMaxRange();
-        }
     }
 }

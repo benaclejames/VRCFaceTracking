@@ -122,8 +122,6 @@ namespace VRCFaceTracking.SRanipal
         {
             MinDilation = 999;
             MaxDilation = 0;
-            
-            LipShapeMerger.ResetLipShapeMinMaxThresholds();
         }
     }
 }

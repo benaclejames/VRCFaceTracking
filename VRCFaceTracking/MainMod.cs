@@ -4,11 +4,9 @@ using System.Linq;
 using System.Reflection;
 using VRCFaceTracking;
 using MelonLoader;
-using UnityEngine;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.LipMerging;
-using VRCFaceTracking.Pimax;
 using VRCFaceTracking.QuickMenu;
 using VRCFaceTracking.SRanipal;
 
@@ -59,8 +57,6 @@ namespace VRCFaceTracking
                     }));
         }
 
-        public override void VRChat_OnUiManagerInit() => UiManagerInit();
-
         private static void UiManagerInit()
         {
             AppendEyeParams();
@@ -69,8 +65,7 @@ namespace VRCFaceTracking
             UnifiedLibManager.Initialize();
             Hooking.SetupHooking();
         }
-
-
+        
         public override void OnSceneWasLoaded(int level, string levelName)
         {
             if (level == -1)
