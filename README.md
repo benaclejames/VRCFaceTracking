@@ -18,6 +18,7 @@ For this mod to work, you'll need to be using an avatar with the correct paramet
 |`EyesY`|Gaze Direction Y|Combined|
 |`LeftEyeLid`|Eyelid Open|Left|
 |`RightEyeLid`|Eyelid Open|Right|
+|`CombinedEyeLid`|Eyelid Open|Combined|
 |`EyesWiden`|Eye Widen|Combined|
 |`EyesDilation`|Pupil Dilation|Combined|
 |`EyesSqueeze`|Eyelid Squeeze|Combined|
