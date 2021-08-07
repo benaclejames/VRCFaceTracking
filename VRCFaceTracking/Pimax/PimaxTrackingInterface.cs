@@ -7,6 +7,7 @@ namespace VRCFaceTracking.Pimax
     public class PimaxTrackingInterface : ITrackingModule
     {
         private static readonly Thread PimaxWorker = new Thread(() => Update(CancellationToken.Token));
+        private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool _needsUpdate;
@@ -33,7 +34,8 @@ namespace VRCFaceTracking.Pimax
                 {
                     try
                     {
-                        if (UnifiedLibManager.EyeEnabled) UnifiedTrackingData.LatestEyeData = new Ai1EyeData();
+                        PimaxEyeData.Update();
+                        if (UnifiedLibManager.EyeEnabled) UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);
                     }
                     catch (Exception e)
                     {

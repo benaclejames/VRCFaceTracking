@@ -7,6 +7,13 @@ namespace VRCFaceTracking.Pimax
 		public EyeExpressionState Left = PimaxTracker.GetEyeData(Eye.Left);
 		public EyeExpressionState Right = PimaxTracker.GetEyeData(Eye.Right);
 		public EyeExpressionState Recommended = PimaxTracker.GetEyeData(Eye.Any);
+
+		public void Update()
+		{
+			Left = PimaxTracker.GetEyeData(Eye.Left); 
+			Right = PimaxTracker.GetEyeData(Eye.Right);
+		    Recommended = PimaxTracker.GetEyeData(Eye.Any);
+		}
 	}
 	
 	

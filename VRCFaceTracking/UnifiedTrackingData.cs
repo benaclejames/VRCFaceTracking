@@ -7,13 +7,13 @@ using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking
 {
-    public readonly struct Eye
+    public struct Eye
     {
-        private readonly Vector2? _look;
-        private readonly float _openness;
-        public readonly float Widen, Squeeze;
+        private Vector2? _look;
+        private float _openness;
+        public float Widen, Squeeze;
 
-        public Eye(SingleEyeData eyeData, SingleEyeExpression? expression = null)
+        public void Update(SingleEyeData eyeData, SingleEyeExpression? expression = null)
         {
             _look = null;
             _openness = 0;
@@ -32,7 +32,7 @@ namespace VRCFaceTracking
             Squeeze = expression.Value.eye_squeeze;
         }
 
-        public Eye(EyeExpressionState eyeState)
+        public void Update(EyeExpressionState eyeState)
         {
             _look = new Vector2(eyeState.PupilCenterX, eyeState.PupilCenterY);
             _openness = eyeState.Openness;
@@ -52,7 +52,7 @@ namespace VRCFaceTracking
         public float EyesDilation;
 
 
-        public static implicit operator EyeTrackingData(EyeData_v2 eyeData)
+        public void UpdateData(EyeData_v2 eyeData)
         {
             float dilation;
             
@@ -69,25 +69,19 @@ namespace VRCFaceTracking
                 SRanipalTrackingInterface.UpdateMinMaxDilation(eyeData.verbose_data.left.pupil_diameter_mm);
             }
             else dilation = eyeData.verbose_data.combined.eye_data.pupil_diameter_mm;
-            
-            return new EyeTrackingData
-            {
-                Left = new Eye(eyeData.verbose_data.left, eyeData.expression_data.left),
-                Right = new Eye(eyeData.verbose_data.right, eyeData.expression_data.right),
-                Combined = new Eye(eyeData.verbose_data.combined.eye_data),
-                
-                EyesDilation = dilation
-            };
+
+            Left.Update(eyeData.verbose_data.left, eyeData.expression_data.left);
+            Right.Update(eyeData.verbose_data.right, eyeData.expression_data.right);
+            Combined.Update(eyeData.verbose_data.combined.eye_data);
+
+            EyesDilation = dilation;
         }
 
-        public static implicit operator EyeTrackingData(Ai1EyeData eyeData)
+        public void UpdateData(Ai1EyeData eyeData)
         {
-            return new EyeTrackingData
-            {
-                Left = new Eye(eyeData.Left),
-                Right = new Eye(eyeData.Right),
-                Combined = new Eye(eyeData.Recommended)
-            };
+            Left.Update(eyeData.Left);
+            Right.Update(eyeData.Right);
+            Combined.Update(eyeData.Recommended);
         }
     }
 
