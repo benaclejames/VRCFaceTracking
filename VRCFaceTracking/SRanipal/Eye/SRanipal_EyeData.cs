@@ -67,10 +67,7 @@ namespace ViveSR
                 /** The normalized position of a pupil in [0,1]*/
                 public Vector2 pupil_position_in_sensor_area;
 
-                public bool GetValidity(SingleEyeDataValidity validity)
-                {
-                    return (eye_data_validata_bit_mask & (ulong)(1 << (int)validity)) > 0;
-                }
+                public bool GetValidity(SingleEyeDataValidity validity) => (eye_data_validata_bit_mask & (ulong)(1 << (int)validity)) > 0;
             }
 
             [StructLayout(LayoutKind.Sequential)]

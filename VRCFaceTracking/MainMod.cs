@@ -78,6 +78,9 @@ namespace VRCFaceTracking
         
         public override void OnUpdate()
         {
+            if (!UnifiedLibManager.ShouldThread) 
+                UnifiedLibManager.Update();
+            
             if (_shouldCheckUiManager) CheckUiManager();
             
             OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);

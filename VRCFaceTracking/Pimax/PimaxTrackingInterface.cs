@@ -6,7 +6,7 @@ namespace VRCFaceTracking.Pimax
 { 
     public class PimaxTrackingInterface : ITrackingModule
     {
-        private static readonly Thread PimaxWorker = new Thread(() => Update(CancellationToken.Token));
+        private static Thread PimaxWorker;
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
@@ -17,6 +17,7 @@ namespace VRCFaceTracking.Pimax
 
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
+            MelonLogger.Msg("Init Pimax");
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
 
             var success = PimaxTracker.Start();
@@ -26,26 +27,26 @@ namespace VRCFaceTracking.Pimax
 
         public void Teardown() => PimaxTracker.Stop();
 
-        private static void Update(CancellationToken token)
+        public void Update(bool threaded = false)
         {
-            while (!token.IsCancellationRequested)
+            if (!threaded && UnifiedLibManager.EyeEnabled)
             {
-                if (_needsUpdate)
+                PimaxEyeData.Update();
+                UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);
+            }
+            else
+            {
+                PimaxWorker = new Thread(() =>
                 {
-                    try
+                    while (!CancellationToken.IsCancellationRequested)
                     {
-                        PimaxEyeData.Update();
-                        if (UnifiedLibManager.EyeEnabled) UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);
+                        if (_needsUpdate)
+                            Update();
+                        
+                        Thread.Sleep(10);
                     }
-                    catch (Exception e)
-                    {
-                        if (e.InnerException.GetType() != typeof(ThreadAbortException))
-                            MelonLogger.Error("Threading error occured in PimaxTrackingInterface Update: " + e + ": " +
-                                              e.InnerException);
-                    }
-                }
-
-                Thread.Sleep(10);
+                });
+                PimaxWorker.Start();
             }
         }
     }

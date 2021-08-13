@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using MelonLoader;
+using UnhollowerBaseLib;
 using UnityEngine.SceneManagement;
 using VRCFaceTracking.QuickMenu;
 
@@ -15,6 +16,7 @@ namespace VRCFaceTracking
         bool SupportsLip { get; }
 
         (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+        void Update(bool threaded = false);
         void Teardown();
     }
 
@@ -24,6 +26,7 @@ namespace VRCFaceTracking
         private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
         
         private static Thread _initializeWorker;
+        public static bool ShouldThread = true;
 
         public static void Initialize(bool eye = true, bool lip = true)
         {
@@ -34,6 +37,8 @@ namespace VRCFaceTracking
 
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
+            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+            
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
 
@@ -64,6 +69,8 @@ namespace VRCFaceTracking
                 else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
             }
 
+            foreach (var module in UsefulModules)
+                module.Value.Update(ShouldThread);
 
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
@@ -73,6 +80,12 @@ namespace VRCFaceTracking
         {
             foreach (var module in UsefulModules)
                 module.Value.Teardown();
+        }
+        
+        public static void Update()
+        {
+            foreach (var module in UsefulModules)
+                module.Value.Update();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
@@ -25,7 +24,7 @@ namespace VRCFaceTracking.QuickMenu.EyeTracking
 
         public void UpdateEyeTrack(EyeTrackingData eyeData)
         {
-            UpdateLook(eyeData.Left, eyeData.Right);
+            UpdateLook(eyeData.Left.Look, eyeData.Right.Look);
         }
 
         private void UpdateLook(Vector2? leftEye, Vector2? rightEye)

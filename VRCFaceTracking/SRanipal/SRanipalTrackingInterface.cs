@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using MelonLoader;
+using UnhollowerBaseLib;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
@@ -13,8 +13,7 @@ namespace VRCFaceTracking.SRanipal
         public static float MaxDilation;
         public static float MinDilation = 999;
 
-        private static readonly Thread SRanipalWorker = new Thread(() => Update(CancellationToken.Token));
-        
+        private Thread UpdateThread;
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
         public bool SupportsEye => true;
@@ -24,15 +23,13 @@ namespace VRCFaceTracking.SRanipal
         {
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
-            if (eye)
+            if (eye && SRanipal_Eye_API.IsViveProEye()) // Only try to init if we're actually using the only headset that supports SRanipal eye tracking
                 eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
 
             if (lip)
                 lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
-            
-            if ((eyeEnabled || lipEnabled) && !SRanipalWorker.IsAlive) SRanipalWorker.Start();
             
             return (eyeEnabled, lipEnabled);
         }
@@ -64,46 +61,42 @@ namespace VRCFaceTracking.SRanipal
             CancellationToken.Dispose();
         }
 
-        private static void Update(CancellationToken token)
+        public void Update(bool threaded = false)
         {
-            while (!token.IsCancellationRequested)
+            if (!threaded)
             {
-                try
+                if (UnifiedLibManager.EyeEnabled) UpdateEye();
+                if (UnifiedLibManager.LipEnabled) UpdateMouth();
+            }
+            else
+            {
+                UpdateThread = new Thread(() =>
                 {
-                    if (UnifiedLibManager.LipEnabled) UpdateMouth();
-                    if (UnifiedLibManager.EyeEnabled) UpdateEye();
-                }
-                catch (Exception e)
-                {
-                    if (e.InnerException.GetType() != typeof(ThreadAbortException))
-                        MelonLogger.Error("Threading error occured in SRanipalTrackingInterface Update: "+e+": "+e.InnerException);
-                }
-                Thread.Sleep(10);
+                    IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                    while (!CancellationToken.IsCancellationRequested)
+                    {
+                        Update();
+                        Thread.Sleep(10);
+                    }
+                });
+                UpdateThread.Start();
             }
         }
         
         #region EyeUpdate
 
-        private static EyeData_v2 _eyeData;
-        private static void UpdateEye()
+        private void UpdateEye()
         {
-            SRanipal_Eye_API.GetEyeData_v2(ref _eyeData);
-            UnifiedTrackingData.LatestEyeData.UpdateData(_eyeData);;
+            EyeData_v2 eyeData = default;
+            SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
+            UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
         }
 
-        public static void UpdateMinMaxDilation(float readDilation)
-        {
-            if (readDilation > MaxDilation)
-                MaxDilation = readDilation;
-            if (readDilation < MinDilation)
-                MinDilation = readDilation;
-        }
-        
         #endregion
 
         #region MouthUpdate
 
-        private static void UpdateMouth()
+        private void UpdateMouth()
         {
             LipData_v2 lipData = default;
 

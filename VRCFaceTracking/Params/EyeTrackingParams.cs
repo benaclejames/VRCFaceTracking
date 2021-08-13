@@ -8,7 +8,7 @@ namespace VRCFaceTracking.Params
     {
         public static readonly List<IParameter> ParameterList = new List<IParameter>
         {
-            new XYEyeParameter(v2 => v2.Combined, "EyesX", "EyesY"),
+            new XYEyeParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
 
             new FloatEyeParameter(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
 
@@ -19,26 +19,26 @@ namespace VRCFaceTracking.Params
                 return Mathf.Clamp(normalizedFloat, 0, 1);
             }, "EyesDilation"),
 
-            new XYEyeParameter(v2 => v2.Left, "LeftEyeX", "LeftEyeY"),
-            new XYEyeParameter(v2 => v2.Right, "RightEyeX", "RightEyeY"),
+            new XYEyeParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
+            new XYEyeParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
 
-            new FloatEyeParameter(v2 => v2.Left, "LeftEyeLid", true),
-            new FloatEyeParameter(v2 => v2.Right, "RightEyeLid", true),
+            new FloatEyeParameter(v2 => v2.Left.Openness, "LeftEyeLid", true),
+            new FloatEyeParameter(v2 => v2.Right.Openness, "RightEyeLid", true),
             
-            new BoolEyeParameter(v2 => v2.Left < 0.5f, "LeftEyeLid"),
-            new BoolEyeParameter(v2 => v2.Right < 0.5f, "RightEyeLid"),
+            new BoolEyeParameter(v2 => v2.Left.Openness < 0.5f, "LeftEyeLid"),
+            new BoolEyeParameter(v2 => v2.Right.Openness < 0.5f, "RightEyeLid"),
             
             new FloatEyeParameter(v2 =>
             {
-                if (v2.Left >= 1 && v2.Left.Widen > 0)
+                if (v2.Left.Openness >= 1 && v2.Left.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen); 
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left);
+                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
             }, "LeftEyeLidExpanded", true),
             new FloatEyeParameter(v2 =>
             {
-                if (v2.Right >= 1 && v2.Right.Widen > 0)
+                if (v2.Right.Openness >= 1 && v2.Right.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen); 
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right);
+                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
             }, "RightEyeLidExpanded", true),
 
             new FloatEyeParameter(v2 => v2.Left.Widen, "LeftEyeWiden"),
