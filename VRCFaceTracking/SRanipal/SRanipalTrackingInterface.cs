@@ -10,10 +10,7 @@ namespace VRCFaceTracking.SRanipal
 {
     public class SRanipalTrackingInterface : ITrackingModule
     {
-        public static float MaxDilation;
-        public static float MinDilation = 999;
-
-        private Thread UpdateThread;
+        private Thread _updateThread;
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
 
         public bool SupportsEye => true;
@@ -70,7 +67,7 @@ namespace VRCFaceTracking.SRanipal
             }
             else
             {
-                UpdateThread = new Thread(() =>
+                _updateThread = new Thread(() =>
                 {
                     IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
                     while (!CancellationToken.IsCancellationRequested)
@@ -79,7 +76,7 @@ namespace VRCFaceTracking.SRanipal
                         Thread.Sleep(10);
                     }
                 });
-                UpdateThread.Start();
+                _updateThread.Start();
             }
         }
         
@@ -108,11 +105,5 @@ namespace VRCFaceTracking.SRanipal
         }
 
         #endregion
-
-        public static void ResetTrackingThresholds()
-        {
-            MinDilation = 999;
-            MaxDilation = 0;
-        }
     }
 }

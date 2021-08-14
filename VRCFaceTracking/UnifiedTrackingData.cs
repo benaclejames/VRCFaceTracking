@@ -71,7 +71,7 @@ namespace VRCFaceTracking
             Right.Update(eyeData.verbose_data.right, eyeData.expression_data.right);
             Combined.Update(eyeData.verbose_data.combined.eye_data);
 
-            EyesDilation = dilation;
+            EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
         }
 
         public void UpdateData(Ai1EyeData eyeData)
@@ -87,6 +87,12 @@ namespace VRCFaceTracking
                 _maxDilation = readDilation;
             if (readDilation < _minDilation)
                 _minDilation = readDilation;
+        }
+
+        public void ResetThresholds()
+        {
+            _maxDilation = 0;
+            _minDilation = 999;
         }
     }
 

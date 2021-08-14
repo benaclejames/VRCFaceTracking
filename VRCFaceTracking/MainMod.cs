@@ -8,9 +8,8 @@ using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
-using VRCFaceTracking.SRanipal;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.5", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.1.6 PTB", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -70,8 +69,8 @@ namespace VRCFaceTracking
         {
             if (level == -1)
                 QuickModeMenu.CheckIfShouldInit();
-            
-            SRanipalTrackingInterface.ResetTrackingThresholds();
+
+            UnifiedTrackingData.LatestEyeData.ResetThresholds();
         }
 
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();

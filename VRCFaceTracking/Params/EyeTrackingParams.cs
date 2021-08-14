@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using VRCFaceTracking.SRanipal;
 
 namespace VRCFaceTracking.Params
 {
@@ -12,12 +10,7 @@ namespace VRCFaceTracking.Params
 
             new FloatEyeParameter(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
 
-            new FloatEyeParameter(v2 =>
-            {
-                var normalizedFloat = v2.EyesDilation / SRanipalTrackingInterface.MinDilation /
-                                      (SRanipalTrackingInterface.MaxDilation - SRanipalTrackingInterface.MinDilation);
-                return Mathf.Clamp(normalizedFloat, 0, 1);
-            }, "EyesDilation"),
+            new FloatEyeParameter(v2 => v2.EyesDilation, "EyesDilation"),
 
             new XYEyeParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
             new XYEyeParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
