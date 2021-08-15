@@ -58,26 +58,24 @@ namespace VRCFaceTracking.SRanipal
             CancellationToken.Dispose();
         }
 
-        public void Update(bool threaded = false)
+        public void StartThread()
         {
-            if (!threaded)
+            _updateThread = new Thread(() =>
             {
-                if (UnifiedLibManager.EyeEnabled) UpdateEye();
-                if (UnifiedLibManager.LipEnabled) UpdateMouth();
-            }
-            else
-            {
-                _updateThread = new Thread(() =>
+                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                while (!CancellationToken.IsCancellationRequested)
                 {
-                    IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                    while (!CancellationToken.IsCancellationRequested)
-                    {
-                        Update();
-                        Thread.Sleep(10);
-                    }
-                });
-                _updateThread.Start();
-            }
+                    Update();
+                    Thread.Sleep(10);
+                }
+            });
+            _updateThread.Start();
+        }
+
+        public void Update()
+        {
+            if (UnifiedLibManager.EyeEnabled) UpdateEye();
+            if (UnifiedLibManager.LipEnabled) UpdateMouth();
         }
         
         #region EyeUpdate

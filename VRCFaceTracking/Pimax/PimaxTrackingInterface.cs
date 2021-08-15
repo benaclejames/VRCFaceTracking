@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using MelonLoader;
+using UnhollowerBaseLib;
 
 namespace VRCFaceTracking.Pimax
 { 
@@ -17,7 +17,6 @@ namespace VRCFaceTracking.Pimax
 
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
-            MelonLogger.Msg("Init Pimax");
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
 
             var success = PimaxTracker.Start();
@@ -25,29 +24,30 @@ namespace VRCFaceTracking.Pimax
             return (success, false);
         }
 
+        public void StartThread()
+        {
+            PimaxWorker = new Thread(() =>
+            {
+                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                while (!CancellationToken.IsCancellationRequested)
+                {
+                    if (_needsUpdate)
+                        Update();
+                        
+                    Thread.Sleep(10);
+                }
+            });
+            PimaxWorker.Start();
+        }
+
         public void Teardown() => PimaxTracker.Stop();
 
-        public void Update(bool threaded = false)
+        public void Update()
         {
-            if (!threaded && UnifiedLibManager.EyeEnabled)
-            {
-                PimaxEyeData.Update();
-                UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);
-            }
-            else
-            {
-                PimaxWorker = new Thread(() =>
-                {
-                    while (!CancellationToken.IsCancellationRequested)
-                    {
-                        if (_needsUpdate)
-                            Update();
-                        
-                        Thread.Sleep(10);
-                    }
-                });
-                PimaxWorker.Start();
-            }
+            if (!UnifiedLibManager.EyeEnabled) return;
+            
+            PimaxEyeData.Update();
+            UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);
         }
     }
 }
