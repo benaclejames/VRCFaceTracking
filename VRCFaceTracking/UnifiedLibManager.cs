@@ -16,7 +16,8 @@ namespace VRCFaceTracking
         bool SupportsLip { get; }
 
         (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-        void Update(bool threaded = false);
+        void StartThread();
+        void Update();
         void Teardown();
     }
 
@@ -26,7 +27,7 @@ namespace VRCFaceTracking
         private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
         
         private static Thread _initializeWorker;
-        public static bool ShouldThread = true;
+        public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
 
         public static void Initialize(bool eye = true, bool lip = true)
         {
@@ -50,8 +51,12 @@ namespace VRCFaceTracking
                     (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
 
                 if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
+                {
                     UsefulModules.Add(module, moduleObj);
-                
+                    if (ShouldThread)
+                        moduleObj.StartThread();
+                }
+
                 if (eyeSuccess) EyeEnabled = true;
                 if (lipSuccess) LipEnabled = true;
 
@@ -69,9 +74,6 @@ namespace VRCFaceTracking
                 else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
             }
 
-            foreach (var module in UsefulModules)
-                module.Value.Update(ShouldThread);
-
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
         }
@@ -84,6 +86,8 @@ namespace VRCFaceTracking
         
         public static void Update()
         {
+            if (ShouldThread) return;
+            
             foreach (var module in UsefulModules)
                 module.Value.Update();
         }

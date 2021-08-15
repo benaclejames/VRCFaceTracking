@@ -17,9 +17,11 @@ namespace VRCFaceTracking.Params
 
             new FloatEyeParameter(v2 => v2.Left.Openness, "LeftEyeLid", true),
             new FloatEyeParameter(v2 => v2.Right.Openness, "RightEyeLid", true),
+            new FloatEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid", true),
             
             new BoolEyeParameter(v2 => v2.Left.Openness < 0.5f, "LeftEyeLid"),
             new BoolEyeParameter(v2 => v2.Right.Openness < 0.5f, "RightEyeLid"),
+            new BoolEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2 < 0.5f, "CombinedEyeLid"),
             
             new FloatEyeParameter(v2 =>
             {
