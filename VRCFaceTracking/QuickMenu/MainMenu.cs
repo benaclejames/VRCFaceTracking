@@ -48,6 +48,7 @@ namespace VRCFaceTracking.QuickMenu
         public void UpdateParams()
         {
             if (_eyeTrackingMenuPage.Root.active) _eyeTrackingMenuPage.UpdateEyeTrack(UnifiedTrackingData.LatestEyeData);
+            if (_lipTrackingMenuPage.Root.active) _lipTrackingMenuPage.UpdateImage(UnifiedTrackingData.LatestLipData.image);
         }
     }
 }

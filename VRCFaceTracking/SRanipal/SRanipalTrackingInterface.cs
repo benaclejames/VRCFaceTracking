@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnhollowerBaseLib;
 using ViveSR;
@@ -27,6 +28,9 @@ namespace VRCFaceTracking.SRanipal
                 lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
+
+            if (lipEnabled)
+                UnifiedTrackingData.LatestLipData.image = Marshal.AllocCoTaskMem(SRanipal_Lip.ImageWidth * SRanipal_Lip.ImageHeight);
             
             return (eyeEnabled, lipEnabled);
         }
@@ -93,13 +97,8 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateMouth()
         {
-            LipData_v2 lipData = default;
-
-            SRanipal_Lip_API.GetLipData_v2(ref lipData);
-            SRanipal_Lip_v2.GetLipWeightings(out var lipWeightings);
-
-            UnifiedTrackingData.LatestLipData = lipData;
-            UnifiedTrackingData.LatestLipShapes = lipWeightings;
+            SRanipal_Lip_API.GetLipData_v2(ref UnifiedTrackingData.LatestLipData);
+            SRanipal_Lip_v2.GetLipWeightings(out UnifiedTrackingData.LatestLipShapes);
         }
 
         #endregion
