@@ -13,7 +13,7 @@ namespace VRCFaceTracking.Params
         {
             MainMod.OnSRanipalParamsUpdated += (eye, lip, floats) =>
             {
-                if (lip == null) return;
+                if (lip == null || floats == null) return;
 
                 var newParamValue = getValueFunc.Invoke(floats, lip);
                 if (newParamValue.HasValue) ParamValue = newParamValue.Value;

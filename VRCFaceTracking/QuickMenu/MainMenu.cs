@@ -8,6 +8,7 @@ namespace VRCFaceTracking.QuickMenu
     {
         private readonly EyeTrackingMenuPage _eyeTrackingMenuPage;
         private readonly LipTrackingMenuPage _lipTrackingMenuPage;
+        private readonly Transform _errorPage;
 
         public MainMenu(Transform parentMenuTransform, AssetBundle bundle)
         {
@@ -19,6 +20,7 @@ namespace VRCFaceTracking.QuickMenu
 
             _eyeTrackingMenuPage = new EyeTrackingMenuPage(menuObject.transform.Find("Pages/Eye Tracking"), menuObject.transform.Find("Tabs/Buttons/Eye Tracking"));
             _lipTrackingMenuPage = new LipTrackingMenuPage(menuObject.transform.Find("Pages/Lip Tracking"), menuObject.transform.Find("Tabs/Buttons/Lip Tracking"));
+            _errorPage = menuObject.transform.Find("Pages/No Tracking Available");
             
             foreach (var sprite in Resources.FindObjectsOfTypeAll<Sprite>())
                 switch (sprite.name)
@@ -36,6 +38,7 @@ namespace VRCFaceTracking.QuickMenu
 
         public void UpdateEnabledTabs(bool eye = false, bool lip = false)
         {
+            _errorPage.gameObject.SetActive(false);
             _eyeTrackingMenuPage.TabObject.SetActive(eye);
             _lipTrackingMenuPage.TabObject.SetActive(lip);
             
@@ -43,6 +46,8 @@ namespace VRCFaceTracking.QuickMenu
                 _eyeTrackingMenuPage.Root.SetActive(true);
             else if (lip)
                 _lipTrackingMenuPage.Root.SetActive(true);
+            else
+                _errorPage.gameObject.SetActive(true);
         }
 
         public void UpdateParams()
