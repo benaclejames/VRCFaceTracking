@@ -9,7 +9,7 @@ using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.2.0", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.3.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
