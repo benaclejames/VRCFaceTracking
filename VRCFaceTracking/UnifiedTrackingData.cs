@@ -51,7 +51,7 @@ namespace VRCFaceTracking
 
         public void UpdateData(EyeData_v2 eyeData)
         {
-            float dilation;
+            float dilation = 0;
             
             if (eyeData.verbose_data.right.GetValidity(SingleEyeDataValidity
                 .SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
@@ -65,13 +65,13 @@ namespace VRCFaceTracking
                 dilation = eyeData.verbose_data.left.pupil_diameter_mm;
                 UpdateMinMaxDilation(eyeData.verbose_data.left.pupil_diameter_mm);
             }
-            else dilation = eyeData.verbose_data.combined.eye_data.pupil_diameter_mm;
 
             Left.Update(eyeData.verbose_data.left, eyeData.expression_data.left);
             Right.Update(eyeData.verbose_data.right, eyeData.expression_data.right);
             Combined.Update(eyeData.verbose_data.combined.eye_data);
 
-            EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
+            if (dilation != 0)
+                EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
         }
 
         public void UpdateData(Ai1EyeData eyeData)
