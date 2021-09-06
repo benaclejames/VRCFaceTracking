@@ -30,6 +30,8 @@ For this mod to work, you'll need to be using an avatar with the correct paramet
 |`RightEyeWiden`|Eye Widen|Right|
 |`LeftEyeSqueeze`|Eyelid Squeeze|Left|
 |`RightEyeSqueeze`|Eyelid Squeeze|Right|
+|`LeftEyeLidExpanded`|0.0-0.8 Eyelid Open. 0.8-1.0 Eye Widen|Left|
+|`RightEyeLidExpanded`|0.0-0.8 Eyelid Open. 0.8-1.0 Eye Widen|Right|
 
 It's not required to use all of these parameters. Similar to the setup of parameters with Unity Animation Controllers, these are all case-sensitive and must be copied **EXACTLY** as shown into your Avatar's base parameters. A typical setup might look something like this:<br>
 ![](https://i.imgur.com/KZRweT7.png)
