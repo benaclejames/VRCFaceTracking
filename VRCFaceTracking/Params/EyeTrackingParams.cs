@@ -6,14 +6,14 @@ namespace VRCFaceTracking.Params
     {
         public static readonly List<IParameter> ParameterList = new List<IParameter>
         {
-            new XYEyeParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
+            new XYParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
 
             new FloatEyeParameter(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
 
             new FloatEyeParameter(v2 => v2.EyesDilation, "EyesDilation"),
 
-            new XYEyeParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
-            new XYEyeParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
+            new XYParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
+            new XYParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
 
             new FloatEyeParameter(v2 => v2.Left.Openness, "LeftEyeLid", true),
             new FloatEyeParameter(v2 => v2.Right.Openness, "RightEyeLid", true),

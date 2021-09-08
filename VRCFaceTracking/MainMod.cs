@@ -37,7 +37,7 @@ namespace VRCFaceTracking
         private MethodInfo _uiManagerInstance;
         private bool _shouldCheckUiManager;
 
-        public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnSRanipalParamsUpdated = (eye, lip, floats) => { };
+        public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnUnifiedParamsUpdated = (eye, lip, floats) => { };
 
         private static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
         
@@ -82,7 +82,7 @@ namespace VRCFaceTracking
             
             if (_shouldCheckUiManager) CheckUiManager();
             
-            OnSRanipalParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
+            OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
                 QuickModeMenu.MainMenu.UpdateParams();
