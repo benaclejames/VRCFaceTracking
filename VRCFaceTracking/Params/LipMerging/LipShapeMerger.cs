@@ -7,7 +7,6 @@ namespace VRCFaceTracking.Params.LipMerging
 {
     public static class LipShapeMerger
     {
-
         private static readonly Dictionary<string, PositiveNegativeShape> MergedShapes =
             new Dictionary<string, PositiveNegativeShape>
             {
@@ -22,6 +21,8 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"PuffSuckLeft", new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
             };
 
+        public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out LipShape_v2 shape);
+        
         public static IEnumerable<LipParameter> GetOptimizedLipParameters() => MergedShapes
             .Select(shape => new LipParameter(shape.Key, (eye, lip) => 
                 shape.Value.GetBlendedLipShape(eye), true)).ToList();

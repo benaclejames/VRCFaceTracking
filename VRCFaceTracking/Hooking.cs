@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDKBase;
 
 namespace VRCFaceTracking
@@ -31,24 +32,35 @@ namespace VRCFaceTracking
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
-            bool loaded)
+            bool loaded, IntPtr methodInfo)
         {
-            _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, loaded);
+            _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, loaded, methodInfo);
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0?.prop_VRCAvatarManager_0
-                    ?.prop_VRCAvatarDescriptor_0 == null || avatarDescriptor != VRCPlayer
-                    .field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
-                    .prop_VRCAvatarDescriptor_0) return;
                 
-                MainMod.ZeroParams();
-                MainMod.ResetParams();
+                if (VRCPlayer.field_Internal_Static_VRCPlayer_0
+                        ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0 == null   // Is our current avatar null?
+                    || avatarDescriptor != VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
+                        .prop_VRCAvatarDescriptor_0)    // Is this avatar descriptor being assigned to our local player?
+                {
+                    //TODO: Add nameplate badge to indicate supported tracking types
+                    var av3Descriptor = avatarDescriptor.TryCast<VRCAvatarDescriptor>();
+                    if (!av3Descriptor) return;
+                    
+                    var (supportsEye, supportsLip) = UnifiedLibManager.GetAvatarSupportedTracking(av3Descriptor);
+                    MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
+                }
+                else
+                {
+                    MainMod.ZeroParams();
+                    MainMod.ResetParams();
+                }
             }
             catch (Exception e) { MelonLogger.Error(e.ToString()); }
         }
 
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
-            bool loaded);
+            bool loaded, IntPtr methodInfo);
     }
 }

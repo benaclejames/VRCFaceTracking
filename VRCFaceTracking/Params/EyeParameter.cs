@@ -8,15 +8,17 @@ namespace VRCFaceTracking.Params
     {
         public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool prioritised = false)
             : base(paramName, prioritised) =>
-            MainMod.OnSRanipalParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+
+        public bool IsName(string name) => ParamName == name;
     }
 
-    public class XYEyeParameter : XYParam, IParameter
+    public class XYParameter : XYParam, IParameter
     {
-        public XYEyeParameter(Func<EyeTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
+        public XYParameter(Func<EyeTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
         {
-            MainMod.OnSRanipalParamsUpdated += (eye, lip, floats) =>
+            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
                 var newValue = getValueFunc.Invoke(eye);
                 if (newValue.HasValue) ParamValue = newValue.Value;
@@ -25,11 +27,14 @@ namespace VRCFaceTracking.Params
 
         void IParameter.ResetParam() => ResetParams();
         public void ZeroParam() => ZeroParams();
+        public bool IsName(string name) => X.ParamName == name || Y.ParamName == name;
     }
 
     public class BoolEyeParameter : BoolBaseParam, IParameter
     {
         public BoolEyeParameter(Func<EyeTrackingData, bool> getValueFunc, string paramName) : base(paramName) =>
-            MainMod.OnSRanipalParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+
+        public bool IsName(string name) => ParamName == name;
     }
 }

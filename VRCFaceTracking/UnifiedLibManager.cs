@@ -6,6 +6,9 @@ using System.Threading;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine.SceneManagement;
+using VRC.SDK3.Avatars.Components;
+using VRCFaceTracking.Params;
+using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking
@@ -91,5 +94,12 @@ namespace VRCFaceTracking
             foreach (var module in UsefulModules)
                 module.Value.Update();
         }
+
+        public static (bool, bool) GetAvatarSupportedTracking(VRCAvatarDescriptor descriptor) =>
+            (descriptor.expressionParameters.parameters.Any(param =>    // Eye
+                EyeTrackingParams.ParameterList.Any(virtualParam => virtualParam.IsName(param.name))), 
+                
+                descriptor.expressionParameters.parameters.Any(param => // Lip
+                    LipShapeMerger.IsLipShapeName(param.name)));
     }
 }

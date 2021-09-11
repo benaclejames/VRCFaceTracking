@@ -19,5 +19,7 @@ namespace VRCFaceTracking.Params
                 if (newParamValue.HasValue) ParamValue = newParamValue.Value;
             };
         }
+
+        public bool IsName(string name) => ParamName == name;
     }
 }

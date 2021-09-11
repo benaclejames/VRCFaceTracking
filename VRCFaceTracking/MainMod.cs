@@ -17,8 +17,8 @@ namespace VRCFaceTracking
 {
     public class MainMod : MelonMod
     {
-        public static void ResetParams() => SRanipalTrackParams.ForEach(param => param.ResetParam());
-        public static void ZeroParams() => SRanipalTrackParams.ForEach(param => param.ZeroParam());
+        public static void ResetParams() => CurrentlyTrackedParams.ForEach(param => param.ResetParam());
+        public static void ZeroParams() => CurrentlyTrackedParams.ForEach(param => param.ZeroParam());
         public override void OnApplicationStart()
         {
             DependencyManager.Init();
@@ -30,7 +30,7 @@ namespace VRCFaceTracking
 
         public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
-        private static readonly List<IParameter> SRanipalTrackParams = new List<IParameter>();
+        private static readonly List<IParameter> CurrentlyTrackedParams = new List<IParameter>();
 
         private Assembly _assemblyCSharp;
         private Type _uiManager;
@@ -39,16 +39,16 @@ namespace VRCFaceTracking
 
         public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnUnifiedParamsUpdated = (eye, lip, floats) => { };
 
-        private static void AppendEyeParams() => SRanipalTrackParams.AddRange(EyeTrackingParams.ParameterList);
+        private static void AppendEyeParams() => CurrentlyTrackedParams.AddRange(EyeTrackingParams.ParameterList);
         
         private static void AppendLipParams()
         {
             // Add optimized shapes
-            SRanipalTrackParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
+            CurrentlyTrackedParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
             
             // Add unoptimized shapes in case someone wants to use em
             foreach (var unoptimizedShape in LipShapeMerger.GetAllLipShapes())
-                SRanipalTrackParams.Add(new LipParameter(unoptimizedShape.ToString(), 
+                CurrentlyTrackedParams.Add(new LipParameter(unoptimizedShape.ToString(), 
                     (eye, lip) =>
                     {
                         if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
