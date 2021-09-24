@@ -19,6 +19,7 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"TongueX", new PositiveNegativeShape(LipShape_v2.TongueRight, LipShape_v2.TongueLeft)},
                 {"PuffSuckRight", new PositiveNegativeShape(LipShape_v2.CheekPuffRight, LipShape_v2.CheekSuck)},
                 {"PuffSuckLeft", new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
+                {"TongueInOut", new PositiveNegativeShape(LipShape_v2.TongueLongStep2, LipShape_v2.TongueLongStep1)},
             };
 
         public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out LipShape_v2 shape);
