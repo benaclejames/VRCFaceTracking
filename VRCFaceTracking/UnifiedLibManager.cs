@@ -91,15 +91,8 @@ namespace VRCFaceTracking
         {
             if (ShouldThread) return;
             
-            foreach (var module in UsefulModules)
-                module.Value.Update();
+            foreach (var module in UsefulModules.Values)
+                module.Update();
         }
-
-        public static (bool, bool) GetAvatarSupportedTracking(VRCAvatarDescriptor descriptor) =>
-            (descriptor.expressionParameters.parameters.Any(param =>    // Eye
-                EyeTrackingParams.ParameterList.Any(virtualParam => virtualParam.IsName(param.name))), 
-                
-                descriptor.expressionParameters.parameters.Any(param => // Lip
-                    LipShapeMerger.IsLipShapeName(param.name)));
     }
 }

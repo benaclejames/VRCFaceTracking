@@ -2,8 +2,12 @@
 {
     public interface IParameter
     {
-        bool IsName(string name);
+        string[] GetName();
+        
+        // Rescan
         void ResetParam();
+        
+        // Reset Index to null
         void ZeroParam();
     }
 }

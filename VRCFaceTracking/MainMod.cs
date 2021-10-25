@@ -9,7 +9,7 @@ using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.3.0", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.4.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -17,8 +17,10 @@ namespace VRCFaceTracking
 {
     public class MainMod : MelonMod
     {
-        public static void ResetParams() => CurrentlyTrackedParams.ForEach(param => param.ResetParam());
-        public static void ZeroParams() => CurrentlyTrackedParams.ForEach(param => param.ZeroParam());
+        public static void ResetParams() => _currentlyTrackedParams = FindParams(ParamLib.ParamLib.GetLocalParams().Select(p => p.name).Distinct());
+        
+        public static void ZeroParams() => _currentlyTrackedParams.Clear();
+
         public override void OnApplicationStart()
         {
             DependencyManager.Init();
@@ -30,7 +32,7 @@ namespace VRCFaceTracking
 
         public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
-        private static readonly List<IParameter> CurrentlyTrackedParams = new List<IParameter>();
+        private static List<IParameter> _currentlyTrackedParams = new List<IParameter>();
 
         private Assembly _assemblyCSharp;
         private Type _uiManager;
@@ -39,28 +41,27 @@ namespace VRCFaceTracking
 
         public static Action<EyeTrackingData, float[], Dictionary<LipShape_v2, float>> OnUnifiedParamsUpdated = (eye, lip, floats) => { };
 
-        private static void AppendEyeParams() => CurrentlyTrackedParams.AddRange(EyeTrackingParams.ParameterList);
-        
-        private static void AppendLipParams()
+        private static List<IParameter> FindParams(IEnumerable<string> searchParams)
         {
-            // Add optimized shapes
-            CurrentlyTrackedParams.AddRange(LipShapeMerger.GetOptimizedLipParameters());
+            var eyeParams = EyeTrackingParams.ParameterList.Where(p => p.GetName().Any(searchParams.Contains));
             
-            // Add unoptimized shapes in case someone wants to use em
-            foreach (var unoptimizedShape in LipShapeMerger.GetAllLipShapes())
-                CurrentlyTrackedParams.Add(new LipParameter(unoptimizedShape.ToString(), 
-                    (eye, lip) =>
-                    {
-                        if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
-                        return null;
-                    }));
+            var optimizedLipParams = LipShapeMerger.GetOptimizedLipParameters().Where(p => p.GetName().Any(searchParams.Contains));
+            
+            var unoptimizedLipParams = LipShapeMerger.GetAllLipShapes()
+                .Where(shape => searchParams.Contains(shape.ToString()))
+                .Select(unoptimizedShape => new LipParameter(unoptimizedShape.ToString(), (eye, lip) =>
+                {
+                    if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
+                    return null;
+                }, true))
+                .Cast<IParameter>()
+                .ToList();
+
+            return eyeParams.Union(optimizedLipParams).Union(unoptimizedLipParams).ToList();
         }
 
         private static void UiManagerInit()
         {
-            AppendEyeParams();
-            AppendLipParams();
-
             UnifiedLibManager.Initialize();
             Hooking.SetupHooking();
         }
@@ -111,7 +112,7 @@ namespace VRCFaceTracking
                 return;
             }
 
-            if (_uiManagerInstance.Invoke(null, new object[0]) == null)
+            if (_uiManagerInstance.Invoke(null, Array.Empty<object>()) == null)
                 return;
 
             _shouldCheckUiManager = false;

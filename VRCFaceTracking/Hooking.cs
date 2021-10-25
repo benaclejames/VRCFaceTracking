@@ -45,11 +45,11 @@ namespace VRCFaceTracking
                         .prop_VRCAvatarDescriptor_0)    // Is this avatar descriptor being assigned to our local player?
                 {
                     //TODO: Add nameplate badge to indicate supported tracking types
-                    var av3Descriptor = avatarDescriptor.TryCast<VRCAvatarDescriptor>();
-                    if (!av3Descriptor) return;
+                    //var av3Descriptor = avatarDescriptor.TryCast<VRCAvatarDescriptor>();
+                    //if (!av3Descriptor) return;
                     
-                    var (supportsEye, supportsLip) = UnifiedLibManager.GetAvatarSupportedTracking(av3Descriptor);
-                    MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
+                    //var (supportsEye, supportsLip) = UnifiedLibManager.GetAvatarSupportedTracking(av3Descriptor);
+                    //MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
                 }
                 else
                 {
