@@ -1,10 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using MelonLoader;
 using UnhollowerBaseLib;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using VRC.SDK3.Avatars.Components;
 using VRCFaceTracking.Params;
@@ -32,6 +35,21 @@ namespace VRCFaceTracking
         private static Thread _initializeWorker;
         public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
 
+        public static IEnumerator CheckRuntimeSanity()
+        {
+            EyeEnabled = false;
+            LipEnabled = false;
+            UsefulModules.Clear();
+            foreach (var process in Process.GetProcessesByName("sr_runtime"))
+            {
+                MelonLogger.Msg("Killing "+process.ProcessName);
+                process.Kill();
+                yield return new WaitForSeconds(3);
+                MelonLogger.Msg("Re-Initializing");
+                Initialize();
+            }
+        }
+        
         public static void Initialize(bool eye = true, bool lip = true)
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
@@ -42,7 +60,7 @@ namespace VRCFaceTracking
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-            
+
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
 
@@ -89,7 +107,7 @@ namespace VRCFaceTracking
         
         public static void Update()
         {
-            if (ShouldThread) return;
+            if (ShouldThread || !(EyeEnabled || LipEnabled)) return;
             
             foreach (var module in UsefulModules.Values)
                 module.Update();
