@@ -8,7 +8,7 @@ namespace VRCFaceTracking.Params
     {
         public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool prioritised = false)
             : base(paramName, prioritised) =>
-            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
 
         public string[] GetName() => new[] {ParamName};
     }
@@ -18,7 +18,7 @@ namespace VRCFaceTracking.Params
         public XYParameter(Func<EyeTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
         {
-            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
                 var newValue = getValueFunc.Invoke(eye);
                 if (newValue.HasValue) ParamValue = newValue.Value;
@@ -34,7 +34,7 @@ namespace VRCFaceTracking.Params
     public class BoolEyeParameter : BoolBaseParam, IParameter
     {
         public BoolEyeParameter(Func<EyeTrackingData, bool> getValueFunc, string paramName) : base(paramName) =>
-            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
 
         public string[] GetName() => new [] {ParamName};
     }

@@ -40,7 +40,7 @@ namespace VRCFaceTracking.Params
             new FloatEyeParameter(v2 => v2.Right.Widen, "RightEyeWiden"),
 
             new FloatEyeParameter(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
-            new FloatEyeParameter(v2 => v2.Right.Squeeze, "RightEyeSqueeze")
+            new FloatEyeParameter(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
         };
 
         // Brain Hurty

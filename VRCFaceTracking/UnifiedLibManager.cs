@@ -35,6 +35,7 @@ namespace VRCFaceTracking
         private static Thread _initializeWorker;
         public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
 
+        // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
         public static IEnumerator CheckRuntimeSanity()
         {
             EyeEnabled = false;
@@ -66,11 +67,14 @@ namespace VRCFaceTracking
 
             foreach (var module in trackingModules)
             {
-                bool eyeSuccess = false, lipSuccess = false;
+                bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
+                
                 var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
+                // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
                 if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
                     (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
 
+                // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
                 if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
                 {
                     UsefulModules.Add(module, moduleObj);
@@ -99,12 +103,14 @@ namespace VRCFaceTracking
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
         }
 
+        // Signal all active modules to gracefully shut down their respective runtimes
         public static void Teardown()
         {
             foreach (var module in UsefulModules)
                 module.Value.Teardown();
         }
         
+        // Manually signal all useful modules to get the latest data
         public static void Update()
         {
             if (ShouldThread || !(EyeEnabled || LipEnabled)) return;

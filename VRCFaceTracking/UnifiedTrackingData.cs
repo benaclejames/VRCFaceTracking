@@ -1,11 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking.Params;
+using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.Pimax;
 
 namespace VRCFaceTracking
 {
+    // Represents a single eye, can also be used as a combined eye
     public struct Eye
     {
         public Vector2? Look;
@@ -25,7 +30,8 @@ namespace VRCFaceTracking
                     new Vector3(-1, 1, 1));
 
             Openness = eyeData.eye_openness;
-            if (expression == null) return;
+            
+            if (expression == null) return; // This is null when we use this as a combined eye, so don't try read data from it
             
             Widen = expression.Value.eye_wide;
             Squeeze = expression.Value.eye_squeeze;
@@ -98,8 +104,41 @@ namespace VRCFaceTracking
 
     public struct UnifiedTrackingData
     {
+        // Central update action for all parameters to subscribe to
+        public static Action<EyeTrackingData, float[] /* Lip Data Blend Shape  */, Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedParamsUpdated = (eye, lip, floats) => { };
+        
+        // List of parameter objects the current avatar is using
+        private static List<IParameter> _currentlyUsedParams = new List<IParameter>();
+        
+        // Copy of latest updated unified eye data
         public static EyeTrackingData LatestEyeData;
+        
+        // SRanipal Exclusives
         public static LipData_v2 LatestLipData;
         public static Dictionary<LipShape_v2, float> LatestLipShapes;
+        
+        // Resets the currently used params list and regenerates it with the latest found parameters
+        public static void RefreshParameterList() => _currentlyUsedParams = FindParams(ParamLib.ParamLib.GetLocalParams().Select(p => p.name).Distinct());
+
+        
+        // Returns a list of all parameters given by name in the searchParams parameter
+        private static List<IParameter> FindParams(IEnumerable<string> searchParams)
+        {
+            var eyeParams = EyeTrackingParams.ParameterList.Where(p => p.GetName().Any(searchParams.Contains));
+            
+            var optimizedLipParams = LipShapeMerger.GetOptimizedLipParameters().Where(p => p.GetName().Any(searchParams.Contains));
+            
+            var unoptimizedLipParams = LipShapeMerger.GetAllLipShapes()
+                .Where(shape => searchParams.Contains(shape.ToString()))
+                .Select(unoptimizedShape => new LipParameter(unoptimizedShape.ToString(), (eye, lip) =>
+                {
+                    if (eye.TryGetValue(unoptimizedShape, out var retValue)) return retValue;
+                    return null;
+                }, true))
+                .Cast<IParameter>()
+                .ToList();
+
+            return eyeParams.Union(optimizedLipParams).Union(unoptimizedLipParams).ToList();
+        }
     }
 }

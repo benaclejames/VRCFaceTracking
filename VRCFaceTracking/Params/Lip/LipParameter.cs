@@ -11,7 +11,7 @@ namespace VRCFaceTracking.Params
             bool prioritised = false)
             : base(paramName, prioritised)
         {
-            MainMod.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
                 if (lip == null || floats == null) return;
 

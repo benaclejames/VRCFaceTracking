@@ -83,8 +83,7 @@ namespace VRCFaceTracking
 
         private static void LoadAssembly(string path)
         {
-            var h = LoadLibrary(path);
-            if (h == IntPtr.Zero)
+            if (LoadLibrary(path) == IntPtr.Zero)
                 MelonLogger.Error("Unable to load library " + path);
         }
     }
