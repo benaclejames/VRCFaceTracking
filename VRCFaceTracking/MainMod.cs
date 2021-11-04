@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reflection;
 using VRCFaceTracking;
 using MelonLoader;
-using VRCFaceTracking.Params;
-using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.4.1", "benaclejames",

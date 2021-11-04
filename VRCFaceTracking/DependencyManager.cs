@@ -12,12 +12,12 @@ namespace VRCFaceTracking
     {
         // Because SRanipal.dll needs to be loaded last.. Too lazy to automate moving it to back of load queue
         private static readonly string[] AssembliesToLoad = {
-            "VRCFaceTracking.SRanipal.libHTC_License.dll",
-            "VRCFaceTracking.SRanipal.nanomsg.dll",
-            "VRCFaceTracking.SRanipal.SRWorks_Log.dll",
-            "VRCFaceTracking.SRanipal.ViveSR_Client.dll",
-            "VRCFaceTracking.SRanipal.SRanipal.dll",
-            "VRCFaceTracking.Pimax.PimaxEyeTracker.dll"
+            "SRanipal.libHTC_License.dll",
+            "SRanipal.nanomsg.dll",
+            "SRanipal.SRWorks_Log.dll",
+            "SRanipal.ViveSR_Client.dll",
+            "SRanipal.SRanipal.dll",
+            "Pimax.PimaxEyeTracker.dll"
         };
 
         public static void Init()
@@ -42,7 +42,7 @@ namespace VRCFaceTracking
             {
                 var dllPath = Path.Combine(dirName, GetAssemblyNameFromPath(dll));
 
-                using (var stm = Assembly.GetExecutingAssembly().GetManifestResourceStream(dll))
+                using (var stm = Assembly.GetExecutingAssembly().GetManifestResourceStream("VRCFaceTracking.TrackingLibs."+dll))
                 {
                     try
                     {
