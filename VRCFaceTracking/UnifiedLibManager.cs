@@ -9,9 +9,6 @@ using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VRC.SDK3.Avatars.Components;
-using VRCFaceTracking.Params;
-using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking

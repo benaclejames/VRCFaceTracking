@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
-using VRC.SDK3.Avatars.Components;
 using VRC.SDKBase;
 
 namespace VRCFaceTracking
@@ -16,7 +15,7 @@ namespace VRCFaceTracking
         {
             try
             {
-                var intPtr = (IntPtr) typeof(VRCAvatarManager.MulticastDelegateNPublicSealedVoGaVRBoUnique)
+                var intPtr = (IntPtr) typeof(VRCAvatarManager.AvatarCreationCallback)
                     .GetField(
                         "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
