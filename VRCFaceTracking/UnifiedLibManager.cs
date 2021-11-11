@@ -35,6 +35,7 @@ namespace VRCFaceTracking
         // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
         public static IEnumerator CheckRuntimeSanity()
         {
+            MelonLogger.Msg("Checking Runtime Sanity...");
             EyeEnabled = false;
             LipEnabled = false;
             UsefulModules.Clear();

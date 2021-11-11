@@ -123,8 +123,6 @@ namespace VRCFaceTracking
         // Resets the currently used params list and regenerates it with the latest found parameters
         public static void RefreshParameterList()
         {
-            foreach (var baseParam in FloatBaseParam.PrioritisedParams)
-                MelonCoroutines.Stop(baseParam);
             foreach (var current in _currentlyUsedParams)
             {
                 current.ZeroParam();

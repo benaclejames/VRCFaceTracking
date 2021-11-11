@@ -1,142 +1,68 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
 using System.Reflection;
-using MelonLoader;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.UI;
+using VRC.UI.Core.Styles;
 using VRC.UI.Elements;
+using VRC.UI.Elements.Controls;
 
 namespace VRCFaceTracking.QuickMenu
 {
     public static class QuickModeMenu
     {
         private static bool _hasInitMenu;
-        private static MonoBehaviourPublicObCoGaCoObCoObCoUnique _qmTabManager;
-        private static int _tabIndex;
+        private static MenuStateController _menuStateController;
+        private static Transform _menuTab;
         
-        public static bool IsMenuShown => (int)_qmTabManager.field_Private_EnumNPublicSealedvaHoNoPl4vUnique_0 == _tabIndex;
+        public static bool IsMenuShown => _menuStateController.field_Private_UIPage_0 == MainMenu.MainMenuPage;
         public static MainMenu MainMenu;
 
         public static void CheckIfShouldInit()
         {
-            if (!_hasInitMenu)
-                InitializeMenu();
-        }
-
-        private static void InitializeMenu()
-        {
-            CreateNotificationTab("VRCSRanipal", "Text", Color.green); // Organization 100
+            if (_hasInitMenu) return;
+            
+            CreateNotificationTab();
             _hasInitMenu = true;
         }
 
-        private static void CreateNotificationTab(string name, string text, Color color)
+        private static void CreateNotificationTab()
         {
-            return;
             var bundle = AssetBundle.LoadFromMemory(ExtractAb());
-            
-            MelonLogger.Msg("Start");
+
             var baseParent = GameObject.Find(
-                "UserInterface").transform.FindChild("Canvas_QuickMenu(Clone)/Container/Window/Page_Buttons_QM/HorizontalLayoutGroup");
+                    "UserInterface").transform
+                .FindChild("Canvas_QuickMenu(Clone)/Container/Window/Page_Buttons_QM/HorizontalLayoutGroup");
 
-            var settingTabToClone = baseParent.FindChild("Page_Notifications");
+            var notifTab = baseParent.FindChild("Page_Notifications");
 
-            var newGO = GameObject.Instantiate(settingTabToClone, baseParent, true);
-MelonLogger.Msg("Instantiated new tab");
-            var thingy = GameObject.Find("UserInterface").transform
+            _menuTab = GameObject.Instantiate(notifTab, baseParent, true);
+
+            _menuTab.GetComponent<MenuTab>().field_Public_String_0 = "QuickMenuFaceTracking";
+            var iconImage = _menuTab.FindChild("Icon").GetComponent<Image>();
+            GameObject.Destroy(_menuTab.GetComponent<NotificationTab>());
+            GameObject.Destroy(_menuTab.GetComponent<StyleElement>());
+            iconImage.sprite = LoadQmSprite(bundle);
+            iconImage.m_Color = new Color(0.4157f, 0.8902f, 0.9765f, 1);
+
+            // Main Window
+
+            var parentRoot = GameObject.Find("UserInterface").transform;
+            var menuController = parentRoot.FindChild("Canvas_QuickMenu(Clone)");
+            _menuStateController = menuController.GetComponent<MenuStateController>();
+            var mainWindowParent = GameObject.Find("UserInterface").transform
                 .FindChild("Canvas_QuickMenu(Clone)/Container/Window/QMParent");
-            var origPage = thingy.FindChild("Modal_AddMessage");
-            MelonLogger.Msg("orgi page");
-            
-            var newPage = GameObject.Instantiate(origPage, thingy, true);
-            MelonLogger.Msg("newpage");
-            var parentroot = GameObject.Find("UserInterface").transform;
-            var menuController = parentroot.FindChild("Canvas_QuickMenu(Clone)");
-            MelonLogger.Msg("menu controller");
-            var betterMenu = menuController.GetComponent<MenuStateController>();
-            var newpageui = newPage.GetComponent<UIPage>();
-            MelonLogger.Msg("newUI");
-            betterMenu.enabled = true;
-            betterMenu.field_Private_Dictionary_2_String_UIPage_0.Add("QuickMenuMeme", newpageui);
-            MelonLogger.Msg("Added");
 
-            return;
-            MelonLogger.Msg(newGO.transform.name);
-             newGO.FindChild("Icon").GetComponent<VRC.UI.Core.Styles.StyleElement>().field_Public_StyleElement_0 = null;   // GIT
-             var iconImage = newGO.FindChild("Icon").GetComponent<Image>();
-             iconImage.sprite = LoadQmSprite(bundle);
-             iconImage.m_Color = new Color(0.4157f, 0.8902f, 0.9765f, 1);
-             var iconButton = newGO.GetComponent<Button>();
-             iconButton.onClick.AddListener((Action)(() => MelonLogger.Msg("Hello")));
-             MelonLogger.Msg("Startt");
-             _qmTabManager = Resources.FindObjectsOfTypeAll<MonoBehaviourPublicObCoGaCoObCoObCoUnique>()[0];
-             var existingTabs = _qmTabManager.field_Public_ArrayOf_GameObject_0.ToList();
-             /*
-             var quickMenu = Resources.FindObjectsOfTypeAll<global::QuickMenu>()[0];
- 
-             // Tab
- 
-             var quickModeTabs = quickMenu.transform.Find("QuickModeTabs").GetComponent<MonoBehaviourPublicObCoGaCoObCoObCoUnique>();
-             var menuTab = Object.Instantiate(quickModeTabs.transform.Find("NotificationsTab"), quickModeTabs.transform);
-             menuTab.name = name;
-             Object.DestroyImmediate(menuTab.GetComponent<MonoBehaviourPublicGaTeSiSiUnique>());
-             SetTabIndex(menuTab, (MonoBehaviourPublicObCoGaCoObCoObCoUnique.EnumNPublicSealedvaHoNoPl4vUnique)existingTabs.Count);
-             menuTab.Find("Badge").GetComponent<RawImage>().color = color;
-             menuTab.Find("Badge/NotificationsText").GetComponent<Text>().text = text;
- 
-             _tabIndex = existingTabs.Count;
-             existingTabs.Add(menuTab.gameObject);
- 
-             _qmTabManager.field_Public_ArrayOf_GameObject_0 = existingTabs.ToArray();
- 
-             menuTab.Find("Icon").GetComponent<Image>().sprite = LoadQmSprite(bundle);
- 
-             // Menu
- 
-             var quickModeMenus = quickMenu.transform.Find("QuickModeMenus");
-             var newMenu = new GameObject(name + "Menu", new[] { Il2CppType.Of<RectTransform>() }).GetComponent<RectTransform>();
-             newMenu.SetParent(quickModeMenus, false);
-             newMenu.anchorMin = new Vector2(0, 1);
-             newMenu.anchorMax = new Vector2(0, 1);
-             newMenu.sizeDelta = new Vector2(1680f, 1200f);
-             newMenu.pivot = new Vector2(0.5f, 0.5f);
-             newMenu.anchoredPosition = new Vector2(0, 200f);
-             newMenu.gameObject.SetActive(false);
- 
-             MainMenu = new MainMenu(newMenu, bundle);
- 
-             // Tab interaction
-             var tabButton = menuTab.GetComponent<Button>();
-             tabButton.onClick.RemoveAllListeners();
-             tabButton.onClick.AddListener((Action)(() =>
-             {
-                 global::QuickMenu.prop_QuickMenu_0.field_Private_GameObject_6.SetActive(false);
-                 global::QuickMenu.prop_QuickMenu_0.field_Private_GameObject_6 = newMenu.gameObject;
-                 newMenu.gameObject.SetActive(true);
-             }));
-             
-             menuTab.transform.FindChild("Badge").gameObject.SetActive(false);
- 
-             // Allow invite menu to instantiate
-             quickModeMenus.Find("QuickModeNotificationsMenu").gameObject.SetActive(true);
-             quickModeMenus.Find("QuickModeNotificationsMenu").gameObject.SetActive(false);
-             
-             // Add Streamer Mode Hide
-             menuTab.gameObject.SetActive(!VRCInputManager.Method_Public_Static_Boolean_EnumNPublicSealedvaUnCoHeToTaThShPeVoUnique_0(
-                             VRCInputManager.EnumNPublicSealedvaUnCoHeToTaThShPeVoUnique.StreamerModeEnabled));
-             
-             GameObject
-                 .Find("UserInterface/MenuContent/Screens/Settings/ComfortSafetyPanel/StreamerModeToggle")
-                 .GetComponent<Toggle>().onValueChanged.AddListener((Action<bool>)(b => menuTab.gameObject.SetActive(!b)));
-                 */
-        }
+            MainMenu = new MainMenu(mainWindowParent, bundle, _menuStateController);
 
-        private static void SetTabIndex(Transform tab, MonoBehaviourPublicObCoGaCoObCoObCoUnique.EnumNPublicSealedvaHoNoPl4vUnique value)
-        {
-            var tabDescriptor = tab.GetComponents<MonoBehaviour>().First(c => c.GetIl2CppType().GetMethod("ShowTabContent") != null);
+            // Add Streamer Mode Hide
+            _menuTab.gameObject.SetActive(
+                !VRCInputManager.Method_Public_Static_Boolean_InputSetting_0(
+                    VRCInputManager.InputSetting.StreamerModeEnabled));
 
-            tabDescriptor.GetIl2CppType().GetFields().First(f => f.FieldType.IsEnum).SetValue(tabDescriptor, new Il2CppSystem.Int32 { m_value = (int)value }.BoxIl2CppObject());
+            GameObject
+                .Find("UserInterface/MenuContent/Screens/Settings/ComfortSafetyPanel/StreamerModeToggle")
+                .GetComponent<Toggle>().onValueChanged
+                .AddListener((Action<bool>) (b => _menuTab.gameObject.SetActive(!b)));
         }
 
         private static Sprite LoadQmSprite(AssetBundle bundle)

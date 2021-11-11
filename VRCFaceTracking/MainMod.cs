@@ -49,8 +49,8 @@ namespace VRCFaceTracking
         
         public override void OnSceneWasLoaded(int level, string levelName)
         {
-            if (level == -1)
-                QuickModeMenu.CheckIfShouldInit();
+            //if (level == -1)
+                //QuickModeMenu.CheckIfShouldInit();
 
             UnifiedTrackingData.LatestEyeData.ResetThresholds();
         }
