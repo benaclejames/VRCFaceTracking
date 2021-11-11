@@ -22,7 +22,39 @@ namespace VRCFaceTracking.Params
             new BoolEyeParameter(v2 => v2.Left.Openness < 0.5f, "LeftEyeLid"),
             new BoolEyeParameter(v2 => v2.Right.Openness < 0.5f, "RightEyeLid"),
             new BoolEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2 < 0.5f, "CombinedEyeLid"),
-            
+
+            // Testing out the bool idea: Ideally would handle this in a class, but a test is a test.
+            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5))%2) == 1), "LeftEyeLid1"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1), "LeftEyeLid2"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1), "LeftEyeLid4"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1), "LeftEyeLid8"),
+
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5))%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5))%2) == 1), "LeftEyeLidExpanded1"),
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/2)%2) == 1), "LeftEyeLidExpanded2"),
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/4)%2) == 1), "LeftEyeLidExpanded4"),
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/8)%2) == 1), "LeftEyeLidExpanded8"),
+
+            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5))%2) == 1), "RightEyeLid1"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1), "RightEyeLid2"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1), "RightEyeLid4"),
+            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1), "RightEyeLid8"),
+
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5))%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5))%2) == 1), "RightEyeLidExpanded1"),
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/2)%2) == 1), "RightEyeLidExpanded2"),
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/4)%2) == 1), "RightEyeLidExpanded4"),
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/8)%2) == 1), "RightEyeLidExpanded8"),
+
+            new BoolEyeParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
+            new BoolEyeParameter(v2 => v2.Right.Widen > 0, "RightEyeWidenToggle"),
+            new BoolEyeParameter(v2 => v2.Combined.Widen > 0, "EyesWidenToggle"),
+
+            new FloatEyeParameter(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
+            new FloatEyeParameter(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
+
+            new BoolEyeParameter(v2 => v2.Left.Squeeze > 0, "LeftEyeSqueezeToggle"),
+            new BoolEyeParameter(v2 => v2.Right.Squeeze > 0, "RightEyeSqueezeToggle"),
+            new BoolEyeParameter(v2 => v2.Combined.Squeeze > 0, "EyesSqueezeToggle"),
+
             new FloatEyeParameter(v2 =>
             {
                 if (v2.Left.Openness >= 1 && v2.Left.Widen > 0)
