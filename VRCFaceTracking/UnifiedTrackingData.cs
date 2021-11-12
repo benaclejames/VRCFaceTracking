@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MelonLoader;
-using ParamLib;
 using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
@@ -123,18 +121,20 @@ namespace VRCFaceTracking
         // Resets the currently used params list and regenerates it with the latest found parameters
         public static void RefreshParameterList()
         {
+            // Yeet the existing params back to zero
             foreach (var current in _currentlyUsedParams)
-            {
                 current.ZeroParam();
-                current.ResetParam();
-            }
 
+            // Find the new params we actually need
             _currentlyUsedParams = FindParams(ParamLib.ParamLib.GetLocalParams().Select(p => p.name).Distinct());
+            
+            // Reset em to find their values
+            foreach (var current in _currentlyUsedParams)
+                current.ResetParam();
         }
 
-
         // Returns a list of all parameters given by name in the searchParams parameter
-        public static List<IParameter> FindParams(IEnumerable<string> searchParams)
+        private static List<IParameter> FindParams(IEnumerable<string> searchParams)
         {
             var eyeParams = EyeTrackingParams.ParameterList.Where(p => p.GetName().Any(searchParams.Contains));
             
