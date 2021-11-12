@@ -16,7 +16,10 @@ namespace VRCFaceTracking.QuickMenu
         
         public static bool IsMenuShown => _menuStateController.field_Private_UIPage_0 == MainMenu.MainMenuPage;
         public static MainMenu MainMenu;
+        private static AssetBundle _assetBundle;
 
+        public static void LoadBundle() => _assetBundle = AssetBundle.LoadFromMemory(ExtractAb());
+        
         public static void CheckIfShouldInit()
         {
             if (_hasInitMenu) return;
@@ -27,8 +30,6 @@ namespace VRCFaceTracking.QuickMenu
 
         private static void CreateNotificationTab()
         {
-            var bundle = AssetBundle.LoadFromMemory(ExtractAb());
-
             var baseParent = GameObject.Find(
                     "UserInterface").transform
                 .FindChild("Canvas_QuickMenu(Clone)/Container/Window/Page_Buttons_QM/HorizontalLayoutGroup");
@@ -41,7 +42,7 @@ namespace VRCFaceTracking.QuickMenu
             var iconImage = _menuTab.FindChild("Icon").GetComponent<Image>();
             GameObject.Destroy(_menuTab.GetComponent<NotificationTab>());
             GameObject.Destroy(_menuTab.GetComponent<StyleElement>());
-            iconImage.sprite = LoadQmSprite(bundle);
+            iconImage.sprite = LoadQmSprite(_assetBundle);
             iconImage.m_Color = new Color(0.4157f, 0.8902f, 0.9765f, 1);
 
             // Main Window
@@ -52,7 +53,7 @@ namespace VRCFaceTracking.QuickMenu
             var mainWindowParent = GameObject.Find("UserInterface").transform
                 .FindChild("Canvas_QuickMenu(Clone)/Container/Window/QMParent");
 
-            MainMenu = new MainMenu(mainWindowParent, bundle, _menuStateController);
+            MainMenu = new MainMenu(mainWindowParent, _assetBundle, _menuStateController);
 
             // Add Streamer Mode Hide
             _menuTab.gameObject.SetActive(
