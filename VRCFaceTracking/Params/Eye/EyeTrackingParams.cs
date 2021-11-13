@@ -34,6 +34,11 @@ namespace VRCFaceTracking.Params
             new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/4)%2) == 1), "LeftEyeLidExpanded4"),
             new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/8)%2) == 1), "LeftEyeLidExpanded8"),
 
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) & ((int)(((v2.Left.Openness * 15 + .5))%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5))%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze1"),
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) & ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/2)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze2"),
+            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) &  ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/4)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze4"),
+            new BoolEyeParameter(v2 =>  (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) &  ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/8)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze8"),
+
             new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5))%2) == 1), "RightEyeLid1"),
             new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1), "RightEyeLid2"),
             new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1), "RightEyeLid4"),
@@ -44,6 +49,12 @@ namespace VRCFaceTracking.Params
             new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/4)%2) == 1), "RightEyeLidExpanded4"),
             new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/8)%2) == 1), "RightEyeLidExpanded8"),
 
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5))%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5))%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze1"),
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/2)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze2"),
+            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/4)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze4"),
+            new BoolEyeParameter(v2 =>  (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/8)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze8"),
+
+            //Use these in combination with the binary params above to help with animation states
             new BoolEyeParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
             new BoolEyeParameter(v2 => v2.Right.Widen > 0, "RightEyeWidenToggle"),
             new BoolEyeParameter(v2 => v2.Combined.Widen > 0, "EyesWidenToggle"),
