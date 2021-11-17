@@ -18,43 +18,68 @@ namespace VRCFaceTracking.Params
             new FloatEyeParameter(v2 => v2.Left.Openness, "LeftEyeLid", true),
             new FloatEyeParameter(v2 => v2.Right.Openness, "RightEyeLid", true),
             new FloatEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid", true),
-            
+
             new BoolEyeParameter(v2 => v2.Left.Openness < 0.5f, "LeftEyeLid"),
             new BoolEyeParameter(v2 => v2.Right.Openness < 0.5f, "RightEyeLid"),
             new BoolEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2 < 0.5f, "CombinedEyeLid"),
 
-            // Testing out the bool idea: Ideally would handle this in a class, but a test is a test.
-            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5))%2) == 1), "LeftEyeLid1"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1), "LeftEyeLid2"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1), "LeftEyeLid4"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1), "LeftEyeLid8"),
+            // BinaryEyeParameter takes in a single parameter of String, and creates
+            // 4 bool VRC parameters as String1, String2, String4, and String8
+            // represented in the binary counting system.
+            new BinaryEyeParameter(v2 => v2.Left.Openness, "LeftEyeLid"),
+            new BinaryEyeParameter(v2 => v2.Right.Openness, "RightEyeLid"),
+            new BinaryEyeParameter(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid"),
 
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5))%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5))%2) == 1), "LeftEyeLidExpanded1"),
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/2)%2) == 1), "LeftEyeLidExpanded2"),
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/4)%2) == 1), "LeftEyeLidExpanded4"),
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Left.Widen * 15 + .5)/8)%2) == 1), "LeftEyeLidExpanded8"),
+            new BinaryEyeParameter(v2 =>
+            {
+                if (v2.Left.Widen > 0)
+                    return v2.Left.Widen;
+                return v2.Left.Openness;
+            } ,"LeftEyeLidExpanded"),
+            
+            new BinaryEyeParameter(v2 =>
+            {
+                if (v2.Right.Widen > 0)
+                    return v2.Right.Widen;
+                return v2.Right.Openness;
+            } ,"RightEyeLidExpanded"),
 
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) & ((int)(((v2.Left.Openness * 15 + .5))%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5))%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze1"),
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) & ((int)(((v2.Left.Openness * 15 + .5)/2)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/2)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze2"),
-            new BoolEyeParameter(v2 => (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) &  ((int)(((v2.Left.Openness * 15 + .5)/4)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/4)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze4"),
-            new BoolEyeParameter(v2 =>  (v2.Left.Widen == 0) & (v2.Left.Squeeze == 0) &  ((int)(((v2.Left.Openness * 15 + .5)/8)%2) == 1) || (v2.Left.Widen > 0) & ((int)(((v2.Left.Widen * 15 + .5)/8)%2) == 1) || ((int)(((v2.Left.Squeeze * 15 + .5))%2) == 1), "LeftEyeLidExpandedSqueeze8"),
+            new BinaryEyeParameter(v2 =>
+            {
+                if ((v2.Left.Widen + v2.Right.Widen) / 2 > 0)
+                    return (v2.Left.Widen + v2.Right.Widen) / 2;
+                return (v2.Left.Openness + v2.Right.Openness)/2;
+            } ,"CombinedEyeLidExpanded"),
 
-            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5))%2) == 1), "RightEyeLid1"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1), "RightEyeLid2"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1), "RightEyeLid4"),
-            new BoolEyeParameter(v2 => ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1), "RightEyeLid8"),
+            new BinaryEyeParameter(v2 =>
+            {
+                if (v2.Left.Widen > 0)
+                    return v2.Left.Widen;
+                if (v2.Left.Squeeze > 0)
+                    return v2.Left.Squeeze;
+                return v2.Left.Openness;
+            } ,"LeftEyeLidExpandedSqueeze"),
 
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5))%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5))%2) == 1), "RightEyeLidExpanded1"),
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/2)%2) == 1), "RightEyeLidExpanded2"),
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/4)%2) == 1), "RightEyeLidExpanded4"),
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1) || ((int)(((v2.Right.Widen * 15 + .5)/8)%2) == 1), "RightEyeLidExpanded8"),
+            new BinaryEyeParameter(v2 =>
+            {
+                if (v2.Right.Widen > 0)
+                    return v2.Right.Widen;
+                if (v2.Right.Squeeze > 0)
+                    return v2.Right.Squeeze;
+                return v2.Right.Openness;
+            } ,"RightEyeLidExpandedSqueeze"),
 
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5))%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5))%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze1"),
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/2)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/2)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze2"),
-            new BoolEyeParameter(v2 => (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/4)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/4)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze4"),
-            new BoolEyeParameter(v2 =>  (v2.Right.Widen == 0) & (v2.Right.Squeeze == 0) & ((int)(((v2.Right.Openness * 15 + .5)/8)%2) == 1) || (v2.Right.Widen > 0) & ((int)(((v2.Right.Widen * 15 + .5)/8)%2) == 1) || ((int)(((v2.Right.Squeeze * 15 + .5))%2) == 1), "RightEyeLidExpandedSqueeze8"),
+            new BinaryEyeParameter(v2 =>
+            {
+                if ((v2.Left.Widen + v2.Right.Widen) / 2 > 0)
+                    return (v2.Left.Widen + v2.Right.Widen) / 2;
+                if ((v2.Left.Squeeze + v2.Right.Squeeze) / 2 > 0)
+                    return (v2.Left.Squeeze + v2.Right.Squeeze) / 2;
+                return (v2.Left.Openness + v2.Right.Openness) / 2;
+            } ,"CombinedEyeLidExpandedSqueeze"),
 
-            //Use these in combination with the binary params above to help with animation states
+            // Use these in combination with the binary params above to help with animation states
+            // of the Expanded (Widen & blink only) or ExpandedSqueeze (Widen, Squeeze, Blink) eyelids
             new BoolEyeParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
             new BoolEyeParameter(v2 => v2.Right.Widen > 0, "RightEyeWidenToggle"),
             new BoolEyeParameter(v2 => v2.Combined.Widen > 0, "EyesWidenToggle"),

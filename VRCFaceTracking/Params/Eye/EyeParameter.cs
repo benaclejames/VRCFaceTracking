@@ -38,4 +38,25 @@ namespace VRCFaceTracking.Params
 
         public string[] GetName() => new [] {ParamName};
     }
+
+    public class BinaryEyeParameter : BinaryParam, IParameter
+    {
+        public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName) : base
+        (
+            new BoolBaseParam(paramName + "1"), 
+            new BoolBaseParam(paramName + "2"), 
+            new BoolBaseParam(paramName + "4"), 
+            new BoolBaseParam(paramName + "8")
+        ) => 
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            {
+                Q1.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5) % 2 == 1;
+                Q2.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/2 % 2 == 1;
+                Q3.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/4 % 2 == 1;
+                Q4.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/8 % 2 == 1;
+            };
+        void IParameter.ResetParam() => ResetParams();
+        public void ZeroParam() => ZeroParams();
+        public string[] GetName() => new[] { Q1.ParamName, Q2.ParamName, Q3.ParamName, Q4.ParamName };
+    }
 }
