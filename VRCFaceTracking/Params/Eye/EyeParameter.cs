@@ -2,6 +2,49 @@
 using ParamLib;
 using UnityEngine;
 
+namespace ParamLib
+{
+    public class BinaryParam
+    {
+        public BoolBaseParam Q1, Q2, Q3, Q4;
+
+        protected bool ParamValue
+        {
+            set
+            {
+                Q1.ParamValue = value;
+                Q2.ParamValue = value;
+                Q3.ParamValue = value;
+                Q4.ParamValue = value;
+            }
+        }
+
+        protected BinaryParam(BoolBaseParam q1, BoolBaseParam q2, BoolBaseParam q3, BoolBaseParam q4)
+        {
+            Q1 = q1;
+            Q2 = q2;
+            Q3 = q3;
+            Q4 = q4;
+        }
+
+        protected void ResetParams()
+        {
+            Q1.ResetParam();
+            Q2.ResetParam();
+            Q3.ResetParam();
+            Q4.ResetParam();
+        }
+
+        protected void ZeroParams()
+        {
+            Q1.ParamIndex = null;
+            Q2.ParamIndex = null;
+            Q3.ParamIndex = null;
+            Q4.ParamIndex = null;
+        }
+    }
+}
+
 namespace VRCFaceTracking.Params
 {
     public class FloatEyeParameter : FloatBaseParam, IParameter
