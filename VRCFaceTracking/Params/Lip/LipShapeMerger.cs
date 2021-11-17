@@ -21,9 +21,6 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"PuffSuckLeft", new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
 
                 //Additional combined shapes created with the help of the VRCFT Discord!
-                //The idea is that these shapes are the most commonly used and, since they do not tend
-                //to be paired up, eat up a lot of space. This should hopefully cut down drastically on the param space.
-                //The goal is that you should be able to enable every facial parameter even with eye tracking (assuming 16 params).
 
                 //JawOpen based params
                 {"JawOpenApe", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.MouthApeShape)},
@@ -45,7 +42,6 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthUpperUpLeftApe", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthApeShape)},
                 {"MouthUpperUpLeftPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthPout)},
                 {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthLowerOverlay)},
-
 
                 //MouthLowerDownRight based params
                 {"MouthLowerDownRightLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerInside)},
