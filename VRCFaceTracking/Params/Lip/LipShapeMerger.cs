@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking.Params.Lip;
 
 namespace VRCFaceTracking.Params.LipMerging
 {

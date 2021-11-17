@@ -5,6 +5,7 @@ using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
+using VRCFaceTracking.Params.Eye;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.Pimax;
 

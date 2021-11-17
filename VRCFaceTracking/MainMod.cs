@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using VRCFaceTracking;
 using MelonLoader;
 using UnityEngine;
@@ -15,10 +14,6 @@ namespace VRCFaceTracking
 {
     public class MainMod : MelonMod
     {
-        // Detect when UIManager has finished initializing
-        private Type _uiManager;
-        private MethodInfo _uiManagerInstance;
-        
         // Mostly used for UI management, allows calling of main-thread methods directly from a tracking worker thread
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
 
@@ -73,7 +68,6 @@ namespace VRCFaceTracking
                 VRCPlayer.field_Internal_Static_VRCPlayer_0 != null));
 
             UiManagerInit();
-            
         }
     }
 }

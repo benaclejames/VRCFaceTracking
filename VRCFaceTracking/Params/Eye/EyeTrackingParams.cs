@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Params.Eye
 {
     public static class EyeTrackingParams
     {

@@ -1,51 +1,9 @@
 ﻿using System;
+using System.Linq;
 using ParamLib;
 using UnityEngine;
 
-namespace ParamLib
-{
-    public class BinaryParam
-    {
-        public BoolBaseParam Q1, Q2, Q3, Q4;
-
-        protected bool ParamValue
-        {
-            set
-            {
-                Q1.ParamValue = value;
-                Q2.ParamValue = value;
-                Q3.ParamValue = value;
-                Q4.ParamValue = value;
-            }
-        }
-
-        protected BinaryParam(BoolBaseParam q1, BoolBaseParam q2, BoolBaseParam q3, BoolBaseParam q4)
-        {
-            Q1 = q1;
-            Q2 = q2;
-            Q3 = q3;
-            Q4 = q4;
-        }
-
-        protected void ResetParams()
-        {
-            Q1.ResetParam();
-            Q2.ResetParam();
-            Q3.ResetParam();
-            Q4.ResetParam();
-        }
-
-        protected void ZeroParams()
-        {
-            Q1.ParamIndex = null;
-            Q2.ParamIndex = null;
-            Q3.ParamIndex = null;
-            Q4.ParamIndex = null;
-        }
-    }
-}
-
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Params.Eye
 {
     public class FloatEyeParameter : FloatBaseParam, IParameter
     {
@@ -82,24 +40,30 @@ namespace VRCFaceTracking.Params
         public string[] GetName() => new [] {ParamName};
     }
 
-    public class BinaryEyeParameter : BinaryParam, IParameter
+    public class BinaryEyeParameter : IParameter
     {
-        public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName) : base
-        (
-            new BoolBaseParam(paramName + "1"), 
-            new BoolBaseParam(paramName + "2"), 
-            new BoolBaseParam(paramName + "4"), 
-            new BoolBaseParam(paramName + "8")
-        ) => 
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
-            {
-                Q1.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5) % 2 == 1;
-                Q2.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/2 % 2 == 1;
-                Q3.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/4 % 2 == 1;
-                Q4.ParamValue = (int)(getValueFunc.Invoke(eye) * 15 + .5)/8 % 2 == 1;
-            };
-        void IParameter.ResetParam() => ResetParams();
-        public void ZeroParam() => ZeroParams();
-        public string[] GetName() => new[] { Q1.ParamName, Q2.ParamName, Q3.ParamName, Q4.ParamName };
+        private readonly BoolEyeParameter[] _params = new BoolEyeParameter[4];
+        
+        public void ResetParam()
+        {
+            foreach (var param in _params)
+                param.ResetParam();
+        }
+
+        public void ZeroParam()
+        {
+            foreach (var param in _params)
+                param.ParamIndex = null;
+        }
+
+        public string[] GetName() => _params.Select(p => p.ParamName).Distinct().ToArray();
+
+        public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName)
+        {
+            _params[0] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5) % 2 == 1, paramName + "1");
+            _params[1] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/2 % 2 == 1, paramName + "2");
+            _params[2] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/4 % 2 == 1, paramName + "4");
+            _params[3] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/8 % 2 == 1, paramName + "8");
+        }
     }
 }
