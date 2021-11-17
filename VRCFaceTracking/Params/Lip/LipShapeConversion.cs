@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ViveSR.anipal.Lip;
 
-namespace VRCFaceTracking.Params.LipMerging
+namespace VRCFaceTracking.Params.Lip
 {
     public class PositiveNegativeShape
     {

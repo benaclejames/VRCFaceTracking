@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ParamLib;
 using ViveSR.anipal.Lip;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Params.Lip
 {
     public class LipParameter : FloatBaseParam, IParameter
     {
