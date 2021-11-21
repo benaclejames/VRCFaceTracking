@@ -40,7 +40,8 @@ namespace VRCFaceTracking.QuickMenu
 
             _menuTab.GetComponent<MenuTab>().field_Public_String_0 = "QuickMenuFaceTracking";
             var iconImage = _menuTab.FindChild("Icon").GetComponent<Image>();
-            GameObject.Destroy(_menuTab.GetComponent<NotificationTab>());
+            
+            GameObject.Destroy(_menuTab.GetComponent<MonoBehaviourPublicGaTeVoStVoAwOnVoVoVoUnique>()); // Deobfuscated name = NotificationTab
             GameObject.Destroy(_menuTab.GetComponent<StyleElement>());
             iconImage.sprite = LoadQmSprite(_assetBundle);
             iconImage.m_Color = new Color(0.4157f, 0.8902f, 0.9765f, 1);
