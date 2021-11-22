@@ -125,4 +125,4 @@ As with all VRChat mods, modifying the game client can result in account termina
 * [HerpDerpinstine/MelonLoader](https://github.com/HerpDerpinstine/MelonLoader)
 * [VIVE](https://www.vive.com/) for the SRanipal SDK and their awesome hardware! ❤
 
-![](https://i.imgur.com/Bt8lguw.png)
+![](https://i.imgur.com/WXcncO9.jpeg)
