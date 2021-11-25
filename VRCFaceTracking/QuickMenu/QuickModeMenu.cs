@@ -2,7 +2,6 @@
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using VRC.UI.Core.Styles;
 using VRC.UI.Elements;
 using VRC.UI.Elements.Controls;
 
@@ -34,28 +33,27 @@ namespace VRCFaceTracking.QuickMenu
                     "UserInterface").transform
                 .FindChild("Canvas_QuickMenu(Clone)/Container/Window/Page_Buttons_QM/HorizontalLayoutGroup");
 
-            var notifTab = baseParent.FindChild("Page_Notifications");
-
-            _menuTab = GameObject.Instantiate(notifTab, baseParent, true);
-
-            _menuTab.GetComponent<MenuTab>().field_Public_String_0 = "QuickMenuFaceTracking";
-            var iconImage = _menuTab.FindChild("Icon").GetComponent<Image>();
+            var dashboard = baseParent.FindChild("Page_Settings");
+            _menuTab = GameObject.Instantiate(dashboard, baseParent);
             
-            GameObject.Destroy(_menuTab.GetComponent<MonoBehaviourPublicGaTeVoStVoAwOnVoVoVoUnique>()); // Deobfuscated name = NotificationTab
-            GameObject.Destroy(_menuTab.GetComponent<StyleElement>());
-            iconImage.sprite = LoadQmSprite(_assetBundle);
-            iconImage.m_Color = new Color(0.4157f, 0.8902f, 0.9765f, 1);
+            var sprite = LoadQmSprite(_assetBundle);
+            var image = _menuTab.FindChild("Icon").GetComponent<Image>();
+            image.sprite = sprite;
+            image.overrideSprite = sprite;
+
+            var menuTab = _menuTab.GetComponent<MenuTab>();
+            menuTab.field_Private_MenuStateController_0 =
+                dashboard.GetComponent<MenuTab>().field_Private_MenuStateController_0;
+            menuTab.field_Public_String_0 = "QuickMenuFaceTracking";
 
             // Main Window
-
             var parentRoot = GameObject.Find("UserInterface").transform;
             var menuController = parentRoot.FindChild("Canvas_QuickMenu(Clone)");
             _menuStateController = menuController.GetComponent<MenuStateController>();
             var mainWindowParent = GameObject.Find("UserInterface").transform
                 .FindChild("Canvas_QuickMenu(Clone)/Container/Window/QMParent");
-
             MainMenu = new MainMenu(mainWindowParent, _assetBundle, _menuStateController);
-
+            
             // Add Streamer Mode Hide
             _menuTab.gameObject.SetActive(
                 !VRCInputManager.Method_Public_Static_Boolean_InputSetting_0(

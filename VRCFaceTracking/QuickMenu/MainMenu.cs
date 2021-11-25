@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using MelonLoader;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnhollowerBaseLib;
 using UnityEngine;
 using VRC.UI.Elements;
@@ -20,18 +20,31 @@ namespace VRCFaceTracking.QuickMenu
             // Instantiate and setup positioning
             var menuPrefab = bundle.LoadAsset<GameObject>("VRCSRanipal");
             var menuObject = Object.Instantiate(menuPrefab, parentMenuTransform, false);
+            menuObject.name = "Menu_QuickMenuFaceTracking";
             menuObject.transform.localScale = new Vector3(1, 1, 1);
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
             menuObject.transform.localPosition = new Vector3(0, 512, 0);
             
             // Setup MenuStateController and notify of new tab
-            MainMenuPage = menuObject.AddComponent<UIPage>();
-            controller.field_Private_Dictionary_2_String_UIPage_0.Add("QuickMenuFaceTracking", MainMenuPage);
-            var pages = controller.field_Public_ArrayOf_UIPage_0.ToList();
-            pages.Add(MainMenuPage);
-
-            controller.field_Public_ArrayOf_UIPage_0 = new Il2CppReferenceArray<UIPage>(pages.ToArray());
+            var menuStateController = Resources.FindObjectsOfTypeAll<VRC.UI.Elements.QuickMenu>().FirstOrDefault()?.GetComponent<MenuStateController>();
             
+            MainMenuPage = menuObject.AddComponent<UIPage>();
+            MainMenuPage.field_Public_String_0 = "QuickMenuFaceTracking";
+            MainMenuPage.field_Private_Boolean_1 = true;
+            MainMenuPage.field_Private_MenuStateController_0 = menuStateController;
+            MainMenuPage.field_Private_List_1_UIPage_0 = new Il2CppSystem.Collections.Generic.List<UIPage>();
+            MainMenuPage.field_Private_List_1_UIPage_0.Add(MainMenuPage);
+            
+            if (menuStateController != null)
+            {
+                menuStateController.field_Private_Dictionary_2_String_UIPage_0.Add("QuickMenuFaceTracking",
+                    MainMenuPage);
+
+                var list = menuStateController.field_Public_ArrayOf_UIPage_0.ToList();
+                list.Add(MainMenuPage);
+                menuStateController.field_Public_ArrayOf_UIPage_0 = new Il2CppReferenceArray<UIPage>(list.ToArray());
+            }
+
             menuObject.SetActive(false);
 
             _eyeTrackingMenuPage = new EyeTrackingMenuPage(menuObject.transform.Find("Pages/Eye Tracking"), menuObject.transform.Find("Tabs/Buttons/Eye Tracking"));
