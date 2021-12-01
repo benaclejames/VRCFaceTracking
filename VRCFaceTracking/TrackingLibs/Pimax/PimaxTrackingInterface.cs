@@ -6,7 +6,7 @@ namespace VRCFaceTracking.Pimax
 { 
     public class PimaxTrackingInterface : ITrackingModule
     {
-        private static Thread PimaxWorker;
+        private static Thread _pimaxWorker;
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
@@ -20,13 +20,13 @@ namespace VRCFaceTracking.Pimax
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
 
             var success = PimaxTracker.Start();
-            if (success && !PimaxWorker.IsAlive) PimaxWorker.Start();
+            if (success && !_pimaxWorker.IsAlive) StartThread();
             return (success, false);
         }
 
         public void StartThread()
         {
-            PimaxWorker = new Thread(() =>
+            _pimaxWorker = new Thread(() =>
             {
                 IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
                 while (!CancellationToken.IsCancellationRequested)
@@ -37,7 +37,7 @@ namespace VRCFaceTracking.Pimax
                     Thread.Sleep(10);
                 }
             });
-            PimaxWorker.Start();
+            _pimaxWorker.Start();
         }
 
         public void Teardown() => PimaxTracker.Stop();
