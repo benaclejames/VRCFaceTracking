@@ -8,8 +8,8 @@ namespace VRCFaceTracking.Params.LipMerging
 {
     public static class LipShapeMerger
     {
-        private static readonly Dictionary<string, PositiveNegativeShape> MergedShapes =
-            new Dictionary<string, PositiveNegativeShape>
+        private static readonly Dictionary<string, dynamic> MergedShapes =
+            new Dictionary<string, dynamic>
             {
                 {"JawX", new PositiveNegativeShape(LipShape_v2.JawRight, LipShape_v2.JawLeft)},
                 {"MouthUpper", new PositiveNegativeShape(LipShape_v2.MouthUpperRight, LipShape_v2.MouthUpperLeft)},
@@ -71,6 +71,29 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"SmileLeftApe", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthApeShape)},
                 {"SmileLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthLowerOverlay)},
                 {"SmileLeftPout", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthPout)},
+
+                //All in One params; Fit four params into one by compressing their range.
+                {"LeftLowAI1", new SpecialtyShape(new[]
+                {
+                    LipShape_v2.MouthLowerDownLeft,
+                    LipShape_v2.MouthLowerInside,
+                    LipShape_v2.CheekSuck,
+                    LipShape_v2.CheekPuffLeft
+                })},
+                {"RightUpAI1", new SpecialtyShape(new[]
+                {
+                    LipShape_v2.MouthUpperUpRight,
+                    LipShape_v2.MouthUpperInside,
+                    LipShape_v2.MouthUpperOverturn,
+                    LipShape_v2.CheekPuffRight,
+                })},
+
+                //Combination of TongueStep 1 and 2. -1 is fully in, 1 is fully out.
+                {"TongueSteps", new SpecialtyShape(new[]
+                {
+                    LipShape_v2.TongueLongStep1,
+                    LipShape_v2.TongueLongStep2 
+                })},
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters

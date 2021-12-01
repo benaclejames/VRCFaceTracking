@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using JetBrains.Annotations;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -56,12 +58,45 @@ namespace VRCFaceTracking
             _initializeWorker.Start();
         }
 
+        private static List<Type> LoadExternalModules()
+        {
+            var returnList = new List<Type>();
+
+            // Return if MelonUtils.BaseDirectory\\Mods\\VRCFTLibs isn't a folder
+            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs")) return returnList;
+            
+            MelonLogger.Msg("Dir exists");
+            
+            // Load dotnet dlls from the VRCFTLibs folder
+            var dlls = Directory.GetFiles(Path.Combine(MelonUtils.BaseDirectory, "Mods\\VRCFTLibs"), "*.dll");
+            foreach (var dll in dlls)
+            {
+                var loadedModule = Assembly.LoadFrom(dll);
+
+                // Get the first type that implements ITrackingModule
+                var module = loadedModule.GetTypes()
+                    .FirstOrDefault(t => t.GetInterfaces().Contains(typeof(ITrackingModule)));
+                if (module != null)
+                {
+                    returnList.Add(module);
+                    MelonLogger.Msg("Loaded external tracking module: " + module.Name);
+                    continue;
+                }
+                
+                MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
+            }
+
+            return returnList;
+        }
+
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => typeof(ITrackingModule).IsAssignableFrom(type) && !type.IsInterface);
+                .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
+
+            trackingModules = trackingModules.Union(LoadExternalModules());
 
             foreach (var module in trackingModules)
             {
