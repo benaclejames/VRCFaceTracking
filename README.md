@@ -100,19 +100,12 @@ Additionally, the mod provides computed parameters that combine some of the abov
 |`JawX`|Jaw translation fully left to fully right|-1.0 - 1.0|
 |`MouthUpper`|Top lip deflection (MouthUpperLeft/Right) full left to full right, with 0 being neutral|-1.0 - 1.0|
 |`MouthLower`|Bottom lip deflection (MouthLowerLeft/Right) full left to full right, with 0 being neutral|-1.0 - 1.0|
+|`MouthUpperUp`|Bottom lip deflection **with teeth** (MouthUpperUpLeft/Right) full left to full right, with 0 being neutral<sup>2</sup>|-1.0 - 1.0|
+|`MouthLowerDown`|Bottom lip deflection **with teeth** (MouthLowerDownLeft/Right) full left to full right, with 0 being neutral<sup>2</sup>|-1.0 - 1.0|
 |`SmileSadRight`|Left side full smile or full sad, with 0 being neutral<sup>1</sup>|-1.0 - 1.0|
 |`SmileSadLeft`|Left side full smile or full sad, with 0 being neutral<sup>1</sup>|-1.0 - 1.0|
 |`TongueY`|Tongue tip fully up to fully down, with 0 being neutral|-1.0 - 1.0|
 |`TongueX`|Tongue tip fully left to fully right, with 0 being neutral|-1.0 - 1.0|
-|`PuffSuckRight`|Suck to right puff, with 0 being neutral|-1.0 - 1.0|
-|`PuffSuckLeft`|Suck to left puff, with 0 being neutral|-1.0 - 1.0|
-|`JawOpenApe`|Ape to open, with 0 being neutral|-1.0 - 1.0|
-|`JawOpenPuffRight`|Right cheek puff to open, with 0 being neutral|-1.0 - 1.0|
-|`JawOpenPuffLeft`|Left cheek puff to open, with 0 being neutral|-1.0 - 1.0|
-|`JawOpenSuck`|Cheek suck to open, with 0 being neutral|-1.0 - 1.0|
-|`JawOpenForward`|Jaw forward to open, with 0 being neutral|-1.0 - 1.0|
-
-Additional combined shapes can be found in LipShapeMerger.cs
 
 <sup>1</sup> **Note:** These computed parameters don't seem to work well in practice, at least in my experience (-InconsolableCellist)
 
