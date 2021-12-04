@@ -48,9 +48,6 @@ namespace VRCFaceTracking
 
         public override void OnUpdate()
         {
-            if (Input.GetKeyDown(KeyCode.F6))
-                MelonCoroutines.Start(UnifiedLibManager.CheckRuntimeSanity());  //Restart SRanipleRuntime with F6
-            
             if (!UnifiedLibManager.ShouldThread) 
                 UnifiedLibManager.Update();
 
