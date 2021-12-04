@@ -38,10 +38,10 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthUpperUpRightOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthLowerOverlay)},
                 
                 //MouthUpperUpLeft based params
-                {"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthUpperInside)},
-                {"MouthUpperUpLeftPuffLeft", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.CheekPuffRight)},
-                {"MouthUpperUpLeftApe", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthApeShape)},
-                {"MouthUpperUpLeftPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthPout)},
+                {"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperInside)},
+                {"MouthUpperUpLeftPuffLeft", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.CheekPuffLeft)},
+                {"MouthUpperUpLeftApe", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthApeShape)},
+                {"MouthUpperUpLeftPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthPout)},
                 {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthLowerOverlay)},
 
                 //MouthLowerDownRight based params
@@ -53,7 +53,7 @@ namespace VRCFaceTracking.Params.LipMerging
 
                 //MouthLowerDownLeft based params
                 {"MouthLowerDownLeftLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerInside)},
-                {"MouthLowerDownLeftPuffLeft", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.CheekPuffRight)},
+                {"MouthLowerDownLeftPuffLeft", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.CheekPuffLeft)},
                 {"MouthLowerDownLeftApe", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthApeShape)},
                 {"MouthLowerDownLeftPout", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthPout)},
                 {"MouthLowerDownLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerOverlay)},
