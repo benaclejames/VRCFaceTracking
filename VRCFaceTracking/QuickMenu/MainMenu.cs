@@ -24,6 +24,7 @@ namespace VRCFaceTracking.QuickMenu
             menuObject.transform.localScale = new Vector3(1, 1, 1);
             menuObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
             menuObject.transform.localPosition = new Vector3(0, 512, 0);
+            menuObject.layer = LayerMask.NameToLayer("InternalUI");
             
             // Setup MenuStateController and notify of new tab
             var menuStateController = Resources.FindObjectsOfTypeAll<VRC.UI.Elements.QuickMenu>().FirstOrDefault()?.GetComponent<MenuStateController>();
