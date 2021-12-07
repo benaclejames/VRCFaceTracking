@@ -4,7 +4,7 @@ using UnhollowerBaseLib;
 
 namespace VRCFaceTracking.Pimax
 { 
-    public class PimaxTrackingInterface : ITrackingModule
+    public class PimaxTrackingInterface// : ITrackingModule
     {
         private static Thread _pimaxWorker;
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();

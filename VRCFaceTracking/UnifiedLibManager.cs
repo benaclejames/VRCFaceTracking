@@ -62,16 +62,16 @@ namespace VRCFaceTracking
         {
             var returnList = new List<Type>();
 
-            // Return if MelonUtils.BaseDirectory\\Mods\\VRCFTLibs isn't a folder
+            // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
             if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs")) return returnList;
             
-            MelonLogger.Msg("Dir exists");
-            
+            MelonLogger.Msg("Loading External Modules...");
+
             // Load dotnet dlls from the VRCFTLibs folder
             var dlls = Directory.GetFiles(Path.Combine(MelonUtils.BaseDirectory, "Mods\\VRCFTLibs"), "*.dll");
             foreach (var dll in dlls)
             {
-                var loadedModule = Assembly.LoadFrom(dll);
+                var loadedModule = Assembly.Load("Mods\\VRCFTLibs\\VRCFT_Module_Example, Culture=neutral, PublicKeyToken=cdc94201de0b434a");
 
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
