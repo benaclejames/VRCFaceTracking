@@ -9,20 +9,24 @@ namespace VRCFaceTracking.Params.Eye
     {
         public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool prioritised = false)
             : base(paramName, prioritised) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            {
+                if (!UnifiedLibManager.EyeEnabled) return;
+                ParamValue = getValueFunc.Invoke(eye);
+            };
 
         public string[] GetName() => new[] {ParamName};
     }
 
     public class XYParameter : XYParam, IParameter
     {
-        public XYParameter(Func<EyeTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
+        public XYParameter(Func<EyeTrackingData, Vector2> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
         {
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
-                var newValue = getValueFunc.Invoke(eye);
-                if (newValue.HasValue) ParamValue = newValue.Value;
+                if (!UnifiedLibManager.EyeEnabled) return;
+                ParamValue = getValueFunc.Invoke(eye);
             };
         }
 
@@ -35,7 +39,11 @@ namespace VRCFaceTracking.Params.Eye
     public class BoolEyeParameter : BoolBaseParam, IParameter
     {
         public BoolEyeParameter(Func<EyeTrackingData, bool> getValueFunc, string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) => ParamValue = getValueFunc.Invoke(eye);
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            {
+                if (!UnifiedLibManager.EyeEnabled) return;
+                ParamValue = getValueFunc.Invoke(eye);
+            };
 
         public string[] GetName() => new [] {ParamName};
     }

@@ -17,15 +17,6 @@ namespace ViveSR
                 [DllImport("SRanipal")]
                 public static extern bool IsViveProEye();
 
-
-                /// <summary>
-                /// Gets data from anipal's Eye module.
-                /// </summary>
-                /// <param name="data">ViveSR.anipal.Eye.EyeData</param>
-                /// <returns>Indicates the resulting ViveSR.Error status of this method.</returns>
-                [DllImport("SRanipal")]
-                public static extern Error GetEyeData(ref EyeData data);
-
                 /// <summary>
                 /// Gets data from anipal's Eye module.
                 /// </summary>

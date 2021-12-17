@@ -21,24 +21,25 @@ namespace VRCFaceTracking
         {
             // Load all unmanaged DLLs as soon as we can
             DependencyManager.Init();
-
-            QuickModeMenu.LoadBundle();
-            MelonCoroutines.Start(CheckUiManager());
-        }
-        
-        public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
-
-        private static void UiManagerInit()
-        {
             UnifiedLibManager.Initialize();
+            
             Hooking.SetupHooking();
             MelonCoroutines.Start(WaitForMenu());
+            
+            QuickModeMenu.LoadBundle();
         }
+
+        public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
 
         // Just waits for the user to open their quickmenu, easier than trying to work around the uninitialized cloned gameobjects
         private static IEnumerator WaitForMenu()
         {
-            var qmCanvas = GameObject.Find("UserInterface").transform.FindChild("Canvas_QuickMenu(Clone)");
+            Transform qmCanvas = null;
+            while (qmCanvas == null)
+            {
+                qmCanvas = GameObject.Find("UserInterface")?.transform?.FindChild("Canvas_QuickMenu(Clone)");
+                yield return new WaitForSeconds(0.5f);
+            }
             yield return new WaitUntil((Func<bool>) (() => qmCanvas.gameObject.active));
             QuickModeMenu.CheckIfShouldInit();
         }
@@ -60,14 +61,6 @@ namespace VRCFaceTracking
             
             MainThreadExecutionQueue[0].Invoke();
             MainThreadExecutionQueue.RemoveAt(0);
-        }
-
-        private IEnumerator CheckUiManager()
-        {
-            yield return new WaitUntil((Func<bool>) (() =>
-                VRCPlayer.field_Internal_Static_VRCPlayer_0 != null));
-
-            UiManagerInit();
         }
     }
 }

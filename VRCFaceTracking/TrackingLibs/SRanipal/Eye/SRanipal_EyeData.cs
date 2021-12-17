@@ -1,7 +1,8 @@
 ﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
-using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using Vector2 = VRCFaceTracking.Params.Vector2;
+using Vector3 = VRCFaceTracking.Params.Vector3;
 
 namespace ViveSR
 {

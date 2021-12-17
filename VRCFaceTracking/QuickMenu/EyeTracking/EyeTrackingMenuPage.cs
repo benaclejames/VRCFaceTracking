@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
+using Vector2 = VRCFaceTracking.Params.Vector2;
 
 namespace VRCFaceTracking.QuickMenu.EyeTracking
 {
