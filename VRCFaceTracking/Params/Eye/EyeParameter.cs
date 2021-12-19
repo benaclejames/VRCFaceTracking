@@ -68,10 +68,10 @@ namespace VRCFaceTracking.Params.Eye
 
         public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName)
         {
-            _params[0] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5) % 2 == 1, paramName + "1");
-            _params[1] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/2 % 2 == 1, paramName + "2");
-            _params[2] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/4 % 2 == 1, paramName + "4");
-            _params[3] = new BoolEyeParameter(data => (int) (getValueFunc.Invoke(data) * 15 + .5)/8 % 2 == 1, paramName + "8");
+            _params[0] = new BoolEyeParameter(data => ((int)(getValueFunc.Invoke(data) * 15) & 1) == 1, paramName + "1");
+            _params[1] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 1) & 1) == 1, paramName + "2");
+            _params[2] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 2) & 1) == 1, paramName + "4");
+            _params[3] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 3) & 1) == 1, paramName + "8");
         }
     }
 }

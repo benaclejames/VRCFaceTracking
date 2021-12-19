@@ -78,7 +78,7 @@ namespace VRCFaceTracking.QuickMenu
         private static byte[] ExtractAb()
         {
             var a = Assembly.GetExecutingAssembly();
-            using (var resFilestream = a.GetManifestResourceStream("VRCFaceTracking.VRCFaceTracking"))
+            using (var resFilestream = a.GetManifestResourceStream("VRCFaceTracking.VRCFaceTracking.unitypackage"))
             {
                 if (resFilestream == null) return null;
                 var ba = new byte[resFilestream.Length];

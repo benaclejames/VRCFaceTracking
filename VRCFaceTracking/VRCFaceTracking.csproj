@@ -77,7 +77,7 @@
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRanipal.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRWorks_Log.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\ViveSR_Client.dll" />
-    <EmbeddedResource Include="VRCFaceTracking" />
+    <EmbeddedResource Include="VRCFaceTracking.unitypackage" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
