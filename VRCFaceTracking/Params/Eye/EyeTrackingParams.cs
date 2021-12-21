@@ -109,13 +109,13 @@ namespace VRCFaceTracking.Params.Eye
                 if (v2.Left.Openness >= 1 && v2.Left.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen);
                 return v2.Left.Openness < .05 ? -v2.Left.Squeeze : NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
-            }, "LeftEyeLidExpandedSqeeze", true),
+            }, "LeftEyeLidExpandedSqueeze", true),
             new FloatEyeParameter(v2 =>
             {
                 if (v2.Right.Openness >= 1 && v2.Right.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen);
                 return v2.Right.Openness < .05 ? -v2.Right.Squeeze : NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
-            }, "RightEyeLidExpandedSqeeze", true),
+            }, "RightEyeLidExpandedSqueeze", true),
 
             new FloatEyeParameter(v2 => v2.Left.Widen, "LeftEyeWiden"),
             new FloatEyeParameter(v2 => v2.Right.Widen, "RightEyeWiden"),
