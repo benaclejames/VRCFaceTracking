@@ -11,7 +11,6 @@ namespace VRCFaceTracking.SRanipal
 {
     public class SRanipalTrackingInterface : ITrackingModule
     {
-        private Thread _updateThread;
         private static CancellationTokenSource _cancellationToken;
 
         public bool SupportsEye => true;
@@ -20,7 +19,6 @@ namespace VRCFaceTracking.SRanipal
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             _cancellationToken?.Cancel();
-            _updateThread?.Abort(); // If we're reinitializing, we don't wanna query SRanipal while it's doing stuff
             
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
@@ -34,7 +32,7 @@ namespace VRCFaceTracking.SRanipal
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
             if (lipEnabled)
-                UnifiedTrackingData.LatestLipData.image = Marshal.AllocCoTaskMem(SRanipal_Lip.ImageWidth * SRanipal_Lip.ImageHeight);
+                UnifiedTrackingData.LatestLipData.image = Marshal.AllocCoTaskMem(SRanipal_Lip_v2.ImageWidth * SRanipal_Lip_v2.ImageHeight);
             
             return (eyeEnabled, lipEnabled);
         }
@@ -66,28 +64,26 @@ namespace VRCFaceTracking.SRanipal
             _cancellationToken.Dispose();
         }
 
-        public void StartThread()
+        #region Update
+        
+        public Action GetUpdateThreadFunc()
         {
             _cancellationToken = new CancellationTokenSource();
-            _updateThread = new Thread(() =>
+            return () =>
             {
-                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
                 while (!_cancellationToken.IsCancellationRequested)
                 {
                     Update();
                     Thread.Sleep(10);
                 }
-            });
-            _updateThread.Start();
+            };
         }
 
         public void Update()
         {
-            if (UnifiedLibManager.EyeEnabled) UpdateEye();
-            if (UnifiedLibManager.LipEnabled) UpdateMouth();
+            UpdateEye();
+            UpdateMouth();
         }
-        
-        #region EyeUpdate
 
         private void UpdateEye()
         {
@@ -95,10 +91,6 @@ namespace VRCFaceTracking.SRanipal
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
         }
-
-        #endregion
-
-        #region MouthUpdate
 
         private void UpdateMouth()
         {

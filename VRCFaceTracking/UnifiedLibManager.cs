@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using JetBrains.Annotations;
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -21,7 +20,7 @@ namespace VRCFaceTracking
         bool SupportsLip { get; }
 
         (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-        void StartThread();
+        Action GetUpdateThreadFunc();
         void Update();
         void Teardown();
     }
@@ -30,6 +29,7 @@ namespace VRCFaceTracking
     {
         public static bool EyeEnabled, LipEnabled;
         private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
+        private static readonly List<Thread> UsefulThreads = new List<Thread>();
         
         private static Thread _initializeWorker;
         public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
@@ -53,7 +53,15 @@ namespace VRCFaceTracking
         
         public static void Initialize(bool eye = true, bool lip = true)
         {
+            // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
+            foreach (var updateThread in UsefulThreads)
+            {
+                updateThread.Abort();
+                UsefulThreads.Remove(updateThread);
+            }
+            
+            // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
             _initializeWorker.Start();
         }
@@ -63,15 +71,19 @@ namespace VRCFaceTracking
             var returnList = new List<Type>();
 
             // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
-            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs")) return returnList;
+            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs"))
+            {
+                Directory.CreateDirectory(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs");
+                return returnList;
+            }
             
             MelonLogger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
-            var dlls = Directory.GetFiles(Path.Combine(MelonUtils.BaseDirectory, "Mods\\VRCFTLibs"), "*.dll");
+            var dlls = Directory.GetFiles(Path.Combine("Mods\\VRCFTLibs"), "*.dll");
             foreach (var dll in dlls)
             {
-                var loadedModule = Assembly.Load("Mods\\VRCFTLibs\\VRCFT_Module_Example, Culture=neutral, PublicKeyToken=cdc94201de0b434a");
+                var loadedModule = Assembly.LoadFrom(MelonUtils.BaseDirectory+"\\"+dll);
 
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
@@ -112,7 +124,16 @@ namespace VRCFaceTracking
                 {
                     UsefulModules.Add(module, moduleObj);
                     if (ShouldThread)
-                        moduleObj.StartThread();
+                    {
+                        Action updater = moduleObj.GetUpdateThreadFunc();
+                        var updateThread = new Thread(() =>
+                        {
+                            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                            updater.Invoke();
+                        });
+                        UsefulThreads.Add(updateThread);
+                        updateThread.Start();
+                    }
                 }
 
                 if (eyeSuccess) EyeEnabled = true;

@@ -13,14 +13,6 @@ namespace ViveSR
             public static class SRanipal_Lip_API
             {
                 /// <summary>
-                /// Gets data from anipal's Lip module.
-                /// </summary>
-                /// <param name="data">ViveSR.anipal.Lip.LipData</param>
-                /// <returns>Indicates the resulting ViveSR.Error status of this method.</returns>
-                [DllImport("SRanipal")]
-                public static extern Error GetLipData(ref LipData data);
-
-                /// <summary>
                 /// Gets version 2 lip data from anipal's Lip module.
                 /// </summary>
                 /// <param name="data">ViveSR.anipal.Lip.LipData_v2</param>

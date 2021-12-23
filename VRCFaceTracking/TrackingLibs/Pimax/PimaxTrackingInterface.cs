@@ -28,7 +28,6 @@ namespace VRCFaceTracking.Pimax
         {
             _pimaxWorker = new Thread(() =>
             {
-                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
                 while (!CancellationToken.IsCancellationRequested)
                 {
                     if (_needsUpdate)
@@ -40,7 +39,11 @@ namespace VRCFaceTracking.Pimax
             _pimaxWorker.Start();
         }
 
-        public void Teardown() => PimaxTracker.Stop();
+        public void Teardown()
+        {
+            CancellationToken.Cancel();
+            PimaxTracker.Stop();
+        }
 
         public void Update()
         {

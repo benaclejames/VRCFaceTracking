@@ -13,7 +13,7 @@ namespace VRCFaceTracking.Params.Lip
         {
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
-                if (lip == null || floats == null) return;
+                if (lip == null || floats == null || !UnifiedLibManager.LipEnabled) return;
 
                 var newParamValue = getValueFunc.Invoke(floats, lip);
                 if (newParamValue.HasValue) ParamValue = newParamValue.Value;

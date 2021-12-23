@@ -13,7 +13,7 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
         public LipTrackingMenuPage(Transform pageRoot, Transform lipTab) : base(pageRoot, lipTab.gameObject)
         {
             _lipImage = pageRoot.Find("LipImage/Image").GetComponent<RawImage>();
-            _lipTexture = new Texture2D(SRanipal_Lip.ImageWidth, SRanipal_Lip.ImageHeight, TextureFormat.Alpha8, false);
+            _lipTexture = new Texture2D(SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight, TextureFormat.Alpha8, false);
             _lipImage.texture = _lipTexture;
             
             TrackingToggle.OnToggle += b => UnifiedLibManager.LipEnabled = b;
@@ -23,7 +23,7 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
         {
             if (latestImage == IntPtr.Zero || _lipTexture == null || _lipImage == null) return;
 
-            _lipTexture.LoadRawTextureData(latestImage, SRanipal_Lip.ImageWidth * SRanipal_Lip.ImageHeight);
+            _lipTexture.LoadRawTextureData(latestImage, SRanipal_Lip_v2.ImageWidth * SRanipal_Lip_v2.ImageHeight);
             _lipTexture.Apply();
         }
     }

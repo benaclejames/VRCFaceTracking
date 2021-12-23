@@ -39,22 +39,17 @@
     <Compile Include="Params\Lip\LipParameter.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
+    <Compile Include="Params\Vector2.cs" />
+    <Compile Include="Params\Vector3.cs" />
+    <Compile Include="Params\XYParam.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTracker.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTrackingInterface.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeData.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeDataType_v1.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeDataType_v2.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye_API.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye_Framework.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye_v2.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_Lip.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_LipData_v1.cs" />
     <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_LipData_v2.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_LipShapeTableDrawer.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_LipShapeTableDrawer_v2.cs" />
     <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_Lip_API.cs" />
-    <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_Lip_Framework.cs" />
     <Compile Include="TrackingLibs\SRanipal\Lip\SRanipal_Lip_v2.cs" />
     <Compile Include="TrackingLibs\SRanipal\SRanipalTrackingInterface.cs" />
     <Compile Include="TrackingLibs\SRanipal\SRanipal_API.cs" />
@@ -82,7 +77,7 @@
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRanipal.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRWorks_Log.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\ViveSR_Client.dll" />
-    <EmbeddedResource Include="VRCFaceTracking" />
+    <EmbeddedResource Include="VRCFaceTracking.unitypackage" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -171,11 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TrackingLibs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="C:\Users\Ben\vrcFt.snk">
-      <Link>vrcFt.snk</Link>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

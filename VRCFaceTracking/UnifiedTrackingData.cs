@@ -8,28 +8,22 @@ using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.Eye;
 using VRCFaceTracking.Params.LipMerging;
 using VRCFaceTracking.Pimax;
+using Vector2 = VRCFaceTracking.Params.Vector2;
 
 namespace VRCFaceTracking
 {
     // Represents a single eye, can also be used as a combined eye
     public struct Eye
     {
-        public Vector2? Look;
+        public Vector2 Look;
         public float Openness;
         public float Widen, Squeeze;
 
         
         public void Update(SingleEyeData eyeData, SingleEyeExpression? expression = null)
         {
-            Look = null;
-            Openness = 0;
-            Widen = 0;
-            Squeeze = 0;
-
             if (eyeData.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
-                Look = Vector3.Scale(
-                    eyeData.gaze_direction_normalized,
-                    new Vector3(-1, 1, 1));
+                Look = eyeData.gaze_direction_normalized.Invert();
 
             Openness = eyeData.eye_openness;
             
