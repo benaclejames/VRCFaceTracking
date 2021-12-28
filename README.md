@@ -2,6 +2,8 @@
 
 Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK. This MelonLoader mod modifies Avatar V3 Parameters according to data returned by the HMD's Eye Trackers and/or Lip Tracker.
 
+![Discord Shield](https://discordapp.com/api/guilds/849300336128032789/widget.png?style=shield)
+
 ## 🎥 Demo
 
 [![](https://i.imgur.com/TKpyFVs.gif)](https://www.youtube.com/watch?v=KbbfYW-hnMk)
