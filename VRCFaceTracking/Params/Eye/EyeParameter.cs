@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ParamLib;
-using UnityEngine;
+using VRC.SDK3.Avatars.ScriptableObjects;
 
 namespace VRCFaceTracking.Params.Eye
 {
@@ -50,28 +51,77 @@ namespace VRCFaceTracking.Params.Eye
 
     public class BinaryEyeParameter : IParameter
     {
-        private readonly BoolEyeParameter[] _params = new BoolEyeParameter[4];
-        
+        private readonly List<BoolEyeParameter> _params = new List<BoolEyeParameter>();
+        private readonly string _paramName;
+        private readonly Func<EyeTrackingData, float> _getValueFunc;
+
+        /* Pretty complicated, but let me try to explain...
+         * As with other ResetParam functions, the purpose of this function is to reset all the parameters.
+         * Since we don't actually know what parameters we'll be needing for this new avatar, nor do we know if the parameters we currently have are valid
+         * it's just easier to just reset everything.
+         *
+         * Step 1) Find all valid parameters on the new avatar that start with the name of this binary param, and end with a number.
+         * 
+         * Step 2) Find the binary steps for that number. That's the number of shifts we need to do. That number could be 8, and it's steps would be 3 as it's 3 steps away from zero in binary
+         * This also makes sure the number is a valid base2-compatible number
+         *
+         * Step 3) Calculate the maximum possible value for the discovered binary steps, then subtract 1 since we count from 0.
+         *
+         * Step 4) Create each parameter literal that'll be responsible for actually changing parameters. It's output data will be multiplied by the highest possible
+         * binary number scince we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
+         * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
+         */
         public void ResetParam()
         {
-            foreach (var param in _params)
-                param.ResetParam();
-        }
+            // Get all parameters starting with this parameter's name, and of type bool
+            var boolParams = ParamLib.ParamLib.GetLocalParams().Where(p => p.valueType == VRCExpressionParameters.ValueType.Bool && p.name.StartsWith(_paramName)).ToArray();
 
-        public void ZeroParam()
+            var paramsToCreate = new Dictionary<string, int>();
+            foreach (var param in boolParams)
+            {
+                // Cut the parameter name to get the index
+                var index = int.Parse(param.name.Substring(_paramName.Length));
+                // Get the shift steps
+                var binaryIndex = GetBinarySteps(index);
+                // If this index has a shift step, create the parameter
+                if (binaryIndex.HasValue)
+                    paramsToCreate.Add(param.name, index);
+            }
+
+            if (paramsToCreate.Count == 0) return;
+            
+            // Calculate the highest possible binary number by getting the biggest shift step,
+            // getting it to the power of 2, and then subtracting 1 since we count zero as a possible value
+            var maxPossibleBinaryInt = (paramsToCreate.Values.Max()^2)-1;
+            foreach (var param in paramsToCreate)
+                // Create the parameter literal. Calculate the 
+                _params.Add(new BoolEyeParameter(
+                    data => (((int) (_getValueFunc.Invoke(data) * maxPossibleBinaryInt) >> param.Value) & 1) == 1, param.Key));
+        }
+        
+        // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
+        private static int? GetBinarySteps(int index)
         {
-            foreach (var param in _params)
-                param.ParamIndex = null;
+            var currSeqItem = 1;
+            for (var i = 0; i < index; i++)
+            {
+                if (currSeqItem == index)
+                    return i;
+                currSeqItem*=2;
+            }
+            return null;
         }
 
-        public string[] GetName() => _params.Select(p => p.ParamName).Distinct().ToArray();
+        public void ZeroParam() => _params.Clear();
+
+        public string[] GetName() =>
+            // If we have no parameters, return a single value array containing the paramName. If we have values, return the names of all the parameters
+            _params.Count == 0 ? new[] {_paramName} : _params.Select(p => p.ParamName).ToArray();
 
         public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName)
         {
-            _params[0] = new BoolEyeParameter(data => ((int)(getValueFunc.Invoke(data) * 15) & 1) == 1, paramName + "1");
-            _params[1] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 1) & 1) == 1, paramName + "2");
-            _params[2] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 2) & 1) == 1, paramName + "4");
-            _params[3] = new BoolEyeParameter(data => (((int)(getValueFunc.Invoke(data) * 15) >> 3) & 1) == 1, paramName + "8");
+            _paramName = paramName;
+            _getValueFunc = getValueFunc;
         }
     }
 }

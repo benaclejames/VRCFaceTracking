@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
@@ -131,7 +130,12 @@ namespace VRCFaceTracking
         // Returns a list of all parameters given by name in the searchParams parameter
         private static List<IParameter> FindParams(IEnumerable<string> searchParams)
         {
-            var eyeParams = EyeTrackingParams.ParameterList.Where(p => p.GetName().Any(searchParams.Contains));
+            // Get all eye params that match any item in searchParams, unless it's a BinaryEyeParameter,
+            // in which case we count it as a match if it starts with the name of the binary param, and ends with an int-parseable string
+            var eyeParams = EyeTrackingParams.ParameterList.Where(p =>
+                p.GetName().Any(name => searchParams.Contains(name) || p.GetType() == typeof(BinaryEyeParameter) &&
+                    searchParams.Any(str =>
+                        str.StartsWith(name) && int.TryParse(str.Substring(name.Length), out var unused))));
             
             var optimizedLipParams = LipShapeMerger.AllLipParameters.Where(p => p.GetName().Any(searchParams.Contains));
 
