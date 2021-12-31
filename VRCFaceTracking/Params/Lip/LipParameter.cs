@@ -8,8 +8,8 @@ namespace VRCFaceTracking.Params.Lip
     public class LipParameter : FloatBaseParam, IParameter
     {
         public LipParameter(string paramName, Func<Dictionary<LipShape_v2, float>, float[], float?> getValueFunc,
-            bool prioritised = false)
-            : base(paramName, prioritised)
+            bool wantsPriority = false)
+            : base(paramName, wantsPriority)
         {
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {

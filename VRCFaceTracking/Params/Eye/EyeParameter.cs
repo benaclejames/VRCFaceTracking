@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MelonLoader;
 using ParamLib;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
@@ -8,8 +9,8 @@ namespace VRCFaceTracking.Params.Eye
 {
     public class FloatEyeParameter : FloatBaseParam, IParameter
     {
-        public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool prioritised = false)
-            : base(paramName, prioritised) =>
+        public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool wantsPriority = false)
+            : base(paramName, wantsPriority) =>
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
             {
                 if (!UnifiedLibManager.EyeEnabled) return;
@@ -127,6 +128,42 @@ namespace VRCFaceTracking.Params.Eye
         {
             _paramName = paramName;
             _getValueFunc = getValueFunc;
+        }
+    }
+
+    // EverythingParam, or EpicParam. You choose!
+    // Contains a bool, float and binary parameter, all in one class with IParameter implemented.
+    public class EParam : IParameter
+    {
+        private readonly IParameter[] _parameter;
+
+        public EParam(Func<EyeTrackingData, float> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
+        {
+            var boolParam = new BoolEyeParameter(eye => getValueFunc.Invoke(eye) < minBoolThreshold, paramName);
+            var floatParam = new FloatEyeParameter(getValueFunc, paramName, true);
+            var binaryParam = new BinaryEyeParameter(getValueFunc, paramName);
+            
+            _parameter = new IParameter[] {boolParam, floatParam, binaryParam};
+        }
+
+        public string[] GetName()
+        {
+            var names = new List<string>();
+            foreach (var param in _parameter)
+                names.AddRange(param.GetName());
+            return names.ToArray();
+        }
+
+        public void ResetParam()
+        {
+            foreach (var param in _parameter)
+                param.ResetParam();
+        }
+
+        public void ZeroParam()
+        {
+            foreach (var param in _parameter)
+                param.ZeroParam();
         }
     }
 }

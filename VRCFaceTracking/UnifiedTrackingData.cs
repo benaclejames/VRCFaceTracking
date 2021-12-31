@@ -69,8 +69,12 @@ namespace VRCFaceTracking
 
             Left.Update(eyeData.verbose_data.left, eyeData.expression_data.left);
             Right.Update(eyeData.verbose_data.right, eyeData.expression_data.right);
+            
             Combined.Update(eyeData.verbose_data.combined.eye_data);
-
+            // Fabricate missing combined eye data
+            Combined.Widen = (Left.Widen + Right.Widen) / 2;
+            Combined.Squeeze = (Left.Squeeze + Right.Squeeze) / 2;
+            
             if (dilation != 0)
                 EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
         }
@@ -133,9 +137,10 @@ namespace VRCFaceTracking
             // Get all eye params that match any item in searchParams, unless it's a BinaryEyeParameter,
             // in which case we count it as a match if it starts with the name of the binary param, and ends with an int-parseable string
             var eyeParams = EyeTrackingParams.ParameterList.Where(p =>
-                p.GetName().Any(name => searchParams.Contains(name) || p.GetType() == typeof(BinaryEyeParameter) &&
-                    searchParams.Any(str =>
-                        str.StartsWith(name) && int.TryParse(str.Substring(name.Length), out var unused))));
+            {
+                return p.GetName().Any(name => searchParams.Any(str => str == name || (str.Length > name.Length && str.Substring(0, name.Length) == name &&
+                    int.TryParse(str.Substring(name.Length), out var unused))));
+            });
             
             var optimizedLipParams = LipShapeMerger.AllLipParameters.Where(p => p.GetName().Any(searchParams.Contains));
 
