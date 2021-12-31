@@ -68,7 +68,7 @@ namespace VRCFaceTracking.Params.Eye
          * Step 3) Calculate the maximum possible value for the discovered binary steps, then subtract 1 since we count from 0.
          *
          * Step 4) Create each parameter literal that'll be responsible for actually changing parameters. It's output data will be multiplied by the highest possible
-         * binary number scince we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
+         * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
          * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
          */
         public void ResetParam()
@@ -85,18 +85,18 @@ namespace VRCFaceTracking.Params.Eye
                 var binaryIndex = GetBinarySteps(index);
                 // If this index has a shift step, create the parameter
                 if (binaryIndex.HasValue)
-                    paramsToCreate.Add(param.name, index);
+                    paramsToCreate.Add(param.name, binaryIndex.Value);
             }
 
             if (paramsToCreate.Count == 0) return;
             
-            // Calculate the highest possible binary number by getting the biggest shift step,
-            // getting it to the power of 2, and then subtracting 1 since we count zero as a possible value
-            var maxPossibleBinaryInt = (paramsToCreate.Values.Max()^2)-1;
+            // Calculate the highest possible binary number
+            var maxPossibleBinaryInt = Math.Pow(2, paramsToCreate.Values.Count)-1;
             foreach (var param in paramsToCreate)
                 // Create the parameter literal. Calculate the 
                 _params.Add(new BoolEyeParameter(
-                    data => (((int) (_getValueFunc.Invoke(data) * maxPossibleBinaryInt) >> param.Value) & 1) == 1, param.Key));
+                    data => (((int) (_getValueFunc.Invoke(data) * maxPossibleBinaryInt) >> param.Value) & 1) == 1,
+                    param.Key));
         }
         
         // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
@@ -112,7 +112,12 @@ namespace VRCFaceTracking.Params.Eye
             return null;
         }
 
-        public void ZeroParam() => _params.Clear();
+        public void ZeroParam()
+        {
+            foreach (var param in _params)
+                param.ZeroParam();
+            _params.Clear();
+        }
 
         public string[] GetName() =>
             // If we have no parameters, return a single value array containing the paramName. If we have values, return the names of all the parameters
