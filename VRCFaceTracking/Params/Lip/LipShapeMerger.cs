@@ -74,20 +74,16 @@ namespace VRCFaceTracking.Params.LipMerging
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters
-        public static List<LipParameter> AllLipParameters =
-            new List<LipParameter>(GetAllLipShapes().Union(GetOptimizedLipParameters()));
+        public static readonly List<EParam> AllLipParameters =
+            new List<EParam>(GetAllLipShapes().Union(GetOptimizedLipParameters()));
 
         public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out LipShape_v2 shape);
         
-        private static IEnumerable<LipParameter> GetOptimizedLipParameters() => MergedShapes
-            .Select(shape => new LipParameter(shape.Key, (eye, lip) => 
-                shape.Value.GetBlendedLipShape(eye), true)).ToList();
+        private static IEnumerable<EParam> GetOptimizedLipParameters() => MergedShapes
+            .Select(shape => new EParam((eye, lip) => 
+                shape.Value.GetBlendedLipShape(lip), shape.Key, 0.0f)).ToList();
 
-        private static IEnumerable<LipParameter> GetAllLipShapes() => ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape => 
-            new LipParameter(shape.ToString(), (eye, lip) =>
-            {
-                if (eye.TryGetValue(shape, out var retValue)) return retValue;
-                return null;
-            }, true));
+        private static IEnumerable<EParam> GetAllLipShapes() => ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape => 
+            new EParam((eye, lip) => lip.TryGetValue(shape, out var outValue) ? outValue : (float?) null, shape.ToString(), 0.0f));
     }
 }

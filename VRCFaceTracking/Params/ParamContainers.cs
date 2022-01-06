@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MelonLoader;
 using ParamLib;
+using ViveSR.anipal.Lip;
 using VRC.SDK3.Avatars.ScriptableObjects;
 
-namespace VRCFaceTracking.Params.Eye
+namespace VRCFaceTracking.Params
 {
-    public class FloatEyeParameter : FloatBaseParam, IParameter
+    public class FloatParameter : FloatBaseParam, IParameter
     {
-        public FloatEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName, bool wantsPriority = false)
+        public FloatParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName, bool wantsPriority = false)
             : base(paramName, wantsPriority) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled) return;
-                ParamValue = getValueFunc.Invoke(eye);
+                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
+                var value = getValueFunc.Invoke(eye, lip);
+                if (value.HasValue)
+                    ParamValue = value.Value;
             };
 
         public string[] GetName() => new[] {ParamName};
@@ -22,14 +24,21 @@ namespace VRCFaceTracking.Params.Eye
 
     public class XYParameter : XYParam, IParameter
     {
-        public XYParameter(Func<EyeTrackingData, Vector2> getValueFunc, string xParamName, string yParamName)
+        public XYParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true))
         {
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled) return;
-                ParamValue = getValueFunc.Invoke(eye);
+                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
+                var value = getValueFunc.Invoke(eye, lip);
+                if (value.HasValue)
+                    ParamValue = value.Value;
             };
+        }
+
+        public XYParameter(Func<EyeTrackingData, Vector2> getValueFunc, string xParamName, string yParamName)
+            : this((eye, lip) => getValueFunc.Invoke(eye), xParamName, yParamName)
+        {
         }
 
         void IParameter.ResetParam() => ResetParams();
@@ -38,23 +47,31 @@ namespace VRCFaceTracking.Params.Eye
 
     }
 
-    public class BoolEyeParameter : BoolBaseParam, IParameter
+    public class BoolParameter : BoolBaseParam, IParameter
     {
-        public BoolEyeParameter(Func<EyeTrackingData, bool> getValueFunc, string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip, floats) =>
+        public BoolParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, bool?> getValueFunc, string paramName) : base(paramName) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled) return;
-                ParamValue = getValueFunc.Invoke(eye);
+                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
+                var value = getValueFunc.Invoke(eye, lip);
+                if (value.HasValue)
+                    ParamValue = value.Value;
             };
+
+        public BoolParameter(Func<EyeTrackingData, bool> getValueFunc, string paramName) : this(
+            (eye, lip) => getValueFunc.Invoke(eye), paramName)
+        {
+        }
 
         public string[] GetName() => new [] {ParamName};
     }
 
-    public class BinaryEyeParameter : IParameter
+    public class BinaryParameter : IParameter
     {
-        private readonly List<BoolEyeParameter> _params = new List<BoolEyeParameter>();
+        private readonly List<BoolParameter> _params = new List<BoolParameter>();
+        private readonly BoolParameter _negativeParam;
         private readonly string _paramName;
-        private readonly Func<EyeTrackingData, float> _getValueFunc;
+        private readonly Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> _getValueFunc;
 
         /* Pretty complicated, but let me try to explain...
          * As with other ResetParam functions, the purpose of this function is to reset all the parameters.
@@ -74,14 +91,16 @@ namespace VRCFaceTracking.Params.Eye
          */
         public void ResetParam()
         {
+            _negativeParam.ResetParam();
+            
             // Get all parameters starting with this parameter's name, and of type bool
-            var boolParams = ParamLib.ParamLib.GetLocalParams().Where(p => p.valueType == VRCExpressionParameters.ValueType.Bool && p.name.StartsWith(_paramName)).ToArray();
+            var boolParams = ParamLib.ParamLib.GetLocalParams().Where(p => p.valueType == VRCExpressionParameters.ValueType.Bool && p.name.StartsWith(_paramName));
 
             var paramsToCreate = new Dictionary<string, int>();
             foreach (var param in boolParams)
             {
                 // Cut the parameter name to get the index
-                var index = int.Parse(param.name.Substring(_paramName.Length));
+                if (!int.TryParse(param.name.Substring(_paramName.Length), out var index)) continue;
                 // Get the shift steps
                 var binaryIndex = GetBinarySteps(index);
                 // If this index has a shift step, create the parameter
@@ -92,12 +111,25 @@ namespace VRCFaceTracking.Params.Eye
             if (paramsToCreate.Count == 0) return;
             
             // Calculate the highest possible binary number
-            var maxPossibleBinaryInt = Math.Pow(2, paramsToCreate.Values.Count)-1;
+            var maxPossibleBinaryInt = Math.Pow(2, paramsToCreate.Values.Count);
             foreach (var param in paramsToCreate)
-                // Create the parameter literal. Calculate the 
-                _params.Add(new BoolEyeParameter(
-                    data => (((int) (_getValueFunc.Invoke(data) * maxPossibleBinaryInt) >> param.Value) & 1) == 1,
-                    param.Key));
+                _params.Add(new BoolParameter(
+                    (eye, lip) =>
+                    {
+                        var valueRaw = _getValueFunc.Invoke(eye, lip);
+                        if (!valueRaw.HasValue) return null;
+                        // If the value is negative, make it positive
+                        valueRaw = valueRaw > 1 ? 1 : valueRaw < -1 ? -1 : valueRaw;
+                        if (_negativeParam.ParamIndex == null &&
+                            valueRaw < 0) // If the negative parameter isn't set, cut the negative values
+                            return null;
+                        
+                        // Ensure value going into the bitwise shifts is between 0 and 1
+                        valueRaw = Math.Abs(valueRaw.Value);
+
+                        var value = (int) (valueRaw * (maxPossibleBinaryInt - 1));
+                        return ((value >> param.Value) & 1) == 1;
+                    }, param.Key));
         }
         
         // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
@@ -115,6 +147,7 @@ namespace VRCFaceTracking.Params.Eye
 
         public void ZeroParam()
         {
+            _negativeParam.ZeroParam();
             foreach (var param in _params)
                 param.ZeroParam();
             _params.Clear();
@@ -124,10 +157,21 @@ namespace VRCFaceTracking.Params.Eye
             // If we have no parameters, return a single value array containing the paramName. If we have values, return the names of all the parameters
             _params.Count == 0 ? new[] {_paramName} : _params.Select(p => p.ParamName).ToArray();
 
-        public BinaryEyeParameter(Func<EyeTrackingData, float> getValueFunc, string paramName)
+        public BinaryParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName)
         {
             _paramName = paramName;
             _getValueFunc = getValueFunc;
+            
+            _negativeParam = new BoolParameter((eye, lip) =>
+            {
+                var valueRaw = _getValueFunc.Invoke(eye, lip);
+                if (!valueRaw.HasValue) return null;
+                return valueRaw < 0;
+            }, _paramName + "Negative");
+        }
+
+        public BinaryParameter(Func<EyeTrackingData, float> getValueFunc, string paramName) : this((eye, lip) => getValueFunc.Invoke(eye), paramName)
+        {
         }
     }
 
@@ -137,13 +181,18 @@ namespace VRCFaceTracking.Params.Eye
     {
         private readonly IParameter[] _parameter;
 
-        public EParam(Func<EyeTrackingData, float> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
+        public EParam(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
         {
-            var boolParam = new BoolEyeParameter(eye => getValueFunc.Invoke(eye) < minBoolThreshold, paramName);
-            var floatParam = new FloatEyeParameter(getValueFunc, paramName, true);
-            var binaryParam = new BinaryEyeParameter(getValueFunc, paramName);
+            var boolParam = new BoolParameter((eye, lip) => getValueFunc.Invoke(eye, lip) < minBoolThreshold, paramName);
+            var floatParam = new FloatParameter(getValueFunc, paramName, true);
+            var binaryParam = new BinaryParameter(getValueFunc, paramName);
             
             _parameter = new IParameter[] {boolParam, floatParam, binaryParam};
+        }
+
+        public EParam(Func<EyeTrackingData, float> getValueFunc, string paramName,
+            float minBoolThreshold = 0.5f) : this((eye, lip) => getValueFunc.Invoke(eye), paramName, minBoolThreshold)
+        {
         }
 
         public string[] GetName()

@@ -139,7 +139,7 @@ namespace VRCFaceTracking
             var eyeParams = EyeTrackingParams.ParameterList.Where(p =>
             {
                 return p.GetName().Any(name => searchParams.Any(str => str == name || (str.Length > name.Length && str.Substring(0, name.Length) == name &&
-                    int.TryParse(str.Substring(name.Length), out var unused))));
+                    (int.TryParse(str.Substring(name.Length), out var unused) || str.Substring(name.Length) == "Negative"))));
             });
             
             var optimizedLipParams = LipShapeMerger.AllLipParameters.Where(p => p.GetName().Any(searchParams.Contains));
