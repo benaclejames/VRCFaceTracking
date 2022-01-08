@@ -7,18 +7,20 @@ namespace VRCFaceTracking.Params.Lip
     {
         private readonly LipShape_v2 _positiveShape, _negativeShape;
         private float _positiveCache, _negativeCache;
+        private bool _steps;
         
-        public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape)
+        public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape, bool steps = false)
         {
             _positiveShape = positiveShape;
             _negativeShape = negativeShape;
+            _steps = steps;
         }
 
         public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
         {
             if (inputMap.ContainsKey(_positiveShape)) _positiveCache = inputMap[_positiveShape];
             if (inputMap.ContainsKey(_negativeShape)) _negativeCache = inputMap[_negativeShape] * -1;
-            return _positiveCache + _negativeCache;
+            return _steps ? (_positiveCache - _negativeCache) - 1 : _positiveCache + _negativeCache;
         }
     }
 }
