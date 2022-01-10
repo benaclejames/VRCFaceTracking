@@ -34,7 +34,7 @@ namespace VRCFaceTracking
 
         public void Update(EyeExpressionState eyeState)
         {
-            Look = new Vector2(eyeState.PupilCenterX, eyeState.PupilCenterY);
+            Look = new Vector2(eyeState.PupilCenterX-0.5f, eyeState.PupilCenterY-0.5f) * 3;
             Openness = eyeState.Openness;
             Widen = 0;
             Squeeze = 0;
@@ -103,48 +103,17 @@ namespace VRCFaceTracking
 
     public struct UnifiedTrackingData
     {
+        public static readonly List<IParameter> AllParameters = EyeTrackingParams.ParameterList.Union(LipShapeMerger.AllLipParameters).ToList();
+        
         // Central update action for all parameters to subscribe to
-        public static Action<EyeTrackingData, float[] /* Lip Data Blend Shape  */, Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedParamsUpdated = (eye, lip, floats) => { };
-        
-        // List of parameter objects the current avatar is using (This is not where the parameters are stored, but rather a way to know which of the existing stored parameters are being used)
-        private static List<IParameter> _currentlyUsedParams = new List<IParameter>();
-        
+        public static Action<EyeTrackingData, float[] /* Lip Data Blend Shape  */
+            , Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedParamsUpdated;
+
         // Copy of latest updated unified eye data
         public static EyeTrackingData LatestEyeData;
         
         // SRanipal Exclusives
         public static LipData_v2 LatestLipData;
-        public static Dictionary<LipShape_v2, float> LatestLipShapes;
-
-        // Resets the currently used params list and regenerates it with the latest found parameters
-        public static void RefreshParameterList()
-        {
-            // Yeet the existing params back to zero
-            foreach (var current in _currentlyUsedParams)
-                current.ZeroParam();
-
-            // Find the new params we actually need
-            _currentlyUsedParams = FindParams(ParamLib.ParamLib.GetLocalParams().Select(p => p.name).Distinct());
-            
-            // Reset em to find their values
-            foreach (var current in _currentlyUsedParams)
-                current.ResetParam();
-        }
-
-        // Returns a list of all parameters given by name in the searchParams parameter
-        private static List<IParameter> FindParams(IEnumerable<string> searchParams)
-        {
-            // Get all eye params that match any item in searchParams, unless it's a BinaryEyeParameter,
-            // in which case we count it as a match if it starts with the name of the binary param, and ends with an int-parseable string
-            var eyeParams = EyeTrackingParams.ParameterList.Where(p =>
-            {
-                return p.GetName().Any(name => searchParams.Any(str => str == name || (str.Length > name.Length && str.Substring(0, name.Length) == name &&
-                    (int.TryParse(str.Substring(name.Length), out var unused) || str.Substring(name.Length) == "Negative"))));
-            });
-            
-            var optimizedLipParams = LipShapeMerger.AllLipParameters.Where(p => p.GetName().Any(searchParams.Contains));
-
-            return eyeParams.Union(optimizedLipParams).ToList();
-        }
+        public static Dictionary<LipShape_v2, float> LatestLipShapes = new Dictionary<LipShape_v2, float>();
     }
 }

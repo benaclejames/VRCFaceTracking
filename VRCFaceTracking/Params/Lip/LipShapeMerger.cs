@@ -83,7 +83,9 @@ namespace VRCFaceTracking.Params.LipMerging
             .Select(shape => new EParam((eye, lip) => 
                 shape.Value.GetBlendedLipShape(lip), shape.Key, 0.0f)).ToList();
 
-        private static IEnumerable<EParam> GetAllLipShapes() => ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape => 
-            new EParam((eye, lip) => lip.TryGetValue(shape, out var outValue) ? outValue : (float?) null, shape.ToString(), 0.0f));
+        private static IEnumerable<EParam> GetAllLipShapes() =>
+            ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape =>
+                new EParam((eye, lip) => lip.TryGetValue(shape, out var outValue) ? outValue : (float?) null,
+                    shape.ToString(), 0.0f));
     }
 }

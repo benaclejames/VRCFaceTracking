@@ -16,8 +16,8 @@ namespace VRCFaceTracking.Params.Lip
 
         public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
         {
-            if (inputMap.ContainsKey(_positiveShape)) _positiveCache = inputMap[_positiveShape];
-            if (inputMap.ContainsKey(_negativeShape)) _negativeCache = inputMap[_negativeShape] * -1;
+            if (inputMap.TryGetValue(_positiveShape, out var positiveResult)) _positiveCache = positiveResult;
+            if (inputMap.TryGetValue(_negativeShape, out var negativeResult)) _negativeCache = negativeResult * -1;
             return _positiveCache + _negativeCache;
         }
     }

@@ -13,11 +13,11 @@
         }
 
         // Make an implicit conversion from vector3 to vector2
-        public static implicit operator Vector2(Vector3 v)
-        {
-            return new Vector2(v.x, v.y);
-        }
-
+        public static implicit operator Vector2(Vector3 v) => new Vector2(v.x, v.y);
+        
+        public static Vector2 operator *(Vector2 a, float d)
+        => new Vector2(a.x * d, a.y * d);
+        
         public static Vector2 zero => new Vector2(0, 0);
     }
 }
