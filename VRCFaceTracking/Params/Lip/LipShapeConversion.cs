@@ -3,11 +3,11 @@ using ViveSR.anipal.Lip;
 
 namespace VRCFaceTracking.Params.Lip
 {
-    public class PositiveNegativeShape
+    public class PositiveNegativeShape : ILipMerger
     {
         private readonly LipShape_v2 _positiveShape, _negativeShape;
         private float _positiveCache, _negativeCache;
-        
+
         public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape)
         {
             _positiveShape = positiveShape;
