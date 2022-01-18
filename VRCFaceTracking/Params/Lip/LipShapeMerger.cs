@@ -8,14 +8,15 @@ namespace VRCFaceTracking.Params.LipMerging
 {
     public static class LipShapeMerger
     {
-        private static readonly Dictionary<string, PositiveNegativeShape> MergedShapes =
-            new Dictionary<string, PositiveNegativeShape>
+        private static readonly Dictionary<string, ICombinedShape> MergedShapes =
+            new Dictionary<string, ICombinedShape>
             {
                 {"JawX", new PositiveNegativeShape(LipShape_v2.JawRight, LipShape_v2.JawLeft)},
                 {"MouthUpper", new PositiveNegativeShape(LipShape_v2.MouthUpperRight, LipShape_v2.MouthUpperLeft)},
                 {"MouthLower", new PositiveNegativeShape(LipShape_v2.MouthLowerRight, LipShape_v2.MouthLowerLeft)},
                 {"SmileSadRight", new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthSadRight)},
                 {"SmileSadLeft", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSadLeft)},
+                {"SmileSad", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthSadLeft, LipShape_v2.MouthSadRight})},
                 {"TongueY", new PositiveNegativeShape(LipShape_v2.TongueUp, LipShape_v2.TongueDown)},
                 {"TongueX", new PositiveNegativeShape(LipShape_v2.TongueRight, LipShape_v2.TongueLeft)},
                 {"PuffSuckRight", new PositiveNegativeShape(LipShape_v2.CheekPuffRight, LipShape_v2.CheekSuck)},
@@ -25,6 +26,7 @@ namespace VRCFaceTracking.Params.LipMerging
 
                 //JawOpen based params
                 {"JawOpenApe", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.MouthApeShape)},
+                {"JawOpenPuff", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.JawOpen}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight})},
                 {"JawOpenPuffRight", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekPuffRight)},
                 {"JawOpenPuffLeft", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekPuffLeft)},
                 {"JawOpenSuck", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekSuck)},
@@ -44,6 +46,15 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthUpperUpLeftPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthPout)},
                 {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthLowerOverlay)},
 
+                // MouthUpperUp Left+Right base params
+                {"MouthUpperUpUpperInside", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthUpperInside })},
+                {"MouthUpperUpPuff", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight})},
+                {"MouthUpperUpPuffLeft", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft})},
+                {"MouthUpperUpPuffRight", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.CheekPuffRight})},
+                {"MouthUpperUpApe", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthApeShape})},
+                {"MouthUpperUpPout", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthPout})},
+                {"MouthUpperUpOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
+
                 //MouthLowerDownRight based params
                 {"MouthLowerDownRightLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerInside)},
                 {"MouthLowerDownRightPuffRight", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.CheekPuffRight)},
@@ -58,6 +69,15 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthLowerDownLeftPout", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthPout)},
                 {"MouthLowerDownLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerOverlay)},
 
+                // MouthLowerDown Left+Right base params
+                {"MouthLowerDownLowerInside", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.MouthLowerInside})},
+                {"MouthLowerDownPuff", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight})},
+                {"MouthLowerDownPuffLeft", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft})},
+                {"MouthLowerDownPuffRight", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.CheekPuffRight})},
+                {"MouthLowerDownApe", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.MouthApeShape})},
+                {"MouthLowerDownPout", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.MouthPout})},
+                {"MouthLowerDownOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
+
                 //SmileRight based params; Recommend using these if you already have SmileSadLeft setup!
                 {"SmileRightUpperOverturn", new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthUpperOverturn)},
                 {"SmileRightLowerOverturn", new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthLowerOverturn)},
@@ -71,6 +91,13 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"SmileLeftApe", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthApeShape)},
                 {"SmileLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthLowerOverlay)},
                 {"SmileLeftPout", new PositiveNegativeShape(LipShape_v2.MouthSmileLeft, LipShape_v2.MouthPout)},
+
+                {"SmileUpperOverturn", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthUpperOverturn})},
+                {"SmileLowerOverturn", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverturn})},
+                {"SmileApe", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthApeShape})},
+                {"SmileOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
+                {"SmilePout", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthPout})},
+
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters
