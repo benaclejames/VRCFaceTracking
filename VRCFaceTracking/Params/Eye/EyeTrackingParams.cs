@@ -71,7 +71,7 @@ namespace VRCFaceTracking.Params.Eye
                 if (v2.Combined.Openness <= 0 && v2.Left.Squeeze > 0)
                     return v2.Combined.Squeeze * -1;
                 return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
-            }, "LeftEyeLidExpanded", true),
+            }, "CombinedEyeLidExpanded", true),
 
 
             new BinaryParameter(v2 =>
