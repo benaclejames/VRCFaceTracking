@@ -46,35 +46,7 @@ namespace VRCFaceTracking.Params.Eye
             
             #region EyeLidExpanded
             
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Left.Openness >= 1 && v2.Left.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen);
-                if (v2.Left.Openness <= 0 && v2.Left.Squeeze > 0)
-                    return v2.Left.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
-            }, "LeftEyeLidExpanded", true),
-
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Right.Openness >= 1 && v2.Right.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen);
-                if (v2.Right.Openness <= 0 && v2.Right.Squeeze > 0)
-                    return v2.Right.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
-            }, "RightEyeLidExpanded", true),
-
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Combined.Openness >= 1 && v2.Combined.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Combined.Widen);
-                if (v2.Combined.Openness <= 0 && v2.Combined.Squeeze > 0)
-                    return v2.Combined.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
-            }, "CombinedEyeLidExpanded", true),
-
-
-            new BinaryParameter(v2 =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Left.Widen > 0)
                     return v2.Left.Widen; 
@@ -82,8 +54,8 @@ namespace VRCFaceTracking.Params.Eye
                     return v2.Left.Squeeze;
                 return v2.Left.Openness;
             }, "LeftEyeLidExpanded"),
-            
-            new BinaryParameter(v2 =>
+
+            new EParam((v2, eye) =>
             {
                 if (v2.Right.Widen > 0)
                     return v2.Right.Widen; 
@@ -92,7 +64,7 @@ namespace VRCFaceTracking.Params.Eye
                 return v2.Right.Openness;
             }, "RightEyeLidExpanded"),
 
-            new BinaryParameter(v2 =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Combined.Widen > 0)
                     return v2.Combined.Widen; 
@@ -101,129 +73,36 @@ namespace VRCFaceTracking.Params.Eye
                 return v2.Combined.Openness;
             }, "CombinedEyeLidExpanded"),
 
-            new BoolParameter(v2 =>
-            {
-                if (v2.Left.Widen > 0.5f)
-                    return true; 
-                if (v2.Left.Squeeze > 0.5f)
-                    return true;
-                if (v2.Left.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "LeftEyeLidExpanded"),
-
-            new BoolParameter(v2 =>
-            {
-                if (v2.Right.Widen > 0.5f)
-                    return true; 
-                if (v2.Right.Squeeze > 0.5f)
-                    return true;
-                if (v2.Right.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "RightEyeLidExpanded"),
-
-            new BoolParameter(v2 =>
-            {
-                if (v2.Combined.Widen > 0.5f)
-                    return true; 
-                if (v2.Combined.Squeeze > 0.5f)
-                    return true;
-                if (v2.Combined.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "CombinedEyeLidExpanded"),
-            
             #endregion
 
             #region EyeLidExpandedSqueeze
 
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Left.Openness >= 1 && v2.Left.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen);
-                if (v2.Left.Openness <= 0 && v2.Left.Squeeze > 0)
-                    return v2.Left.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
-            } ,"LeftEyeLidExpandedSqueeze", true),
-
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Right.Openness >= 1 && v2.Right.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen);
-                if (v2.Right.Openness <= 0 && v2.Right.Squeeze > 0)
-                    return v2.Right.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
-            } ,"RightEyeLidExpandedSqueeze", true),
-
-            new FloatParameter((v2, eye) =>
-            {
-                if (v2.Combined.Openness >= 1 && v2.Combined.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Combined.Widen);
-                if (v2.Combined.Openness <= 0 && v2.Combined.Squeeze > 0)
-                    return v2.Combined.Squeeze * -1;
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
-            } ,"CombinedEyeLidExpandedSqueeze", true),
-
-            new BinaryParameter(v2 =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Left.Widen > 0)
                     return v2.Left.Widen; 
                 if (v2.Left.Squeeze > 0)
                     return v2.Left.Squeeze;
                 return v2.Left.Openness;
-            }, "LeftEyeLidExpandedSqueeze"),
-            
-            new BinaryParameter(v2 =>
+            } ,"LeftEyeLidExpandedSqueeze"),
+
+            new EParam((v2, eye) =>
             {
                 if (v2.Right.Widen > 0)
                     return v2.Right.Widen; 
                 if (v2.Right.Squeeze > 0)
                     return v2.Right.Squeeze;
                 return v2.Right.Openness;
-            }, "RightEyeLidExpandedSqueeze"),
+            } ,"RightEyeLidExpandedSqueeze"),
 
-            new BinaryParameter(v2 =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Combined.Widen > 0)
                     return v2.Combined.Widen; 
                 if (v2.Combined.Squeeze > 0)
                     return v2.Combined.Squeeze;
                 return v2.Combined.Openness;
-            }, "CombinedEyeLidExpandedSqueeze"),
-
-            new BoolParameter(v2 =>
-            {
-                if (v2.Left.Widen > 0.5f)
-                    return true; 
-                if (v2.Left.Squeeze > 0.5f)
-                    return true;
-                if (v2.Left.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "LeftEyeLidExpandedSqueeze"),
-
-            new BoolParameter(v2 =>
-            {
-                if (v2.Right.Widen > 0.5f)
-                    return true; 
-                if (v2.Right.Squeeze > 0.5f)
-                    return true;
-                if (v2.Right.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "RightEyeLidExpandedSqueeze"),
-
-            new BoolParameter(v2 =>
-            {
-                if (v2.Combined.Widen > 0.5f)
-                    return true; 
-                if (v2.Combined.Squeeze > 0.5f)
-                    return true;
-                if (v2.Combined.Openness > 0.5f)
-                    return true;
-                return false;
-            }, "CombinedEyeLidExpandedSqueeze"),
+            } ,"CombinedEyeLidExpandedSqueeze"),
 
             #endregion
 

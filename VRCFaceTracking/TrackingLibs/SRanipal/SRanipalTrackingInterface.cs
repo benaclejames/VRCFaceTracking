@@ -87,6 +87,7 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateEye()
         {
+            if (!UnifiedLibManager.EyeEnabled) return;
             EyeData_v2 eyeData = default;
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
@@ -94,6 +95,7 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateMouth()
         {
+            if (!UnifiedLibManager.LipEnabled) return;
             SRanipal_Lip_API.GetLipData_v2(ref UnifiedTrackingData.LatestLipData);
             SRanipal_Lip_v2.GetLipWeightings(out UnifiedTrackingData.LatestLipShapes);
         }
