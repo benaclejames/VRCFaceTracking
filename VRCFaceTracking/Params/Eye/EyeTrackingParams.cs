@@ -49,9 +49,7 @@ namespace VRCFaceTracking.Params.Eye
             new EParam((v2, eye) =>
             {
                 if (v2.Left.Widen > 0)
-                    return v2.Left.Widen; 
-                if (v2.Left.Squeeze > 0)
-                    return v2.Left.Squeeze;
+                    return v2.Left.Widen;
                 return v2.Left.Openness;
             }, "LeftEyeLidExpanded"),
 
@@ -59,8 +57,6 @@ namespace VRCFaceTracking.Params.Eye
             {
                 if (v2.Right.Widen > 0)
                     return v2.Right.Widen; 
-                if (v2.Right.Squeeze > 0)
-                    return v2.Right.Squeeze;
                 return v2.Right.Openness;
             }, "RightEyeLidExpanded"),
 
@@ -68,8 +64,6 @@ namespace VRCFaceTracking.Params.Eye
             {
                 if (v2.Combined.Widen > 0)
                     return v2.Combined.Widen; 
-                if (v2.Combined.Squeeze > 0)
-                    return v2.Combined.Squeeze;
                 return v2.Combined.Openness;
             }, "CombinedEyeLidExpanded"),
 
