@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using MelonLoader;
@@ -151,9 +153,23 @@ namespace VRCFaceTracking.SRanipal
 
             if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
             
+            // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
             var imageBytes = ReadMemory(offset, 20000);
-                
-            UnifiedTrackingData.LatestEyeData.ImageData = imageBytes;
+            
+            // Concatenate the two images side by side instead of one after the other
+            var leftEye = imageBytes.Take(10000).ToList();
+            var rightEye = imageBytes.Skip(10000).ToList();
+            var concatImage = new List<byte>();
+            for (var i = 0; i < 100; i++)
+            {
+                concatImage.AddRange(leftEye.Take(100));
+                concatImage.AddRange(rightEye.Take(100));
+                leftEye.RemoveRange(0, 100);
+                rightEye.RemoveRange(0, 100);
+            }
+
+            // Write the image to the latest eye data
+            UnifiedTrackingData.LatestEyeData.ImageData = concatImage.ToArray();
         }
 
         private void UpdateMouth()
