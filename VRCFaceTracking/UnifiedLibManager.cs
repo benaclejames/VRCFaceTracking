@@ -39,7 +39,7 @@ namespace VRCFaceTracking
         public static IEnumerator CheckRuntimeSanity()
         {
             // Check we have UAC admin
-            if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
+            if (!MainMod.HasAdmin)
             {
                 MelonLogger.Error("VRChat must be running with Administrator privileges to force module reinitialization.");
                 yield return null;

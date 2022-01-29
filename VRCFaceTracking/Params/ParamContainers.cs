@@ -181,13 +181,18 @@ namespace VRCFaceTracking.Params
     {
         private readonly IParameter[] _parameter;
 
-        public EParam(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
+        public EParam(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
-            var boolParam = new BoolParameter((eye, lip) => getValueFunc.Invoke(eye, lip) < minBoolThreshold, paramName);
-            var floatParam = new FloatParameter(getValueFunc, paramName, true);
-            var binaryParam = new BinaryParameter(getValueFunc, paramName);
+            var paramLiterals = new List<IParameter>
+            {
+                new BoolParameter((eye, lip) => getValueFunc.Invoke(eye, lip) < minBoolThreshold, paramName),
+                new FloatParameter(getValueFunc, paramName, true),
+            };
             
-            _parameter = new IParameter[] {boolParam, floatParam, binaryParam};
+            if (!skipBinaryParamCreation)
+             paramLiterals.Add(new BinaryParameter(getValueFunc, paramName));
+            
+            _parameter = paramLiterals.ToArray();
         }
 
         public EParam(Func<EyeTrackingData, float> getValueFunc, string paramName,

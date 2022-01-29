@@ -43,6 +43,11 @@ namespace VRCFaceTracking
     
     public struct EyeTrackingData
     {
+        // Camera Data
+        public (int x, int y) ImageSize;
+        public byte[] ImageData;
+        public bool SupportsImage;
+        
         public Eye Left, Right, Combined;
         
         // SRanipal Exclusive
@@ -111,7 +116,7 @@ namespace VRCFaceTracking
 
         // Copy of latest updated unified eye data
         public static EyeTrackingData LatestEyeData;
-        
+
         // SRanipal Exclusives
         public static LipData_v2 LatestLipData;
         public static Dictionary<LipShape_v2, float> LatestLipShapes = new Dictionary<LipShape_v2, float>();
