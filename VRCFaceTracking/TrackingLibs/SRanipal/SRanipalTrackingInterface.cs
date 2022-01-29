@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using MelonLoader;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
@@ -44,6 +45,11 @@ namespace VRCFaceTracking.SRanipal
 
                 if (found)
                 {
+                    // Find the EyeCameraDevice.dll module inside sr_runtime, get it's offset and add hex 19190 to it for the image stream.
+                    foreach (ProcessModule module in _process.Modules)
+                        if (module.ModuleName == "EyeCameraDevice.dll")
+                            offset = module.BaseAddress + 0x19190;
+                    
                     UnifiedTrackingData.LatestEyeData.SupportsImage = true;
                     UnifiedTrackingData.LatestEyeData.ImageSize = (200, 100);
                 }
@@ -106,6 +112,7 @@ namespace VRCFaceTracking.SRanipal
         private const int PROCESS_VM_OPERATION = 0x0008;
         private const int PROCESS_VM_READ = 0x0010;
         private const int PROCESS_VM_WRITE = 0x0020;
+        private IntPtr offset;
 
         [DllImport("kernel32.dll")]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
@@ -144,7 +151,7 @@ namespace VRCFaceTracking.SRanipal
 
             if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
             
-            var imageBytes = ReadMemory((IntPtr) 0x7FFD58EF9190, 20000);
+            var imageBytes = ReadMemory(offset, 20000);
                 
             UnifiedTrackingData.LatestEyeData.ImageData = imageBytes;
         }
