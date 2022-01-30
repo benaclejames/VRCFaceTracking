@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Threading;
 using MelonLoader;
 using UnhollowerBaseLib;
@@ -37,6 +38,13 @@ namespace VRCFaceTracking
         // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
         public static IEnumerator CheckRuntimeSanity()
         {
+            // Check we have UAC admin
+            if (!MainMod.HasAdmin)
+            {
+                MelonLogger.Error("VRChat must be running with Administrator privileges to force module reinitialization.");
+                yield return null;
+            }
+            
             MelonLogger.Msg("Checking Runtime Sanity...");
             EyeEnabled = false;
             LipEnabled = false;

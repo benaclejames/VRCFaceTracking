@@ -51,7 +51,11 @@ namespace VRCFaceTracking
                     //MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
                 }
                 else
-                    UnifiedTrackingData.RefreshParameterList();
+                    foreach (var allParameter in UnifiedTrackingData.AllParameters)
+                    {
+                        allParameter.ZeroParam();
+                        allParameter.ResetParam();
+                    }
             }
             catch (Exception e) { MelonLogger.Error(e.ToString()); }
         }

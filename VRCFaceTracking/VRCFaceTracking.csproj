@@ -34,11 +34,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DependencyManager.cs" />
-    <Compile Include="Params\Eye\EyeParameter.cs" />
     <Compile Include="Params\Eye\EyeTrackingParams.cs" />
-    <Compile Include="Params\Lip\LipParameter.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
+    <Compile Include="Params\ParamContainers.cs" />
     <Compile Include="Params\Vector2.cs" />
     <Compile Include="Params\Vector3.cs" />
     <Compile Include="Params\XYParam.cs" />

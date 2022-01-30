@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Principal;
 using VRCFaceTracking;
 using MelonLoader;
 using UnityEngine;
 using VRCFaceTracking.QuickMenu;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.5.1", "benaclejames",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.6.0", "benaclejames",
     "https://github.com/benaclejames/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
@@ -16,6 +17,9 @@ namespace VRCFaceTracking
     {
         // Mostly used for UI management, allows calling of main-thread methods directly from a tracking worker thread
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
+
+        public static readonly bool HasAdmin =
+            new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         public override void OnApplicationStart()
         {
