@@ -50,7 +50,7 @@ namespace VRCFaceTracking.SRanipal
                     // Find the EyeCameraDevice.dll module inside sr_runtime, get it's offset and add hex 19190 to it for the image stream.
                     foreach (ProcessModule module in _process.Modules)
                         if (module.ModuleName == "EyeCameraDevice.dll")
-                            offset = module.BaseAddress + 0x19190;
+                            offset = module.BaseAddress + (_process.MainModule.FileVersionInfo.FileVersion == "1.3.2.0" ? 0x19190 : 0x19100);
                     
                     UnifiedTrackingData.LatestEyeData.SupportsImage = true;
                     UnifiedTrackingData.LatestEyeData.ImageSize = (200, 100);
