@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Threading;
-using UnhollowerBaseLib;
+using VRCFaceTracking.Pimax;
 
-namespace VRCFaceTracking.Pimax
+namespace VRCFaceTracking.TrackingLibs.Pimax
 { 
-    public class PimaxTrackingInterface// : ITrackingModule
+    public class PimaxTrackingInterface //: ITrackingModule
     {
-        private static Thread _pimaxWorker;
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
@@ -20,23 +19,21 @@ namespace VRCFaceTracking.Pimax
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
 
             var success = PimaxTracker.Start();
-            if (success && !_pimaxWorker.IsAlive) StartThread();
             return (success, false);
         }
 
-        public void StartThread()
+        public Action GetUpdateThreadFunc()
         {
-            _pimaxWorker = new Thread(() =>
+            return () =>
             {
                 while (!CancellationToken.IsCancellationRequested)
                 {
                     if (_needsUpdate)
                         Update();
-                        
+
                     Thread.Sleep(10);
                 }
-            });
-            _pimaxWorker.Start();
+            };
         }
 
         public void Teardown()
