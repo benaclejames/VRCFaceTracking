@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ViveSR.anipal.Lip;
+using System.Linq;
 
 namespace VRCFaceTracking.Params.Lip
 {
@@ -34,6 +35,7 @@ namespace VRCFaceTracking.Params.Lip
         private readonly LipShape_v2[] _positiveShapes, _negativeShapes;
         private readonly float[] _positiveCache, _negativeCache;
         private readonly int _positiveCount, _negativeCount;
+        private readonly bool _useMax;
 
         public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes)
         {
@@ -45,24 +47,50 @@ namespace VRCFaceTracking.Params.Lip
             _negativeCount = negativeShapes.Length;
         }
 
-        public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
+        public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes, bool useMax)
         {
-            float positive = 0;
-            float negative = 0;
+            _positiveShapes = positiveShapes;
+            _negativeShapes = negativeShapes;
+            _positiveCache = new float[positiveShapes.Length];
+            _negativeCache = new float[negativeShapes.Length];
+            _positiveCount = positiveShapes.Length;
+            _negativeCount = negativeShapes.Length;
+            _useMax = useMax;
+        }
+
+        public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
+        {                      
+            if (!_useMax)
+            {
+                float positive = 0;
+                float negative = 0;
+
+                for (int i = 0; i < _positiveCount; i++) {
+                    if (inputMap.TryGetValue(_positiveShapes[i], out var positiveResult))
+                        _positiveCache[i] = positiveResult;
+                    positive += _positiveCache[i];
+                }
+
+                for (int i = 0; i < _negativeCount; i++) {
+                    if (inputMap.TryGetValue(_negativeShapes[i], out var negativeResult))
+                        _negativeCache[i] = negativeResult * -1;
+                    negative += _negativeCache[i];
+                }
+
+                return (positive / _positiveCount) + (negative / _negativeCount);
+            }
+
             for (int i = 0; i < _positiveCount; i++) {
                 if (inputMap.TryGetValue(_positiveShapes[i], out var positiveResult))
-                    _positiveCache[i] = positiveResult;
-                positive += _positiveCache[i];
+                     _positiveCache[i] = positiveResult;     
             }
 
             for (int i = 0; i < _negativeCount; i++) {
                 if (inputMap.TryGetValue(_negativeShapes[i], out var negativeResult))
-                    _negativeCache[i] = negativeResult * -1;
-                negative += _negativeCache[i];
+                    _negativeCache[i] = negativeResult;
             }
 
-            return (positive / _positiveCount) + (negative / _negativeCount);
+            return _positiveCache.Max() + (-1) * _negativeCache.Max();
         }
     }
-
 }
