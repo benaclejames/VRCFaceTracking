@@ -98,6 +98,8 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"SmileOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
                 {"SmilePout", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthPout})},
 
+                //Combine both TongueSteps (-1 fully in, 0 on edge, 1 fully out)
+                {"TongueSteps", new PositiveNegativeShape(LipShape_v2.TongueLongStep1, LipShape_v2.TongueLongStep2, true)},
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters
