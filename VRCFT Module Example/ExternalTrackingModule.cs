@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
 
@@ -24,17 +25,17 @@ namespace VRCFT_Module_Example
     public static class TrackingData
     {
         // This function parses the external module's single-eye data into a VRCFT-Parseable format
-        public static void Update(this Eye data, ExampleExternalTrackingDataEye external)
+        public static void Update(ref Eye data, ExampleExternalTrackingDataEye external)
         {
             data.Look = new Vector2(external.eye_x, external.eye_y);
             data.Openness = external.eye_lid_openness;
         }
 
         // This function parses the external module's full-data data into multiple VRCFT-Parseable single-eye structs
-        public static void Update(this EyeTrackingData data, ExampleExternalTrackingDataStruct external)
+        public static void Update(ref EyeTrackingData data, ExampleExternalTrackingDataStruct external)
         {
-            data.Right.Update(external.left_eye);
-            data.Left.Update(external.right_eye);
+            Update(ref data.Right, external.left_eye);
+            Update(ref data.Left, external.right_eye);
         }
     }
     
@@ -44,19 +45,26 @@ namespace VRCFT_Module_Example
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             Console.WriteLine("Initializing inside external module");
-            return (true, true);
+            return (true, false);
         }
 
         // This will be run in the tracking thread. This is exposed so you can control when and if the tracking data is updated down to the lowest level.
         public Action GetUpdateThreadFunc()
         {
-            return Update;
+            return () =>
+            {
+                while (true)
+                {
+                    Update();
+                    Thread.Sleep(10);
+                }
+            };
         }
 
         // The update function needs to be defined separately in case the user is running with the --vrcft-nothread launch parameter
         public void Update()
         {
-            Console.WriteLine("Update");
+            Console.WriteLine("Updating inside external module");
         }
 
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
