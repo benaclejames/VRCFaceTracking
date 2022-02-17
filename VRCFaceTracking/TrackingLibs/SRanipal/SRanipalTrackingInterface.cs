@@ -150,6 +150,7 @@ namespace VRCFaceTracking.SRanipal
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
 
+            #if DLL
             if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
@@ -169,6 +170,7 @@ namespace VRCFaceTracking.SRanipal
 
             // Write the image to the latest eye data
             UnifiedTrackingData.LatestEyeData.ImageData = concatImage.ToArray();
+#endif
         }
 
         private void UpdateMouth()

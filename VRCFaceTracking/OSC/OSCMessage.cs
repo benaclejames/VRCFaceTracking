@@ -1,23 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace VRCFaceTracking.OSC
 {
     public class OscMessage
     {
-        public readonly List<byte> Data = new List<byte>();
+        public readonly byte[] Data;
 
         private OscMessage(string name, char typeIdentifier)
         {
-            var nameBytes = new List<byte>(Encoding.ASCII.GetBytes(name)) {0};
-            nameBytes.EnsureCompliance();
-            
-            var valueIdentBytes = new List<byte>(Encoding.ASCII.GetBytes(","+typeIdentifier)) {0};
-            valueIdentBytes.EnsureCompliance();
-            
-            Data.AddRange(nameBytes.Concat(valueIdentBytes));
+            var nameBytes = Encoding.ASCII.GetBytes(name);
+            nameBytes = nameBytes.EnsureCompliance();
+
+            var valueIdentBytes = Encoding.ASCII.GetBytes("," + typeIdentifier);
+            valueIdentBytes = valueIdentBytes.EnsureCompliance();
+
+            Data = new byte[nameBytes.Length + valueIdentBytes.Length];
+            Array.Copy(nameBytes, Data, nameBytes.Length);
+            Array.Copy(valueIdentBytes, 0, Data, nameBytes.Length, valueIdentBytes.Length);
         }
 
         public OscMessage(string name, int value) : this(name, 'i')
@@ -25,7 +25,10 @@ namespace VRCFaceTracking.OSC
             var valueArr = BitConverter.GetBytes(value);
             Array.Reverse(valueArr);
 
-            Data.AddRange(valueArr);
+            var newFullArr = new byte[Data.Length+valueArr.Length];
+            Array.Copy(Data, newFullArr, Data.Length);
+            Array.Copy(valueArr, 0, newFullArr, Data.Length, valueArr.Length);
+            Data = newFullArr;
         }
         
         public OscMessage(string name, double value) : this(name, 'f')
@@ -34,7 +37,12 @@ namespace VRCFaceTracking.OSC
             var valueArr = BitConverter.GetBytes(floatVal);
             Array.Reverse(valueArr);
 
-            Data .AddRange(valueArr);
+            var newFullArr = new byte[Data.Length+valueArr.Length];
+            Array.Copy(Data, newFullArr, Data.Length);
+            Array.Copy(valueArr, 0, newFullArr, Data.Length, valueArr.Length);
+            Data = newFullArr;
         }
+        
+        public OscMessage(string name, bool value) : this(name, value ? 'T' : 'F') {}
     }
 }

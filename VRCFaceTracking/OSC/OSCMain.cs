@@ -1,29 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Net.Sockets;
-using OSCTest;
 
 namespace VRCFaceTracking.OSC
 {
     public static class OSCMain
     {
-        public static void EnsureCompliance(this List<byte> inputArr)
+        public static byte[] EnsureCompliance(this byte[] inputArr)
         {
-            int n = inputArr.Count + 3;
+            var nullTerm = new byte[inputArr.Length + 1];
+            Array.Copy(inputArr, nullTerm, inputArr.Length);
+
+            int n = nullTerm.Length + 3;
             int m = n % 4;
             int closestMult = n - m;
-            int multDiff = closestMult - inputArr.Count;
+            int multDiff = closestMult - nullTerm.Length;
             
-            // Construct new array of zeros with the correct length
-            byte[] newArr = new byte[multDiff];
-            inputArr.AddRange(newArr);
+            // Construct new array of zeros with the correct length + 1 for null terminator
+            byte[] newArr = new byte[nullTerm.Length+multDiff];
+            Array.Copy(nullTerm, newArr, nullTerm.Length);
+            return newArr;
         }
         
-        private static readonly UdpClient _udpClient = new UdpClient();
-        public static int Port = 9000;
+        private static readonly UdpClient UdpClient = new UdpClient();
+        private static int Port = 9000;
 
-        public static void SendOSCBundle(OscBundle messages)
-        {
-            _udpClient.Send(messages.Data, messages.Data.Length, "127.0.0.1", 9000);
-        }
+        public static void SendOscBundle(OscBundle messages) => UdpClient.SendAsync(messages.Data, messages.Data.Length, "127.0.0.1", Port);
     }
 }
