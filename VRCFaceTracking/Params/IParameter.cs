@@ -1,4 +1,6 @@
-﻿namespace VRCFaceTracking.Params
+﻿using ParamLib;
+
+namespace VRCFaceTracking.Params
 {
     public interface IParameter
     {
@@ -9,5 +11,6 @@
         
         // Reset Index to null
         void ZeroParam();
+        BaseParam[] GetBase();
     }
 }

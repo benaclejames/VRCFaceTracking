@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if DLL
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Eye;
@@ -47,3 +48,4 @@ namespace VRCFaceTracking.QuickMenu.EyeTracking
         }
     }
 }
+#endif

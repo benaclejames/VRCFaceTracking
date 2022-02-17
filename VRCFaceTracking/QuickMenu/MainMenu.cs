@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
+#if DLL
+using VRCFaceTracking.QuickMenu.EyeTracking;
+using VRCFaceTracking.QuickMenu.LipTracking;
 using UnhollowerBaseLib;
 using UnityEngine;
 using VRC.UI.Elements;
-using VRCFaceTracking.QuickMenu.EyeTracking;
-using VRCFaceTracking.QuickMenu.LipTracking;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -27,12 +29,12 @@ namespace VRCFaceTracking.QuickMenu
             menuObject.layer = LayerMask.NameToLayer("InternalUI");
             
             // Setup MenuStateController and notify of new tab
-            var menuStateController = Resources.FindObjectsOfTypeAll<VRC.UI.Elements.QuickMenu>().FirstOrDefault()?.GetComponent<MenuStateController>();
+            var menuStateController = new MenuStateController();//Resources.FindObjectsOfTypeAll<VRC.UI.Elements.QuickMenu>().FirstOrDefault()?.GetComponent<MenuStateController>());
             
             MainMenuPage = menuObject.AddComponent<UIPage>();
             MainMenuPage.field_Public_String_0 = "QuickMenuFaceTracking";
             MainMenuPage.field_Private_Boolean_1 = true;
-            MainMenuPage.field_Private_MenuStateController_0 = menuStateController;
+            //MainMenuPage.field_Private_MenuStateController_0 = menuStateController;
             MainMenuPage.field_Private_List_1_UIPage_0 = new Il2CppSystem.Collections.Generic.List<UIPage>();
             MainMenuPage.field_Private_List_1_UIPage_0.Add(MainMenuPage);
             
@@ -43,7 +45,7 @@ namespace VRCFaceTracking.QuickMenu
 
                 var list = menuStateController.field_Public_ArrayOf_UIPage_0.ToList();
                 list.Add(MainMenuPage);
-                menuStateController.field_Public_ArrayOf_UIPage_0 = new Il2CppReferenceArray<UIPage>(list.ToArray());
+                //menuStateController.field_Public_ArrayOf_UIPage_0 = new Il2CppReferenceArray<UIPage>(list.ToArray());
             }
 
             menuObject.SetActive(false);
@@ -87,3 +89,4 @@ namespace VRCFaceTracking.QuickMenu
         }
     }
 }
+#endif

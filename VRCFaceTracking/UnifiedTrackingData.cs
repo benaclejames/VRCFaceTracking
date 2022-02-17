@@ -108,7 +108,7 @@ namespace VRCFaceTracking
 
     public struct UnifiedTrackingData
     {
-        public static readonly List<IParameter> AllParameters = EyeTrackingParams.ParameterList.Union(LipShapeMerger.AllLipParameters).ToList();
+        public static readonly List<IParameter> AllParameters = EyeTrackingParams.ParameterList.ToList();
         
         // Central update action for all parameters to subscribe to
         public static Action<EyeTrackingData, float[] /* Lip Data Blend Shape  */

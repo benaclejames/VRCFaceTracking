@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MelonLoader;
 
 namespace VRCFaceTracking
 {
@@ -30,10 +29,7 @@ namespace VRCFaceTracking
         {
             var extractedPaths = new List<string>();
 
-            var melonInfo = Assembly.GetExecutingAssembly().CustomAttributes.ToList()
-                .Find(a => a.AttributeType == typeof(MelonInfoAttribute));
-            
-            var dirName = Path.Combine(Path.GetTempPath(), melonInfo.ConstructorArguments[1].Value.ToString());
+            var dirName = Path.Combine(Path.GetTempPath(), "VRCFaceTracking");
             if (!Directory.Exists(dirName))
                 Directory.CreateDirectory(dirName);
 
@@ -63,7 +59,7 @@ namespace VRCFaceTracking
                     }
                     catch(Exception e)
                     {
-                        MelonLogger.Error($"Failed to get DLL: " + e.Message);
+                        Logger.Error($"Failed to get DLL: " + e.Message);
                     }
                 }
             }
@@ -83,7 +79,9 @@ namespace VRCFaceTracking
         private static void LoadAssembly(string path)
         {
             if (LoadLibrary(path) == IntPtr.Zero)
-                MelonLogger.Error("Unable to load library " + path);
+                Logger.Error("Unable to load library " + path);
+            else
+                Logger.Msg("Loaded library " + path);
         }
     }
 }

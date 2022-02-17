@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if DLL
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using ViveSR.anipal.Lip;
@@ -28,3 +29,4 @@ namespace VRCFaceTracking.QuickMenu.LipTracking
         }
     }
 }
+#endif

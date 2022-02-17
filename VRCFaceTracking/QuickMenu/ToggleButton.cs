@@ -1,4 +1,5 @@
 ﻿using System;
+#if DLL
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,3 +30,4 @@ namespace VRCFaceTracking.QuickMenu
         }
     }
 }
+#endif

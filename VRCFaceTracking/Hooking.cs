@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if DLL
 using MelonLoader;
 using VRC.SDKBase;
+#endif
 
 namespace VRCFaceTracking
 {
@@ -15,30 +17,31 @@ namespace VRCFaceTracking
         {
             try
             {
-                var intPtr = (IntPtr) typeof(VRCAvatarManager.AvatarCreationCallback)
+                /*var intPtr = (IntPtr) typeof(VRCAvatarManager.AvatarCreationCallback)
                     .GetField(
                         "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
                         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
                 MelonUtils.NativeHookAttach(intPtr, typeof(Hooking).GetMethod(nameof(OnAvatarInstantiated), BindingFlags.Static | BindingFlags.NonPublic).MethodHandle
                         .GetFunctionPointer());
                 _onAvatarInstantiatedDelegate =
-                    Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
+                    Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);*/
             }
             catch (Exception ex)
             {
-                MelonLogger.Error("Patch Failed " + ex);
+                Logger.Error("Patch Failed " + ex);
             }
         }
 
         private static void OnAvatarInstantiated(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded, IntPtr methodInfo)
         {
+            #if DLL
             _onAvatarInstantiatedDelegate(@this, avatarPtr, avatarDescriptorPtr, loaded, methodInfo);
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
                 
-                if (VRCPlayer.field_Internal_Static_VRCPlayer_0
+                /*if (VRCPlayer.field_Internal_Static_VRCPlayer_0
                         ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0 == null   // Is our current avatar null?
                     || avatarDescriptor != VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
                         .prop_VRCAvatarDescriptor_0)    // Is this avatar descriptor being assigned to our local player?
@@ -55,9 +58,10 @@ namespace VRCFaceTracking
                     {
                         allParameter.ZeroParam();
                         allParameter.ResetParam();
-                    }
+                    }*/
             }
             catch (Exception e) { MelonLogger.Error(e.ToString()); }
+#endif
         }
 
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,

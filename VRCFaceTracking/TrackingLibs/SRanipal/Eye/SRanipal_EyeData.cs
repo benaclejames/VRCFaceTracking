@@ -1,6 +1,5 @@
 ﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
 using System.Runtime.InteropServices;
-using UnityEngine;
 using Vector2 = VRCFaceTracking.Params.Vector2;
 using Vector3 = VRCFaceTracking.Params.Vector3;
 
@@ -114,21 +113,6 @@ namespace ViveSR
             {
                 public GazeRayParameter gaze_ray_parameter;
             };
-            #endregion
-
-            #region FocusInfo
-            /// <summary>
-            /// The data structure to indicate Focus information
-            /// </summary>
-            public struct FocusInfo
-            {
-                public Vector3 point;
-                public Vector3 normal;
-                public float distance;
-                public Collider collider;
-                public Rigidbody rigidbody;
-                public Transform transform;
-            }
             #endregion
 
             #region CalibrationResult

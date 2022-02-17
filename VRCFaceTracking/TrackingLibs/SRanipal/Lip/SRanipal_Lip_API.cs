@@ -1,8 +1,5 @@
 ﻿//========= Copyright 2019, HTC Corporation. All rights reserved. ===========
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace ViveSR
 {

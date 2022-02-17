@@ -1,7 +1,6 @@
 ﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace ViveSR
 {
@@ -31,12 +30,6 @@ namespace ViveSR
                 Max = 15,
             }
 
-            [Serializable]
-            public class EyeShapeTable_v2
-            {
-                public SkinnedMeshRenderer skinnedMeshRenderer;
-                public EyeShape_v2[] eyeShapes;
-            }
             #endregion
 
             [StructLayout(LayoutKind.Sequential)]

@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+#if DLL
 using UnityEngine;
+#endif
 
 namespace ViveSR
 {
@@ -10,20 +12,12 @@ namespace ViveSR
     {
         namespace Lip
         {
-            [Serializable]
-            public class LipShapeTable_v2
-            {
-                public SkinnedMeshRenderer skinnedMeshRenderer;
-                public LipShape_v2[] lipShapes;
-            }
-
             public class SRanipal_Lip_v2
             {
                 public const int ANIPAL_TYPE_LIP_V2 = 3;
 
                 public const int ImageWidth = 800, ImageHeight = 400, ImageChannel = 1;
                 public const int WeightingCount = (int)LipShape_v2.Max;
-                private static int LastUpdateFrame = -1;
                 private static Error LastUpdateResult = Error.FAILED;
                 public static LipData_v2 LipData;
                 private static Dictionary<LipShape_v2, float> Weightings;
@@ -37,8 +31,6 @@ namespace ViveSR
 
                 private static bool UpdateData()
                 {
-                    if (Time.frameCount == LastUpdateFrame) return LastUpdateResult == Error.WORK;
-                    else LastUpdateFrame = Time.frameCount;
                     LastUpdateResult = SRanipal_Lip_API.GetLipData_v2(ref LipData);
                     if (LastUpdateResult == Error.WORK)
                     {
@@ -66,6 +58,7 @@ namespace ViveSR
                 /// </summary>
                 /// <param name="texture">A texture whose colors, height, and width are set as those of the lastest image extracted from the lip device.</param>
                 /// <returns>Indicates whether the image extracted is new.</returns>
+                #if DLL
                 public static bool GetLipImage(ref Texture2D texture)
                 {
                     if (LipData.image == IntPtr.Zero) return false;
@@ -74,6 +67,7 @@ namespace ViveSR
                     texture.Apply();
                     return update;
                 }
+#endif
             }
         }
     }

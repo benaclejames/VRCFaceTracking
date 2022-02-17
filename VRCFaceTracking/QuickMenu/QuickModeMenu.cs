@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+#if DLL
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.UI.Elements;
@@ -88,3 +89,4 @@ namespace VRCFaceTracking.QuickMenu
         }
     }
 }
+#endif

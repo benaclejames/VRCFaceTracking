@@ -7,11 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Threading;
+#if DLL
 using MelonLoader;
 using UnhollowerBaseLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VRCFaceTracking.QuickMenu;
+#endif
 
 namespace VRCFaceTracking
 {
@@ -39,22 +41,26 @@ namespace VRCFaceTracking
         public static IEnumerator CheckRuntimeSanity()
         {
             // Check we have UAC admin
-            if (!MainMod.HasAdmin)
+            if (!MainStandalone.HasAdmin)
             {
-                MelonLogger.Error("VRChat must be running with Administrator privileges to force module reinitialization.");
+                Logger.Error("VRCFaceTracking must be running with Administrator privileges to force module reinitialization.");
                 yield return null;
             }
             
-            MelonLogger.Msg("Checking Runtime Sanity...");
+            Logger.Msg("Checking Runtime Sanity...");
             EyeEnabled = false;
             LipEnabled = false;
             UsefulModules.Clear();
             foreach (var process in Process.GetProcessesByName("sr_runtime"))
             {
-                MelonLogger.Msg("Killing "+process.ProcessName);
+                Logger.Msg("Killing "+process.ProcessName);
                 process.Kill();
+                #if DLL
                 yield return new WaitForSeconds(3);
-                MelonLogger.Msg("Re-Initializing");
+                #else
+                Thread.Sleep(3000);
+                #endif
+                Logger.Msg("Re-Initializing");
                 Initialize();
             }
         }
@@ -78,6 +84,7 @@ namespace VRCFaceTracking
         {
             var returnList = new List<Type>();
 
+            #if DLL
             // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
             if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs"))
             {
@@ -105,13 +112,16 @@ namespace VRCFaceTracking
                 
                 MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
             }
+            #endif
 
             return returnList;
         }
 
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
+#if DLL
             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+#endif
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
@@ -136,7 +146,9 @@ namespace VRCFaceTracking
                         Action updater = moduleObj.GetUpdateThreadFunc();
                         var updateThread = new Thread(() =>
                         {
+                            #if DLL
                             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                            #endif     
                             updater.Invoke();
                         });
                         UsefulThreads.Add(updateThread);
@@ -151,18 +163,21 @@ namespace VRCFaceTracking
             }
 
             if (eye)
-                MelonLogger.Msg(EyeEnabled
-                    ? "Eye Tracking Initialized"
-                    : "Eye Tracking will be unavailable for this session.");
+            {
+                if (EyeEnabled) Logger.Msg("Eye Tracking Initialized");
+                else Logger.Warning("Eye Tracking will be unavailable for this session.");
+            }
 
             if (lip)
             {
-                if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
-                else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
+                if (LipEnabled) Logger.Msg("Lip Tracking Initialized");
+                else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
 
+            #if DLL
             if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
+            #endif
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes

@@ -1,4 +1,6 @@
-﻿using VRC.UI;
+﻿#if DLL
+using VRC.UI;
+#endif
 
 namespace VRCFaceTracking.Params
 {
@@ -23,6 +25,7 @@ namespace VRCFaceTracking.Params
             return this;
         }
         
+        #if DLL
         public static implicit operator Vector3(UnityEngine.Vector3 v)
         {
             return new Vector3(v.x, v.y, v.z);
@@ -32,5 +35,6 @@ namespace VRCFaceTracking.Params
         {
             return new UnityEngine.Vector3(v.x, v.y, v.z);
         }
+#endif
     }
 }

@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using MelonLoader;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
@@ -34,7 +33,7 @@ namespace VRCFaceTracking.SRanipal
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
-            if (eyeEnabled && MainMod.HasAdmin)
+            if (eyeEnabled && MainStandalone.HasAdmin)
             {
                 var found = false;
                 int tries = 0;
