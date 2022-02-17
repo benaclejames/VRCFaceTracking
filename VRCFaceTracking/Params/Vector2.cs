@@ -22,5 +22,11 @@ namespace VRCFaceTracking.Params
         => new Vector2(a.x * d, a.y * d);
         
         public static Vector2 zero => new Vector2(0, 0);
+        
+        public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
+        {
+            // Copilot generated this I literally have no idea if this works
+            return new Vector2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+        }
     }
 }

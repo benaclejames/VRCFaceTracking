@@ -25,8 +25,8 @@ namespace VRCFaceTracking
         public override void OnApplicationStart()
         {
             // Load all unmanaged DLLs as soon as we can
-            DependencyManager.Init();
-            UnifiedLibManager.Initialize();
+            DependencyManager.Load();
+            MelonCoroutines.Start(UnifiedLibManager.Initialize());
             
             Hooking.SetupHooking();
             MelonCoroutines.Start(WaitForMenu());
@@ -55,10 +55,7 @@ namespace VRCFaceTracking
 
         public override void OnUpdate()
         {
-            if (!UnifiedLibManager.ShouldThread) 
-                UnifiedLibManager.Update();
-
-            UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData.prediction_data.blend_shape_weight, UnifiedTrackingData.LatestLipShapes);
+            UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestEyeData, UnifiedTrackingData.LatestLipData);
                 
             if (QuickModeMenu.MainMenu != null && QuickModeMenu.IsMenuShown) 
                 QuickModeMenu.MainMenu.UpdateParams();

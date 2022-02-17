@@ -2,6 +2,7 @@
 using System.Linq;
 using UnhollowerBaseLib;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using VRC.UI.Elements;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
@@ -63,27 +64,44 @@ namespace VRCFaceTracking.QuickMenu
                         break;
                 }
             
-            UpdateEnabledTabs(UnifiedLibManager.EyeEnabled, UnifiedLibManager.LipEnabled);
+            UpdateEnabledTabs(UnifiedLibManager.EyeStatus, UnifiedLibManager.LipStatus);
+            UnifiedLibManager.OnTrackingStateUpdate += UpdateEnabledTabs;
         }
 
-        public void UpdateEnabledTabs(bool eye = false, bool lip = false)
+        public void UpdateEnabledTabs(ModuleState eye = ModuleState.Uninitialized, ModuleState lip = ModuleState.Uninitialized)
         {
-            _errorPage.gameObject.SetActive(false);
-            _eyeTrackingMenuPage.TabObject.SetActive(eye);
-            _lipTrackingMenuPage.TabObject.SetActive(lip);
+            _eyeTrackingMenuPage.TabObject.SetActive(eye != ModuleState.Uninitialized);
+            _lipTrackingMenuPage.TabObject.SetActive(lip != ModuleState.Uninitialized);
             
-            if (eye)
-                _eyeTrackingMenuPage.Root.SetActive(true);
-            else if (lip)
-                _lipTrackingMenuPage.Root.SetActive(true);
-            else
+            // If both are uninitialized, show the error page
+            if (eye == ModuleState.Uninitialized && lip == ModuleState.Uninitialized)
+            {
+                _eyeTrackingMenuPage.Root.SetActive(false);
+                _lipTrackingMenuPage.Root.SetActive(false);
                 _errorPage.gameObject.SetActive(true);
+                return;
+            }
+            
+            // If both menu pages are inactive
+            if (!_eyeTrackingMenuPage.Root.activeSelf && !_lipTrackingMenuPage.Root.activeSelf)
+            {
+                _errorPage.gameObject.SetActive(false);
+                
+                if (eye > ModuleState.Uninitialized)
+                {
+                    _eyeTrackingMenuPage.Root.SetActive(true);
+                }
+                else if (lip > ModuleState.Uninitialized)
+                {
+                    _lipTrackingMenuPage.Root.SetActive(true);
+                }
+            }
         }
 
         public void UpdateParams()
         {
             if (_eyeTrackingMenuPage.Root.active) _eyeTrackingMenuPage.UpdateEyeTrack(UnifiedTrackingData.LatestEyeData);
-            if (_lipTrackingMenuPage.Root.active) _lipTrackingMenuPage.UpdateImage(UnifiedTrackingData.LatestLipData.image);
+            if (_lipTrackingMenuPage.Root.active) _lipTrackingMenuPage.UpdateImage(UnifiedTrackingData.LatestLipData.ImageData);
         }
     }
 }

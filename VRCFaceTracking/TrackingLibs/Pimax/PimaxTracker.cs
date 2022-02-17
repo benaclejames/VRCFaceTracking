@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Numerics;
+using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking.Pimax
 {
@@ -17,8 +18,8 @@ namespace VRCFaceTracking.Pimax
 		private EyeExpressionState GetEyeExpressionState(Eye eye)
 		{
 			EyeExpressionState state;
-			state.PupilCenter.X = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterX);
-			state.PupilCenter.Y = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterY);
+			state.PupilCenter.x = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterX);
+			state.PupilCenter.y = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterY);
 			state.Openness = PimaxTracker.GetEyeExpression(eye, EyeExpression.Openness);
 
 			return state;
@@ -51,8 +52,8 @@ namespace VRCFaceTracking.Pimax
 		private static EyeExpressionState FilterEye(EyeExpressionState state)
 		{
 			state.Openness = (float)(0.65f * Math.Atan(5f * state.Openness));
-			state.PupilCenter.X = (float)(0.65f * Math.Atan(state.PupilCenter.X));
-			state.PupilCenter.Y = (float)(0.65f * Math.Atan(state.PupilCenter.Y));
+			state.PupilCenter.x = (float)(0.65f * Math.Atan(state.PupilCenter.x));
+			state.PupilCenter.y = (float)(0.65f * Math.Atan(state.PupilCenter.y));
 
 			return state;
 		}

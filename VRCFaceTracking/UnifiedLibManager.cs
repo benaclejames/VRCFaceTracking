@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using UnhollowerBaseLib;
+using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking
 {
@@ -62,7 +65,7 @@ namespace VRCFaceTracking
         
         private static Thread _initializeWorker;
 
-        public static void Initialize(bool eye = true, bool lip = true)
+        public static IEnumerator Initialize(bool eye = true, bool lip = true)
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
@@ -76,6 +79,7 @@ namespace VRCFaceTracking
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
             _initializeWorker.Start();
+            yield return null;
         }
 
         private static List<Type> LoadExternalModules()
@@ -128,13 +132,19 @@ namespace VRCFaceTracking
             if (UsefulThreads.ContainsKey(module))
                 return;
             
-            var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
+            var thread = new Thread(() =>
+            {
+                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                module.GetUpdateThreadFunc().Invoke();
+            });
             UsefulThreads.Add(module, thread);
             thread.Start();
         }
 
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
+            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+            
             Logger.Msg("Finding and initializing runtimes...");
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
