@@ -33,8 +33,7 @@ namespace VRCFaceTracking.OSC
         
         public OscMessage(string name, double value) : this(name, 'f')
         {
-            float floatVal = (float)value;
-            var valueArr = BitConverter.GetBytes(floatVal);
+            var valueArr = BitConverter.GetBytes((float)value);
             Array.Reverse(valueArr);
 
             var newFullArr = new byte[Data.Length+valueArr.Length];

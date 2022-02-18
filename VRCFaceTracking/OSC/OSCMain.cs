@@ -24,6 +24,7 @@ namespace VRCFaceTracking.OSC
         private static readonly UdpClient UdpClient = new UdpClient();
         private static int Port = 9000;
 
-        public static void SendOscBundle(OscBundle messages) => UdpClient.SendAsync(messages.Data, messages.Data.Length, "127.0.0.1", Port);
+        static OSCMain() => UdpClient.Connect("127.0.0.1", Port);
+        public static void Send(byte[] data) => UdpClient.Send(data, data.Length);
     }
 }
