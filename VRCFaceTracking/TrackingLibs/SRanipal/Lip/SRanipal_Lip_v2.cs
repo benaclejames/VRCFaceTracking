@@ -46,10 +46,11 @@ namespace ViveSR
                 /// </summary>
                 /// <param name="shapes">Weighting values obtained from anipal's Lip module.</param>
                 /// <returns>Indicates whether the values received are new.</returns>
-                public static bool GetLipWeightings(out Dictionary<LipShape_v2, float> shapes)
+                public static bool GetLipWeightingsAndImage(out Dictionary<LipShape_v2, float> shapes, out IntPtr image)
                 {
                     bool update = UpdateData();
                     shapes = Weightings;
+                    image = LipData.image;
                     return update;
                 }
 

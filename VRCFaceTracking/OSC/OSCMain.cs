@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace VRCFaceTracking.OSC
@@ -21,10 +22,10 @@ namespace VRCFaceTracking.OSC
             return newArr;
         }
         
-        private static readonly UdpClient UdpClient = new UdpClient();
+        private static readonly Socket UdpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private static int Port = 9000;
 
-        static OSCMain() => UdpClient.Connect("127.0.0.1", Port);
-        public static void Send(byte[] data) => UdpClient.Send(data, data.Length);
+        static OSCMain() => UdpClient.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), Port));
+        public static void Send(byte[] data) => UdpClient.Send(data, data.Length, SocketFlags.None);
     }
 }

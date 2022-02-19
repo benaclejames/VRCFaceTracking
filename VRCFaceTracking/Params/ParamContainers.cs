@@ -10,9 +10,9 @@ namespace VRCFaceTracking.Params
         public FloatParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc,
             string paramName, bool wantsPriority = false)
             : base(paramName, wantsPriority) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
+                //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -29,7 +29,7 @@ namespace VRCFaceTracking.Params
     {
         public XYParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true)) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
                 if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
@@ -57,7 +57,7 @@ namespace VRCFaceTracking.Params
     {
         public BoolParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, bool?> getValueFunc,
             string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
                 #if DLL
                 if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;

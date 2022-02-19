@@ -56,9 +56,11 @@ namespace VRCFaceTracking.SRanipal
                 }
             }
 
+            #if DLL
             if (lipEnabled)
-                UnifiedTrackingData.LatestLipData.image = Marshal.AllocCoTaskMem(SRanipal_Lip_v2.ImageWidth * SRanipal_Lip_v2.ImageHeight);
-            
+                UnifiedTrackingData.Image = Marshal.AllocCoTaskMem(SRanipal_Lip_v2.ImageWidth * SRanipal_Lip_v2.ImageHeight);
+#endif
+
             return (eyeEnabled, lipEnabled);
         }
 
@@ -90,6 +92,7 @@ namespace VRCFaceTracking.SRanipal
         }
 
         #region Update
+
         
         public Action GetUpdateThreadFunc()
         {
@@ -173,11 +176,13 @@ namespace VRCFaceTracking.SRanipal
 #endif
         }
 
+        private int lastUpdate;
+        public static int diff;
+
         private void UpdateMouth()
         {
             if (!UnifiedLibManager.LipEnabled) return;
-            SRanipal_Lip_API.GetLipData_v2(ref UnifiedTrackingData.LatestLipData);
-            SRanipal_Lip_v2.GetLipWeightings(out UnifiedTrackingData.LatestLipShapes);
+            SRanipal_Lip_v2.GetLipWeightingsAndImage(out UnifiedTrackingData.LatestLipShapes, out UnifiedTrackingData.Image);
         }
 
         #endregion
