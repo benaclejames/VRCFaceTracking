@@ -9,8 +9,8 @@ namespace VRCFaceTracking.Params.Eye
             #region XYParams
             
             new XYParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
-            //new XYParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
-            //new XYParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
+            new XYParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
+            new XYParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
             
             #endregion
             
@@ -60,18 +60,18 @@ namespace VRCFaceTracking.Params.Eye
                 return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
             }, "RightEyeLidExpanded", 0.5f, true),
 
-            /*new EParam((v2, eye) =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Combined.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Combined.Widen); 
                 return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
-            }, "CombinedEyeLidExpanded", 0.5f, true),*/
+            }, "CombinedEyeLidExpanded", 0.5f, true),
 
             #endregion
 
             #region EyeLidExpandedSqueeze
 
-            /*new EParam((v2, eye) =>
+            new EParam((v2, eye) =>
             {
                 if (v2.Left.Widen > 0)
                     return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen); 
@@ -96,7 +96,7 @@ namespace VRCFaceTracking.Params.Eye
                 if (v2.Combined.Squeeze > 0)
                     return v2.Combined.Squeeze * -1;      
                 return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
-            } ,"CombinedEyeLidExpandedSqueeze", 0.5f, true),*/
+            } ,"CombinedEyeLidExpandedSqueeze", 0.5f, true),
 
             #endregion
             

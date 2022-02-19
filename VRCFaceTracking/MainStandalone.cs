@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using Microsoft.Win32;
 using ParamLib;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Params;
@@ -38,8 +39,20 @@ namespace VRCFaceTracking
         {
             bool isMono = Type.GetType("Mono.Runtime") != null;
             if (!isMono)
+            {
+                string monoPath = (string)Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Mono", "SdkInstallRoot", null);
+                if (!string.IsNullOrEmpty(monoPath))
+                {
+                    Logger.Msg("Restarting in Mono");
+                    
+                    // Run the program with Mono
+                    System.Diagnostics.Process.Start(monoPath+"\\bin\\mono.exe",System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    return;
+                }
+                
                 Logger.Error("Currently running in non-mono mode. While this will work, it is not recommended and may cause some parameter values to be laggy.\n" +
-                             "Please restart using the command line using the command 'mono VRCFaceTracking.exe'");
+                             "Please install Mono and restart the program.");
+            }
             
             Logger.Msg("VRCFT Standalone Initializing!");
             DependencyManager.Init();
