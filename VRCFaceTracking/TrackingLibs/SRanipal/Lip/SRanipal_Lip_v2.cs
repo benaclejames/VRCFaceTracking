@@ -17,7 +17,7 @@ namespace ViveSR
                 public const int ANIPAL_TYPE_LIP_V2 = 3;
 
                 public const int ImageWidth = 800, ImageHeight = 400, ImageChannel = 1;
-                public const int WeightingCount = (int)LipShape_v2.Max;
+                public const int WeightingCount = 37;
                 private static Error LastUpdateResult = Error.FAILED;
                 public static LipData_v2 LipData;
                 private static Dictionary<LipShape_v2, float> Weightings;

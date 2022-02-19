@@ -102,7 +102,7 @@ namespace VRCFaceTracking.SRanipal
                 while (!_cancellationToken.IsCancellationRequested)
                 {
                     Update();
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
                 }
             };
         }

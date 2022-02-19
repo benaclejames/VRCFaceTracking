@@ -14,7 +14,7 @@ namespace VRCFaceTracking
             #if DLL
             MelonLogger.Msg(msgStr);
 #else
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " " + msgStr);
+            Console.WriteLine("["+DateTime.Now.ToString("HH:mm:ss") + "] " + msgStr);
 #endif
         }
         
@@ -23,7 +23,9 @@ namespace VRCFaceTracking
 #if DLL
             MelonLogger.Warning(warningStr);
 #else
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [WARNING] " + warningStr);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("["+DateTime.Now.ToString("HH:mm:ss") + "] [WARNING] " + warningStr);
+            Console.ResetColor();
 #endif
         }
         
@@ -32,7 +34,9 @@ namespace VRCFaceTracking
 #if DLL
             MelonLogger.Error(errorStr);
 #else
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [ERROR] " + errorStr);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("["+DateTime.Now.ToString("HH:mm:ss") + "] [ERROR] " + errorStr);
+            Console.ResetColor();
 #endif
         }
     }

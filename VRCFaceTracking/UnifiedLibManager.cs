@@ -119,6 +119,7 @@ namespace VRCFaceTracking
 
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
+            Logger.Msg("Finding and initializing runtimes...");
 #if DLL
             IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
 #endif

@@ -125,7 +125,6 @@ namespace VRCFaceTracking.Params
 
             Name = paramName;
             _parameter = paramLiterals.ToArray();
-            Logger.Msg("Constructing EParam name " + Name);
         }
 
         public EParam(Func<EyeTrackingData, float> getValueFunc, string paramName,
