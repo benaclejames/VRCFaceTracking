@@ -1,9 +1,11 @@
-﻿#if DLL
+﻿using System.Runtime.InteropServices;
+#if DLL
 using VRC.UI;
 #endif
 
 namespace VRCFaceTracking.Params
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
     {
         public float x;

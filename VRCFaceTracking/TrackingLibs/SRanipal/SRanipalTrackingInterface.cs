@@ -109,8 +109,8 @@ namespace VRCFaceTracking.SRanipal
 
         public void Update()
         {
-            UpdateEye();
             UpdateMouth();
+            UpdateEye();
         }
         
         private const int PROCESS_VM_OPERATION = 0x0008;
@@ -145,7 +145,7 @@ namespace VRCFaceTracking.SRanipal
 
             return bytesRead != size ? null : buffer;
         }
-
+        
         private void UpdateEye()
         {
             if (!UnifiedLibManager.EyeEnabled) return;

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.Principal;
-using Microsoft.Win32;
+using System.Threading;
 using ParamLib;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Params;
@@ -34,26 +36,22 @@ namespace VRCFaceTracking
 
             return paramList;
         }
+        
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage"), SuppressUnmanagedCodeSecurity]
+        [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", SetLastError = true)]
+
+        public static extern uint TimeBeginPeriod(uint uMilliseconds);
+
+        /// <summary>TimeEndPeriod(). See the Windows API documentation for details.</summary>
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage"), SuppressUnmanagedCodeSecurity]
+        [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", SetLastError = true)]
+
+        public static extern uint TimeEndPeriod(uint uMilliseconds);
 
         public static void Main()
         {
-            bool isMono = Type.GetType("Mono.Runtime") != null;
-            if (!isMono)
-            {
-                string monoPath = (string)Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Mono", "SdkInstallRoot", null);
-                if (!string.IsNullOrEmpty(monoPath))
-                {
-                    Logger.Msg("Restarting in Mono");
-                    
-                    // Run the program with Mono
-                    System.Diagnostics.Process.Start(monoPath+"\\bin\\mono.exe",System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    return;
-                }
-                
-                Logger.Error("Currently running in non-mono mode. While this will work, it is not recommended and may cause some parameter values to be laggy.\n" +
-                             "Please install Mono and restart the program.");
-            }
-            
+            TimeBeginPeriod(1);
             Logger.Msg("VRCFT Standalone Initializing!");
             DependencyManager.Init();
             Logger.Msg("Initialized DependencyManager Successfully");
@@ -63,6 +61,7 @@ namespace VRCFaceTracking
             var allParams = UnifiedTrackingData.AllParameters.SelectMany(param => param.GetBase().Where(b => b.GetType() == typeof(FloatParameter) || b.GetType() == typeof(FloatBaseParam)));
             while (true)
             {
+                Thread.Sleep(10);
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 
@@ -70,6 +69,8 @@ namespace VRCFaceTracking
                 
                 OSCMain.Send(bundle.Data);
             }
+
+            TimeEndPeriod(1);
         }
     }
 }

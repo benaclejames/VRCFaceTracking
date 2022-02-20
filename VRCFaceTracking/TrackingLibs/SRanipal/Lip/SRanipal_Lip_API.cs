@@ -15,7 +15,7 @@ namespace ViveSR
                 /// <param name="data">ViveSR.anipal.Lip.LipData_v2</param>
                 /// <returns>Indicates the resulting ViveSR.Error status of this method.</returns>
                 [DllImport("SRanipal")]
-                public static extern Error GetLipData_v2(ref LipData_v2 data);
+                public static extern unsafe Error GetLipData_v2(ref LipData_v2 data);
             }
         }
     }

@@ -29,13 +29,17 @@ namespace ViveSR
                     for (int i = 0; i < WeightingCount; ++i) Weightings.Add((LipShape_v2)i, 0.0f);
                 }
 
-                private static bool UpdateData()
+                private static unsafe bool UpdateData()
                 {
                     LastUpdateResult = SRanipal_Lip_API.GetLipData_v2(ref LipData);
                     if (LastUpdateResult == Error.WORK)
                     {
-                        for (int i = 0; i < WeightingCount; ++i) {
-                            Weightings[(LipShape_v2)i] = LipData.prediction_data.blend_shape_weight[i];
+                        for (int i = 0; i < WeightingCount; ++i)
+                        {
+                            unsafe
+                            {
+                                Weightings[(LipShape_v2)i] = LipData.prediction_data.blend_shape_weight[i];
+                            }
                         }
                     }
                     return LastUpdateResult == Error.WORK;

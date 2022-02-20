@@ -54,8 +54,7 @@ namespace ViveSR
             [StructLayout(LayoutKind.Sequential)]
             public struct PredictionData_v2
             {
-                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
-                public float[] blend_shape_weight;
+                 public unsafe fixed float blend_shape_weight[60];
             };
 
             [StructLayout(LayoutKind.Sequential)]
