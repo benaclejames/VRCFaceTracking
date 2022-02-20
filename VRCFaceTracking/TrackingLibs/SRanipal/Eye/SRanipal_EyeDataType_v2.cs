@@ -54,7 +54,7 @@ namespace ViveSR
             public struct EyeData_v2
             {
                 /** Indicate if there is a user in front of HMD. */
-                public bool no_user;
+                public byte no_user;
                 /** The frame sequence.*/
                 public int frame_sequence;
                 /** The time when the frame was capturing. in millisecond.*/

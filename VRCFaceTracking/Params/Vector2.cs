@@ -1,6 +1,9 @@
-﻿namespace VRCFaceTracking.Params
+﻿using System.Runtime.InteropServices;
+
+namespace VRCFaceTracking.Params
 {
     // Make a nullable class called Vector2
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector2
     {
         public float x;

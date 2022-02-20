@@ -43,8 +43,7 @@ namespace ViveSR
             public struct TrackingImprovements
             {
                 public int count;
-                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-                public TrackingImprovement[] items;
+                public unsafe fixed int items[10];
             };
 
             /** @struct SingleEyeData
@@ -74,7 +73,7 @@ namespace ViveSR
             public struct CombinedEyeData
             {
                 public SingleEyeData eye_data;
-                public bool convergence_distance_validity;
+                public byte convergence_distance_validity;
                 public float convergence_distance_mm;
             }
 
