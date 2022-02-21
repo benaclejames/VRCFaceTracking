@@ -11,6 +11,8 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         private static readonly Dictionary<BaseParam, double> CachedValues = new Dictionary<BaseParam, double>();
+        private static OscMain _oscMain;
+        
         private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<BaseParam> parameters)
         {
             var paramList = new List<OscMessage>();
@@ -31,7 +33,7 @@ namespace VRCFaceTracking
             return paramList;
         }
 
-        public static void Main()
+        public static void Main(string[] args)
         {
             Utils.TimeBeginPeriod(1);
             Logger.Msg("VRCFT Standalone Initializing!");
@@ -39,6 +41,8 @@ namespace VRCFaceTracking
             Logger.Msg("Initialized DependencyManager Successfully");
             UnifiedLibManager.Initialize();
             Logger.Msg("Initialized UnifiedLibManager Successfully");
+            _oscMain = new OscMain("127.0.0.1", 9000, 9001);
+            
 
             var allParams = UnifiedTrackingData.AllParameters.SelectMany(param => param.GetBase().Where(b => b.GetType() == typeof(FloatParameter) || b.GetType() == typeof(FloatBaseParam)));
             
@@ -56,7 +60,7 @@ namespace VRCFaceTracking
 
                 var bundle = new OscBundle(ConstructMessages(allParams));
                 
-                OSCMain.Send(bundle.Data);
+                _oscMain.Send(bundle.Data);
             }
         }
     }
