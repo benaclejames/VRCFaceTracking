@@ -33,7 +33,7 @@ namespace VRCFaceTracking.SRanipal
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
-            if (eyeEnabled && MainStandalone.HasAdmin)
+            if (eyeEnabled && Utils.HasAdmin)
             {
                 var found = false;
                 int tries = 0;

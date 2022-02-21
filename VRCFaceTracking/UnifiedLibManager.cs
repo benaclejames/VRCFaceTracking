@@ -41,7 +41,7 @@ namespace VRCFaceTracking
         public static IEnumerator CheckRuntimeSanity()
         {
             // Check we have UAC admin
-            if (!MainStandalone.HasAdmin)
+            if (!Utils.HasAdmin)
             {
                 Logger.Error("VRCFaceTracking must be running with Administrator privileges to force module reinitialization.");
                 yield return null;
@@ -83,22 +83,21 @@ namespace VRCFaceTracking
         private static List<Type> LoadExternalModules()
         {
             var returnList = new List<Type>();
-
-            #if DLL
-            // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
-            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs"))
+            var path = Path.Combine(Utils.DataDirectory, "CustomLibs");
+            
+            if (!Directory.Exists(path))
             {
-                Directory.CreateDirectory(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs");
+                Directory.CreateDirectory(path);
                 return returnList;
             }
             
-            MelonLogger.Msg("Loading External Modules...");
+            Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
-            var dlls = Directory.GetFiles(Path.Combine("Mods\\VRCFTLibs"), "*.dll");
+            var dlls = Directory.GetFiles(path, "*.dll");
             foreach (var dll in dlls)
             {
-                var loadedModule = Assembly.LoadFrom(MelonUtils.BaseDirectory+"\\"+dll);
+                var loadedModule = Assembly.LoadFrom(Utils.DataDirectory+"\\"+dll);
 
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
@@ -106,13 +105,12 @@ namespace VRCFaceTracking
                 if (module != null)
                 {
                     returnList.Add(module);
-                    MelonLogger.Msg("Loaded external tracking module: " + module.Name);
+                    Logger.Msg("Loaded external tracking module: " + module.Name);
                     continue;
                 }
                 
-                MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
+                Logger.Warning("Module " + dll + " does not implement ITrackingModule");
             }
-            #endif
 
             return returnList;
         }

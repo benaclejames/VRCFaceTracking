@@ -105,6 +105,7 @@
     <Compile Include="QuickMenu\MenuPage.cs" />
     <Compile Include="QuickMenu\ToggleButton.cs" />
     <Compile Include="Params\IParameter.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TrackingLibs\Pimax\PimaxEyeTracker.dll" />
