@@ -12,11 +12,11 @@ https://www.youtube.com/watch?v=KbbfYW-hnMk
 
 ## 🛠 Avatar Setup
 
-For this app to work, you'll need to be using an avatar with the correct parameters or an avatar config file with the correct mappings l. The system is designed to control your avatar's eyes and lips via simple blend states but what the parameters control is completely up to you.
+For this app to work, you'll need to be using an avatar with the correct parameters or an avatar config file with the correct mappings. The system is designed to control your avatar's eyes and lips via simple blend states but what the parameters control is completely up to you.
 
 ### [List of Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters)
 
-## 👀 [Eye Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#eye)
+## 👀 [Eye Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#eye-tracking-parameters)
 
 ### [Eye Tracking Setup Guide](https://github.com/benaclejames/VRCFaceTracking/wiki/Eye-Tracking-Setup)
 
@@ -27,13 +27,13 @@ It's not required to use all of these parameters. Similar to the setup of parame
 
 Feel free to [consult the wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Eye-Tracking-Setup) for a setup guide and more info as to what each parameter does
 
-## :lips: [Lip Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#lip)
+## :lips: [Lip Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#lip-tracking-parameters)
 
 There are a large number of parameters you can use for lip tracking. 
 
 ### [Lip Tracking Setup Guide](https://github.com/benaclejames/VRCFaceTracking/wiki/Lip-Tracking-Setup) - Basic setup guide
 
-### [Combined Lip Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#combined-lip) - Combined parameters to group mutually exclusive face shapes.
+### [Combined Lip Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#combined-lip-parameters) - Combined parameters to group mutually exclusive face shapes.
 
 ### [Blend Shape Setup](https://github.com/benaclejames/VRCFaceTracking/wiki/Blend-Shapes-Setup) - Reference of standard blend shapes for to be used with facetracking
 
