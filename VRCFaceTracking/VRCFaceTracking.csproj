@@ -79,7 +79,6 @@
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRanipal.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRWorks_Log.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\ViveSR_Client.dll" />
-    <EmbeddedResource Include="VRCFaceTracking.unitypackage" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TrackingLibs" />
@@ -132,6 +131,13 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\System.Text.Json.7.0.0-preview.1.22076.8\build\System.Text.Json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Text.Json.7.0.0-preview.1.22076.8\build\System.Text.Json.targets'))" />
+  </Target>
+  <Target Name="AfterResolveReferences">
+  <ItemGroup>
+    <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dll'">
+      <LogicalName>%(ReferenceCopyLocalPaths.DestinationSubDirectory)%(ReferenceCopyLocalPaths.Filename)%(ReferenceCopyLocalPaths.Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.

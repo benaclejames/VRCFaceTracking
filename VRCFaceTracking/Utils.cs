@@ -20,5 +20,8 @@ namespace VRCFaceTracking
         public static extern uint TimeEndPeriod(uint uMilliseconds);
         
         public static string DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
+
+        public static string VRCOSCDirectory = Path.Combine(Environment
+            .GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow"), "VRChat\\VRChat\\OSC");
     }
 }

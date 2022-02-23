@@ -50,7 +50,7 @@ namespace VRCFaceTracking.OSC
             byte[] buffer = new byte[2048];
             ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
             var newMsg = new OscMessage(buffer);
-            if (newMsg.Address == "/avatar/config")
+            if (newMsg.Address == "/avatar/change")
                 ConfigParser.ParseNewAvatar((string)newMsg.Value);
         }
 

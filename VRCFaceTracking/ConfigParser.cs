@@ -48,19 +48,31 @@ namespace VRCFaceTracking
 
         public static Action OnConfigLoaded = () => { };
 
-        public static void ParseNewAvatar(string path)
+        public static void ParseNewAvatar(string newId)
         {
-            // Read the file
-            var avatarConfig = File.ReadAllText(path);
-            
-            // Parse the config file to json
-            var avatarConfigSpec = JsonSerializer.Deserialize<AvatarConfigSpec>(avatarConfig);
+            AvatarConfigSpec avatarConfig = null;
+            foreach (var userFolder in Directory.GetDirectories(Utils.VRCOSCDirectory))
+            {
+                foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))
+                {
+                    var configText = File.ReadAllText(avatarFile);
+                    var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
+                    if (tempConfig == null || tempConfig.id != newId)
+                        continue;
+                    
+                    avatarConfig = tempConfig;
+                    break;
+                }
+            }
 
-            if (avatarConfigSpec == null)
+            if (avatarConfig == null)
+            {
+                Logger.Error("Avatar config file for " + newId + " not found");
                 return;
+            }
             
-            Logger.Msg("Parsing config file for avatar: " + avatarConfigSpec.name);
-            var parameters = avatarConfigSpec.parameters.Where(param => param.input != null).ToArray();
+            Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
+            var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
             foreach (var parameter in UnifiedTrackingData.AllParameters)
                 parameter.ResetParam(parameters);
 
