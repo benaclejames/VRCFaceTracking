@@ -5,15 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Threading;
-#if DLL
-using MelonLoader;
-using UnhollowerBaseLib;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using VRCFaceTracking.QuickMenu;
-#endif
 
 namespace VRCFaceTracking
 {
@@ -41,7 +33,7 @@ namespace VRCFaceTracking
         public static IEnumerator CheckRuntimeSanity()
         {
             // Check we have UAC admin
-            if (!MainStandalone.HasAdmin)
+            if (!Utils.HasAdmin)
             {
                 Logger.Error("VRCFaceTracking must be running with Administrator privileges to force module reinitialization.");
                 yield return null;
@@ -55,11 +47,7 @@ namespace VRCFaceTracking
             {
                 Logger.Msg("Killing "+process.ProcessName);
                 process.Kill();
-                #if DLL
-                yield return new WaitForSeconds(3);
-                #else
                 Thread.Sleep(3000);
-                #endif
                 Logger.Msg("Re-Initializing");
                 Initialize();
             }
@@ -83,22 +71,21 @@ namespace VRCFaceTracking
         private static List<Type> LoadExternalModules()
         {
             var returnList = new List<Type>();
-
-            #if DLL
-            // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
-            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs"))
+            var path = Path.Combine(Utils.DataDirectory, "CustomLibs");
+            
+            if (!Directory.Exists(path))
             {
-                Directory.CreateDirectory(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs");
+                Directory.CreateDirectory(path);
                 return returnList;
             }
             
-            MelonLogger.Msg("Loading External Modules...");
+            Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
-            var dlls = Directory.GetFiles(Path.Combine("Mods\\VRCFTLibs"), "*.dll");
+            var dlls = Directory.GetFiles(path, "*.dll");
             foreach (var dll in dlls)
             {
-                var loadedModule = Assembly.LoadFrom(MelonUtils.BaseDirectory+"\\"+dll);
+                var loadedModule = Assembly.LoadFrom(Utils.DataDirectory+"\\"+dll);
 
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
@@ -106,13 +93,12 @@ namespace VRCFaceTracking
                 if (module != null)
                 {
                     returnList.Add(module);
-                    MelonLogger.Msg("Loaded external tracking module: " + module.Name);
+                    Logger.Msg("Loaded external tracking module: " + module.Name);
                     continue;
                 }
                 
-                MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
+                Logger.Warning("Module " + dll + " does not implement ITrackingModule");
             }
-            #endif
 
             return returnList;
         }
@@ -120,9 +106,6 @@ namespace VRCFaceTracking
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
             Logger.Msg("Finding and initializing runtimes...");
-#if DLL
-            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-#endif
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
@@ -147,9 +130,6 @@ namespace VRCFaceTracking
                         Action updater = moduleObj.GetUpdateThreadFunc();
                         var updateThread = new Thread(() =>
                         {
-                            #if DLL
-                            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                            #endif     
                             updater.Invoke();
                         });
                         UsefulThreads.Add(updateThread);
@@ -174,11 +154,6 @@ namespace VRCFaceTracking
                 if (LipEnabled) Logger.Msg("Lip Tracking Initialized");
                 else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
-
-            #if DLL
-            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
-            #endif
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes

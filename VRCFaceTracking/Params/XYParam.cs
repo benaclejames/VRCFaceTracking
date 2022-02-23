@@ -1,10 +1,10 @@
-﻿using ParamLib;
+﻿using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Params
 {
     public class XYParam
     {
-        public FloatBaseParam X, Y;
+        public OSCParams.FloatBaseParam X, Y;
 
         protected Vector2 ParamValue
         {
@@ -15,22 +15,16 @@ namespace VRCFaceTracking.Params
             }
         }
 
-        protected XYParam(FloatBaseParam x, FloatBaseParam y)
+        protected XYParam(OSCParams.FloatBaseParam x, OSCParams.FloatBaseParam y)
         {
             X = x;
             Y = y;
         }
 
-        protected void ResetParams()
+        protected void ResetParams(ConfigParser.Parameter[] newParams)
         {
-            X.ResetParam();
-            Y.ResetParam();
-        }
-
-        protected void ZeroParams()
-        {
-            X.ZeroParam();
-            Y.ZeroParam();
+            X.ResetParam(newParams);
+            Y.ResetParam(newParams);
         }
     }
 }

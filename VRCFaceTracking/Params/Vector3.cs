@@ -1,7 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-#if DLL
-using VRC.UI;
-#endif
 
 namespace VRCFaceTracking.Params
 {
@@ -26,17 +23,5 @@ namespace VRCFaceTracking.Params
             
             return this;
         }
-        
-        #if DLL
-        public static implicit operator Vector3(UnityEngine.Vector3 v)
-        {
-            return new Vector3(v.x, v.y, v.z);
-        }
-        
-        public static implicit operator UnityEngine.Vector3(Vector3 v)
-        {
-            return new UnityEngine.Vector3(v.x, v.y, v.z);
-        }
-#endif
     }
 }

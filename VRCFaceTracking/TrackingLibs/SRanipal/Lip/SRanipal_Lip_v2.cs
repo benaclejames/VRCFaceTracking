@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-#if DLL
-using UnityEngine;
-#endif
 
 namespace ViveSR
 {
@@ -57,22 +54,6 @@ namespace ViveSR
                     image = LipData.image;
                     return update;
                 }
-
-                /// <summary>
-                /// Extracts the latest image from the lip device.
-                /// </summary>
-                /// <param name="texture">A texture whose colors, height, and width are set as those of the lastest image extracted from the lip device.</param>
-                /// <returns>Indicates whether the image extracted is new.</returns>
-                #if DLL
-                public static bool GetLipImage(ref Texture2D texture)
-                {
-                    if (LipData.image == IntPtr.Zero) return false;
-                    bool update = UpdateData();
-                    texture.LoadRawTextureData(LipData.image, ImageWidth * ImageHeight * ImageChannel);
-                    texture.Apply();
-                    return update;
-                }
-#endif
             }
         }
     }

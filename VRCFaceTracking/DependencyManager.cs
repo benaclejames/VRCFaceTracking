@@ -29,7 +29,7 @@ namespace VRCFaceTracking
         {
             var extractedPaths = new List<string>();
 
-            var dirName = Path.Combine(Path.GetTempPath(), "VRCFaceTracking");
+            var dirName = Path.Combine(Utils.DataDirectory, "StockLibs");
             if (!Directory.Exists(dirName))
                 Directory.CreateDirectory(dirName);
 
