@@ -49,7 +49,9 @@ namespace VRCFaceTracking.OSC
         {
             byte[] buffer = new byte[2048];
             ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
-            var newMsg = new OscMessage(buffer); 
+            var newMsg = new OscMessage(buffer);
+            if (newMsg.Address == "/avatar/config")
+                ConfigParser.ParseNewAvatar((string)newMsg.Value);
         }
 
         public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);

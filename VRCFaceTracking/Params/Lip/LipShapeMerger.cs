@@ -20,36 +20,36 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"SmileSad", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthSmileLeft, LipShape_v2.MouthSmileRight}, new LipShape_v2[]{LipShape_v2.MouthSadLeft, LipShape_v2.MouthSadRight})},
                 {"TongueY", new PositiveNegativeShape(LipShape_v2.TongueUp, LipShape_v2.TongueDown)},
                 {"TongueX", new PositiveNegativeShape(LipShape_v2.TongueRight, LipShape_v2.TongueLeft)},
-                //{"PuffSuckRight", new PositiveNegativeShape(LipShape_v2.CheekPuffRight, LipShape_v2.CheekSuck)},
-                //{"PuffSuckLeft", new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
-                //{"PuffSuck", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight}, new LipShape_v2[]{LipShape_v2.CheekSuck}, true)},
+                {"PuffSuckRight", new PositiveNegativeShape(LipShape_v2.CheekPuffRight, LipShape_v2.CheekSuck)},
+                {"PuffSuckLeft", new PositiveNegativeShape(LipShape_v2.CheekPuffLeft, LipShape_v2.CheekSuck)},
+                {"PuffSuck", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight}, new LipShape_v2[]{LipShape_v2.CheekSuck}, true)},
 
                 //Additional combined shapes created with the help of the VRCFT Discord!
 
                 //JawOpen based params
-                /*{"JawOpenApe", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.MouthApeShape)},
+                {"JawOpenApe", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.MouthApeShape)},
                 {"JawOpenPuff", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.JawOpen}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight})},
                 {"JawOpenPuffRight", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekPuffRight)},
                 {"JawOpenPuffLeft", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekPuffLeft)},
                 {"JawOpenSuck", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekSuck)},
-                {"JawOpenForward", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.JawForward)},*/
+                {"JawOpenForward", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.JawForward)},
 
                 //MouthUpperUpRight based params
-                /*{"MouthUpperUpRightUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthUpperInside)},
+                {"MouthUpperUpRightUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthUpperInside)},
                 {"MouthUpperUpRightPuffRight", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.CheekPuffRight)},
                 {"MouthUpperUpRightApe", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthApeShape)},
                 {"MouthUpperUpRightPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthPout)},
-                {"MouthUpperUpRightOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthLowerOverlay)},*/
+                {"MouthUpperUpRightOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthLowerOverlay)},
                 
                 //MouthUpperUpLeft based params
-                /*{"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperInside)},
+                {"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperInside)},
                 {"MouthUpperUpLeftPuffLeft", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.CheekPuffLeft)},
                 {"MouthUpperUpLeftApe", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthApeShape)},
                 {"MouthUpperUpLeftPout", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthPout)},
-                {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthLowerOverlay)},*/
+                {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthLowerOverlay)},
 
                 // MouthUpperUp Left+Right base params
-                /*{"MouthUpperUpUpperInside", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthUpperInside })},
+                {"MouthUpperUpUpperInside", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthUpperInside })},
                 {"MouthUpperUpInside", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthUpperInside, LipShape_v2.MouthLowerInside}, true)},
                 {"MouthUpperUpPuff", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft, LipShape_v2.CheekPuffRight})},
                 {"MouthUpperUpPuffLeft", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.CheekPuffLeft})},
@@ -57,13 +57,13 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthUpperUpApe", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthApeShape})},
                 {"MouthUpperUpPout", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthPout})},
                 {"MouthUpperUpOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthUpperUpLeft, LipShape_v2.MouthUpperUpRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
-*/
+
                 //MouthLowerDownRight based params
-                /*{"MouthLowerDownRightLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerInside)},
+                {"MouthLowerDownRightLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerInside)},
                 {"MouthLowerDownRightPuffRight", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.CheekPuffRight)},
                 {"MouthLowerDownRightApe", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthApeShape)},
                 {"MouthLowerDownRightPout", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthPout)},
-                {"MouthLowerDownRightOverlay", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerOverlay)},*/
+                {"MouthLowerDownRightOverlay", new PositiveNegativeShape(LipShape_v2.MouthLowerDownRight, LipShape_v2.MouthLowerOverlay)},
 
                 //MouthLowerDownLeft based params
                 {"MouthLowerDownLeftLowerInside", new PositiveNegativeShape(LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerInside)},

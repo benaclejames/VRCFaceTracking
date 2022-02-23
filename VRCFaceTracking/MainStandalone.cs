@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using ParamLib;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Params;
 
@@ -10,28 +9,19 @@ namespace VRCFaceTracking
 {
     public static class MainStandalone
     {
-        private static readonly Dictionary<BaseParam, double> CachedValues = new Dictionary<BaseParam, double>();
         private static OscMain _oscMain;
         
-        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<BaseParam> parameters)
+        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters)
         {
             var paramList = new List<OscMessage>();
             foreach (var param in parameters) {
-                if (!CachedValues.ContainsKey(param))
-                {
-                    CachedValues.Add(param, param.ParamValue);
-                    paramList.Add(new OscMessage("/avatar/parameters/" + param.ParamName, param.ParamValue));
-                }
-
-                if (CachedValues[param] != param.ParamValue)
-                {
-                    CachedValues[param] = param.ParamValue;
-                    paramList.Add(new OscMessage("/avatar/parameters/" + param.ParamName, param.ParamValue));
-                }
+                paramList.Add(new OscMessage("/avatar/parameters/" + param.ParamName, param.ParamType, param.ParamValue));
             }
 
             return paramList;
         }
+
+        public static IEnumerable<OSCParams.BaseParam> RelevantParams;
 
         public static void Main(string[] args)
         {
@@ -43,22 +33,27 @@ namespace VRCFaceTracking
             Logger.Msg("Initialized UnifiedLibManager Successfully");
             _oscMain = new OscMain("127.0.0.1", 9000, 9001);
             
-
-            var allParams = UnifiedTrackingData.AllParameters.SelectMany(param => param.GetBase().Where(b => b.GetType() == typeof(FloatParameter) || b.GetType() == typeof(FloatBaseParam)));
+            RelevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
             
             Console.CancelKeyPress += delegate {
                 Utils.TimeEndPeriod(1);
                 Logger.Msg("VRCFT Standalone Exiting!");
                 UnifiedLibManager.Teardown();
             };
-            
+
+            ConfigParser.OnConfigLoaded += () =>
+            {
+                RelevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+                Logger.Msg("Config file parsed successfully! "+RelevantParams.Count()+" parameters loaded");
+            };
+
             while (true)
             {
                 Thread.Sleep(10);
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 
-                var bundle = new OscBundle(ConstructMessages(allParams));
+                var bundle = new OscBundle(ConstructMessages(RelevantParams));
                 
                 _oscMain.Send(bundle.Data);
             }

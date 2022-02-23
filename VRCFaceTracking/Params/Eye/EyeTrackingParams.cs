@@ -16,31 +16,31 @@ namespace VRCFaceTracking.Params.Eye
             
             #region Widen
 
-            //new EParam(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
-            //new EParam(v2 => v2.Left.Widen, "LeftEyeWiden"),
-            //new EParam(v2 => v2.Right.Widen, "RightEyeWiden"),
+            new EParam(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
+            new EParam(v2 => v2.Left.Widen, "LeftEyeWiden"),
+            new EParam(v2 => v2.Right.Widen, "RightEyeWiden"),
             
             #endregion
             
             #region Squeeze
             
-            //new EParam(v2 => v2.Combined.Squeeze, "EyesSqueeze"),
-            //new EParam(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
-            //new EParam(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
+            new EParam(v2 => v2.Combined.Squeeze, "EyesSqueeze"),
+            new EParam(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
+            new EParam(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
             
             #endregion
             
             #region Dilation
             
-            //new EParam(v2 => v2.EyesDilation, "EyesDilation"),
+            new EParam(v2 => v2.EyesDilation, "EyesDilation"),
             
             #endregion
             
             #region EyeLid
             
-            //new EParam(v2 => v2.Left.Openness, "LeftEyeLid"),
-            //new EParam(v2 => v2.Right.Openness, "RightEyeLid"),
-            //new EParam(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid"),
+            new EParam(v2 => v2.Left.Openness, "LeftEyeLid"),
+            new EParam(v2 => v2.Right.Openness, "RightEyeLid"),
+            new EParam(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid"),
             
             #endregion
             
@@ -102,7 +102,7 @@ namespace VRCFaceTracking.Params.Eye
             
             #region EyeLidExpanded Binary
             
-            /*new BinaryParameter((v2, eye) =>
+            new BinaryParameter((v2, eye) =>
             {
                 if (v2.Left.Widen > 0)
                     return v2.Left.Widen;
@@ -122,12 +122,12 @@ namespace VRCFaceTracking.Params.Eye
                     return v2.Combined.Widen;
                 return v2.Combined.Openness;
             }, "CombinedEyeLidExpanded"),
-*/
+
             #endregion
             
             #region EyeLidExpandedSqueeze Binary
             
-            /*new BinaryParameter(v2 =>
+            new BinaryParameter(v2 =>
             {
                 if (v2.Left.Widen > 0)
                     return v2.Left.Widen; 
@@ -152,7 +152,7 @@ namespace VRCFaceTracking.Params.Eye
                 if (v2.Combined.Squeeze > 0)
                     return v2.Combined.Squeeze;
                 return v2.Combined.Openness;
-            }, "CombinedEyeLidExpandedSqueeze"),*/
+            }, "CombinedEyeLidExpandedSqueeze"),
             
             #endregion
 
@@ -160,13 +160,13 @@ namespace VRCFaceTracking.Params.Eye
 
             // These parameters are used to distinguish when EyeLidExpanded / EyeLidExpandedSqueeze
             // is returning a value as a Widen or Squeeze. Intended for the Bool or Binary param variant.
-            /*new BoolParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
+            new BoolParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
             new BoolParameter(v2 => v2.Right.Widen > 0, "RightEyeWidenToggle"),
             new BoolParameter(v2 => v2.Combined.Widen > 0, "EyesWidenToggle"),
 
             new BoolParameter(v2 => v2.Left.Squeeze > 0, "LeftEyeSqueezeToggle"),
             new BoolParameter(v2 => v2.Right.Squeeze > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(v2 => v2.Combined.Squeeze > 0, "EyesSqueezeToggle"),*/
+            new BoolParameter(v2 => v2.Combined.Squeeze > 0, "EyesSqueezeToggle"),
 
             #endregion
         };

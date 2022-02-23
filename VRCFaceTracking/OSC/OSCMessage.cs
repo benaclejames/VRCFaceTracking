@@ -13,6 +13,8 @@ namespace VRCFaceTracking.OSC
 
         private OscMessage(string name, char typeIdentifier)
         {
+            Address = name;
+            
             var nameBytes = Encoding.ASCII.GetBytes(name);
             nameBytes = nameBytes.EnsureCompliance();
 
@@ -45,6 +47,17 @@ namespace VRCFaceTracking.OSC
             Array.Copy(valueArr, 0, newFullArr, Data.Length, valueArr.Length);
             Data = newFullArr;
         }
+        
+        public OscMessage(string name, bool value) : this(name, value ? 'T' : 'F') {}
+
+        public OscMessage(string name, char type, byte[] valueBytes) : this(name, type)
+        {
+            if (valueBytes == null) return;
+            var newFullArr = new byte[Data.Length+valueBytes.Length];
+            Array.Copy(Data, newFullArr, Data.Length);
+            Array.Copy(valueBytes, 0, newFullArr, Data.Length, valueBytes.Length);
+            Data = newFullArr;
+        }
 
         public OscMessage(byte[] bytes)
         {
@@ -58,6 +71,7 @@ namespace VRCFaceTracking.OSC
 
                 addressBytes.Add(bytes[iter]);
             }
+
             Address = Encoding.ASCII.GetString(addressBytes.ToArray());
             // Increase iter until we find the type identifier
             for (; iter < bytes.Length; iter++)
@@ -70,7 +84,7 @@ namespace VRCFaceTracking.OSC
             }
 
             byte type = bytes[iter];
-            iter += 2;  // Next multiple of 4
+            iter += 2; // Next multiple of 4
 
             switch (type)
             {
@@ -88,13 +102,14 @@ namespace VRCFaceTracking.OSC
                     break;
                 case 115:
                     var stringBytes = new List<byte>();
-                    for (; iter < bytes.Length; iter++)
+                    for (iter++; iter < bytes.Length; iter++)
                     {
                         if (bytes[iter] == 0)
                             break;
 
                         stringBytes.Add(bytes[iter]);
                     }
+
                     Value = Encoding.ASCII.GetString(stringBytes.ToArray());
                     break;
                 case 70:
@@ -104,10 +119,8 @@ namespace VRCFaceTracking.OSC
                     Value = true;
                     break;
                 default:
-                    throw new Exception("Unknown type identifier: " + type+" for name "+Address);
+                    throw new Exception("Unknown type identifier: " + type + " for name " + Address);
             }
         }
-        
-        public OscMessage(string name, bool value) : this(name, value ? 'T' : 'F') {}
     }
 }
