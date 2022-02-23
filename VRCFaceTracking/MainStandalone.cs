@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using VRCFaceTracking.OSC;
-using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
 {

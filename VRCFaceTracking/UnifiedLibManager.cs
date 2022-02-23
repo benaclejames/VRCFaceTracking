@@ -5,15 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Threading;
-#if DLL
-using MelonLoader;
-using UnhollowerBaseLib;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using VRCFaceTracking.QuickMenu;
-#endif
 
 namespace VRCFaceTracking
 {
@@ -55,11 +47,7 @@ namespace VRCFaceTracking
             {
                 Logger.Msg("Killing "+process.ProcessName);
                 process.Kill();
-                #if DLL
-                yield return new WaitForSeconds(3);
-                #else
                 Thread.Sleep(3000);
-                #endif
                 Logger.Msg("Re-Initializing");
                 Initialize();
             }
@@ -118,9 +106,6 @@ namespace VRCFaceTracking
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
             Logger.Msg("Finding and initializing runtimes...");
-#if DLL
-            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-#endif
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
@@ -145,9 +130,6 @@ namespace VRCFaceTracking
                         Action updater = moduleObj.GetUpdateThreadFunc();
                         var updateThread = new Thread(() =>
                         {
-                            #if DLL
-                            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                            #endif     
                             updater.Invoke();
                         });
                         UsefulThreads.Add(updateThread);
@@ -172,11 +154,6 @@ namespace VRCFaceTracking
                 if (LipEnabled) Logger.Msg("Lip Tracking Initialized");
                 else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
-
-            #if DLL
-            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
-            #endif
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes

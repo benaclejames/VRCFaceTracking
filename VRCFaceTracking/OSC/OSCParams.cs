@@ -168,16 +168,7 @@ namespace VRCFaceTracking.OSC
             }
             return null;
         }
-
-        public new void ZeroParam()
-        {
-            _params.Clear();
-        }
-
-        public string[] GetName() =>
-            // If we have no parameters, return a single value array containing the paramName. If we have values, return the names of all the parameters
-            _params.Count == 0 ? new[] {_paramName} : _params.Select(p => p.Value.ParamName).ToArray();
-
+        
         public BinaryBaseParameter(string paramName) : base(paramName)
         {
             _paramName = paramName;
