@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using MelonLoader;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
@@ -34,7 +33,7 @@ namespace VRCFaceTracking.SRanipal
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
-            if (eyeEnabled && MainMod.HasAdmin)
+            if (eyeEnabled && Utils.HasAdmin)
             {
                 var found = false;
                 int tries = 0;
@@ -57,9 +56,6 @@ namespace VRCFaceTracking.SRanipal
                 }
             }
 
-            if (lipEnabled)
-                UnifiedTrackingData.LatestLipData.image = Marshal.AllocCoTaskMem(SRanipal_Lip_v2.ImageWidth * SRanipal_Lip_v2.ImageHeight);
-            
             return (eyeEnabled, lipEnabled);
         }
 
@@ -91,6 +87,7 @@ namespace VRCFaceTracking.SRanipal
         }
 
         #region Update
+
         
         public Action GetUpdateThreadFunc()
         {
@@ -100,15 +97,15 @@ namespace VRCFaceTracking.SRanipal
                 while (!_cancellationToken.IsCancellationRequested)
                 {
                     Update();
-                    Thread.Sleep(10);
+                    //Thread.Sleep(10);
                 }
             };
         }
 
         public void Update()
         {
-            UpdateEye();
             UpdateMouth();
+            UpdateEye();
         }
         
         private const int PROCESS_VM_OPERATION = 0x0008;
@@ -143,40 +140,19 @@ namespace VRCFaceTracking.SRanipal
 
             return bytesRead != size ? null : buffer;
         }
-
+        
         private void UpdateEye()
         {
             if (!UnifiedLibManager.EyeEnabled) return;
             EyeData_v2 eyeData = default;
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
-
-            if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
-            
-            // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
-            var imageBytes = ReadMemory(offset, 20000);
-            
-            // Concatenate the two images side by side instead of one after the other
-            var leftEye = imageBytes.Take(10000).ToList();
-            var rightEye = imageBytes.Skip(10000).ToList();
-            var concatImage = new List<byte>();
-            for (var i = 0; i < 100; i++)
-            {
-                concatImage.AddRange(leftEye.Take(100));
-                concatImage.AddRange(rightEye.Take(100));
-                leftEye.RemoveRange(0, 100);
-                rightEye.RemoveRange(0, 100);
-            }
-
-            // Write the image to the latest eye data
-            UnifiedTrackingData.LatestEyeData.ImageData = concatImage.ToArray();
         }
 
         private void UpdateMouth()
         {
             if (!UnifiedLibManager.LipEnabled) return;
-            SRanipal_Lip_API.GetLipData_v2(ref UnifiedTrackingData.LatestLipData);
-            SRanipal_Lip_v2.GetLipWeightings(out UnifiedTrackingData.LatestLipShapes);
+            SRanipal_Lip_v2.GetLipWeightingsAndImage(out UnifiedTrackingData.LatestLipShapes, out UnifiedTrackingData.Image);
         }
 
         #endregion

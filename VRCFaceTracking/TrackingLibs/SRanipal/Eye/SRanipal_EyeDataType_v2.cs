@@ -1,7 +1,6 @@
 ﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
 using System;
 using System.Runtime.InteropServices;
-using UnityEngine;
 
 namespace ViveSR
 {
@@ -31,12 +30,6 @@ namespace ViveSR
                 Max = 15,
             }
 
-            [Serializable]
-            public class EyeShapeTable_v2
-            {
-                public SkinnedMeshRenderer skinnedMeshRenderer;
-                public EyeShape_v2[] eyeShapes;
-            }
             #endregion
 
             [StructLayout(LayoutKind.Sequential)]
@@ -61,7 +54,7 @@ namespace ViveSR
             public struct EyeData_v2
             {
                 /** Indicate if there is a user in front of HMD. */
-                public bool no_user;
+                public byte no_user;
                 /** The frame sequence.*/
                 public int frame_sequence;
                 /** The time when the frame was capturing. in millisecond.*/
