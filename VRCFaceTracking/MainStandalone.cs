@@ -1,8 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using VRCFaceTracking.OSC;
+
+[assembly: AssemblyTitle("VRCFaceTracking")]
+[assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
+[assembly: AssemblyCompany("benaclejames")]
+[assembly: AssemblyProduct("VRCFaceTracking")]
+[assembly: AssemblyCopyright("Copyright © benaclejames 2022")]
+[assembly: ComVisible(false)]
+[assembly: AssemblyVersion("3.0.0")]
+[assembly: AssemblyFileVersion("3.0.0")]
+[assembly: NeutralResourcesLanguage("en")]
 
 namespace VRCFaceTracking
 {
@@ -15,18 +29,56 @@ namespace VRCFaceTracking
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
 
+        private static string IP = "127.0.0.1";
+        private static int InPort = 9001, OutPort = 9000;
+        
         public static void Main(string[] args)
         {
-            Utils.TimeBeginPeriod(1);
+            // Parse Arguments
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("--osc="))
+                {
+                    var oscConfig = arg.Remove(0, 6).Split(':');
+                    if (oscConfig.Length < 3)
+                    {
+                        Console.WriteLine("Invalid OSC config: " + arg +"\nExpected format: --osc=<OutPort>:<IP>:<InPort>");
+                        return;
+                    }
+
+                    if (!int.TryParse(oscConfig[0], out OutPort))
+                    {
+                        Console.WriteLine("Invalid OSC OutPort: " + oscConfig[0]);
+                        return;
+                    }
+                    
+                    if (!new Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").IsMatch(oscConfig[1]))
+                    {
+                        Console.WriteLine("Invalid OSC IP: " + oscConfig[1]);
+                        return;
+                    } 
+                    IP = oscConfig[1];
+                    
+                    if (!int.TryParse(oscConfig[2], out InPort))
+                    {
+                        Console.WriteLine("Invalid OSC InPort: " + oscConfig[2]);
+                        return;
+                    }
+                }
+            }
+            
+            // Initialize dependencies and tracking runtimes
             Logger.Msg("VRCFT Standalone Initializing!");
             DependencyManager.Init();
             Logger.Msg("Initialized DependencyManager Successfully");
             UnifiedLibManager.Initialize();
             Logger.Msg("Initialized UnifiedLibManager Successfully");
-            _oscMain = new OscMain("127.0.0.1", 9000, 9001);
             
+            // Initialize Locals
+            _oscMain = new OscMain(IP, OutPort, InPort);
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
             
+            // Bind callbacks
             Console.CancelKeyPress += delegate {
                 Utils.TimeEndPeriod(1);
                 Logger.Msg("VRCFT Standalone Exiting!");
@@ -39,9 +91,11 @@ namespace VRCFaceTracking
                 Logger.Msg("Config file parsed successfully! "+_relevantParams.Count()+" parameters loaded");
             };
 
+            // Begin main OSC update loop
+            Utils.TimeBeginPeriod(1);
             while (true)
             {
-                Thread.Sleep(50);
+                Thread.Sleep(10);
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 
