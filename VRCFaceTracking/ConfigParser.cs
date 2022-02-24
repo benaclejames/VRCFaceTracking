@@ -15,21 +15,7 @@ namespace VRCFaceTracking
             public string type { get; set; }
 
             [JsonIgnore]
-            public Type Type
-            {
-                get
-                {
-                    switch (type)
-                    {
-                        case "Bool":
-                            return typeof(bool);
-                        case "Float":
-                            return typeof(float);
-                        default:
-                            throw new Exception("Unknown type");
-                    }
-                }
-            }
+            public Type Type => Utils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
         }
 
         public class Parameter

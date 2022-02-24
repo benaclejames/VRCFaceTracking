@@ -10,17 +10,10 @@ namespace VRCFaceTracking
     {
         private static OscMain _oscMain;
         
-        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters)
-        {
-            var paramList = new List<OscMessage>();
-            foreach (var param in parameters) {
-                paramList.Add(new OscMessage("/avatar/parameters/" + param.ParamName, param.ParamType, param.ParamValue));
-            }
+        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
+            parameters.Select(param => new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue)).ToList();
 
-            return paramList;
-        }
-
-        public static IEnumerable<OSCParams.BaseParam> RelevantParams;
+        private static IEnumerable<OSCParams.BaseParam> _relevantParams;
 
         public static void Main(string[] args)
         {
@@ -32,7 +25,7 @@ namespace VRCFaceTracking
             Logger.Msg("Initialized UnifiedLibManager Successfully");
             _oscMain = new OscMain("127.0.0.1", 9000, 9001);
             
-            RelevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
             
             Console.CancelKeyPress += delegate {
                 Utils.TimeEndPeriod(1);
@@ -42,17 +35,17 @@ namespace VRCFaceTracking
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                RelevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-                Logger.Msg("Config file parsed successfully! "+RelevantParams.Count()+" parameters loaded");
+                _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+                Logger.Msg("Config file parsed successfully! "+_relevantParams.Count()+" parameters loaded");
             };
 
             while (true)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(50);
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 
-                var bundle = new OscBundle(ConstructMessages(RelevantParams));
+                var bundle = new OscBundle(ConstructMessages(_relevantParams));
                 
                 _oscMain.Send(bundle.Data);
             }

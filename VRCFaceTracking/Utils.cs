@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -23,5 +24,13 @@ namespace VRCFaceTracking
 
         public static string VRCOSCDirectory = Path.Combine(Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow"), "VRChat\\VRChat\\OSC");
+
+        public static readonly Dictionary<Type, (char oscType, string configType)> TypeConversions =
+            new Dictionary<Type, (char oscType, string configType)>
+            {
+                {typeof(bool), ('F', "Bool")},
+                {typeof(float), ('f', "Float")},
+                {typeof(int), ('i', "Int")},
+            };
     }
 }

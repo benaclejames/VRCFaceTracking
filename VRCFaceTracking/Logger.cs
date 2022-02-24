@@ -3,7 +3,7 @@
 
 namespace VRCFaceTracking
 {
-    public class Logger
+    public static class Logger
     {
         public static void Msg(string msgStr) => Console.WriteLine("["+DateTime.Now.ToString("HH:mm:ss") + "] " + msgStr);
 
