@@ -91,6 +91,7 @@ namespace VRCFaceTracking
             ConfigParser.OnConfigLoaded += () =>
             {
                 _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+                UnifiedTrackingData.LatestEyeData.ResetThresholds();
                 Logger.Msg("Config file parsed successfully! "+_relevantParams.Count()+" parameters loaded");
             };
 
@@ -101,8 +102,10 @@ namespace VRCFaceTracking
             while (true)
             {
                 Thread.Sleep(10);
-                if (_inputManager.ShouldPause) 
+                // If RelevantParams is empty, or we're paused, don't update or send a bundle
+                if (_inputManager.ShouldPause || !_relevantParams.Any())
                     continue;
+                
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 

@@ -20,7 +20,7 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
-            private byte[] _paramValue;
+            private byte[] _paramValue = new byte[4];
             private readonly Type _paramType;
             public char OscType;
             public bool Relevant;
