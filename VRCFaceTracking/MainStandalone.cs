@@ -14,8 +14,8 @@ using VRCFaceTracking.OSC;
 [assembly: AssemblyProduct("VRCFaceTracking")]
 [assembly: AssemblyCopyright("Copyright © benaclejames 2022")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("3.0.0")]
-[assembly: AssemblyFileVersion("3.0.0")]
+[assembly: AssemblyVersion("3.0.1")]
+[assembly: AssemblyFileVersion("3.0.1")]
 [assembly: NeutralResourcesLanguage("en")]
 
 namespace VRCFaceTracking
@@ -29,8 +29,10 @@ namespace VRCFaceTracking
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
 
-        private static string IP = "127.0.0.1";
-        private static int InPort = 9001, OutPort = 9000;
+        private static InputManager _inputManager;
+
+        private static string _ip = "127.0.0.1";
+        private static int _inPort = 9001, _outPort = 9000;
         
         public static void Main(string[] args)
         {
@@ -46,7 +48,7 @@ namespace VRCFaceTracking
                         return;
                     }
 
-                    if (!int.TryParse(oscConfig[0], out OutPort))
+                    if (!int.TryParse(oscConfig[0], out _outPort))
                     {
                         Console.WriteLine("Invalid OSC OutPort: " + oscConfig[0]);
                         return;
@@ -57,9 +59,9 @@ namespace VRCFaceTracking
                         Console.WriteLine("Invalid OSC IP: " + oscConfig[1]);
                         return;
                     } 
-                    IP = oscConfig[1];
+                    _ip = oscConfig[1];
                     
-                    if (!int.TryParse(oscConfig[2], out InPort))
+                    if (!int.TryParse(oscConfig[2], out _inPort))
                     {
                         Console.WriteLine("Invalid OSC InPort: " + oscConfig[2]);
                         return;
@@ -75,8 +77,9 @@ namespace VRCFaceTracking
             Logger.Msg("Initialized UnifiedLibManager Successfully");
             
             // Initialize Locals
-            _oscMain = new OscMain(IP, OutPort, InPort);
+            _oscMain = new OscMain(_ip, _outPort, _inPort);
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _inputManager = new InputManager();
             
             // Bind callbacks
             Console.CancelKeyPress += delegate {
@@ -91,11 +94,15 @@ namespace VRCFaceTracking
                 Logger.Msg("Config file parsed successfully! "+_relevantParams.Count()+" parameters loaded");
             };
 
+            Logger.Warning("Due to a bug with VRChat's current OSC implementation, it's important you pause the runtime before switching avatars, and unpause when the swap has completed.\nPress P to toggle the pause state.");
+            
             // Begin main OSC update loop
             Utils.TimeBeginPeriod(1);
             while (true)
             {
                 Thread.Sleep(10);
+                if (_inputManager.ShouldPause) 
+                    continue;
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipShapes);
 

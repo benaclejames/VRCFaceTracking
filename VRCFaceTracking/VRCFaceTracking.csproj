@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ConfigParser.cs" />
     <Compile Include="DependencyManager.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainStandalone.cs" />
     <Compile Include="OSC\OSCBundle.cs" />

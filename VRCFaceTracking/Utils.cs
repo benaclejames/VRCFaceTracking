@@ -22,8 +22,10 @@ namespace VRCFaceTracking
         
         public static string DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
 
-        public static string VRCOSCDirectory = Path.Combine(Environment
-            .GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow"), "VRChat\\VRChat\\OSC");
+        public static string VRCData = Path.Combine(Environment
+            .GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow"), "VRChat\\VRChat");
+        
+        public static string VRCOSCDirectory = Path.Combine(VRCData, "OSC");
 
         public static readonly Dictionary<Type, (char oscType, string configType)> TypeConversions =
             new Dictionary<Type, (char oscType, string configType)>

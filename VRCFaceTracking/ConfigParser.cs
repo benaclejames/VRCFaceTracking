@@ -28,7 +28,6 @@ namespace VRCFaceTracking
         public class AvatarConfigSpec
         {
             public string id { get; set; }
-            public string name { get; set; }
             public List<Parameter> parameters { get; set; }
         }
 
@@ -57,7 +56,7 @@ namespace VRCFaceTracking
                 return;
             }
             
-            Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
+            Logger.Msg("Parsing config file for avatar id: " + newId);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
             foreach (var parameter in UnifiedTrackingData.AllParameters)
                 parameter.ResetParam(parameters);
