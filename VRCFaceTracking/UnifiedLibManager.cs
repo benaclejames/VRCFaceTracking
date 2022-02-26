@@ -85,7 +85,8 @@ namespace VRCFaceTracking
             var dlls = Directory.GetFiles(path, "*.dll");
             foreach (var dll in dlls)
             {
-                var loadedModule = Assembly.LoadFrom(Utils.DataDirectory+"\\"+dll);
+                Logger.Msg("Loading "+dll);
+                var loadedModule = Assembly.LoadFrom(dll);
 
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
