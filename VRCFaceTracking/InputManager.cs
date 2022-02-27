@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using static VRCFaceTracking.MainWindow;
 
 namespace VRCFaceTracking
 {
@@ -7,7 +8,7 @@ namespace VRCFaceTracking
     {
         // Move to the WPF window as a button
         public bool ShouldPause;
-        
+
         public InputManager() => new Thread(Listen).Start();
 
         private void Listen()
