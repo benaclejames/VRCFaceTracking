@@ -5,12 +5,14 @@ namespace VRCFaceTracking
 {
     public class InputManager
     {
+        // Move to the WPF window as a button
         public bool ShouldPause;
         
         public InputManager() => new Thread(Listen).Start();
 
         private void Listen()
         {
+            return;
             while (true)
             {
                 var key = Console.ReadKey(true);

@@ -6,6 +6,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows;
 using VRCFaceTracking.OSC;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
@@ -17,6 +18,10 @@ using VRCFaceTracking.OSC;
 [assembly: AssemblyVersion("3.0.1")]
 [assembly: AssemblyFileVersion("3.0.1")]
 [assembly: NeutralResourcesLanguage("en")]
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None,
+    ResourceDictionaryLocation.SourceAssembly
+)]
 
 namespace VRCFaceTracking
 {
@@ -34,10 +39,10 @@ namespace VRCFaceTracking
         private static string _ip = "127.0.0.1";
         private static int _inPort = 9001, _outPort = 9000;
         
-        public static void Main(string[] args)
+        public static void Initialize()
         {
             // Parse Arguments
-            foreach (var arg in args)
+            /*foreach (var arg in args)
             {
                 if (arg.StartsWith("--osc="))
                 {
@@ -67,7 +72,7 @@ namespace VRCFaceTracking
                         return;
                     }
                 }
-            }
+            }*/
             
             // Initialize dependencies and tracking runtimes
             Logger.Msg("VRCFT Standalone Initializing!");
