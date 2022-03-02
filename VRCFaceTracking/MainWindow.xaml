@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:VRCFaceTracking"
         mc:Ignorable="d"
-        Title="VRCFaceTracking" Height="450" Width="800" Background="#3b3b3b" ResizeMode="NoResize">
+        Title="VRCFaceTracking" Height="450" Width="800" Background="#3b3b3b" ResizeMode="CanMinimize">
     <Grid Margin="0,0,-0.4,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="279*"/>
@@ -29,7 +29,5 @@
         <Button x:Name="PauseMouthButton" Content="Pause Mouth Tracking" HorizontalAlignment="Left" Height="36" Margin="202,168,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickMouth" Grid.Row="1" Grid.Column="1"/>
         <ListBox x:Name="OSCReceive" Background="#00000000" Height="145" Margin="20,59,119.2,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.Row="1"/>
         <ListBox x:Name="OSCSend" Background="#00000000" Height="145" Margin="170,59,483.6,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.Row="1" Grid.ColumnSpan="2"/>
-
-
     </Grid>
 </Window>
