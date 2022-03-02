@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Threading;
+using System.Windows;
 
 namespace VRCFaceTracking
 {
@@ -12,6 +13,7 @@ namespace VRCFaceTracking
 
         public MainWindow()
         {
+            
             InitializeComponent();
 
             // TODO
@@ -38,7 +40,7 @@ namespace VRCFaceTracking
             // UI Update loop
             while (true)
             {
-                
+                Thread.Sleep(10);
             }
 
         }
