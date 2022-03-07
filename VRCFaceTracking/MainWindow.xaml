@@ -5,14 +5,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:VRCFaceTracking"
         mc:Ignorable="d"
-        Title="VRCFaceTracking" Height="450" Width="800" Background="#3b3b3b">
-    <Grid>
+        Title="VRCFaceTracking" Height="450" Width="800" Background="#3b3b3b" ResizeMode="CanMinimize">
+    <Grid Margin="0,0,-0.4,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="279*"/>
+            <ColumnDefinition Width="515*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="16*"/>
+            <RowDefinition Height="19*"/>
+        </Grid.RowDefinitions>
         <Image x:Name="VRCFTLogo" HorizontalAlignment="Left" Height="120" Margin="20,20,0,0" VerticalAlignment="Top" Width="120" Source="VRCFTLogo.png"/>
-        <TextBlock HorizontalAlignment="Left" Margin="145,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="115" Width="185" Foreground="#FFE8E8E8" FontWeight="Bold" FontSize="20">
-            Welcome to <LineBreak/>
-            VRCFaceTracking
-        </TextBlock>
-
-
+        <TextBlock x:Name="WTVRCFT" HorizontalAlignment="Left" Margin="145,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="115" Width="185" Foreground="#FFE8E8E8" FontWeight="Bold" FontSize="20" Grid.ColumnSpan="2"><Run Text="Welcome to"/><LineBreak/><Run Text="VRCFaceTracking!"/></TextBlock>
+        <ListBox x:Name="AvatarInfo" Background="#00000000" Height="283" Margin="51,20,22.6,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.RowSpan="2" Grid.Column="1"/>
+        <Button x:Name="PauseEyesButton" Content="Pause Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="202,126,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes" Grid.Row="1" Grid.Column="1"/>
+        <Button x:Name="ReinitializeButton" Content="Reinitialize" HorizontalAlignment="Left" Height="68" Margin="352,131,0,0" VerticalAlignment="Top" Width="140" Click="ReinitializeClick" Grid.Row="1" Grid.Column="1"/>
+        <TextBlock x:Name="IPText" HorizontalAlignment="Left" Margin="63.8,139,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25" Width="32" Foreground="#FFE8E8E8" FontSize="15" Text="IP: " Grid.Row="1" Grid.Column="1"/>
+        <TextBlock x:Name="PortText" HorizontalAlignment="Left" Margin="48.8,169,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25" Width="32" Foreground="#FFE8E8E8" FontSize="15" RenderTransformOrigin="0.481,1.432" Grid.Row="1" Grid.Column="1"><Run Text="Port:"/><LineBreak/><Run/></TextBlock>
+        <TextBox x:Name="IPInput" HorizontalAlignment="Left" Foreground="#FFE8E8E8" Height="26" Margin="83.8,138,0,0" FontSize="15" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="110" Background="#00000000" TextChanged="IPInputUpdate" Grid.Row="1" Grid.Column="1"/>
+        <TextBox x:Name="PortInput" HorizontalAlignment="Left" Foreground="#FFE8E8E8" Height="26" Margin="83.8,168,0,0" FontSize="15" TextWrapping="Wrap" Text="9000&#xD;&#xA;" VerticalAlignment="Top" Width="110" Background="#00000000" TextChanged="PortInputUpdate" Grid.Row="1" Grid.Column="1"/>
+        <TextBlock x:Name="EyeTrackingInfo" HorizontalAlignment="Left" Margin="24,147,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="50" Width="286" Foreground="#FFE8E8E8" FontSize="15" Grid.RowSpan="2" Grid.ColumnSpan="2"><Run Text="Has eye tracking?"/><LineBreak/><Run Text="    Type of eye tracking"/></TextBlock>
+        <TextBlock x:Name="MouthTrackingInfo" HorizontalAlignment="Left" Margin="24,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="49" Width="286" Foreground="#FFE8E8E8" FontSize="15" Grid.Row="1" Grid.ColumnSpan="2"><Run Text="Has mouth tracking?"/><LineBreak/><Run Text="    Type of mouth tracking"/></TextBlock>
+        <Button x:Name="PauseMouthButton" Content="Pause Mouth Tracking" HorizontalAlignment="Left" Height="36" Margin="202,168,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickMouth" Grid.Row="1" Grid.Column="1"/>
+        <ListBox x:Name="OSCReceive" Background="#00000000" Height="145" Margin="20,59,119.2,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.Row="1"/>
+        <ListBox x:Name="OSCSend" Background="#00000000" Height="145" Margin="170,59,483.6,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.Row="1" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
