@@ -11,8 +11,8 @@ namespace VRCFaceTracking
 {
     public interface ITrackingModule
     {
-        bool SupportsEye { get; }
-        bool SupportsLip { get; }
+        (bool SupportsEye, bool SupportsLip) Supported { get; }
+        (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
 
         (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
         Action GetUpdateThreadFunc();
@@ -119,7 +119,7 @@ namespace VRCFaceTracking
                 
                 var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
-                if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
+                if (!EyeEnabled && moduleObj.Supported.SupportsEye || !LipEnabled && moduleObj.Supported.SupportsLip)
                     (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
 
                 // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
@@ -138,21 +138,42 @@ namespace VRCFaceTracking
                     }
                 }
 
-                if (eyeSuccess) EyeEnabled = true;
-                if (lipSuccess) LipEnabled = true;
+                if (!EyeEnabled && eyeSuccess)
+                {
+                    // Let the module know it'll be used for eye tracking
+                    var moduleObjUtilizing = moduleObj.Utilizing;
+                    moduleObjUtilizing.UtilizingEye = true;
+                    moduleObj.Utilizing = moduleObjUtilizing;
+                    
+                    // We can now assume that we have a module that's willing to give us eye tracking data
+                    EyeEnabled = true;
+                }
+
+                if (!LipEnabled && lipSuccess)
+                {
+                    // Let the module know it'll be used for lip tracking
+                    var moduleObjUtilizing = moduleObj.Utilizing;
+                    moduleObjUtilizing.UtilizingLip = true;
+                    moduleObj.Utilizing = moduleObjUtilizing;
+
+                    // We can now assume that we have a module that's willing to give us lip tracking data
+                    LipEnabled = true;
+                }
 
                 if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
             }
 
             if (eye)
             {
-                if (EyeEnabled) Logger.Msg("Eye Tracking Initialized");
+                if (EyeEnabled) Logger.Msg("Eye Tracking Initialized via " + UsefulModules.First(module => module.Value.Utilizing.UtilizingEye).Key.Name);
                 else Logger.Warning("Eye Tracking will be unavailable for this session.");
             }
 
             if (lip)
             {
-                if (LipEnabled) Logger.Msg("Lip Tracking Initialized");
+                if (LipEnabled)
+                    Logger.Msg("Lip Tracking Initialized via " +
+                               UsefulModules.First(module => module.Value.Utilizing.UtilizingLip).Key.Name);
                 else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
         }

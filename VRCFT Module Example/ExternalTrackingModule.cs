@@ -42,6 +42,9 @@ namespace VRCFT_Module_Example
     public class ExternalTrackingModule : ITrackingModule
     {
         // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
+        public (bool SupportsEye, bool SupportsLip) Supported => (true, true);
+        public (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
+
         public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             Console.WriteLine("Initializing inside external module");
@@ -64,7 +67,12 @@ namespace VRCFT_Module_Example
         // The update function needs to be defined separately in case the user is running with the --vrcft-nothread launch parameter
         public void Update()
         {
-            Console.WriteLine("Updating inside external module");
+            Console.WriteLine("Updating inside external module.");
+            
+            if (Utilizing.UtilizingEye)
+                Console.WriteLine("Eye data is being utilized.");
+            if (Utilizing.UtilizingLip)
+                Console.WriteLine("Lip data is being utilized.");
         }
 
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
@@ -72,8 +80,5 @@ namespace VRCFT_Module_Example
         {
             Console.WriteLine("Teardown");
         }
-
-        public bool SupportsEye => true;
-        public bool SupportsLip => true;
     }
 }
