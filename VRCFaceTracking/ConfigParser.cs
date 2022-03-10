@@ -9,13 +9,25 @@ namespace VRCFaceTracking
 {
     public static class ConfigParser
     {
+        public class StringToTypeConverter : JsonConverter<Type>
+        {
+            public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                // Read the string value
+                string value = reader.GetString();
+                return Utils.TypeConversions.First(elem => elem.Value.configType == value).Key;
+            }
+
+            public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
+            {
+            }
+        }
+        
         public class InputOutputDef
         {
             public string address { get; set; }
-            public string type { get; set; }
-
-            [JsonIgnore]
-            public Type Type => Utils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
+            [JsonConverter(typeof(StringToTypeConverter))]
+            public Type type { get; set; } 
         }
 
         public class Parameter
