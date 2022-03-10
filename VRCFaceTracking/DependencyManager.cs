@@ -103,7 +103,7 @@ namespace VRCFaceTracking
                     }
                     catch(Exception e)
                     {
-                        Logger.Error($"Failed to get DLL: " + e.Message);
+                        Logger.Error("Failed to get DLL: " + e.Message);
                     }
                 }
             }

@@ -171,9 +171,7 @@ namespace VRCFaceTracking
 
             if (lip)
             {
-                if (LipEnabled)
-                    Logger.Msg("Lip Tracking Initialized via " +
-                               UsefulModules.First(module => module.Value.Utilizing.UtilizingLip).Key.Name);
+                if (LipEnabled) Logger.Msg("Lip Tracking Initialized via " + UsefulModules.First(module => module.Value.Utilizing.UtilizingLip).Key.Name);
                 else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
         }
