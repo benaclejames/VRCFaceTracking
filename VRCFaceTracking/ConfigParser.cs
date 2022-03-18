@@ -54,12 +54,19 @@ namespace VRCFaceTracking
                 foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))
                 {
                     var configText = File.ReadAllText(avatarFile);
-                    var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
-                    if (tempConfig == null || tempConfig.id != newId)
-                        continue;
-                    
-                    avatarConfig = tempConfig;
-                    break;
+                    try
+                    {
+                        var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
+                        if (tempConfig == null || tempConfig.id != newId)
+                            continue;
+
+                        avatarConfig = tempConfig;
+                        break;
+                    }
+                    catch (JsonException e)
+                    {
+                        Logger.Warning("Failed to parse JSON file: "+avatarFile+". Ensure it follows RFC 8259 formatting");
+                    }
                 }
             }
 
