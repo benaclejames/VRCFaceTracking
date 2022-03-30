@@ -37,12 +37,15 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
-        <Reference Include="VRCFaceTracking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>D:\SteamLibrary\steamapps\common\VRChat\Mods\VRCFaceTracking.dll</HintPath>
-        </Reference>
     </ItemGroup>
     <ItemGroup>
       <Compile Include="ExternalTrackingModule.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj">
+        <Project>{0767c09e-d536-464b-b0a1-46d5bfa19e98}</Project>
+        <Name>VRCFaceTracking</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

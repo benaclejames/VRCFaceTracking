@@ -1,5 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace VRCFaceTracking
 {
@@ -13,19 +16,13 @@ namespace VRCFaceTracking
 
         public MainWindow()
         {
-            
             InitializeComponent();
+            DataContext = this;
 
-            // TODO
+            ConsoleOutput.CollectionChanged += (sender, args) => 
+                Dispatcher.BeginInvoke(new ThreadStart(() => Scroller.ScrollToVerticalOffset(Scroller.ExtentHeight)));
 
-            // Does the user have eye tracking?
-            // If so, set its name 
-            EyeTrackingInfo.Text = "Made you look!";
-
-            // Does the user have face tracking?
-            // If so, set its name 
-            MouthTrackingInfo.Text = "Made you smile!";
-
+            
             // Is this running as admin?
             // If not, disable the re-int button
             if (!Utils.HasAdmin)
@@ -35,15 +32,10 @@ namespace VRCFaceTracking
                 ReinitializeButton.FontSize = 10f;
                 ReinitializeButton.IsEnabled = false;
             }
-
-            return;
-            // UI Update loop
-            while (true)
-            {
-                Thread.Sleep(10);
-            }
-
         }
+
+
+        public ObservableCollection<Tuple<string, string>> ConsoleOutput => Logger.ConsoleOutput;
 
         private void AvatarInfoUpdate(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
@@ -57,12 +49,11 @@ namespace VRCFaceTracking
 
         private void PortInputUpdate(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            
+
         }
 
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
-
             ShouldReinitialize = !ShouldReinitialize;
             Logger.Msg("Reinitializing...");
         }

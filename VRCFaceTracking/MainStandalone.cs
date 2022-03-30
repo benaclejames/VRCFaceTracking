@@ -34,15 +34,26 @@ namespace VRCFaceTracking
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
 
-        private static InputManager _inputManager;
-
         private static string _ip = "127.0.0.1";
         private static int _inPort = 9001, _outPort = 9000;
+
+        public static readonly CancellationTokenSource MainToken = new CancellationTokenSource();
+
+        public static bool ShouldPause;
+        
+        public static void Teardown()
+        {
+            MainToken.Cancel();
+            Utils.TimeEndPeriod(1);
+            Logger.Msg("VRCFT Standalone Exiting!");
+            UnifiedLibManager.Teardown();
+            Console.WriteLine("Shutting down");
+        }
         
         public static void Initialize()
         {
             // Parse Arguments
-            /*foreach (var arg in args)
+            foreach (var arg in Environment.GetCommandLineArgs())
             {
                 if (arg.StartsWith("--osc="))
                 {
@@ -72,7 +83,7 @@ namespace VRCFaceTracking
                         return;
                     }
                 }
-            }*/
+            }
             
             // Initialize dependencies and tracking runtimes
             Logger.Msg("VRCFT Standalone Initializing!");
@@ -84,14 +95,6 @@ namespace VRCFaceTracking
             // Initialize Locals
             _oscMain = new OscMain(_ip, _outPort, _inPort);
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-            _inputManager = new InputManager();
-            
-            // Bind callbacks
-            Console.CancelKeyPress += delegate {
-                Utils.TimeEndPeriod(1);
-                Logger.Msg("VRCFT Standalone Exiting!");
-                UnifiedLibManager.Teardown();
-            };
 
             ConfigParser.OnConfigLoaded += () =>
             {
@@ -104,11 +107,11 @@ namespace VRCFaceTracking
             
             // Begin main OSC update loop
             Utils.TimeBeginPeriod(1);
-            while (true)
+            while (!MainToken.IsCancellationRequested)
             {
                 Thread.Sleep(10);
                 // If RelevantParams is empty, or we're paused, don't update or send a bundle
-                if (_inputManager.ShouldPause || !_relevantParams.Any())
+                if (ShouldPause || !_relevantParams.Any())
                     continue;
                 
                 UnifiedTrackingData.OnUnifiedParamsUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
