@@ -15,8 +15,9 @@
             <RowDefinition Height="16*"/>
             <RowDefinition Height="19*"/>
         </Grid.RowDefinitions>
-        <Image x:Name="VRCFTLogoTop" HorizontalAlignment="Left" Height="120" Margin="20,20,0,0" VerticalAlignment="Top" Width="120" Source="Images/VRCFTLogoTop.png"/>
-        <Image x:Name="VRCFTLogoBottom" HorizontalAlignment="Left" Height="120" Margin="20,20,0,0" VerticalAlignment="Top" Width="120" Source="Images/VRCFTLogo.png"/>
+        
+        <Image x:Name="VRCFTLogoTop" HorizontalAlignment="Left" Height="120" Margin="20,15,0,0" VerticalAlignment="Top" Width="120" Source="Images/LogoIndicators/Idle/Top.png"/>
+        <Image x:Name="VRCFTLogoBottom" HorizontalAlignment="Left" Height="120" Margin="20,72,0,0" VerticalAlignment="Top" Width="120" Source="Images/LogoIndicators/Active/Bottom.png"/>
 
         <TextBlock x:Name="WTVRCFT" HorizontalAlignment="Left" Margin="145,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="115" Width="185" Foreground="#FFE8E8E8" FontWeight="Bold" FontSize="20" Grid.ColumnSpan="2"><Run Text="Welcome to"/><LineBreak/><Run Text="VRCFaceTracking!"/></TextBlock>
         <ListBox x:Name="AvatarInfo" Background="#00000000" Height="283" Margin="51,20,22.6,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.RowSpan="2" Grid.Column="1"/>
