@@ -44,7 +44,7 @@ namespace VRCFaceTracking.TrackingLibs.Pimax
 
         public void Update()
         {
-            if (!UnifiedLibManager.EyeEnabled) return;
+            if (UnifiedLibManager.EyeStatus != ModuleState.Active) return;
             
             PimaxEyeData.Update();
             UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);

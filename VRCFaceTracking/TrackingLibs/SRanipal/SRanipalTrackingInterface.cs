@@ -80,8 +80,8 @@ namespace VRCFaceTracking.SRanipal
         {
             _cancellationToken.Cancel();
             
-            if (UnifiedLibManager.EyeEnabled) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
-            if (UnifiedLibManager.LipEnabled) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            if (UnifiedLibManager.EyeStatus != ModuleState.Inactive) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+            if (UnifiedLibManager.LipStatus != ModuleState.Inactive) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
             
             _cancellationToken.Dispose();
         }
@@ -143,7 +143,7 @@ namespace VRCFaceTracking.SRanipal
         
         private void UpdateEye()
         {
-            if (!UnifiedLibManager.EyeEnabled) return;
+            if (UnifiedLibManager.EyeStatus != ModuleState.Active) return;
             EyeData_v2 eyeData = default;
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
@@ -151,7 +151,7 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateMouth()
         {
-            if (!UnifiedLibManager.LipEnabled) return;
+            if (UnifiedLibManager.LipStatus != ModuleState.Active) return;
             SRanipal_Lip_v2.GetLipWeightingsAndImage(out UnifiedTrackingData.LatestLipShapes, out UnifiedTrackingData.Image);
         }
 
