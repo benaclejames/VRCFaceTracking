@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize">
     <Window.Resources>
-        <SolidColorBrush x:Key="RedBrush" Color="#FF6D6D6D"/>
+        <SolidColorBrush x:Key="BackBrush" Color="#3b3b3b"/>
 
-        <SolidColorBrush x:Key="SolidBorderBrush" Color="#888" />
+        <SolidColorBrush x:Key="SolidBorderBrush" Color="#FF4F4F4F" />
 
-        <SolidColorBrush x:Key="SelectBrush" Color="#FFCCCCCC" />
+        <SolidColorBrush x:Key="SelectBrush" Color="#FF6E6E6E" />
 
         <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#EEE" />
 
@@ -27,9 +27,9 @@
                             <Border 
                                 Name="Border"
                                 Margin="0,0,-4,0" 
-                                Background="{StaticResource RedBrush}"
+                                Background="{StaticResource BackBrush}"
                                 BorderBrush="{StaticResource  SolidBorderBrush}" 
-                                BorderThickness="1,1,1,1" 
+                                BorderThickness="1,1,1,0" 
                                 CornerRadius="6,6,0,0" >
                                 <ContentPresenter x:Name="ContentSite"
                                     VerticalAlignment="Center"
@@ -43,7 +43,7 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Panel.ZIndex" Value="100" />
                                 <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectBrush}" />
-                                <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" />
+                                <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,0" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Border" Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
@@ -59,7 +59,7 @@
 
     <Grid Margin="0,0,-0.4,0">
 
-        <TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" >
+        <TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" >
             <TabControl.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0.569"/>
@@ -102,9 +102,14 @@
                 </Grid>
 
             </TabItem>
-            <TabItem Header="Eye Tracking" Foreground="White"/>
-            <TabItem Header="Face Tracking" Foreground="White"/>
+            <TabItem Header="Eye Tracking" Foreground="White">
+                <Image Margin="22,22,22,22"/>
+            </TabItem>
+            <TabItem Header="Face Tracking" Foreground="White">
+                <Image Margin="22,22,22,22"/>
+            </TabItem>
         </TabControl>
+
 
     </Grid>
 </Window>
