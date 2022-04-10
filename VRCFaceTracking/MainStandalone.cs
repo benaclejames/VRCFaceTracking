@@ -98,13 +98,12 @@ namespace VRCFaceTracking
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+                _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase())
+                    .Where(param => param.Relevant);
                 UnifiedTrackingData.LatestEyeData.ResetThresholds();
-                Logger.Msg("Config file parsed successfully! "+_relevantParams.Count()+" parameters loaded");
+                Logger.Msg("Config file parsed successfully! " + _relevantParams.Count() + " parameters loaded");
             };
 
-            Logger.Warning("Due to a bug with VRChat's current OSC implementation, it's important you pause the runtime before switching avatars, and unpause when the swap has completed.\nPress P to toggle the pause state.");
-            
             // Begin main OSC update loop
             Utils.TimeBeginPeriod(1);
             while (!MainToken.IsCancellationRequested)

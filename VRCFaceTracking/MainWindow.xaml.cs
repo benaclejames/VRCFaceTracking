@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace VRCFaceTracking
@@ -30,8 +32,31 @@ namespace VRCFaceTracking
 
             UnifiedLibManager.OnTrackingStateUpdate += (eye, lip) =>
                 Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLogo(eye, lip)));
+            
+            // Start a new thread to update the lip image
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(10);
+                    Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLipImage()));
+                }
+            }).Start();
         }
 
+        void UpdateLipImage()
+        {
+            if (UnifiedTrackingData.Image == IntPtr.Zero)   // If the image is not initialized
+                return;
+            
+            byte[] managedArray = new byte[800*400];
+            Marshal.Copy(UnifiedTrackingData.Image, managedArray, 0, 800*400);
+            var bitmap = new WriteableBitmap(800, 400, 96, 96, PixelFormats.Gray8, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, 800, 400), managedArray, 800, 0);
+            
+            // Set the WPF image name LipImage 
+            LipImage.Source = bitmap;
+        }
 
         public ObservableCollection<Tuple<string, string>> ConsoleOutput => Logger.ConsoleOutput;
 
@@ -82,6 +107,9 @@ namespace VRCFaceTracking
             VRCFTLogoBottom.Source =
                 new BitmapImage(new Uri(@"Images/LogoIndicators/" + lipState + "/Bottom.png",
                     UriKind.Relative));
+            
+            // Construct a new bitmap image from the alpha bytes in UnifiedTrackingData.Image
+            
         }
     }
 }
