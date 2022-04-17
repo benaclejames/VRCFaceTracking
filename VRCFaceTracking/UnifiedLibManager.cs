@@ -86,8 +86,21 @@ namespace VRCFaceTracking
             foreach (var dll in dlls)
             {
                 Logger.Msg("Loading "+dll);
-                var loadedModule = Assembly.LoadFrom(dll);
-
+                Assembly loadedModule = null;
+                try 
+                {
+                    loadedModule = Assembly.LoadFrom(dll);
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    foreach (var loaderException in e.LoaderExceptions)
+                    {
+                        Logger.Error("LoaderException: " + loaderException.Message);
+                    }
+                    Logger.Error("Exception loading " + dll + ". Skipping.");
+                    continue;
+                }
+                
                 // Get the first type that implements ITrackingModule
                 var module = loadedModule.GetTypes()
                     .FirstOrDefault(t => t.GetInterfaces().Contains(typeof(ITrackingModule)));
@@ -111,17 +124,7 @@ namespace VRCFaceTracking
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
 
-            try 
-            {
-                trackingModules = trackingModules.Union(LoadExternalModules());
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                foreach (var loaderException in e.LoaderExceptions)
-                {
-                    Logger.Error("LoaderException: " + loaderException.Message);
-                }
-            }
+            trackingModules = trackingModules.Union(LoadExternalModules());
 
             foreach (var module in trackingModules)
             {
