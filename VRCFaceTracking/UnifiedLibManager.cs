@@ -9,21 +9,27 @@ using System.Threading;
 
 namespace VRCFaceTracking
 {
-    public interface ITrackingModule
+    public abstract class ExtTrackingModule
     {
-        (bool SupportsEye, bool SupportsLip) Supported { get; }
-        (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
+        // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
+        public abstract (bool SupportsEye, bool SupportsLip) Supported { get; }
+        
+        // Should the module be writing to UnifiedTrackingData for eye or lip tracking updates.
+        public abstract (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
 
-        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-        Action GetUpdateThreadFunc();
-        void Update();
-        void Teardown();
+        public abstract (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+
+        public abstract Action GetUpdateThreadFunc();
+
+        public abstract void Update();
+
+        public abstract void Teardown();
     }
 
     public static class UnifiedLibManager
     {
         public static bool EyeEnabled, LipEnabled;
-        private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
+        private static readonly Dictionary<Type, ExtTrackingModule> UsefulModules = new Dictionary<Type, ExtTrackingModule>();
         private static readonly List<Thread> UsefulThreads = new List<Thread>();
         
         private static Thread _initializeWorker;
@@ -88,9 +94,8 @@ namespace VRCFaceTracking
                 Logger.Msg("Loading "+dll);
                 var loadedModule = Assembly.LoadFrom(dll);
 
-                // Get the first type that implements ITrackingModule
-                var module = loadedModule.GetTypes()
-                    .FirstOrDefault(t => t.GetInterfaces().Contains(typeof(ITrackingModule)));
+                // Get the first class that implements ExtTrackingModule
+                var module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
                 if (module != null)
                 {
                     returnList.Add(module);
@@ -109,7 +114,7 @@ namespace VRCFaceTracking
             Logger.Msg("Finding and initializing runtimes...");
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
+                .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
 
             trackingModules = trackingModules.Union(LoadExternalModules());
 
@@ -117,7 +122,7 @@ namespace VRCFaceTracking
             {
                 bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
                 
-                var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
+                var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
                 if (!EyeEnabled && moduleObj.Supported.SupportsEye || !LipEnabled && moduleObj.Supported.SupportsLip)
                     (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
