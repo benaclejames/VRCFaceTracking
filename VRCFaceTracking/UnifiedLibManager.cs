@@ -92,8 +92,21 @@ namespace VRCFaceTracking
             foreach (var dll in dlls)
             {
                 Logger.Msg("Loading "+dll);
-                var loadedModule = Assembly.LoadFrom(dll);
-
+                Assembly loadedModule = null;
+                try 
+                {
+                    loadedModule = Assembly.LoadFrom(dll);
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    foreach (var loaderException in e.LoaderExceptions)
+                    {
+                        Logger.Error("LoaderException: " + loaderException.Message);
+                    }
+                    Logger.Error("Exception loading " + dll + ". Skipping.");
+                    continue;
+                }
+                
                 // Get the first class that implements ExtTrackingModule
                 var module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
                 if (module != null)
