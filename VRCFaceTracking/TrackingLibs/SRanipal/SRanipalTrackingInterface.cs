@@ -9,14 +9,14 @@ using ViveSR.anipal.Lip;
 
 namespace VRCFaceTracking.SRanipal
 {
-    public class SRanipalTrackingInterface : ITrackingModule
+    public class SRanipalExtTrackingInterface : ExtTrackingModule
     {
         private static CancellationTokenSource _cancellationToken;
 
-        public (bool SupportsEye, bool SupportsLip) Supported => (true, true);
-        public (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
+        public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
+        public override (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
 
-        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             _cancellationToken?.Cancel();
             
@@ -74,7 +74,7 @@ namespace VRCFaceTracking.SRanipal
             return (eyeEnabled, lipEnabled);
         }
         
-        public void Teardown()
+        public override void Teardown()
         {
             _cancellationToken.Cancel();
             
@@ -87,7 +87,7 @@ namespace VRCFaceTracking.SRanipal
         #region Update
 
         
-        public Action GetUpdateThreadFunc()
+        public override Action GetUpdateThreadFunc()
         {
             _cancellationToken = new CancellationTokenSource();
             return () =>
@@ -100,7 +100,7 @@ namespace VRCFaceTracking.SRanipal
             };
         }
 
-        public void Update()
+        public override void Update()
         {
             if (Utilizing.UtilizingLip)
                 UpdateMouth();
