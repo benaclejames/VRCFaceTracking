@@ -111,7 +111,17 @@ namespace VRCFaceTracking
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
 
-            trackingModules = trackingModules.Union(LoadExternalModules());
+            try 
+            {
+                trackingModules = trackingModules.Union(LoadExternalModules());
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                foreach (var loaderException in e.LoaderExceptions)
+                {
+                    Logger.Error("LoaderException: " + loaderException.Message);
+                }
+            }
 
             foreach (var module in trackingModules)
             {
