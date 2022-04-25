@@ -63,7 +63,7 @@ namespace VRCFaceTracking
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            foreach (var updateThread in UsefulThreads)
+            foreach (var updateThread in UsefulThreads.ToList())
             {
                 updateThread.Abort();
                 UsefulThreads.Remove(updateThread);

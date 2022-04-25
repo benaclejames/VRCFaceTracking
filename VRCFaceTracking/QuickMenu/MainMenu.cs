@@ -32,7 +32,7 @@ namespace VRCFaceTracking.QuickMenu
             MainMenuPage = menuObject.AddComponent<UIPage>();
             MainMenuPage.field_Public_String_0 = "QuickMenuFaceTracking";
             MainMenuPage.field_Private_Boolean_1 = true;
-            MainMenuPage.field_Private_MenuStateController_0 = menuStateController;
+            MainMenuPage.field_Protected_MenuStateController_0 = menuStateController;
             MainMenuPage.field_Private_List_1_UIPage_0 = new Il2CppSystem.Collections.Generic.List<UIPage>();
             MainMenuPage.field_Private_List_1_UIPage_0.Add(MainMenuPage);
             
