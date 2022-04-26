@@ -4,7 +4,7 @@ using VRCFaceTracking.Pimax;
 
 namespace VRCFaceTracking.TrackingLibs.Pimax
 { 
-    public class PimaxTrackingInterface //: ITrackingModule
+    public class PimaxTrackingInterface : ITrackingModule
     {
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();

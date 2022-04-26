@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="TrackingLibs\Pimax\PimaxEyeTracker.dll" />
+    <EmbeddedResource Include="TrackingLibs\Pimax\PimaxEyeTracker.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\libHTC_License.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\nanomsg.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRanipal.dll" />
