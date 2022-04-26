@@ -36,7 +36,7 @@ namespace VRCFaceTracking
             // Start a new thread to update the lip image
             new Thread(() =>
             {
-                while (true)
+                while (!MainStandalone.MainToken.IsCancellationRequested)
                 {
                     Thread.Sleep(10);
                     Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLipImage()));

@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Windows;
 using System.Windows.Data;
 
 namespace VRCFaceTracking
@@ -14,5 +15,7 @@ namespace VRCFaceTracking
         }
 
         ~App() => MainStandalone.Teardown();
+
+        private void App_OnExit(object sender, ExitEventArgs e) => MainStandalone.Teardown();
     }
 }
