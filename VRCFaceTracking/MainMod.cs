@@ -5,6 +5,7 @@ using System.Security.Principal;
 using VRCFaceTracking;
 using MelonLoader;
 using UnityEngine;
+using VRC.UI.Core;
 using VRCFaceTracking.QuickMenu;
 
 [assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.6.1", "benaclejames & Fenrix",
@@ -34,17 +35,18 @@ namespace VRCFaceTracking
         }
 
         public override void OnApplicationQuit() => UnifiedLibManager.Teardown();
-
-        // Just waits for the user to open their quickmenu, easier than trying to work around the uninitialized cloned gameobjects
+        
         private static IEnumerator WaitForMenu()
         {
-            Transform qmCanvas = null;
-            while (qmCanvas == null)
-            {
-                qmCanvas = GameObject.Find("UserInterface")?.transform?.FindChild("Canvas_QuickMenu(Clone)");
-                yield return new WaitForSeconds(0.5f);
-            }
-            yield return new WaitUntil((Func<bool>) (() => qmCanvas.gameObject.active));
+            while (VRCUiManager.field_Private_Static_VRCUiManager_0 == null)
+                yield return null;
+            
+            while (UIManager.field_Private_Static_UIManager_0 == null)
+                yield return null;
+            
+            while (GameObject.Find("UserInterface").GetComponentInChildren<VRC.UI.Elements.QuickMenu>(true) == null)
+                yield return null;
+            
             QuickModeMenu.CheckIfShouldInit();
         }
         
