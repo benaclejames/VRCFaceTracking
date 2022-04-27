@@ -5,8 +5,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:VRCFaceTracking"
         mc:Ignorable="d"
-        Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize">
+        Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize" StateChanged="MainWindow_OnSizeChanged">
     <Window.Resources>
+        
         <SolidColorBrush x:Key="BackBrush" Color="#3b3b3b"/>
 
         <SolidColorBrush x:Key="SolidBorderBrush" Color="#FF4F4F4F" />
@@ -58,7 +59,6 @@
     </Window.Resources>
 
     <Grid Margin="0,0,-0.4,0">
-
         <TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" >
             <TabControl.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

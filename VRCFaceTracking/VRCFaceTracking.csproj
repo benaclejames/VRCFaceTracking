@@ -146,7 +146,7 @@
     <Resource Include="Images\LogoIndicators\Idle\Top.png" />
     <Resource Include="Images\LogoIndicators\Inactive\Bottom.png" />
     <Resource Include="Images\LogoIndicators\Inactive\Top.png" />
-    <Content Include="VRCFT.ico" />
+    <EmbeddedResource Include="VRCFT.ico" />
     <Resource Include="Images\LogoIndicators\Active\Top.png" />
   </ItemGroup>
   <ItemGroup>

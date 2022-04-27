@@ -48,6 +48,8 @@ namespace VRCFaceTracking
             Logger.Msg("VRCFT Standalone Exiting!");
             UnifiedLibManager.Teardown();
             Console.WriteLine("Shutting down");
+            MainWindow.TrayIcon.Visible = false;
+            Application.Current?.Shutdown();
         }
         
         public static void Initialize()

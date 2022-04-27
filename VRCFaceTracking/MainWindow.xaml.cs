@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -10,15 +14,43 @@ namespace VRCFaceTracking
 {
     public partial class MainWindow
     {
+        public static NotifyIcon TrayIcon = new NotifyIcon
+        {
+            Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("VRCFaceTracking.VRCFT.ico")), 
+            Text = "VRCFaceTracking",
+            Visible = true,
+        };
+
+        private void ShowWindow(object sender, EventArgs args)
+        { 
+            Show();
+            WindowState = WindowState.Normal;
+        }
+        
         public MainWindow()
         {
             InitializeComponent();
+            // If --min is passed as a command line arg, hide the window immediately
+            if (Environment.GetCommandLineArgs().Length > 1 && Environment.GetCommandLineArgs().Any(arg => arg == "--min"))
+            {
+                WindowState = WindowState.Minimized;
+                Hide();
+            }
+
             DataContext = this;
 
             ConsoleOutput.CollectionChanged += (sender, args) =>
                 Dispatcher.BeginInvoke(new ThreadStart(() => Scroller.ScrollToVerticalOffset(Scroller.ExtentHeight)));
 
 
+            // use the application icon as the icon for the tray
+            TrayIcon.DoubleClick += ShowWindow;
+            TrayIcon.ContextMenu = new ContextMenu(new[]
+            {
+                new MenuItem("Exit", (sender, args) => MainStandalone.Teardown()),
+                new MenuItem("Show", ShowWindow)
+            });
+            
             // Is this running as admin?
             // If not, disable the re-int button
             if (!Utils.HasAdmin)
@@ -110,6 +142,14 @@ namespace VRCFaceTracking
             
             // Construct a new bitmap image from the alpha bytes in UnifiedTrackingData.Image
             
+        }
+
+        private void MainWindow_OnSizeChanged(object sender, EventArgs eventArgs)
+        {
+            if (this.WindowState == WindowState.Minimized)  
+            {  
+                Hide();                 
+            } 
         }
     }
 }
