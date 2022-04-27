@@ -34,7 +34,7 @@ namespace VRCFaceTracking
 
         public void Update(EyeExpressionState eyeState)
         {
-            Look = new Vector2(eyeState.PupilCenterX, eyeState.PupilCenterY);
+            Look = new Vector2(eyeState.PupilCenter.X, eyeState.PupilCenter.Y);
             Openness = eyeState.Openness;
             Widen = 0;
             Squeeze = 0;

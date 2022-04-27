@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using UnityEngine;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Numerics;
 
 namespace VRCFaceTracking.Pimax
 {
@@ -16,8 +17,8 @@ namespace VRCFaceTracking.Pimax
 		private EyeExpressionState GetEyeExpressionState(Eye eye)
 		{
 			EyeExpressionState state;
-			state.PupilCenterX = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterX);
-			state.PupilCenterY = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterY);
+			state.PupilCenter.X = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterX);
+			state.PupilCenter.Y = PimaxTracker.GetEyeExpression(eye, EyeExpression.PupilCenterY);
 			state.Openness = PimaxTracker.GetEyeExpression(eye, EyeExpression.Openness);
 
 			return state;
@@ -32,15 +33,13 @@ namespace VRCFaceTracking.Pimax
 			Recommended = GetEyeExpressionState(PimaxTracker.GetRecommendedEye());
 
 			/* Credit to azmidi for Linear Interpolation */
-			PrevLeft.PupilCenterX = Mathf.Lerp(PrevLeft.PupilCenterX, Left.PupilCenterX, smooth);
-			PrevLeft.PupilCenterY = Mathf.Lerp(PrevLeft.PupilCenterY, Left.PupilCenterY, smooth);
+			PrevLeft.PupilCenter = Vector2.Lerp(PrevLeft.PupilCenter, Left.PupilCenter, smooth);
 			PrevLeft.Openness = Left.Openness;
 
-			PrevRight.PupilCenterX = Mathf.Lerp(PrevRight.PupilCenterX, Right.PupilCenterX, smooth);
-			PrevRight.PupilCenterY = Mathf.Lerp(PrevRight.PupilCenterY, Right.PupilCenterY, smooth);
+			PrevRight.PupilCenter = Vector2.Lerp(PrevRight.PupilCenter, Right.PupilCenter, smooth);
 			PrevRight.Openness = Right.Openness;
 
-			PrevRecommended.PupilCenterY = Mathf.Lerp(PrevRecommended.PupilCenterY, Recommended.PupilCenterY, smooth);
+			PrevRecommended.PupilCenter = Vector2.Lerp(PrevRecommended.PupilCenter, Recommended.PupilCenter, smooth);
 
 			Left = FilterEye(PrevLeft);
 			Right = FilterEye(PrevRight);
@@ -51,9 +50,9 @@ namespace VRCFaceTracking.Pimax
 		/* Credit to azmidi for arctangent filtering */
 		private static EyeExpressionState FilterEye(EyeExpressionState state)
 		{
-			state.Openness = 0.65f * Mathf.Atan(5f * state.Openness);
-			state.PupilCenterX = 0.65f * Mathf.Atan(state.PupilCenterX);
-			state.PupilCenterY = 0.65f * Mathf.Atan(state.PupilCenterY);
+			state.Openness = (float)(0.65f * Math.Atan(5f * state.Openness));
+			state.PupilCenter.X = (float)(0.65f * Math.Atan(state.PupilCenter.X));
+			state.PupilCenter.Y = (float)(0.65f * Math.Atan(state.PupilCenter.Y));
 
 			return state;
 		}
@@ -87,8 +86,7 @@ namespace VRCFaceTracking.Pimax
 
 	public struct EyeExpressionState
 	{
-		public float PupilCenterX;
-		public float PupilCenterY;
+		public Vector2 PupilCenter;
 		public float Openness;
 	};
 
