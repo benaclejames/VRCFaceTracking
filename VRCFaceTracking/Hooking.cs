@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
+using UnhollowerBaseLib;
 using VRC.SDKBase;
 
 namespace VRCFaceTracking
@@ -15,14 +15,13 @@ namespace VRCFaceTracking
         {
             try
             {
-                var intPtr = (IntPtr) typeof(VRCAvatarManager.AvatarCreationCallback)
-                    .GetField(
-                        "NativeMethodInfoPtr_Invoke_Public_Virtual_New_Void_GameObject_VRC_AvatarDescriptor_Boolean_0",
-                        BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
-                MelonUtils.NativeHookAttach(intPtr, typeof(Hooking).GetMethod(nameof(OnAvatarInstantiated), BindingFlags.Static | BindingFlags.NonPublic).MethodHandle
-                        .GetFunctionPointer());
+                var originalMethodPtr = *(IntPtr*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(
+                    typeof(VRCAvatarManager.AvatarCreationCallback)
+                        .GetMethod("Invoke")).GetValue(null);
+                var detourDelegate = Marshal.GetFunctionPointerForDelegate<AvatarInstantiatedDelegate>(OnAvatarInstantiated);
+                MelonUtils.NativeHookAttach((IntPtr)(&originalMethodPtr), detourDelegate);
                 _onAvatarInstantiatedDelegate =
-                    Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(*(IntPtr*) (void*) intPtr);
+                    Marshal.GetDelegateForFunctionPointer<AvatarInstantiatedDelegate>(originalMethodPtr);
             }
             catch (Exception ex)
             {
@@ -37,16 +36,16 @@ namespace VRCFaceTracking
             try
             {
                 var avatarDescriptor = new VRC_AvatarDescriptor(avatarDescriptorPtr);
-                
+
                 if (VRCPlayer.field_Internal_Static_VRCPlayer_0
-                        ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0 == null   // Is our current avatar null?
+                        ?.prop_VRCAvatarManager_0?.prop_VRCAvatarDescriptor_0 == null // Is our current avatar null?
                     || avatarDescriptor != VRCPlayer.field_Internal_Static_VRCPlayer_0.prop_VRCAvatarManager_0
-                        .prop_VRCAvatarDescriptor_0)    // Is this avatar descriptor being assigned to our local player?
+                        .prop_VRCAvatarDescriptor_0) // Is this avatar descriptor being assigned to our local player?
                 {
                     //TODO: Add nameplate badge to indicate supported tracking types
                     //var av3Descriptor = avatarDescriptor.TryCast<VRCAvatarDescriptor>();
                     //if (!av3Descriptor) return;
-                    
+
                     //var (supportsEye, supportsLip) = UnifiedLibManager.GetAvatarSupportedTracking(av3Descriptor);
                     //MelonLogger.Msg($"Player {avatarDescriptor.transform.parent.parent.GetComponent<VRCPlayer>().prop_String_0} : Lip {supportsLip}, Eye{supportsEye}");
                 }
@@ -57,9 +56,13 @@ namespace VRCFaceTracking
                         allParameter.ResetParam();
                     }
             }
-            catch (Exception e) { MelonLogger.Error(e.ToString()); }
+            catch (Exception e)
+            {
+                MelonLogger.Error(e.ToString());
+            }
         }
-
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate void AvatarInstantiatedDelegate(IntPtr @this, IntPtr avatarPtr, IntPtr avatarDescriptorPtr,
             bool loaded, IntPtr methodInfo);
     }
