@@ -8,7 +8,7 @@ using UnityEngine;
 using VRC.UI.Core;
 using VRCFaceTracking.QuickMenu;
 
-[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.6.1", "benaclejames & Fenrix",
+[assembly: MelonInfo(typeof(MainMod), "VRCFaceTracking", "2.6.2", "benaclejames & Fenrix",
     "https://github.com/FenrixTheFox/VRCFaceTracking")]
 [assembly: MelonGame("VRChat", "VRChat")]
 
