@@ -161,7 +161,7 @@ namespace VRCFaceTracking
                 else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
             }
 
-            if (SceneManager.GetActiveScene().buildIndex == -1 && QuickModeMenu.MainMenu != null)
+            if (QuickModeMenu.MainMenu != null)
                 MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
         }
 
