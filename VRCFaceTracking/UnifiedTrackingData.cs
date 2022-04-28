@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.Eye;
 using VRCFaceTracking.Params.LipMerging;
-using VRCFaceTracking.Pimax;
 using Vector2 = VRCFaceTracking.Params.Vector2;
 
 namespace VRCFaceTracking
@@ -31,14 +29,6 @@ namespace VRCFaceTracking
             
             Widen = expression.Value.eye_wide;
             Squeeze = expression.Value.eye_squeeze;
-        }
-
-        public void Update(EyeExpressionState eyeState)
-        {
-            Look = new Vector2(eyeState.PupilCenter.X, eyeState.PupilCenter.Y);
-            Openness = eyeState.Openness;
-            Widen = 0;
-            Squeeze = 0;
         }
     }
     
@@ -83,13 +73,6 @@ namespace VRCFaceTracking
             
             if (dilation != 0)
                 EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
-        }
-
-        public void UpdateData(Ai1EyeData eyeData)
-        {
-            Left.Update(eyeData.Left);
-            Right.Update(eyeData.Right);
-            Combined.Update(eyeData.Recommended);
         }
 
         private void UpdateMinMaxDilation(float readDilation)

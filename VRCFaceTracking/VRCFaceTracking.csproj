@@ -66,8 +66,6 @@
     <Compile Include="Params\XYParam.cs" />
     <Compile Include="SDK\ExtTrackingModule.cs" />
     <Compile Include="VRChat.cs" />
-    <Compile Include="TrackingLibs\Pimax\PimaxTracker.cs" />
-    <Compile Include="TrackingLibs\Pimax\PimaxTrackingInterface.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeData.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeDataType_v2.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye_API.cs" />
@@ -87,7 +85,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Assets\Images\VRCFT.ico" />
-    <EmbeddedResource Include="TrackingLibs\Pimax\PimaxEyeTracker.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\libHTC_License.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\nanomsg.dll" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\SRanipal.dll" />
