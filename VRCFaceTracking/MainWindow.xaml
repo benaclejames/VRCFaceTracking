@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:VRCFaceTracking"
         mc:Ignorable="d"
         Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize" StateChanged="MainWindow_OnSizeChanged">
+
     <Window.Resources>
-        
+
         <SolidColorBrush x:Key="BackBrush" Color="#3b3b3b"/>
 
         <SolidColorBrush x:Key="SolidBorderBrush" Color="#FF4F4F4F" />
@@ -56,16 +57,32 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="Button" >
+            <Setter Property="Background" Value="White" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="7" 
+                        Background="White" BorderBrush="#ccc" 
+                        BorderThickness="0,0,0,0" >
+                            <ContentPresenter x:Name="contentPresenter" 
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                      Content="{TemplateBinding Content}" 
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      Margin="{TemplateBinding Padding}" 
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </Window.Resources>
 
     <Grid Margin="0,0,-0.4,0">
-        <TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" >
-            <TabControl.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0.569"/>
-                    <GradientStop Color="#FF6E6E6E" Offset="0"/>
-                </LinearGradientBrush>
-            </TabControl.Background>
+        <TabControl Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" Background="#FF6E6E6E" >
             <TabItem Header="Main" Foreground="White">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -78,18 +95,17 @@
                     </Grid.RowDefinitions>
                     <Image x:Name="VRCFTLogoTop" HorizontalAlignment="Left" Height="120" Margin="20,15,0,0" VerticalAlignment="Top" Width="120" Source="Images/LogoIndicators/Inactive/Top.png"/>
                     <Image x:Name="VRCFTLogoBottom" HorizontalAlignment="Left" Height="120" Margin="20,72,0,0" VerticalAlignment="Top" Width="120" Source="Images/LogoIndicators/Inactive/Bottom.png"/>
-
                     <TextBlock x:Name="WTVRCFT" HorizontalAlignment="Left" Margin="145,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="115" Width="185" Foreground="#FFE8E8E8" FontWeight="Bold" FontSize="20" Grid.ColumnSpan="2"><Run Text="Welcome to"/><LineBreak/><Run Text="VRCFaceTracking!"/></TextBlock>
                     <ListBox x:Name="AvatarInfo" Background="#00000000" Height="254" Margin="20,20,18,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.RowSpan="2" Grid.Column="1"/>
-                    <Button x:Name="PauseEyesButton" Content="Toggle Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="190,144,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes"/>
+                    <Button x:Name="PauseEyesButton" Content="Toggle Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="190,144,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes" BorderThickness="1,1,1,1" />                   
                     <Button x:Name="PauseMouthButton" Content="Toggle Lip Tracking" HorizontalAlignment="Left" Height="36" Margin="190,185,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickMouth" Grid.RowSpan="2"/>
                     <Button x:Name="ReinitializeButton" Content="Reinitialize" HorizontalAlignment="Left" Margin="190,227,0,261" Width="140" Click="ReinitializeClick" Grid.RowSpan="2"/>
                     <TextBlock x:Name="IPText" HorizontalAlignment="Left" Margin="20,151,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25" Width="32" Foreground="#FFE8E8E8" FontSize="15" Text="IP: "/>
                     <TextBlock x:Name="PortText" HorizontalAlignment="Left" Margin="20,188,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25" Width="32" Foreground="#FFE8E8E8" FontSize="15" RenderTransformOrigin="0.481,1.432" Grid.RowSpan="2"><Run Text="Port:"/><LineBreak/><Run/></TextBlock>
                     <TextBox x:Name="IPInput" HorizontalAlignment="Left" Foreground="#FFE8E8E8" Height="26" Margin="63,149,0,0" FontSize="15" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="110" Background="#00000000" TextChanged="IPInputUpdate"/>
                     <TextBox x:Name="PortInput" HorizontalAlignment="Left" Foreground="#FFE8E8E8" Height="26" Margin="63,188,0,0" FontSize="15" TextWrapping="Wrap" Text="9000&#xD;&#xA;" VerticalAlignment="Top" Width="110" Background="#00000000" TextChanged="PortInputUpdate" Grid.RowSpan="2"/>
-                    <ScrollViewer x:Name="Scroller" Margin="20,49,20,0" Background="Black" HorizontalScrollBarVisibility="Auto" Grid.Row="1" Grid.ColumnSpan="2" Height="240" VerticalAlignment="Top">
-                        <StackPanel Width="945">
+                    <ScrollViewer x:Name="Scroller" Margin="20,49,20,0" HorizontalScrollBarVisibility="Disabled" Grid.Row="1" Grid.ColumnSpan="2" Height="240" VerticalAlignment="Top">
+                        <StackPanel Width="945" Visibility="Visible">
                             <ItemsControl ItemsSource="{Binding Source={x:Static local:Logger.ConsoleOutput}}" Width="940">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
