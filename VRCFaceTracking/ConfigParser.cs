@@ -51,24 +51,37 @@ namespace VRCFaceTracking
             AvatarConfigSpec avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(Utils.VRCOSCDirectory))
             {
-                foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))
+                var avatarFolder = userFolder+"\\Avatars\\";
+                if (!Directory.Exists(userFolder))
                 {
-                    var configText = File.ReadAllText(avatarFile);
-                    try
+                    continue;
+                }
+                try
+                {
+                    foreach (var avatarFile in Directory.GetFiles(avatarFolder))
                     {
-                        var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
-                        if (tempConfig == null || tempConfig.id != newId)
-                            continue;
+                        var configText = File.ReadAllText(avatarFile);
+                        try
+                        {
+                            var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
+                            if (tempConfig == null || tempConfig.id != newId)
+                                continue;
 
-                        avatarConfig = tempConfig;
-                        break;
-                    }
-                    catch (JsonException e)
-                    {
-                        Logger.Warning("Failed to parse JSON file: "+avatarFile+". Ensure it follows RFC 8259 formatting");
+                            avatarConfig = tempConfig;
+                            break;
+                        }
+                        catch (JsonException e)
+                        {
+                            Logger.Warning("Failed to parse JSON file: "+avatarFile+". Ensure it follows RFC 8259 formatting");
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Logger.Warning("Failed to parse folder: " + avatarFolder);
+                }
             }
+                
 
             if (avatarConfig == null)
             {
