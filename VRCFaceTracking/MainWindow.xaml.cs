@@ -68,7 +68,7 @@ namespace VRCFaceTracking
             // Start a new thread to update the lip image
             new Thread(() =>
             {
-                while (!MainStandalone.MainToken.IsCancellationRequested)
+                while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                 {
                     Thread.Sleep(10);
                     Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLipImage()));
@@ -109,13 +109,12 @@ namespace VRCFaceTracking
 
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
-            UnifiedLibManager.CheckRuntimeSanity();
             Logger.Msg("Reinitializing...");
         }
 
         private void PauseClickEyes(object sender, RoutedEventArgs e)
         {
-            if (UnifiedLibManager.EyeStatus == ModuleState.Inactive)   // We don't wanna change states of an inactive module
+            if (UnifiedLibManager.EyeStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
                 return;
             
             UnifiedLibManager.EyeStatus = UnifiedLibManager.EyeStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
@@ -124,7 +123,7 @@ namespace VRCFaceTracking
 
         private void PauseClickMouth(object sender, RoutedEventArgs e)
         {
-            if (UnifiedLibManager.LipStatus == ModuleState.Inactive)   // We don't wanna change states of an inactive module
+            if (UnifiedLibManager.LipStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
                 return;
             
             UnifiedLibManager.LipStatus = UnifiedLibManager.LipStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;

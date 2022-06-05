@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ViveSR;
@@ -11,14 +9,13 @@ using ViveSR.anipal.Lip;
 
 namespace VRCFaceTracking.SRanipal
 {
-    public class SRanipalTrackingInterface : ITrackingModule
+    public class SRanipalExtTrackingInterface : ExtTrackingModule
     {
         private static CancellationTokenSource _cancellationToken;
+        
+        public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
 
-        public bool SupportsEye => true;
-        public bool SupportsLip => true;
-
-        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             _cancellationToken?.Cancel();
             
@@ -76,12 +73,12 @@ namespace VRCFaceTracking.SRanipal
             return (eyeEnabled, lipEnabled);
         }
         
-        public void Teardown()
+        public override void Teardown()
         {
             _cancellationToken.Cancel();
             
-            if (UnifiedLibManager.EyeStatus != ModuleState.Inactive) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
-            if (UnifiedLibManager.LipStatus != ModuleState.Inactive) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
+            if (Status.EyeState > ModuleState.Uninitialized) SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2);
+            if (Status.LipState > ModuleState.Uninitialized) SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2);
             
             _cancellationToken.Dispose();
         }
@@ -89,25 +86,22 @@ namespace VRCFaceTracking.SRanipal
         #region Update
 
         
-        public Action GetUpdateThreadFunc()
+        public override Action GetUpdateThreadFunc()
         {
             _cancellationToken = new CancellationTokenSource();
             return () =>
             {
                 while (!_cancellationToken.IsCancellationRequested)
                 {
-                    Update();
-                    //Thread.Sleep(10);
+                    if (Status.LipState == ModuleState.Active)
+                        UpdateMouth();
+            
+                    if (Status.EyeState == ModuleState.Active)
+                        UpdateEye();
                 }
             };
         }
 
-        public void Update()
-        {
-            UpdateMouth();
-            UpdateEye();
-        }
-        
         private const int PROCESS_VM_OPERATION = 0x0008;
         private const int PROCESS_VM_READ = 0x0010;
         private const int PROCESS_VM_WRITE = 0x0020;
@@ -143,17 +137,12 @@ namespace VRCFaceTracking.SRanipal
         
         private void UpdateEye()
         {
-            if (UnifiedLibManager.EyeStatus != ModuleState.Active) return;
             EyeData_v2 eyeData = default;
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
         }
 
-        private void UpdateMouth()
-        {
-            if (UnifiedLibManager.LipStatus != ModuleState.Active) return;
-            SRanipal_Lip_v2.GetLipWeightingsAndImage(out UnifiedTrackingData.LatestLipShapes, out UnifiedTrackingData.Image);
-        }
+        private void UpdateMouth() => SRanipal_Lip_v2.GetLipWeightingsAndImage(out UnifiedTrackingData.LatestLipShapes, out UnifiedTrackingData.Image);
 
         #endregion
     }

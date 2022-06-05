@@ -40,7 +40,7 @@ namespace VRCFaceTracking.OSC
 
             receiveThread = new Thread(() =>
             {
-                while (!MainStandalone.MainToken.IsCancellationRequested)
+                while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                     Recv();
             });
             receiveThread.Start();

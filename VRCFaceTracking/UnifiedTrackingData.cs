@@ -112,7 +112,7 @@ namespace VRCFaceTracking
 
         // Central update action for all parameters to subscribe to
         public static Action<EyeTrackingData /* Lip Data Blend Shape  */
-            , Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedParamsUpdated;
+            , Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedDataUpdated;
 
         // Copy of latest updated unified eye data
         public static EyeTrackingData LatestEyeData;

@@ -5,8 +5,8 @@ namespace VRCFaceTracking
 {
     public static class Logger
     {
-        public static ObservableCollection<Tuple<string, string>> ConsoleOutput = new ObservableCollection<Tuple<string, string>> { new Tuple<string, string>("Logger Initialized...", "White") };
-        public static object ConsoleLock = new object();
+        public static readonly ObservableCollection<Tuple<string, string>> ConsoleOutput = new ObservableCollection<Tuple<string, string>> { new Tuple<string, string>("Logger Initialized...", "White") };
+        public static readonly object ConsoleLock = new object();
 
 
         public static void Msg(string msgStr)

@@ -36,7 +36,7 @@ namespace VRCFaceTracking.OSC
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
                 var compatibleParam =
-                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.type == _paramType);
+                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.Type == _paramType);
                 if (compatibleParam != null)
                 {
                     Relevant = true;
@@ -131,7 +131,7 @@ namespace VRCFaceTracking.OSC
                 _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
-                var boolParams = newParams.Where(p => p.input.type == typeof(bool) && p.name.StartsWith(_paramName));
+                var boolParams = newParams.Where(p => p.input.Type == typeof(bool) && p.name.StartsWith(_paramName));
 
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)

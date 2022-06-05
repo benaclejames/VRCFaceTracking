@@ -11,7 +11,7 @@ namespace VRCFaceTracking.Params
         public FloatParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc,
             string paramName)
             : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
                 //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
@@ -26,7 +26,7 @@ namespace VRCFaceTracking.Params
     {
         public XYParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new OSCParams.FloatBaseParam(xParamName), new OSCParams.FloatBaseParam(yParamName)) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
@@ -47,7 +47,7 @@ namespace VRCFaceTracking.Params
     {
         public BoolParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, bool?> getValueFunc,
             string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
@@ -70,7 +70,7 @@ namespace VRCFaceTracking.Params
         public BinaryParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc,
             string paramName) : base(paramName)
         {
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)

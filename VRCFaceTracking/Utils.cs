@@ -20,12 +20,12 @@ namespace VRCFaceTracking
         [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", SetLastError = true)]
         public static extern uint TimeEndPeriod(uint uMilliseconds);
         
-        public static string DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
+        public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
 
-        public static string VRCData = Path.Combine(Environment
+        public static readonly string VRCData = Path.Combine(Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData).Replace("Roaming", "LocalLow"), "VRChat\\VRChat");
         
-        public static string VRCOSCDirectory = Path.Combine(VRCData, "OSC");
+        public static readonly string VRCOSCDirectory = Path.Combine(VRCData, "OSC");
 
         public static readonly Dictionary<Type, (char oscType, string configType)> TypeConversions =
             new Dictionary<Type, (char oscType, string configType)>
