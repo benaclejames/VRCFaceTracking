@@ -28,7 +28,6 @@ namespace VRCFaceTracking.Params
             : base(new OSCParams.FloatBaseParam(xParamName), new OSCParams.FloatBaseParam(yParamName)) =>
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -50,7 +49,6 @@ namespace VRCFaceTracking.Params
             string paramName) : base(paramName) =>
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -74,7 +72,6 @@ namespace VRCFaceTracking.Params
         {
             UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;

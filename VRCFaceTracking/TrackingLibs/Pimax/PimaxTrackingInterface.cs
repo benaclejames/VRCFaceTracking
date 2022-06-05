@@ -4,17 +4,17 @@ using VRCFaceTracking.Pimax;
 
 namespace VRCFaceTracking.TrackingLibs.Pimax
 { 
-    public class PimaxTrackingInterface : ExtTrackingModule
+    public class PimaxTrackingInterface //: ITrackingModule
     {
         private static readonly Ai1EyeData PimaxEyeData = new Ai1EyeData();
         private static readonly CancellationTokenSource CancellationToken = new CancellationTokenSource();
         
         private static bool _needsUpdate;
         
-        public override (bool SupportsEye, bool SupportsLip) Supported => (true, false);
-        public override (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
+        public bool SupportsEye => true;
+        public bool SupportsLip => false;
 
-        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             PimaxTracker.RegisterCallback(CallbackType.Update, () => _needsUpdate = true);
 
@@ -22,7 +22,7 @@ namespace VRCFaceTracking.TrackingLibs.Pimax
             return (success, false);
         }
 
-        public override Action GetUpdateThreadFunc()
+        public Action GetUpdateThreadFunc()
         {
             return () =>
             {
@@ -36,15 +36,15 @@ namespace VRCFaceTracking.TrackingLibs.Pimax
             };
         }
 
-        public override void Teardown()
+        public void Teardown()
         {
             CancellationToken.Cancel();
             PimaxTracker.Stop();
         }
 
-        public override void Update()
+        public void Update()
         {
-            if (!Utilizing.UtilizingEye) return;
+            if (UnifiedLibManager.EyeStatus != ModuleState.Active) return;
             
             PimaxEyeData.Update();
             UnifiedTrackingData.LatestEyeData.UpdateData(PimaxEyeData);

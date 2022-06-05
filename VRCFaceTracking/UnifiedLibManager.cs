@@ -9,66 +9,86 @@ using System.Threading;
 
 namespace VRCFaceTracking
 {
-    public abstract class ExtTrackingModule
+    public interface ITrackingModule
     {
-        // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
-        public abstract (bool SupportsEye, bool SupportsLip) Supported { get; }
-        
-        // Should the module be writing to UnifiedTrackingData for eye or lip tracking updates.
-        public abstract (bool UtilizingEye, bool UtilizingLip) Utilizing { get; set; }
+        bool SupportsEye { get; }
+        bool SupportsLip { get; }
 
-        public abstract (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-
-        public abstract Action GetUpdateThreadFunc();
-
-        public abstract void Update();
-
-        public abstract void Teardown();
+        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+        Action GetUpdateThreadFunc();
+        void Update();
+        void Teardown();
+    }
+    
+    public enum ModuleState
+    {
+        Inactive = -1,
+        Idle = 0,
+        Active = 1
     }
 
     public static class UnifiedLibManager
     {
-        public static bool EyeEnabled, LipEnabled;
-        private static readonly Dictionary<Type, ExtTrackingModule> UsefulModules = new Dictionary<Type, ExtTrackingModule>();
+        private static ModuleState _eyeStatus = ModuleState.Inactive, _lipStatus = ModuleState.Inactive;
+
+        public static ModuleState EyeStatus
+        {
+            get => _eyeStatus;
+            set
+            {
+                _eyeStatus = value;
+                OnTrackingStateUpdate.Invoke(value, LipStatus);
+            }
+        }
+
+        public static ModuleState LipStatus
+        {
+            get => _lipStatus;
+            set
+            {
+                _lipStatus = value;
+                OnTrackingStateUpdate.Invoke(EyeStatus, value);
+            }
+        }
+
+        private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
         private static readonly List<Thread> UsefulThreads = new List<Thread>();
-        
+
         private static Thread _initializeWorker;
         public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
+        public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
 
         // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
-        public static IEnumerator CheckRuntimeSanity()
+        public static void CheckRuntimeSanity()
         {
             // Check we have UAC admin
             if (!Utils.HasAdmin)
             {
                 Logger.Error("VRCFaceTracking must be running with Administrator privileges to force module reinitialization.");
-                yield return null;
+                return;
             }
-            
-            Logger.Msg("Checking Runtime Sanity...");
-            EyeEnabled = false;
-            LipEnabled = false;
+
+            EyeStatus = ModuleState.Inactive;
+            LipStatus = ModuleState.Inactive;
             UsefulModules.Clear();
             foreach (var process in Process.GetProcessesByName("sr_runtime"))
             {
-                Logger.Msg("Killing "+process.ProcessName);
                 process.Kill();
-                Thread.Sleep(3000);
-                Logger.Msg("Re-Initializing");
                 Initialize();
             }
         }
-        
+
         public static void Initialize(bool eye = true, bool lip = true)
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            foreach (var updateThread in UsefulThreads)
+            
+            foreach (var updateThread in UsefulThreads.ToList()) //Add ToList() to isolate the UsefulThreads in the for loop
             {
                 updateThread.Abort();
                 UsefulThreads.Remove(updateThread);
             }
-            
+
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
             _initializeWorker.Start();
@@ -78,13 +98,13 @@ namespace VRCFaceTracking
         {
             var returnList = new List<Type>();
             var path = Path.Combine(Utils.DataDirectory, "CustomLibs");
-            
+
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
                 return returnList;
             }
-            
+
             Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
@@ -92,30 +112,18 @@ namespace VRCFaceTracking
             foreach (var dll in dlls)
             {
                 Logger.Msg("Loading " + dll);
+                var loadedModule = Assembly.LoadFrom(dll);
 
-                Type module = null;
-                try 
-                {
-                    var loadedModule = Assembly.LoadFrom(dll);
-                    // Get the first class that implements ExtTrackingModule
-                    module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    foreach (var loaderException in e.LoaderExceptions)
-                    {
-                        Logger.Error("LoaderException: " + loaderException.Message);
-                    }
-                    Logger.Error("Exception loading " + dll + ". Skipping.");
-                    continue;
-                }
+                // Get the first type that implements ITrackingModule
+                var module = loadedModule.GetTypes()
+                    .FirstOrDefault(t => t.GetInterfaces().Contains(typeof(ITrackingModule)));
                 if (module != null)
                 {
                     returnList.Add(module);
                     Logger.Msg("Loaded external tracking module: " + module.Name);
                     continue;
                 }
-                
+
                 Logger.Warning("Module " + dll + " does not implement ITrackingModule");
             }
 
@@ -124,20 +132,21 @@ namespace VRCFaceTracking
 
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
+            Thread.Sleep(100); //Pause for 100ms so logger does not throw an error
             Logger.Msg("Finding and initializing runtimes...");
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
+                .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
 
             trackingModules = trackingModules.Union(LoadExternalModules());
 
             foreach (var module in trackingModules)
             {
                 bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
-                
-                var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
+
+                var moduleObj = (ITrackingModule)Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
-                if (!EyeEnabled && moduleObj.Supported.SupportsEye || !LipEnabled && moduleObj.Supported.SupportsLip)
+                if (EyeStatus == ModuleState.Inactive && moduleObj.SupportsEye || LipStatus == ModuleState.Inactive && moduleObj.SupportsLip)
                     (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
 
                 // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
@@ -156,42 +165,25 @@ namespace VRCFaceTracking
                     }
                 }
 
-                if (!EyeEnabled && eyeSuccess)
-                {
-                    // Let the module know it'll be used for eye tracking
-                    var moduleObjUtilizing = moduleObj.Utilizing;
-                    moduleObjUtilizing.UtilizingEye = true;
-                    moduleObj.Utilizing = moduleObjUtilizing;
-                    
-                    // We can now assume that we have a module that's willing to give us eye tracking data
-                    EyeEnabled = true;
-                }
+                if (eyeSuccess) EyeStatus = ModuleState.Active;
+                if (lipSuccess) LipStatus = ModuleState.Active;
 
-                if (!LipEnabled && lipSuccess)
-                {
-                    // Let the module know it'll be used for lip tracking
-                    var moduleObjUtilizing = moduleObj.Utilizing;
-                    moduleObjUtilizing.UtilizingLip = true;
-                    moduleObj.Utilizing = moduleObjUtilizing;
-
-                    // We can now assume that we have a module that's willing to give us lip tracking data
-                    LipEnabled = true;
-                }
-
-                if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
+                if (EyeStatus != ModuleState.Inactive && LipStatus != ModuleState.Inactive) break;    // Keep enumerating over all modules until we find ones we can use
             }
 
             if (eye)
             {
-                if (EyeEnabled) Logger.Msg("Eye Tracking Initialized via " + UsefulModules.First(module => module.Value.Utilizing.UtilizingEye).Key.Name);
-                else Logger.Warning("Eye Tracking will be unavailable for this session.");
+                if (EyeStatus != ModuleState.Inactive) Logger.Msg("Eye Tracking Initialized!");
+                else Logger.Warning("Eye Tracking is Inactive");
             }
 
             if (lip)
             {
-                if (LipEnabled) Logger.Msg("Lip Tracking Initialized via " + UsefulModules.First(module => module.Value.Utilizing.UtilizingLip).Key.Name);
-                else Logger.Warning("Lip Tracking will be unavailable for this session.");
+                if (LipStatus != ModuleState.Inactive) Logger.Msg("Lip Tracking Initialized!");
+                else Logger.Warning("Lip Tracking is Inactive");
             }
+
+            OnTrackingStateUpdate?.Invoke(EyeStatus, LipStatus);
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes
@@ -200,12 +192,12 @@ namespace VRCFaceTracking
             foreach (var module in UsefulModules)
                 module.Value.Teardown();
         }
-        
+
         // Manually signal all useful modules to get the latest data
         public static void Update()
         {
-            if (ShouldThread || !(EyeEnabled || LipEnabled)) return;
-            
+            if (ShouldThread || EyeStatus != ModuleState.Active && EyeStatus != ModuleState.Active) return;
+
             foreach (var module in UsefulModules.Values)
                 module.Update();
         }
