@@ -83,9 +83,9 @@ namespace VRCFaceTracking
                 
                 if (_relevantParamsCount <= 0)
                     continue;
-                
+
                 UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
-                    UnifiedTrackingData.LatestLipShapes);
+                    UnifiedTrackingData.LatestLipData);
 
                 var bundle = new OscBundle(ConstructMessages(_relevantParams));
                 

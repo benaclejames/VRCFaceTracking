@@ -71,23 +71,39 @@ namespace VRCFaceTracking
                 while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                 {
                     Thread.Sleep(10);
-                    Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLipImage()));
+                    Dispatcher.BeginInvoke(new ThreadStart(() =>
+                    {
+                        UpdateEyeImage();
+                        UpdateLipImage();
+                    }));
                 }
             }).Start();
         }
 
         void UpdateLipImage()
         {
-            if (UnifiedTrackingData.Image == IntPtr.Zero)   // If the image is not initialized
+            if (UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
                 return;
             
-            byte[] managedArray = new byte[800*400];
-            Marshal.Copy(UnifiedTrackingData.Image, managedArray, 0, 800*400);
-            var bitmap = new WriteableBitmap(800, 400, 96, 96, PixelFormats.Gray8, null);
-            bitmap.WritePixels(new Int32Rect(0, 0, 800, 400), managedArray, 800, 0);
+            var bitmap = new WriteableBitmap(UnifiedTrackingData.LatestLipData.ImageSize.x, UnifiedTrackingData.LatestLipData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestLipData.ImageSize.x, UnifiedTrackingData.LatestLipData.ImageSize.y), UnifiedTrackingData.LatestLipData.ImageData, 800, 0);
             
             // Set the WPF image name LipImage 
             LipImage.Source = bitmap;
+        }
+        
+        void UpdateEyeImage()
+        {
+            if (UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
+                return;
+            
+            var bitmap = new WriteableBitmap(UnifiedTrackingData.LatestEyeData.ImageSize.x, 
+                UnifiedTrackingData.LatestEyeData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+            bitmap.WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestEyeData.ImageSize.x, 
+                UnifiedTrackingData.LatestEyeData.ImageSize.y), UnifiedTrackingData.LatestEyeData.ImageData, UnifiedTrackingData.LatestEyeData.ImageSize.x, 0);
+            
+            // Set the WPF image name EyeImage 
+            EyeImage.Source = bitmap;
         }
 
         public ObservableCollection<Tuple<string, string>> ConsoleOutput => Logger.ConsoleOutput;
@@ -118,7 +134,6 @@ namespace VRCFaceTracking
                 return;
             
             UnifiedLibManager.EyeStatus = UnifiedLibManager.EyeStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
-            Logger.Msg(UnifiedLibManager.EyeStatus == ModuleState.Idle ? "Eyes Paused" : "Eyes Unpaused");
         }
 
         private void PauseClickMouth(object sender, RoutedEventArgs e)
@@ -127,7 +142,6 @@ namespace VRCFaceTracking
                 return;
             
             UnifiedLibManager.LipStatus = UnifiedLibManager.LipStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
-            Logger.Msg(UnifiedLibManager.LipStatus == ModuleState.Idle ? "Mouth Paused" : "Mouth Unpaused");
         }
 
         private void UpdateLogo(ModuleState eyeState, ModuleState lipState)

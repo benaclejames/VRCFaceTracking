@@ -190,9 +190,11 @@ namespace VRCFaceTracking
         {
             foreach (var module in UsefulThreads)
             {
+                module.Key.Status = (ModuleState.Idle, ModuleState.Idle);
                 module.Key.Teardown();
                 module.Value.Abort();
             }
+            UsefulThreads.Clear();
         }
     }
 }

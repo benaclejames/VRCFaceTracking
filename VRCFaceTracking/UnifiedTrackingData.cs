@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
@@ -106,19 +107,37 @@ namespace VRCFaceTracking
         }
     }
 
+    public struct LipTrackingData
+    {
+        // Camera Data
+        public (int x, int y) ImageSize;
+        public byte[] ImageData;
+        public bool SupportsImage;
+
+        public float[] LatestShapes;
+
+        public void UpdateData(LipData_v2 lipData)
+        {
+            if (LatestShapes == null)
+                LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
+
+            unsafe
+            {
+                for (int i = 0; i < SRanipal_Lip_v2.WeightingCount; i++)
+                    LatestShapes[i] = lipData.prediction_data.blend_shape_weight[i];
+            }
+        }
+    }
+
     public struct UnifiedTrackingData
     {
         public static readonly List<IParameter> AllParameters = EyeTrackingParams.ParameterList.Union(LipShapeMerger.AllLipParameters).ToList();
 
         // Central update action for all parameters to subscribe to
         public static Action<EyeTrackingData /* Lip Data Blend Shape  */
-            , Dictionary<LipShape_v2, float> /* Lip Weightings */> OnUnifiedDataUpdated;
+            , LipTrackingData /* Lip Weightings */> OnUnifiedDataUpdated;
 
-        // Copy of latest updated unified eye data
         public static EyeTrackingData LatestEyeData;
-
-        // SRanipal Exclusives
-        public static IntPtr Image;
-        public static Dictionary<LipShape_v2, float> LatestLipShapes = new Dictionary<LipShape_v2, float>();
+        public static LipTrackingData LatestLipData;
     }
 }
