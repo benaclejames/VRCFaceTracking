@@ -28,11 +28,11 @@ namespace VRCFaceTracking
     {
         private static OscMain _oscMain;
         
-        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
+        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
             parameters.Select(param => new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue)).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static int _relevantParamsCount;
+        private static int _relevantParamsCount = 416;
 
         private static string _ip = "127.0.0.1";
         private static int _inPort = 9001, _outPort = 9000;
@@ -60,7 +60,7 @@ namespace VRCFaceTracking
             // Load dependencies and initialize tracking runtimes
             Logger.Msg("VRCFT Initializing!");
             DependencyManager.Load();
-            UnifiedLibManager.Initialize();
+            UnifiedLibManager.Initialize(false);
             
             // Initialize Locals
             _oscMain = new OscMain(_ip, _outPort, _inPort);
@@ -87,9 +87,21 @@ namespace VRCFaceTracking
                 UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
                     UnifiedTrackingData.LatestLipData);
 
-                var bundle = new OscBundle(ConstructMessages(_relevantParams));
+                var messages = ConstructMessages(_relevantParams);
+                while (messages.Count > 0)
+                {
+                    var msgCount = 16;
+                    var msgList = new List<OscMessage>();
+                    while (messages.Count > 0 && msgCount+messages[0].Data.Length+4 < 4096)
+                    {
+                        msgList.Add(messages[0]);
+                        msgCount += messages[0].Data.Length+4;
+                        messages.RemoveAt(0);
+                    }
+                    var bundle = new OscBundle(msgList);
+                    _oscMain.Send(bundle.Data);
+                }
                 
-                _oscMain.Send(bundle.Data);
             }
         }
     }

@@ -42,7 +42,7 @@ namespace VRCFaceTracking
         }
     }
     
-    public struct EyeTrackingData
+    public class EyeTrackingData
     {
         // Camera Data
         public (int x, int y) ImageSize;
@@ -107,20 +107,17 @@ namespace VRCFaceTracking
         }
     }
 
-    public struct LipTrackingData
+    public class LipTrackingData
     {
         // Camera Data
         public (int x, int y) ImageSize;
         public byte[] ImageData;
         public bool SupportsImage;
 
-        public float[] LatestShapes;
+        public float[] LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
 
         public void UpdateData(LipData_v2 lipData)
         {
-            if (LatestShapes == null)
-                LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
-
             unsafe
             {
                 for (int i = 0; i < SRanipal_Lip_v2.WeightingCount; i++)
@@ -129,7 +126,7 @@ namespace VRCFaceTracking
         }
     }
 
-    public struct UnifiedTrackingData
+    public class UnifiedTrackingData
     {
         public static readonly List<IParameter> AllParameters = EyeTrackingParams.ParameterList.Union(LipShapeMerger.AllLipParameters).ToList();
 
@@ -137,7 +134,7 @@ namespace VRCFaceTracking
         public static Action<EyeTrackingData /* Lip Data Blend Shape  */
             , LipTrackingData /* Lip Weightings */> OnUnifiedDataUpdated;
 
-        public static EyeTrackingData LatestEyeData;
-        public static LipTrackingData LatestLipData;
+        public static EyeTrackingData LatestEyeData = new EyeTrackingData();
+        public static LipTrackingData LatestLipData = new LipTrackingData();
     }
 }
