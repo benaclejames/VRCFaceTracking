@@ -1,6 +1,5 @@
 ﻿//========= Copyright 2018, HTC Corporation. All rights reserved. ===========
 using System.Runtime.InteropServices;
-using UnityEngine;
 using Vector2 = VRCFaceTracking.Params.Vector2;
 using Vector3 = VRCFaceTracking.Params.Vector3;
 
@@ -44,8 +43,7 @@ namespace ViveSR
             public struct TrackingImprovements
             {
                 public int count;
-                [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-                public TrackingImprovement[] items;
+                public unsafe fixed int items[10];
             };
 
             /** @struct SingleEyeData
@@ -75,7 +73,7 @@ namespace ViveSR
             public struct CombinedEyeData
             {
                 public SingleEyeData eye_data;
-                public bool convergence_distance_validity;
+                public byte convergence_distance_validity;
                 public float convergence_distance_mm;
             }
 
@@ -114,21 +112,6 @@ namespace ViveSR
             {
                 public GazeRayParameter gaze_ray_parameter;
             };
-            #endregion
-
-            #region FocusInfo
-            /// <summary>
-            /// The data structure to indicate Focus information
-            /// </summary>
-            public struct FocusInfo
-            {
-                public Vector3 point;
-                public Vector3 normal;
-                public float distance;
-                public Collider collider;
-                public Rigidbody rigidbody;
-                public Transform transform;
-            }
             #endregion
 
             #region CalibrationResult

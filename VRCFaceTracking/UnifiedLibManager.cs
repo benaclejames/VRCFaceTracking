@@ -1,72 +1,76 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
 using System.Threading;
-using MelonLoader;
-using UnhollowerBaseLib;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking
 {
-    public interface ITrackingModule
+    public abstract class ExtTrackingModule
     {
-        bool SupportsEye { get; }
-        bool SupportsLip { get; }
+        // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
+        public virtual (bool SupportsEye, bool SupportsLip) Supported => (false, false);
+        
+        // Should the module be writing to UnifiedTrackingData for eye or lip tracking updates.
+        public (ModuleState EyeState, ModuleState LipState) Status = (ModuleState.Uninitialized,
+            ModuleState.Uninitialized);
 
-        (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-        Action GetUpdateThreadFunc();
-        void Update();
-        void Teardown();
+        public abstract (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
+
+        public abstract Action GetUpdateThreadFunc();
+
+        public abstract void Teardown();
+    }
+    
+    public enum ModuleState
+    {
+        Uninitialized = -1, // If the module is not initialized, we can assume it's not being used
+        Idle = 0,   // Idle and above we can assume the module in question is or has been in use
+        Active = 1
     }
 
     public static class UnifiedLibManager
     {
-        public static bool EyeEnabled, LipEnabled;
-        private static readonly Dictionary<Type, ITrackingModule> UsefulModules = new Dictionary<Type, ITrackingModule>();
-        private static readonly List<Thread> UsefulThreads = new List<Thread>();
-        
-        private static Thread _initializeWorker;
-        public static readonly bool ShouldThread = !Environment.GetCommandLineArgs().Contains("--vrcft-nothread");
-
-        // Used when re-initializing modules, kills malfunctioning SRanipal process and restarts it. 
-        public static IEnumerator CheckRuntimeSanity()
+        public static ModuleState EyeStatus
         {
-            // Check we have UAC admin
-            if (!MainMod.HasAdmin)
+            get => _eyeModule?.Status.EyeState ?? ModuleState.Uninitialized;
+            set
             {
-                MelonLogger.Error("VRChat must be running with Administrator privileges to force module reinitialization.");
-                yield return null;
-            }
-            
-            MelonLogger.Msg("Checking Runtime Sanity...");
-            EyeEnabled = false;
-            LipEnabled = false;
-            UsefulModules.Clear();
-            foreach (var process in Process.GetProcessesByName("sr_runtime"))
-            {
-                MelonLogger.Msg("Killing "+process.ProcessName);
-                process.Kill();
-                yield return new WaitForSeconds(3);
-                MelonLogger.Msg("Re-Initializing");
-                Initialize();
+                if (_eyeModule != null)
+                    _eyeModule.Status.EyeState = value;
+                OnTrackingStateUpdate.Invoke(value, LipStatus);
             }
         }
+
+        public static ModuleState LipStatus
+        {
+            get => _lipModule?.Status.LipState ?? ModuleState.Uninitialized;
+            set
+            {
+                if (_lipModule != null)
+                    _lipModule.Status.LipState = value;
+                OnTrackingStateUpdate.Invoke(EyeStatus, value);
+            }
+        }
+
+        private static ExtTrackingModule _eyeModule, _lipModule;
+
+        private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
+            new Dictionary<ExtTrackingModule, Thread>();
+        public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
         
+        private static Thread _initializeWorker;
+
         public static void Initialize(bool eye = true, bool lip = true)
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            foreach (var updateThread in UsefulThreads.ToList())
+            foreach (var updateThread in UsefulThreads)
             {
-                updateThread.Abort();
-                UsefulThreads.Remove(updateThread);
+                updateThread.Key.Teardown();
+                updateThread.Value.Abort();
+                UsefulThreads.Remove(updateThread.Key);
             }
             
             // Start Initialization
@@ -77,108 +81,120 @@ namespace VRCFaceTracking
         private static List<Type> LoadExternalModules()
         {
             var returnList = new List<Type>();
-
-            // Return if VRChat\\Mods\\VRCFTLibs isn't a folder
-            if (!Directory.Exists(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs"))
-            {
-                Directory.CreateDirectory(MelonUtils.BaseDirectory + "\\Mods\\VRCFTLibs");
-                return returnList;
-            }
+            var customLibsPath = Path.Combine(Utils.PersistentDataDirectory, "CustomLibs");
             
-            MelonLogger.Msg("Loading External Modules...");
+            if (!Directory.Exists(customLibsPath))
+                Directory.CreateDirectory(customLibsPath);
+            
+            Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
-            var dlls = Directory.GetFiles(Path.Combine("Mods\\VRCFTLibs"), "*.dll");
-            foreach (var dll in dlls)
+            foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
             {
-                var loadedModule = Assembly.LoadFrom(MelonUtils.BaseDirectory+"\\"+dll);
+                Logger.Msg("Loading " + dll);
 
-                // Get the first type that implements ITrackingModule
-                var module = loadedModule.GetTypes()
-                    .FirstOrDefault(t => t.GetInterfaces().Contains(typeof(ITrackingModule)));
-                if (module != null)
+                Type module;
+                try 
                 {
-                    returnList.Add(module);
-                    MelonLogger.Msg("Loaded external tracking module: " + module.Name);
+                    var loadedModule = Assembly.LoadFrom(dll);
+                    // Get the first class that implements ExtTrackingModule
+                    module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    foreach (var loaderException in e.LoaderExceptions)
+                    {
+                        Logger.Error("LoaderException: " + loaderException.Message);
+                    }
+                    Logger.Error("Exception loading " + dll + ". Skipping.");
                     continue;
                 }
                 
-                MelonLogger.Warning("Module " + dll + " does not implement ITrackingModule");
+                if (module != null)
+                {
+                    returnList.Add(module);
+                    Logger.Msg("Loaded external tracking module: " + module.Name);
+                    continue;
+                }
+                
+                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule");
             }
 
             return returnList;
         }
 
+        private static void StartThreadForModule(ExtTrackingModule module)
+        {
+            if (UsefulThreads.ContainsKey(module))
+                return;
+            
+            var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
+            UsefulThreads.Add(module, thread);
+            thread.Start();
+        }
+
         private static void FindAndInitRuntimes(bool eye = true, bool lip = true)
         {
-            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+            Logger.Msg("Finding and initializing runtimes...");
 
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => type.GetInterfaces().Contains(typeof(ITrackingModule)));
+                .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
 
             trackingModules = trackingModules.Union(LoadExternalModules());
 
             foreach (var module in trackingModules)
             {
-                bool eyeSuccess = false, lipSuccess = false;    // Init result for every 
+                EyeStatus = ModuleState.Uninitialized;
+                LipStatus = ModuleState.Uninitialized;
                 
-                var moduleObj = (ITrackingModule) Activator.CreateInstance(module);
+                var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
-                if (!EyeEnabled && moduleObj.SupportsEye || !LipEnabled && moduleObj.SupportsLip)
-                    (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
-
-                // If the module successfully initialized anything, add it to the list of useful modules and start its update thread
-                if ((eyeSuccess || lipSuccess) && !UsefulModules.ContainsKey(module))
+                if (EyeStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsEye ||
+                    LipStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsLip)
                 {
-                    UsefulModules.Add(module, moduleObj);
-                    if (ShouldThread)
+                    (bool eyeSuccess, bool lipSuccess) = moduleObj.Initialize(eye, lip);
+                    // If eyeSuccess or lipSuccess was true, set the status to active
+                    if (eyeSuccess && _eyeModule == null)
                     {
-                        Action updater = moduleObj.GetUpdateThreadFunc();
-                        var updateThread = new Thread(() =>
-                        {
-                            IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                            updater.Invoke();
-                        });
-                        UsefulThreads.Add(updateThread);
-                        updateThread.Start();
+                        _eyeModule = moduleObj;
+                        EyeStatus = ModuleState.Active;
+                        StartThreadForModule(moduleObj);
+                    }
+
+                    if (lipSuccess && _lipModule == null)
+                    {
+                        _lipModule = moduleObj;
+                        LipStatus = ModuleState.Active;
+                        StartThreadForModule(moduleObj);
                     }
                 }
 
-                if (eyeSuccess) EyeEnabled = true;
-                if (lipSuccess) LipEnabled = true;
-
-                if (EyeEnabled && LipEnabled) break;    // Keep enumerating over all modules until we find ones we can use
+                if ((int)EyeStatus >= 0 && (int)LipStatus >= 0) break;    // Keep enumerating over all modules until we find ones we can use
             }
 
             if (eye)
-                MelonLogger.Msg(EyeEnabled
-                    ? "Eye Tracking Initialized"
-                    : "Eye Tracking will be unavailable for this session.");
+            {
+                if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _eyeModule);
+                else Logger.Warning("Eye Tracking will be unavailable for this session.");
+            }
 
             if (lip)
             {
-                if (LipEnabled) MelonLogger.Msg("Lip Tracking Initialized");
-                else MelonLogger.Warning("Lip Tracking will be unavailable for this session.");
+                if (LipStatus != ModuleState.Uninitialized) Logger.Msg("Lip Tracking Initialized via " +  _lipModule);
+                else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
-
-            if (QuickModeMenu.MainMenu != null)
-                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeEnabled, LipEnabled));
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes
         public static void Teardown()
         {
-            foreach (var module in UsefulModules)
-                module.Value.Teardown();
-        }
-        
-        // Manually signal all useful modules to get the latest data
-        public static void Update()
-        {
-            if (ShouldThread || !(EyeEnabled || LipEnabled)) return;
-            
-            foreach (var module in UsefulModules.Values)
-                module.Update();
+            foreach (var module in UsefulThreads)
+            {
+                module.Key.Status = (ModuleState.Idle, ModuleState.Idle);
+                module.Key.Teardown();
+                module.Value.Abort();
+            }
+            UsefulThreads.Clear();
         }
     }
 }

@@ -39,17 +39,19 @@ namespace VRCFT_Module_Example
         }
     }
     
-    public class ExternalTrackingModule : ITrackingModule
+    public class ExternalExtTrackingModule : ExtTrackingModule
     {
         // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
-        public (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
+
+        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
         {
             Console.WriteLine("Initializing inside external module");
             return (true, false);
         }
 
         // This will be run in the tracking thread. This is exposed so you can control when and if the tracking data is updated down to the lowest level.
-        public Action GetUpdateThreadFunc()
+        public override Action GetUpdateThreadFunc()
         {
             return () =>
             {
@@ -64,16 +66,18 @@ namespace VRCFT_Module_Example
         // The update function needs to be defined separately in case the user is running with the --vrcft-nothread launch parameter
         public void Update()
         {
-            Console.WriteLine("Updating inside external module");
+            Console.WriteLine("Updating inside external module.");
+            
+            if (Status.EyeState == ModuleState.Active)
+                Console.WriteLine("Eye data is being utilized.");
+            if (Status.LipState == ModuleState.Active)
+                Console.WriteLine("Lip data is being utilized.");
         }
 
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
-        public void Teardown()
+        public override void Teardown()
         {
             Console.WriteLine("Teardown");
         }
-
-        public bool SupportsEye => true;
-        public bool SupportsLip => true;
     }
 }

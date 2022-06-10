@@ -1,7 +1,8 @@
-﻿using VRC.UI;
+﻿using System.Runtime.InteropServices;
 
 namespace VRCFaceTracking.Params
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
     {
         public float x;
@@ -21,16 +22,6 @@ namespace VRCFaceTracking.Params
             x *= -1;
             
             return this;
-        }
-        
-        public static implicit operator Vector3(UnityEngine.Vector3 v)
-        {
-            return new Vector3(v.x, v.y, v.z);
-        }
-        
-        public static implicit operator UnityEngine.Vector3(Vector3 v)
-        {
-            return new UnityEngine.Vector3(v.x, v.y, v.z);
         }
     }
 }

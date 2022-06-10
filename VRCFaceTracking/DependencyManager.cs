@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MelonLoader;
 
 namespace VRCFaceTracking
 {
@@ -16,24 +15,66 @@ namespace VRCFaceTracking
             "SRanipal.nanomsg.dll",
             "SRanipal.SRWorks_Log.dll",
             "SRanipal.ViveSR_Client.dll",
-            "SRanipal.SRanipal.dll"
+            "SRanipal.SRanipal.dll",
+            "Pimax.PimaxEyeTracker.dll"
         };
 
-        public static void Init()
+        public static void Load()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly;
+            
             var dllPaths = ExtractAssemblies(AssembliesToLoad);
             foreach (var path in dllPaths)
                 LoadAssembly(path);
+        }
+        
+        private static Assembly OnResolveAssembly(object sender, ResolveEventArgs e)
+        {
+            var thisAssembly = Assembly.GetExecutingAssembly();
+
+            var assemblyName = new AssemblyName(e.Name);
+            var dllName = assemblyName.Name + ".dll";
+
+            // Load from Embedded Resources - This function is not called if the Assembly is already
+            // in the same folder as the app.
+            var resources = thisAssembly.GetManifestResourceNames().Where(s => s.EndsWith(dllName));
+            if (resources.Any())
+            {
+
+                // 99% of cases will only have one matching item, but if you don't,
+                // you will have to change the logic to handle those cases.
+                var resourceName = resources.First();
+                using (var stream = thisAssembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream == null) return null;
+                    var block = new byte[stream.Length];
+
+                    // Safely try to load the assembly.
+                    try
+                    {
+                        stream.Read(block, 0, block.Length);
+                        return Assembly.Load(block);
+                    }
+                    catch (IOException)
+                    {
+                        return null;
+                    }
+                    catch(BadImageFormatException)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            // in the case the resource doesn't exist, return null.
+            return null;
         }
 
         private static IEnumerable<string> ExtractAssemblies(IEnumerable<string> resourceNames)
         {
             var extractedPaths = new List<string>();
 
-            var melonInfo = Assembly.GetExecutingAssembly().CustomAttributes.ToList()
-                .Find(a => a.AttributeType == typeof(MelonInfoAttribute));
-            
-            var dirName = Path.Combine(Path.GetTempPath(), melonInfo.ConstructorArguments[1].Value.ToString());
+            var dirName = Path.Combine(Utils.PersistentDataDirectory, "StockLibs");
             if (!Directory.Exists(dirName))
                 Directory.CreateDirectory(dirName);
 
@@ -63,7 +104,7 @@ namespace VRCFaceTracking
                     }
                     catch(Exception e)
                     {
-                        MelonLogger.Error($"Failed to get DLL: " + e.Message);
+                        Logger.Error("Failed to get DLL: " + e.Message);
                     }
                 }
             }
@@ -83,7 +124,9 @@ namespace VRCFaceTracking
         private static void LoadAssembly(string path)
         {
             if (LoadLibrary(path) == IntPtr.Zero)
-                MelonLogger.Error("Unable to load library " + path);
+                Logger.Error("Unable to load library " + path);
+            else
+                Logger.Msg("Loaded library " + path);
         }
     }
 }

@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ParamLib;
 using ViveSR.anipal.Lip;
-using VRC.SDK3.Avatars.ScriptableObjects;
+using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Params
 {
-    public class FloatParameter : FloatBaseParam, IParameter
+    public class FloatParameter : OSCParams.FloatBaseParam, IParameter
     {
-        public FloatParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc,
-            string paramName, bool wantsPriority = false)
-            : base(paramName, wantsPriority) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+        public FloatParameter(Func<EyeTrackingData, LipTrackingData, float?> getValueFunc,
+            string paramName)
+            : base(paramName) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
+                //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
             };
 
-        public string[] GetName() => new[] {ParamName};
+        public OSCParams.BaseParam[] GetBase() => new OSCParams.BaseParam[] {this};
     }
 
     public class XYParameter : XYParam, IParameter
     {
-        public XYParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, Vector2?> getValueFunc, string xParamName, string yParamName)
-            : base(new FloatBaseParam(xParamName, true), new FloatBaseParam(yParamName, true)) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+        public XYParameter(Func<EyeTrackingData, LipTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
+            : base(new OSCParams.FloatBaseParam(xParamName), new OSCParams.FloatBaseParam(yParamName)) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -40,20 +38,17 @@ namespace VRCFaceTracking.Params
         {
         }
 
-        public string[] GetName() => new[] {X.ParamName, Y.ParamName};
+        public void ResetParam(ConfigParser.Parameter[] newParams) => ResetParams(newParams);
 
-        public void ResetParam() => ResetParams();
-
-        public void ZeroParam() => ZeroParams();
+        public OSCParams.BaseParam[] GetBase() => new OSCParams.BaseParam[] {X, Y};
     }
 
-    public class BoolParameter : BoolBaseParam, IParameter
+    public class BoolParameter : OSCParams.BoolBaseParam, IParameter
     {
-        public BoolParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, bool?> getValueFunc,
+        public BoolParameter(Func<EyeTrackingData, LipTrackingData, bool?> getValueFunc,
             string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -64,17 +59,19 @@ namespace VRCFaceTracking.Params
         {
         }
 
-        public string[] GetName() => new [] {ParamName};
+        public OSCParams.BaseParam[] GetBase()
+        {
+            return new OSCParams.BaseParam[] {this};
+        }
     }
 
-    public class BinaryParameter : BinaryBaseParameter, IParameter
+    public class BinaryParameter : OSCParams.BinaryBaseParameter, IParameter
     {
-        public BinaryParameter(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc,
+        public BinaryParameter(Func<EyeTrackingData, LipTrackingData, float?> getValueFunc,
             string paramName) : base(paramName)
         {
-            UnifiedTrackingData.OnUnifiedParamsUpdated += (eye, lipFloats, lip) =>
+            UnifiedTrackingData.OnUnifiedDataUpdated += (eye, lip) =>
             {
-                if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(eye, lip);
                 if (value.HasValue)
                     ParamValue = value.Value;
@@ -84,6 +81,15 @@ namespace VRCFaceTracking.Params
         public BinaryParameter(Func<EyeTrackingData, float> getValueFunc, string paramName) : this((eye, lip) => getValueFunc.Invoke(eye), paramName)
         {
         }
+
+        public OSCParams.BaseParam[] GetBase()
+        {
+            OSCParams.BaseParam[] retParams = new OSCParams.BaseParam[_params.Count + 1];
+            // Merge _params.Values and _negativeParam
+            Array.Copy(_params.Values.ToArray(), retParams, _params.Count);
+            retParams[_params.Count] = _negativeParam;
+            return retParams;
+        }
     }
 
     // EverythingParam, or EpicParam. You choose!
@@ -91,18 +97,20 @@ namespace VRCFaceTracking.Params
     public class EParam : IParameter
     {
         private readonly IParameter[] _parameter;
+        private readonly string Name;
 
-        public EParam(Func<EyeTrackingData, Dictionary<LipShape_v2, float>, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
+        public EParam(Func<EyeTrackingData, LipTrackingData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
             var paramLiterals = new List<IParameter>
             {
                 new BoolParameter((eye, lip) => getValueFunc.Invoke(eye, lip) < minBoolThreshold, paramName),
-                new FloatParameter(getValueFunc, paramName, true),
+                new FloatParameter(getValueFunc, paramName),
             };
             
             if (!skipBinaryParamCreation)
              paramLiterals.Add(new BinaryParameter(getValueFunc, paramName));
-            
+
+            Name = paramName;
             _parameter = paramLiterals.ToArray();
         }
 
@@ -111,24 +119,13 @@ namespace VRCFaceTracking.Params
         {
         }
 
-        public string[] GetName()
-        {
-            var names = new List<string>();
-            foreach (var param in _parameter)
-                names.AddRange(param.GetName());
-            return names.ToArray();
-        }
+        OSCParams.BaseParam[] IParameter.GetBase() => 
+            _parameter.SelectMany(p => p.GetBase()).ToArray();
 
-        public void ResetParam()
+        public void ResetParam(ConfigParser.Parameter[] newParams)
         {
             foreach (var param in _parameter)
-                param.ResetParam();
-        }
-
-        public void ZeroParam()
-        {
-            foreach (var param in _parameter)
-                param.ZeroParam();
+                param.ResetParam(newParams);
         }
     }
 }
