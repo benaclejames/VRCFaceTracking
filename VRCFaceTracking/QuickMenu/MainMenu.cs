@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnhollowerBaseLib;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.PlayerLoop;
 using VRC.UI.Elements;
 using VRCFaceTracking.QuickMenu.EyeTracking;
 using VRCFaceTracking.QuickMenu.LipTracking;
+using Object = UnityEngine.Object;
 
 namespace VRCFaceTracking.QuickMenu
 {
@@ -65,7 +67,7 @@ namespace VRCFaceTracking.QuickMenu
                 }
             
             UpdateEnabledTabs(UnifiedLibManager.EyeStatus, UnifiedLibManager.LipStatus);
-            UnifiedLibManager.OnTrackingStateUpdate += UpdateEnabledTabs;
+            UnifiedLibManager.OnTrackingStateUpdate += (e, l) => MainMod.MainThreadExecutionQueue.Add(() => UpdateEnabledTabs(e, l));
         }
 
         public void UpdateEnabledTabs(ModuleState eye = ModuleState.Uninitialized, ModuleState lip = ModuleState.Uninitialized)
