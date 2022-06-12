@@ -13,6 +13,8 @@ namespace VRCFaceTracking.SRanipal
 {
     public class SRanipalExtTrackingInterface : ExtTrackingModule
     {
+        LipData_v2 lipData = default;
+        EyeData_v2 eyeData = default;
         private static CancellationTokenSource _cancellationToken;
         
         public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
@@ -21,7 +23,7 @@ namespace VRCFaceTracking.SRanipal
         {
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
-            if (eye && SRanipal_Eye_API.IsViveProEye())
+            if (eye)
                 // Only try to init if we're actually using the only headset that supports SRanipal eye tracking
                 eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
             
@@ -59,6 +61,8 @@ namespace VRCFaceTracking.SRanipal
                 UnifiedTrackingData.LatestLipData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
                 UnifiedTrackingData.LatestLipData.ImageData = new byte[UnifiedTrackingData.LatestLipData.ImageSize.x *
                                                                        UnifiedTrackingData.LatestLipData.ImageSize.y];
+                lipData.image = Marshal.AllocCoTaskMem(UnifiedTrackingData.LatestLipData.ImageSize.x *
+                                                       UnifiedTrackingData.LatestLipData.ImageSize.y);
             }
 
             return (eyeEnabled, lipEnabled);
@@ -154,7 +158,6 @@ namespace VRCFaceTracking.SRanipal
         
         private void UpdateEye()
         {
-            EyeData_v2 eyeData = default;
             SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
             
@@ -181,9 +184,6 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateMouth()
         {
-            LipData_v2 lipData = default;
-            lipData.image = Marshal.AllocCoTaskMem(UnifiedTrackingData.LatestLipData.ImageSize.x *
-                                                   UnifiedTrackingData.LatestLipData.ImageSize.y);
             SRanipal_Lip_API.GetLipData_v2(ref lipData);
             UnifiedTrackingData.LatestLipData.UpdateData(lipData);
             
