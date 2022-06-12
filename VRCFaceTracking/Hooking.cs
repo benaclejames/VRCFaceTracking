@@ -25,7 +25,7 @@ namespace VRCFaceTracking
             }
             catch (Exception ex)
             {
-                MelonLogger.Error("Patch Failed " + ex);
+                Logger.Error("Patch Failed " + ex);
             }
         }
 
@@ -58,7 +58,7 @@ namespace VRCFaceTracking
             }
             catch (Exception e)
             {
-                MelonLogger.Error(e.ToString());
+                Logger.Error(e.ToString());
             }
         }
         

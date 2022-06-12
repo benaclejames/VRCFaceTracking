@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using MelonLoader;
 using UnhollowerBaseLib;
+using UnityEngine;
 using VRCFaceTracking.QuickMenu;
 
 namespace VRCFaceTracking
@@ -64,8 +67,31 @@ namespace VRCFaceTracking
         public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
         
         private static Thread _initializeWorker;
+        
+        public static IEnumerator CheckRuntimeSanity()
+        {
+            // Check we have UAC admin
+            if (!Utils.HasAdmin)
+            {
+                Logger.Error("VRChat must be running with Administrator privileges to force module reinitialization.");
+                yield return null;
+            }
+            
+            Logger.Msg("Checking Runtime Sanity...");
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
+            UsefulThreads.Clear();
+            foreach (var process in Process.GetProcessesByName("sr_runtime"))
+            {
+                Logger.Msg("Killing "+process.ProcessName);
+                process.Kill();
+                yield return new WaitForSeconds(3);
+                Logger.Msg("Re-Initializing");
+                Initialize();
+            }
+        }
 
-        public static IEnumerator Initialize(bool eye = true, bool lip = true)
+        public static void Initialize(bool eye = true, bool lip = true)
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
@@ -79,7 +105,6 @@ namespace VRCFaceTracking
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
             _initializeWorker.Start();
-            yield return null;
         }
 
         private static List<Type> LoadExternalModules()
@@ -131,11 +156,12 @@ namespace VRCFaceTracking
         {
             if (UsefulThreads.ContainsKey(module))
                 return;
-            
+
+            Action updater = module.GetUpdateThreadFunc();
             var thread = new Thread(() =>
             {
                 IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                module.GetUpdateThreadFunc().Invoke();
+                updater.Invoke();
             });
             UsefulThreads.Add(module, thread);
             thread.Start();
@@ -151,7 +177,7 @@ namespace VRCFaceTracking
                 .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
 
             trackingModules = trackingModules.Union(LoadExternalModules());
-
+            
             foreach (var module in trackingModules)
             {
                 EyeStatus = ModuleState.Uninitialized;
@@ -193,6 +219,9 @@ namespace VRCFaceTracking
                 if (LipStatus != ModuleState.Uninitialized) Logger.Msg("Lip Tracking Initialized via " +  _lipModule);
                 else Logger.Warning("Lip Tracking will be unavailable for this session.");
             }
+            
+            if (QuickModeMenu.MainMenu != null)
+                MainMod.MainThreadExecutionQueue.Add(() => QuickModeMenu.MainMenu.UpdateEnabledTabs(EyeStatus, LipStatus));
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes

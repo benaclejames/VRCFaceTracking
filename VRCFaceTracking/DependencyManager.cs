@@ -21,8 +21,6 @@ namespace VRCFaceTracking
 
         public static void Load()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly;
-            
             var dllPaths = ExtractAssemblies(AssembliesToLoad);
             foreach (var path in dllPaths)
                 LoadAssembly(path);

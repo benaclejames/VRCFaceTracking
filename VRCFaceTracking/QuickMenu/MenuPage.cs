@@ -10,7 +10,7 @@ namespace VRCFaceTracking.QuickMenu
         internal readonly ToggleButton TrackingToggle;
 
         private static Action<GameObject> _onMenuTabPress = o => { };
-        protected static Action OnReInitModulePress = () => MelonCoroutines.Start(UnifiedLibManager.Initialize());
+        protected static Action OnReInitModulePress = () => MelonCoroutines.Start(UnifiedLibManager.CheckRuntimeSanity());
         public readonly GameObject Root, TabObject;
 
         protected MenuPage(Transform pageRoot, GameObject tabObject)
@@ -20,7 +20,7 @@ namespace VRCFaceTracking.QuickMenu
             
             TrackingToggle = new ToggleButton(pageRoot.Find("UtilButtons/ToggleActive"));
             var reinit = pageRoot.Find("Recalibrate");
-            reinit.gameObject.SetActive(true);
+            reinit.gameObject.SetActive(false);
             reinit.GetComponent<Button>().onClick.AddListener((Action) (() => { OnReInitModulePress.Invoke(); }));
 
             _onMenuTabPress += o => Root.SetActive(o == Root);

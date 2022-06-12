@@ -19,14 +19,13 @@ namespace VRCFaceTracking
         // Mostly used for UI management, allows calling of main-thread methods directly from a tracking worker thread
         public static readonly List<Action> MainThreadExecutionQueue = new List<Action>();
 
-        public static readonly bool HasAdmin =
-            new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
-
         public override void OnApplicationStart()
         {
+            Logger.logger = LoggerInstance;
+            
             // Load all unmanaged DLLs as soon as we can
             DependencyManager.Load();
-            MelonCoroutines.Start(UnifiedLibManager.Initialize());
+            UnifiedLibManager.Initialize();
             
             Hooking.SetupHooking();
             MelonCoroutines.Start(WaitForMenu());

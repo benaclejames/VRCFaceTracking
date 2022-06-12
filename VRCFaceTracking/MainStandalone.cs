@@ -27,12 +27,13 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         private static OscMain _oscMain;
-        
-        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
+
+        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
+            new List<OscMessage>();
             parameters.Select(param => new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue)).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static int _relevantParamsCount = 416;
+        private static int _relevantParamsCount;
 
         private static string _ip = "127.0.0.1";
         private static int _inPort = 9001, _outPort = 9000;
