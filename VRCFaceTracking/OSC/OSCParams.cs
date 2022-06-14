@@ -15,15 +15,17 @@ namespace VRCFaceTracking.OSC
                 get => _paramValue;
                 set
                 {
-                    if (Relevant)
-                        _paramValue = value;
+                    if (!Relevant || _paramValue.SequenceEqual(value)) return;
+                    
+                    _paramValue = value;
+                    NeedsSend = true;
                 }
             }
 
             private byte[] _paramValue = new byte[4];
             private readonly Type _paramType;
             public char OscType;
-            public bool Relevant;
+            public bool Relevant, NeedsSend = true;
             public ConfigParser.InputOutputDef OutputInfo;
 
             public BaseParam(string name, Type type)

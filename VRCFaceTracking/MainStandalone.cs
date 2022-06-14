@@ -29,7 +29,11 @@ namespace VRCFaceTracking
         private static OscMain _oscMain;
         
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
-            parameters.Select(param => new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue)).ToList();
+            parameters.Where(p => p.NeedsSend).Select(param =>
+            {
+                param.NeedsSend = false;
+                return new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue);
+            }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
@@ -60,7 +64,7 @@ namespace VRCFaceTracking
             // Load dependencies and initialize tracking runtimes
             Logger.Msg("VRCFT Initializing!");
             DependencyManager.Load();
-            UnifiedLibManager.Initialize(false);
+            UnifiedLibManager.Initialize();
             
             // Initialize Locals
             _oscMain = new OscMain(_ip, _outPort, _inPort);
