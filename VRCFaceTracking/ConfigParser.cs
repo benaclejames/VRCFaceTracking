@@ -37,7 +37,7 @@ namespace VRCFaceTracking
         public static void ParseNewAvatar(string newId)
         {
             AvatarConfigSpec avatarConfig = null;
-            foreach (var userFolder in Directory.GetDirectories(Utils.VRCOSCDirectory))
+            foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
             {
                 if (Directory.Exists(userFolder + "\\Avatars"))
                     foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))

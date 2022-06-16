@@ -64,6 +64,7 @@
     <Compile Include="Params\Vector2.cs" />
     <Compile Include="Params\Vector3.cs" />
     <Compile Include="Params\XYParam.cs" />
+    <Compile Include="VRChat.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTracker.cs" />
     <Compile Include="TrackingLibs\Pimax\PimaxTrackingInterface.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeData.cs" />

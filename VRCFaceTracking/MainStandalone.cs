@@ -58,14 +58,28 @@ namespace VRCFaceTracking
         
         public static void Initialize()
         {
+            Logger.Msg("VRCFT Initializing!");
+            
             // Parse Arguments
             (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
             
-            // Load dependencies and initialize tracking runtimes
-            Logger.Msg("VRCFT Initializing!");
+            // Load dependencies
             DependencyManager.Load();
-            UnifiedLibManager.Initialize();
+
+            // Ensure OSC is enabled
+            if (VRChat.ForceEnableOsc())  // If osc was previously not enabled
+            {
+                Logger.Warning("VRCFT detected OSC was disabled and automatically enabled it.");
+                // If we were launched after VRChat
+                if (VRChat.IsVRChatRunning())
+                    Logger.Error(
+                        "However, VRChat was running while this change was made.\n" + 
+                        "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
+            }
             
+            // Initialize Tracking Runtimes
+            UnifiedLibManager.Initialize();
+
             // Initialize Locals
             _oscMain = new OscMain(_ip, _outPort, _inPort);
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
