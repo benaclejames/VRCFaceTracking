@@ -77,7 +77,11 @@ namespace VRCFaceTracking.OSC
 
             public new bool ParamValue
             {
-                set => OscType = value ? 'T' : 'F';
+                set
+                {
+                    OscType = value ? 'T' : 'F';
+                    NeedsSend = true;
+                }
             }
         }
 
