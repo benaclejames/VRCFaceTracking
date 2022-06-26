@@ -20,7 +20,7 @@ namespace VRCFaceTracking.QuickMenu
             
             TrackingToggle = new ToggleButton(pageRoot.Find("UtilButtons/ToggleActive"));
             var reinit = pageRoot.Find("Recalibrate");
-            reinit.gameObject.SetActive(false);
+            reinit.gameObject.SetActive(true);
             reinit.GetComponent<Button>().onClick.AddListener((Action) (() => { OnReInitModulePress.Invoke(); }));
 
             _onMenuTabPress += o => Root.SetActive(o == Root);

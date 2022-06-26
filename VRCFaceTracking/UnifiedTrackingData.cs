@@ -55,6 +55,15 @@ namespace VRCFaceTracking
         public float EyesDilation;
         private float _maxDilation, _minDilation;
 
+        public EyeTrackingData()
+        {
+            Left.Openness = 1f;
+            Right.Openness = 1f;
+            Combined.Openness = 1f;
+
+            EyesDilation = 0.5f;
+        }
+
 
         public void UpdateData(EyeData_v2 eyeData)
         {
