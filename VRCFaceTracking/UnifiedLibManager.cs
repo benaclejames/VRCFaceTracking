@@ -78,8 +78,13 @@ namespace VRCFaceTracking
             }
             
             Logger.Msg("Checking Runtime Sanity...");
+            
             EyeStatus = ModuleState.Uninitialized;
             LipStatus = ModuleState.Uninitialized;
+
+            _eyeModule = null;
+            _lipModule = null;
+            
             UsefulThreads.Clear();
             foreach (var process in Process.GetProcessesByName("sr_runtime"))
             {
