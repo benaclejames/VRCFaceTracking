@@ -104,8 +104,8 @@ namespace VRCFaceTracking
             {
                 updateThread.Key.Teardown();
                 updateThread.Value.Abort();
-                UsefulThreads.Remove(updateThread.Key);
             }
+            UsefulThreads.Clear();
             
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
@@ -183,11 +183,11 @@ namespace VRCFaceTracking
 
             trackingModules = trackingModules.Union(LoadExternalModules());
             
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
+            
             foreach (var module in trackingModules)
             {
-                EyeStatus = ModuleState.Uninitialized;
-                LipStatus = ModuleState.Uninitialized;
-                
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
                 if (EyeStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsEye ||
@@ -212,7 +212,7 @@ namespace VRCFaceTracking
 
                 if ((int)EyeStatus >= 0 && (int)LipStatus >= 0) break;    // Keep enumerating over all modules until we find ones we can use
             }
-
+            
             if (eye)
             {
                 if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _eyeModule);
