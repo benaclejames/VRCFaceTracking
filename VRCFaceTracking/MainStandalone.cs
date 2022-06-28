@@ -6,6 +6,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.OSC;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
@@ -26,7 +27,7 @@ namespace VRCFaceTracking
 {
     public static class MainStandalone
     {
-        private static OscMain _oscMain;
+        public static OscMain OscMain;
         
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
             parameters.Where(p => p.NeedsSend).Select(param =>
@@ -81,7 +82,7 @@ namespace VRCFaceTracking
             UnifiedLibManager.Initialize();
 
             // Initialize Locals
-            _oscMain = new OscMain(_ip, _outPort, _inPort);
+            OscMain = new OscMain(_ip, _outPort, _inPort);
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>
@@ -117,7 +118,7 @@ namespace VRCFaceTracking
                         messages.RemoveAt(0);
                     }
                     var bundle = new OscBundle(msgList);
-                    _oscMain.Send(bundle.Data);
+                    OscMain.Send(bundle.Data);
                 }
                 
             }

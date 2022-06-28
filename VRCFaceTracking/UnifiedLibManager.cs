@@ -7,27 +7,11 @@ using System.Threading;
 
 namespace VRCFaceTracking
 {
-    public abstract class ExtTrackingModule
-    {
-        // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
-        public virtual (bool SupportsEye, bool SupportsLip) Supported => (false, false);
-        
-        // Should the module be writing to UnifiedTrackingData for eye or lip tracking updates.
-        public (ModuleState EyeState, ModuleState LipState) Status = (ModuleState.Uninitialized,
-            ModuleState.Uninitialized);
-
-        public abstract (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip);
-
-        public abstract Action GetUpdateThreadFunc();
-
-        public abstract void Teardown();
-    }
-    
     public enum ModuleState
     {
         Uninitialized = -1, // If the module is not initialized, we can assume it's not being used
         Idle = 0,   // Idle and above we can assume the module in question is or has been in use
-        Active = 1
+        Active = 1  // We're actively getting tracking data from the module
     }
 
     public static class UnifiedLibManager
@@ -70,9 +54,9 @@ namespace VRCFaceTracking
             {
                 updateThread.Key.Teardown();
                 updateThread.Value.Abort();
-                UsefulThreads.Remove(updateThread.Key);
             }
-            
+            UsefulThreads.Clear();
+
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
             _initializeWorker.Start();
@@ -142,11 +126,11 @@ namespace VRCFaceTracking
 
             trackingModules = trackingModules.Union(LoadExternalModules());
 
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
+            
             foreach (var module in trackingModules)
             {
-                EyeStatus = ModuleState.Uninitialized;
-                LipStatus = ModuleState.Uninitialized;
-                
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
                 if (EyeStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsEye ||

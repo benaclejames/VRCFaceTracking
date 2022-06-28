@@ -3,20 +3,19 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking.Assets.UI
 {
     public partial class MainWindow
     {
-        public static NotifyIcon TrayIcon = new NotifyIcon
+        public static readonly NotifyIcon TrayIcon = new NotifyIcon
         {
-            Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("VRCFaceTracking.VRCFT.ico")), 
+            Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("VRCFaceTracking.Assets.Images.VRCFT.ico")), 
             Text = "VRCFaceTracking",
             Visible = true,
         };
@@ -113,19 +112,10 @@ namespace VRCFaceTracking
             // Nothing should go here AFAIK
         }
 
-        private void IPInputUpdate(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
-        private void PortInputUpdate(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-
-        }
-
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
             Logger.Msg("Reinitializing...");
+            UnifiedLibManager.Initialize();
         }
 
         private void PauseClickEyes(object sender, RoutedEventArgs e)
@@ -147,14 +137,11 @@ namespace VRCFaceTracking
         private void UpdateLogo(ModuleState eyeState, ModuleState lipState)
         {
             VRCFTLogoTop.Source =
-                new BitmapImage(new Uri(@"Images/LogoIndicators/" + eyeState + "/Top.png",
+                new BitmapImage(new Uri(@"../Images/LogoIndicators/" + eyeState + "/Top.png",
                     UriKind.Relative));
             VRCFTLogoBottom.Source =
-                new BitmapImage(new Uri(@"Images/LogoIndicators/" + lipState + "/Bottom.png",
+                new BitmapImage(new Uri(@"../Images/LogoIndicators/" + lipState + "/Bottom.png",
                     UriKind.Relative));
-            
-            // Construct a new bitmap image from the alpha bytes in UnifiedTrackingData.Image
-            
         }
 
         private void MainWindow_OnSizeChanged(object sender, EventArgs eventArgs)

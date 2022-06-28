@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking.Assets.UI
 {
     public partial class App
     {
