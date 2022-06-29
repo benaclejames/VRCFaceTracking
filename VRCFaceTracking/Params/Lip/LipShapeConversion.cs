@@ -6,41 +6,41 @@ namespace VRCFaceTracking.Params.Lip
 {
     public interface ICombinedShape
     {
-        float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap);
+        float GetBlendedLipShape(float[] inputMap);
     }
 
     public class PositiveNegativeShape : ICombinedShape
     {
-        private readonly LipShape_v2 _positiveShape, _negativeShape;
+        private readonly int _positiveShape, _negativeShape;
         private float _positiveCache, _negativeCache;
         private bool _steps;
         
         public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape, bool steps = false)
         {
-            _positiveShape = positiveShape;
-            _negativeShape = negativeShape;
+            _positiveShape = (int)positiveShape;
+            _negativeShape = (int)negativeShape;
             _steps = steps;
         }
 
-        public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
+        public float GetBlendedLipShape(float[] inputMap)
         {
-            if (inputMap.TryGetValue(_positiveShape, out var positiveResult)) _positiveCache = positiveResult;
-            if (inputMap.TryGetValue(_negativeShape, out var negativeResult)) _negativeCache = negativeResult * -1;
+            _positiveCache = inputMap[_positiveShape];
+            _negativeCache = inputMap[_negativeShape] * -1;
             return _steps ? (_positiveCache - _negativeCache) - 1 : _positiveCache + _negativeCache;
         }
     }
 
     public class PositiveNegativeAveragedShape : ICombinedShape
     {
-        private readonly LipShape_v2[] _positiveShapes, _negativeShapes;
+        private readonly int[] _positiveShapes, _negativeShapes;
         private readonly float[] _positiveCache, _negativeCache;
         private readonly int _positiveCount, _negativeCount;
         private readonly bool _useMax;
 
         public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes)
         {
-            _positiveShapes = positiveShapes;
-            _negativeShapes = negativeShapes;
+            _positiveShapes = positiveShapes.Select(s => (int)s).ToArray();
+            _negativeShapes = negativeShapes.Select(s => (int)s).ToArray();
             _positiveCache = new float[positiveShapes.Length];
             _negativeCache = new float[negativeShapes.Length];
             _positiveCount = positiveShapes.Length;
@@ -49,8 +49,8 @@ namespace VRCFaceTracking.Params.Lip
 
         public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes, bool useMax)
         {
-            _positiveShapes = positiveShapes;
-            _negativeShapes = negativeShapes;
+            _positiveShapes = positiveShapes.Select(s => (int)s).ToArray();
+            _negativeShapes = negativeShapes.Select(s => (int)s).ToArray();
             _positiveCache = new float[positiveShapes.Length];
             _negativeCache = new float[negativeShapes.Length];
             _positiveCount = positiveShapes.Length;
@@ -58,7 +58,7 @@ namespace VRCFaceTracking.Params.Lip
             _useMax = useMax;
         }
 
-        public float GetBlendedLipShape(Dictionary<LipShape_v2, float> inputMap)
+        public float GetBlendedLipShape(float[] inputMap)
         {                      
             if (!_useMax)
             {
@@ -66,14 +66,12 @@ namespace VRCFaceTracking.Params.Lip
                 float negative = 0;
 
                 for (int i = 0; i < _positiveCount; i++) {
-                    if (inputMap.TryGetValue(_positiveShapes[i], out var positiveResult))
-                        _positiveCache[i] = positiveResult;
+                        _positiveCache[i] = inputMap[_positiveShapes[i]];
                     positive += _positiveCache[i];
                 }
 
                 for (int i = 0; i < _negativeCount; i++) {
-                    if (inputMap.TryGetValue(_negativeShapes[i], out var negativeResult))
-                        _negativeCache[i] = negativeResult * -1;
+                        _negativeCache[i] = inputMap[_negativeShapes[i]] * -1;
                     negative += _negativeCache[i];
                 }
 
@@ -81,13 +79,11 @@ namespace VRCFaceTracking.Params.Lip
             }
 
             for (int i = 0; i < _positiveCount; i++) {
-                if (inputMap.TryGetValue(_positiveShapes[i], out var positiveResult))
-                     _positiveCache[i] = positiveResult;     
+                     _positiveCache[i] = inputMap[_positiveShapes[i]];     
             }
 
             for (int i = 0; i < _negativeCount; i++) {
-                if (inputMap.TryGetValue(_negativeShapes[i], out var negativeResult))
-                    _negativeCache[i] = negativeResult;
+                    _negativeCache[i] = inputMap[_negativeShapes[i]];
             }
 
             return _positiveCache.Max() + (-1) * _negativeCache.Max();

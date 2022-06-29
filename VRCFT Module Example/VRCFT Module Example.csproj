@@ -37,9 +37,6 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
-        <Reference Include="VRCFaceTracking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>D:\SteamLibrary\steamapps\common\VRChat\Mods\VRCFaceTracking.dll</HintPath>
-        </Reference>
     </ItemGroup>
     <ItemGroup>
       <Compile Include="ExternalTrackingModule.cs" />

@@ -15,15 +15,17 @@ namespace VRCFaceTracking.OSC
                 get => _paramValue;
                 set
                 {
-                    if (Relevant)
-                        _paramValue = value;
+                    if (!Relevant || _paramValue.SequenceEqual(value)) return;
+                    
+                    _paramValue = value;
+                    NeedsSend = true;
                 }
             }
 
             private byte[] _paramValue = new byte[4];
             private readonly Type _paramType;
             public char OscType;
-            public bool Relevant;
+            public bool Relevant, NeedsSend = true;
             public ConfigParser.InputOutputDef OutputInfo;
 
             public BaseParam(string name, Type type)
@@ -36,7 +38,7 @@ namespace VRCFaceTracking.OSC
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
                 var compatibleParam =
-                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.type == _paramType);
+                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.Type == _paramType);
                 if (compatibleParam != null)
                 {
                     Relevant = true;
@@ -75,7 +77,11 @@ namespace VRCFaceTracking.OSC
 
             public new bool ParamValue
             {
-                set => OscType = value ? 'T' : 'F';
+                set
+                {
+                    OscType = value ? 'T' : 'F';
+                    NeedsSend = true;
+                }
             }
         }
 
@@ -131,7 +137,7 @@ namespace VRCFaceTracking.OSC
                 _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
-                var boolParams = newParams.Where(p => p.input.type == typeof(bool) && p.name.StartsWith(_paramName));
+                var boolParams = newParams.Where(p => p.input.Type == typeof(bool) && p.name.StartsWith(_paramName));
 
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)

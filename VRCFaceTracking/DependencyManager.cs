@@ -19,7 +19,7 @@ namespace VRCFaceTracking
             "Pimax.PimaxEyeTracker.dll"
         };
 
-        public static void Init()
+        public static void Load()
         {
             AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly;
             
@@ -74,7 +74,7 @@ namespace VRCFaceTracking
         {
             var extractedPaths = new List<string>();
 
-            var dirName = Path.Combine(Utils.DataDirectory, "StockLibs");
+            var dirName = Path.Combine(Utils.PersistentDataDirectory, "StockLibs");
             if (!Directory.Exists(dirName))
                 Directory.CreateDirectory(dirName);
 

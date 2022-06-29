@@ -9,25 +9,13 @@ namespace VRCFaceTracking
 {
     public static class ConfigParser
     {
-        public class StringToTypeConverter : JsonConverter<Type>
-        {
-            public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            {
-                // Read the string value
-                string value = reader.GetString();
-                return Utils.TypeConversions.First(elem => elem.Value.configType == value).Key;
-            }
-
-            public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
-            {
-            }
-        }
-        
         public class InputOutputDef
         {
             public string address { get; set; }
-            [JsonConverter(typeof(StringToTypeConverter))]
-            public Type type { get; set; } 
+            public string type { get; set; }
+
+            [JsonIgnore]
+            public Type Type => Utils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
         }
 
         public class Parameter
@@ -49,36 +37,29 @@ namespace VRCFaceTracking
         public static void ParseNewAvatar(string newId)
         {
             AvatarConfigSpec avatarConfig = null;
-            foreach (var userFolder in Directory.GetDirectories(Utils.VRCOSCDirectory))
+            foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
             {
-                var avatarFolder = userFolder+"\\Avatars\\";
-                if (!Directory.Exists(userFolder))
+                if (!Directory.Exists(userFolder + "\\Avatars"))
                 {
                     continue;
                 }
+                //Directory.Exists() can return true even for non-existing folders, oh well
                 try
                 {
-                    foreach (var avatarFile in Directory.GetFiles(avatarFolder))
+                    foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))
                     {
                         var configText = File.ReadAllText(avatarFile);
-                        try
-                        {
-                            var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
-                            if (tempConfig == null || tempConfig.id != newId)
-                                continue;
+                        var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
+                        if (tempConfig == null || tempConfig.id != newId)
+                            continue;
 
-                            avatarConfig = tempConfig;
-                            break;
-                        }
-                        catch (JsonException e)
-                        {
-                            Logger.Warning("Failed to parse JSON file: "+avatarFile+". Ensure it follows RFC 8259 formatting");
-                        }
+                        avatarConfig = tempConfig;
+                        break;
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.Warning("Failed to parse folder: " + avatarFolder);
+                    Logger.Warning("Failed to parse "  + avatarFolder + " folder");
                 }
             }
                 

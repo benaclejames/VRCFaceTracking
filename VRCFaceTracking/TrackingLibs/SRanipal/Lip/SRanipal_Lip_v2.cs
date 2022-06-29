@@ -33,10 +33,7 @@ namespace ViveSR
                     {
                         for (int i = 0; i < WeightingCount; ++i)
                         {
-                            unsafe
-                            {
-                                Weightings[(LipShape_v2)i] = LipData.prediction_data.blend_shape_weight[i];
-                            }
+                            Weightings[(LipShape_v2)i] = LipData.prediction_data.blend_shape_weight[i];
                         }
                     }
                     return LastUpdateResult == Error.WORK;
