@@ -81,11 +81,11 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
+            if (TabController.SelectedIndex != 2 || UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
-            if (bitmap == null)
+            if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
                 bitmap = new WriteableBitmap(UnifiedTrackingData.LatestLipData.ImageSize.x,
                     UnifiedTrackingData.LatestLipData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
@@ -99,11 +99,11 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
+            if (TabController.SelectedIndex != 1 || UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
-            if (bitmap == null)
+            if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
                 bitmap = new WriteableBitmap(UnifiedTrackingData.LatestEyeData.ImageSize.x,
                     UnifiedTrackingData.LatestEyeData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
