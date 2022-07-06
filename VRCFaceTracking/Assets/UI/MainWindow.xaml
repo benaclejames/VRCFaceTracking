@@ -115,10 +115,10 @@
 
             </TabItem>
             <TabItem Header="Eye Tracking" Foreground="White">
-                <Image x:Name="EyeImage" Height="478" Margin="22,0,22,0"/>
+                <Image x:Name="EyeImage" Height="478" Margin="22,0,22,0" Source="../Images/ColorBars.png"/>
             </TabItem>
             <TabItem Header="Lip Tracking" Foreground="White">
-                <Image x:Name="LipImage" Height="478" Margin="22,0,22,0"/>
+                <Image x:Name="LipImage" Height="478" Margin="22,0,22,0" Source="../Images/ColorBars.png"/>
             </TabItem>
         </TabControl>
 

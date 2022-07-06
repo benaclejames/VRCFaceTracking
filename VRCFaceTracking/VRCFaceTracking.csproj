@@ -166,6 +166,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\ColorBars.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.7.0.0-preview.1.22076.8\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.7.0.0-preview.1.22076.8\build\System.Text.Json.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
