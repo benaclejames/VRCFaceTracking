@@ -51,7 +51,7 @@ namespace VRCFaceTracking
             
             Utils.TimeEndPeriod(1);
             Logger.Msg("VRCFT Standalone Exiting!");
-            UnifiedLibManager.Teardown();
+            UnifiedLibManager.TeardownAllAndReset();
             Console.WriteLine("Shutting down");
             MainWindow.TrayIcon.Visible = false;
             Application.Current?.Shutdown();
@@ -82,7 +82,14 @@ namespace VRCFaceTracking
             UnifiedLibManager.Initialize();
 
             // Initialize Locals
-            OscMain = new OscMain(_ip, _outPort, _inPort);
+            OscMain = new OscMain();
+            var bindResults = OscMain.Bind(_ip, _outPort, _inPort);
+            if (!bindResults.receiverSuccess)
+                Logger.Error("Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
+            
+            if (!bindResults.senderSuccess)
+                Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
+
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>

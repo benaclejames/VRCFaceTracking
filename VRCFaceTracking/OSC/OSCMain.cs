@@ -30,20 +30,31 @@ namespace VRCFaceTracking.OSC
     {
         private static readonly Socket SenderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private static readonly Socket ReceiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private static Thread receiveThread;
-        
-        public OscMain(string address, int outPort, int inPort)
-        {
-            SenderClient.Connect(new IPEndPoint(IPAddress.Parse(address), outPort));
-            ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(address), inPort));
-            ReceiverClient.ReceiveTimeout = 1000;
+        private static Thread _receiveThread;
 
-            receiveThread = new Thread(() =>
+        public (bool senderSuccess, bool receiverSuccess) Bind(string address, int outPort, int inPort)
+        {
+            (bool senderSuccess, bool receiverSuccess) = (false, false);
+            try
             {
-                while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
-                    Recv();
-            });
-            receiveThread.Start();
+                SenderClient.Connect(new IPEndPoint(IPAddress.Parse(address), outPort));
+                senderSuccess = true;
+                ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(address), inPort));
+                receiverSuccess = true;
+                ReceiverClient.ReceiveTimeout = 1000;
+                
+                _receiveThread = new Thread(() =>
+                {
+                    while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
+                        Recv();
+                });
+                _receiveThread.Start();
+            }
+            catch (Exception)
+            {
+                return (senderSuccess, receiverSuccess);
+            }
+            return (true, true);
         }
 
         private void Recv()

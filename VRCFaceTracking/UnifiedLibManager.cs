@@ -16,6 +16,11 @@ namespace VRCFaceTracking
 
     public static class UnifiedLibManager
     {
+        #region Delegates
+        public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
+        #endregion
+        
+        #region Statuses
         public static ModuleState EyeStatus
         {
             get => _eyeModule?.Status.EyeState ?? ModuleState.Uninitialized;
@@ -37,12 +42,13 @@ namespace VRCFaceTracking
                 OnTrackingStateUpdate.Invoke(EyeStatus, value);
             }
         }
+        #endregion
 
+        #region Modules
         private static ExtTrackingModule _eyeModule, _lipModule;
-
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
-        public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
+        #endregion
         
         private static Thread _initializeWorker;
 
@@ -50,12 +56,7 @@ namespace VRCFaceTracking
         {
             // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            foreach (var updateThread in UsefulThreads)
-            {
-                updateThread.Key.Teardown();
-                updateThread.Value.Abort();
-            }
-            UsefulThreads.Clear();
+            TeardownAllAndReset();
 
             // Start Initialization
             _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
@@ -107,7 +108,7 @@ namespace VRCFaceTracking
             return returnList;
         }
 
-        private static void StartThreadForModule(ExtTrackingModule module)
+        private static void EnsureModuleThreadStarted(ExtTrackingModule module)
         {
             if (UsefulThreads.ContainsKey(module))
                 return;
@@ -121,39 +122,57 @@ namespace VRCFaceTracking
         {
             Logger.Msg("Finding and initializing runtimes...");
 
+            // Get a list of our own built-in modules
             var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
 
+            // Concat both our own modules and the external ones
             trackingModules = trackingModules.Union(LoadExternalModules());
-
-            EyeStatus = ModuleState.Uninitialized;
-            LipStatus = ModuleState.Uninitialized;
             
             foreach (var module in trackingModules)
             {
+                // Create module
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
+                
                 // If there is still a need for a module with eye or lip tracking and this module supports the current need, try initialize it
                 if (EyeStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsEye ||
                     LipStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsLip)
                 {
-                    (bool eyeSuccess, bool lipSuccess) = moduleObj.Initialize(eye, lip);
+                    bool eyeSuccess, lipSuccess;
+                    try
+                    {
+                        (eyeSuccess, lipSuccess) = moduleObj.Initialize(eye, lip);
+                    }
+                    catch(MissingMethodException)
+                    {
+                        Logger.Error(moduleObj.GetType().Name+ " does not properly implement ExtTrackingModule. Skipping.");
+                        continue;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error("Exception initializing " + moduleObj.GetType().Name + ". Skipping.");
+                        Logger.Error(e.Message);
+                        continue;
+                    }
+                    
                     // If eyeSuccess or lipSuccess was true, set the status to active
                     if (eyeSuccess && _eyeModule == null)
                     {
                         _eyeModule = moduleObj;
                         EyeStatus = ModuleState.Active;
-                        StartThreadForModule(moduleObj);
+                        EnsureModuleThreadStarted(moduleObj);
                     }
 
                     if (lipSuccess && _lipModule == null)
                     {
                         _lipModule = moduleObj;
                         LipStatus = ModuleState.Active;
-                        StartThreadForModule(moduleObj);
+                        EnsureModuleThreadStarted(moduleObj);
                     }
                 }
 
-                if ((int)EyeStatus >= 0 && (int)LipStatus >= 0) break;    // Keep enumerating over all modules until we find ones we can use
+                if (EyeStatus > ModuleState.Uninitialized && LipStatus > ModuleState.Uninitialized) 
+                    break;    // Keep enumerating over all modules until we find ones we can use
             }
 
             if (eye)
@@ -170,15 +189,20 @@ namespace VRCFaceTracking
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes
-        public static void Teardown()
+        public static void TeardownAllAndReset()
         {
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
+            
             foreach (var module in UsefulThreads)
             {
-                module.Key.Status = (ModuleState.Idle, ModuleState.Idle);
                 module.Key.Teardown();
                 module.Value.Abort();
             }
             UsefulThreads.Clear();
+
+            _eyeModule = null;
+            _lipModule = null;
         }
     }
 }
