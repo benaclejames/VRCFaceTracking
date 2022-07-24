@@ -62,7 +62,9 @@ namespace VRCFaceTracking
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
+
             (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
+            Logger.Msg("InPort = " + _inPort + " , OutPort = " + _outPort + " , target IP = " + _ip);
             
             // Load dependencies
             DependencyManager.Load();
@@ -85,10 +87,10 @@ namespace VRCFaceTracking
             OscMain = new OscMain();
             var bindResults = OscMain.Bind(_ip, _outPort, _inPort);
             if (!bindResults.receiverSuccess)
-                Logger.Error("Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
+                Logger.Error("Socket failed to bind to receiver port " + _inPort + ", please ensure it's not already in use by another program or specify a different one instead.");
             
             if (!bindResults.senderSuccess)
-                Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
+                Logger.Error("Socket failed to bind to sender port "+ _outPort + ", please ensure it's not already in use by another program or specify a different one instead.");
 
             _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
