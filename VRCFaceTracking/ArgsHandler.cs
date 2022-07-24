@@ -28,24 +28,18 @@ namespace VRCFaceTracking
                         break;
                     }
 
-                    if (!int.TryParse(oscConfig[0], out SendPort))
+                    
+                    int parsedIntSP;
+                    if (int.TryParse(oscConfig[0], out parsedIntSP))
                     {
-                        Logger.Error("Invalid OSC OutPort: " + oscConfig[0]);
-                        break;
+                        SendPort = parsedIntSP;
+                        Logger.Msg("Loaded custom OSC OutPort value, " + SendPort);
                     }
                     else
                     {
-                        int parsedIntSP;
-                        if (int.TryParse(oscConfig[0], out parsedIntSP))
-                        {
-                            SendPort = parsedIntSP;
-                            Logger.Msg("Loaded custom OSC OutPort value, " + SendPort);
-                        }
-                        else
-                        {
-                            Logger.Error("Malformed OSC OutPort value, please ensure you set a number");
-                        }
+                        Logger.Error("Malformed OSC OutPort value" + oscConfig[0] + ", please ensure you set a number");
                     }
+        
 
                     if (!new Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").IsMatch(oscConfig[1]))
                     {
@@ -57,25 +51,18 @@ namespace VRCFaceTracking
                         IP = oscConfig[1];
                     }
                     
-                    if (!int.TryParse(oscConfig[2], out RecievePort))
+                    int parsedIntRP;
+                    if (int.TryParse(oscConfig[2], out parsedIntRP))
                     {
-                        Logger.Error("Invalid OSC InPort: " + oscConfig[2]);
-                        break;
+                        RecievePort = parsedIntRP;
+                        Logger.Msg("Loaded custom OSC RecievePort value, " + RecievePort);
                     }
                     else
                     {
-                        int parsedIntRP;
-                        if (int.TryParse(oscConfig[2], out parsedIntRP))
-                        {
-                            RecievePort = parsedIntRP;
-                            Logger.Msg("Loaded custom OSC RecievePort value, " + RecievePort);
-                        }
-                        else
-                        {
-                            Logger.Error("Malformed OSC RecievePort value, please ensure you set a number");
-                        }
+                        Logger.Error("Malformed OSC RecievePort value " + oscConfig[2] + ", please ensure you set a number");
                     }
-        }
+            
+                }
             }
 
             return (SendPort, IP, RecievePort);
