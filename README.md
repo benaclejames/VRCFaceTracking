@@ -39,6 +39,12 @@ There are a large number of parameters you can use for lip tracking.
 
 You can also refer to this visual guide from NeosVR on what the following API parameters do: https://casuallydotcat.wordpress.com/2020/02/10/the-ultimate-neos-blend-shape-guide-february-2020/
 
+## ⛓ External Modules
+
+Use the following modules to add support for other hardware:
+
+* [VRCFTVarjoModule](https://github.com/m3gagluk/VRCFTVarjoModule) - Adds support for Varjo eye tracking (Varjo Aero)
+
 ## 👋 Credits
 
 * [VIVE](https://www.vive.com/) for the SRanipal SDK and their awesome hardware! ❤
