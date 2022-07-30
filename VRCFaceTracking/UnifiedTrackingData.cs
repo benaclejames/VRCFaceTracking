@@ -45,8 +45,6 @@ namespace VRCFaceTracking
         public float EyesDilation;
         private float _maxDilation, _minDilation;
 
-        public bool EyesEnabled;
-
         public void UpdateData(EyeData_v2 eyeData)
         {
             float dilation = 0;
@@ -99,8 +97,6 @@ namespace VRCFaceTracking
         public bool SupportsImage;
 
         public float[] LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
-
-        public bool LipsEnabled;
 
         public void UpdateData(LipData_v2 lipData)
         {
