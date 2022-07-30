@@ -45,7 +45,6 @@ namespace VRCFaceTracking
         public float EyesDilation;
         private float _maxDilation, _minDilation;
 
-
         public void UpdateData(EyeData_v2 eyeData)
         {
             float dilation = 0;

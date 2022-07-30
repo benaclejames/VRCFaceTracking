@@ -125,9 +125,9 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"TongueSteps", new PositiveNegativeShape(LipShape_v2.TongueLongStep1, LipShape_v2.TongueLongStep2, true)},
             };
         
-        // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters
-        public static readonly List<EParam> AllLipParameters =
-            new List<EParam>(GetAllLipShapes().Union(GetOptimizedLipParameters()));
+        // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters, and add GetLipActivatedStatus
+        public static readonly List<IParameter> AllLipParameters =
+            new List<IParameter>(GetAllLipShapes().Union(GetOptimizedLipParameters()).Union(GetLipActivatedStatus()));
 
         public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out LipShape_v2 shape);
         
@@ -139,5 +139,10 @@ namespace VRCFaceTracking.Params.LipMerging
             ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape =>
                 new EParam((eye, lip) => lip.LatestShapes[(int)shape],
                     shape.ToString(), 0.0f));
+
+        private static IEnumerable<IParameter> GetLipActivatedStatus() => new List<IParameter>
+        {
+            new BoolParameter(v2 => UnifiedLibManager.LipStatus.Equals(ModuleState.Active), "LipTrackingActive"),
+        };
     }
 }
