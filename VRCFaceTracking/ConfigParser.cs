@@ -34,11 +34,6 @@ namespace VRCFaceTracking
 
         public static Action OnConfigLoaded = () => { };
 
-        public static void ParseCVRAvatar(string Id)
-        {
-            Logger.Msg("CVR param loaded: "+ Id);
-        }
-
         public static AvatarConfigSpec LoadConfigFrom(string path, string avatarPath, string avatarId)
         {
             AvatarConfigSpec avatarConfig = null;
