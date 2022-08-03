@@ -34,15 +34,15 @@ namespace VRCFaceTracking
 
         public static Action OnConfigLoaded = () => { };
 
-        public static AvatarConfigSpec LoadConfigFrom(string path, string avatarPath, string avatarId)
+        public static AvatarConfigSpec LoadConfigFrom(string path, string avatarId)
         {
             AvatarConfigSpec avatarConfig = null;
             
             foreach (var userFolder in Directory.GetDirectories(path))
             {
-                if (Directory.Exists(userFolder + avatarPath))
+                if (Directory.Exists(userFolder + "\\Avatars"))
                 {
-                    foreach (var avatarFile in Directory.GetFiles(userFolder+avatarPath))
+                    foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))
                     {
                         var configText = File.ReadAllText(avatarFile);
                         var tempConfig = JsonSerializer.Deserialize<AvatarConfigSpec>(configText);
@@ -64,11 +64,11 @@ namespace VRCFaceTracking
             AvatarConfigSpec avatarConfig = null;
             if (ChilloutVR.IsChilloutVRRunning())
             {
-                avatarConfig = LoadConfigFrom(ChilloutVR.CCVROSCDirectory, "", newId);
+                avatarConfig = LoadConfigFrom(ChilloutVR.CCVROSCDirectory, newId);
             }
             else if (VRChat.IsVRChatRunning())
             {
-                avatarConfig = LoadConfigFrom(VRChat.VRCOSCDirectory, "\\Avatars", newId);
+                avatarConfig = LoadConfigFrom(VRChat.VRCOSCDirectory, newId);
             }
 
             if (avatarConfig == null)
