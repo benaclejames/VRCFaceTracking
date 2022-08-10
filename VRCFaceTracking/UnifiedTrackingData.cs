@@ -44,6 +44,9 @@ namespace VRCFaceTracking
         // SRanipal Exclusive
         public float EyesDilation;
         private float _maxDilation, _minDilation;
+        
+        // Custom parameter
+        public float EyesPupilDiameter;
 
         public void UpdateData(EyeData_v2 eyeData)
         {
@@ -71,7 +74,10 @@ namespace VRCFaceTracking
             Combined.Squeeze = (Left.Squeeze + Right.Squeeze) / 2;
             
             if (dilation != 0)
+            {
                 EyesDilation = (dilation - _minDilation) / (_maxDilation - _minDilation);
+                EyesPupilDiameter = dilation > 10 ? 1 : dilation / 10;
+            }
         }
 
         private void UpdateMinMaxDilation(float readDilation)
