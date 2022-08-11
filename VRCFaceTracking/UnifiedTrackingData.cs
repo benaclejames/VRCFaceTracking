@@ -71,7 +71,7 @@ namespace VRCFaceTracking
             Combined.Squeeze = (Left.Squeeze + Right.Squeeze) / 2;
             
             if (dilation != 0)
-                EyesDilation = dilation / _minDilation / (_maxDilation - _minDilation);
+                EyesDilation = (dilation - _minDilation) / (_maxDilation - _minDilation);
         }
 
         private void UpdateMinMaxDilation(float readDilation)
