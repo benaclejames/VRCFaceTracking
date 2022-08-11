@@ -33,6 +33,7 @@ namespace VRCFaceTracking.Params.Eye
             #region Dilation
             
             new EParam(v2 => v2.EyesDilation, "EyesDilation"),
+            new EParam(v2 => v2.EyesPupilDiameter, "EyesPupilDiameter"),
             
             #endregion
             
