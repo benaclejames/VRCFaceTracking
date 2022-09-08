@@ -91,6 +91,7 @@ namespace VRCFaceTracking.SRanipal
 
             if (Status.EyeState > ModuleState.Uninitialized)
             {
+                Logger.Msg("Teardown: Releasing Eye");
                 // Attempt to release this module and give up after 10 seconds because Vive Moment
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2));
                 killThread.Start();
@@ -104,13 +105,13 @@ namespace VRCFaceTracking.SRanipal
 
             if (Status.LipState > ModuleState.Uninitialized)
             {
+                Logger.Msg("Teardown: Releasing Lip");
                 // Same for lips
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2));
                 killThread.Start();
                 if (!killThread.Join(new TimeSpan(0,0,5)))
                     killThread.Abort();
             }
-            
             _cancellationToken.Dispose();
         }
 
@@ -124,11 +125,23 @@ namespace VRCFaceTracking.SRanipal
             {
                 while (!_cancellationToken.IsCancellationRequested)
                 {
-                    if (Status.LipState == ModuleState.Active)
-                        UpdateMouth();
-            
-                    if (Status.EyeState == ModuleState.Active)
-                        UpdateEye();
+                    if (Status.LipState == ModuleState.Active && UpdateMouth() != Error.WORK)
+                    {
+                        Logger.Msg("An error occured while getting lip data. This might be a wireless crash.");
+                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
+                        Thread.Sleep(30000);
+                        UnifiedLibManager.Initialize();
+                        return;
+                    }
+
+                    if (Status.EyeState == ModuleState.Active && UpdateEye() != Error.WORK)
+                    {
+                        Logger.Msg("An error occured while getting eye data. This might be a wireless crash.");
+                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
+                        Thread.Sleep(30000);
+                        UnifiedLibManager.Initialize();
+                        return;
+                    }
                 }
             };
         }
@@ -156,12 +169,12 @@ namespace VRCFaceTracking.SRanipal
             return bytesRead != size ? null : buffer;
         }
         
-        private void UpdateEye()
+        private Error UpdateEye()
         {
-            SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
+            var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
             
-            if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
+            if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return updateResult;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
             var imageBytes = ReadMemory(_offset, 20000);
@@ -180,17 +193,21 @@ namespace VRCFaceTracking.SRanipal
 
             // Write the image to the latest eye data
             UnifiedTrackingData.LatestEyeData.ImageData = concatImage.ToArray();
+
+            return updateResult;
         }
 
-        private void UpdateMouth()
+        private Error UpdateMouth()
         {
-            SRanipal_Lip_API.GetLipData_v2(ref lipData);
+            var updateResult = SRanipal_Lip_API.GetLipData_v2(ref lipData);
             UnifiedTrackingData.LatestLipData.UpdateData(lipData);
             
-            if (lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return;
+            if (lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return updateResult;
             
             Marshal.Copy(lipData.image, UnifiedTrackingData.LatestLipData.ImageData, 0, UnifiedTrackingData.LatestLipData.ImageSize.x *
                 UnifiedTrackingData.LatestLipData.ImageSize.y);
+
+            return updateResult;
         }
 
         #endregion

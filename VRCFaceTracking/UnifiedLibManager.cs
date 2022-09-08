@@ -54,12 +54,18 @@ namespace VRCFaceTracking
 
         public static void Initialize(bool eye = true, bool lip = true)
         {
-            // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            TeardownAllAndReset();
-
+            
             // Start Initialization
-            _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
+            _initializeWorker = new Thread(() =>
+            {
+                // Kill lingering threads
+                TeardownAllAndReset();
+                
+                // Init
+                FindAndInitRuntimes(eye, lip);
+            });
+            Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
         }
 
@@ -131,6 +137,7 @@ namespace VRCFaceTracking
             
             foreach (var module in trackingModules)
             {
+                Logger.Msg("Initializing module: " + module.Name);
                 // Create module
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 
@@ -191,15 +198,17 @@ namespace VRCFaceTracking
         // Signal all active modules to gracefully shut down their respective runtimes
         public static void TeardownAllAndReset()
         {
-            EyeStatus = ModuleState.Uninitialized;
-            LipStatus = ModuleState.Uninitialized;
-            
             foreach (var module in UsefulThreads)
             {
+                Logger.Msg("Teardown: " + module.Key.GetType().Name);
                 module.Key.Teardown();
                 module.Value.Abort();
+                Logger.Msg("Teardown complete: " + module.Key.GetType().Name);
             }
             UsefulThreads.Clear();
+            
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
 
             _eyeModule = null;
             _lipModule = null;
