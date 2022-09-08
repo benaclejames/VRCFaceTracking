@@ -88,6 +88,9 @@ namespace VRCFaceTracking.SRanipal
         public override void Teardown()
         {
             _cancellationToken.Cancel();
+            _cancellationToken.Dispose();
+            
+            Thread.Sleep(2000);
 
             if (Status.EyeState > ModuleState.Uninitialized)
             {
@@ -112,7 +115,6 @@ namespace VRCFaceTracking.SRanipal
                 if (!killThread.Join(new TimeSpan(0,0,5)))
                     killThread.Abort();
             }
-            _cancellationToken.Dispose();
         }
 
         #region Update
