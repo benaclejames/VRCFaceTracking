@@ -82,6 +82,8 @@ namespace VRCFaceTracking
             // Load dotnet dlls from the VRCFTLibs folder
             foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
             {
+                RemoveZoneIdentifier(dll);
+
                 Logger.Msg("Loading " + dll);
 
                 Type module;
@@ -212,6 +214,21 @@ namespace VRCFaceTracking
 
             _eyeModule = null;
             _lipModule = null;
+        }
+
+        private static void RemoveZoneIdentifier(string path)
+        {
+            string zoneFile = path + ":Zone.Identifier";
+
+            if (Utils.GetFileAttributes(zoneFile) == 0xffffffff) // INVALID_FILE_ATTRIBUTES
+            {
+                //zone file doesn't exist, everything's good
+                return;
+            }
+            if (Utils.DeleteFile(zoneFile))
+                Logger.Msg("Removing the downloaded file identifier from " + path);
+            else
+                Logger.Error("Couldn't removed the 'file downloaded' mark from " + path + "! The app will probably crash right now so please unblock the file manually");
         }
     }
 }
