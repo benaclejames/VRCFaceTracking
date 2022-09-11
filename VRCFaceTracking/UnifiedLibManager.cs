@@ -85,7 +85,7 @@ namespace VRCFaceTracking
                 Logger.Msg("Loading " + dll);
 
                 Type module;
-                try 
+                try
                 {
                     var loadedModule = Assembly.LoadFrom(dll);
                     // Get the first class that implements ExtTrackingModule
@@ -98,6 +98,11 @@ namespace VRCFaceTracking
                         Logger.Error("LoaderException: " + loaderException.Message);
                     }
                     Logger.Error("Exception loading " + dll + ". Skipping.");
+                    continue;
+                }
+                catch (BadImageFormatException e)
+                {
+                    Logger.Error("Encountered a .dll with an invalid format: " + e.Message+". Skipping...");
                     continue;
                 }
                 
