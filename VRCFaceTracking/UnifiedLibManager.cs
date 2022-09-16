@@ -82,7 +82,9 @@ namespace VRCFaceTracking
             // Load dotnet dlls from the VRCFTLibs folder
             foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
             {
-                RemoveZoneIdentifier(dll);
+                if (RemoveZoneIdentifier(dll))
+                    // Skip the module which will most likely crash the app
+                    continue;
 
                 Logger.Msg("Loading " + dll);
 
@@ -216,19 +218,27 @@ namespace VRCFaceTracking
             _lipModule = null;
         }
 
-        private static void RemoveZoneIdentifier(string path)
+        /* Removes the 'downloaded from the internet' attribute from a module
+        * @param DLL file path
+        * @return error; if true then the module should be skipped
+        */
+        private static bool RemoveZoneIdentifier(string path)
         {
             string zoneFile = path + ":Zone.Identifier";
 
             if (Utils.GetFileAttributes(zoneFile) == 0xffffffff) // INVALID_FILE_ATTRIBUTES
-            {
                 //zone file doesn't exist, everything's good
-                return;
-            }
+                return false;
+
             if (Utils.DeleteFile(zoneFile))
                 Logger.Msg("Removing the downloaded file identifier from " + path);
             else
-                Logger.Error("Couldn't removed the 'file downloaded' mark from " + path + "! The app will probably crash right now so please unblock the file manually");
+            {
+                Logger.Error("Couldn't removed the 'file downloaded' mark from the " + path + " module! Please unblock the file manually");
+                return true;
+            }
+
+            return false;
         }
     }
 }
