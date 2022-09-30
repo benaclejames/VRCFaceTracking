@@ -126,14 +126,14 @@ namespace VRCFaceTracking.Params.LipMerging
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters, and add GetLipActivatedStatus
-        public static readonly List<IParameter> AllLipParameters =
-            new List<IParameter>(GetAllLipShapes().Union(GetOptimizedLipParameters()).Union(GetLipActivatedStatus()));
+        public static readonly IParameter[] AllLipParameters =
+            GetAllLipShapes().Union(GetOptimizedLipParameters()).Union(GetLipActivatedStatus()).ToArray();
 
         public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out LipShape_v2 shape);
         
         private static IEnumerable<EParam> GetOptimizedLipParameters() => MergedShapes
             .Select(shape => new EParam((eye, lip) => 
-                shape.Value.GetBlendedLipShape(lip.LatestShapes), shape.Key, 0.0f)).ToList();
+                shape.Value.GetBlendedLipShape(lip.LatestShapes), shape.Key, 0.0f));
 
         private static IEnumerable<EParam> GetAllLipShapes() =>
             ((LipShape_v2[]) Enum.GetValues(typeof(LipShape_v2))).ToList().Select(shape =>

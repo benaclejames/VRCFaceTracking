@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace VRCFaceTracking.Params.Eye
+﻿namespace VRCFaceTracking.Params.Eye
 {
     public static class EyeTrackingParams
     {
-        public static readonly List<IParameter> ParameterList = new List<IParameter>
-        {
+        public static readonly IParameter[] ParameterList = {
             #region XYParams
             
             new XYParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
