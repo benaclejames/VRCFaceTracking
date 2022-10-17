@@ -33,6 +33,7 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"JawOpenPuffLeft", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekPuffLeft)},
                 {"JawOpenSuck", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.CheekSuck)},
                 {"JawOpenForward", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.JawForward)},
+                {"JawOpenOverlay", new PositiveNegativeShape(LipShape_v2.JawOpen, LipShape_v2.MouthLowerOverlay)},
 
                 //MouthUpperUpRight based params
                 {"MouthUpperUpRightUpperInside", new PositiveNegativeShape(LipShape_v2.MouthUpperUpRight, LipShape_v2.MouthUpperInside)},
