@@ -29,12 +29,12 @@ namespace VRCFaceTracking
     {
         public static OscMain OscMain;
 
-        private static IEnumerable<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
+        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
             {
                 param.NeedsSend = false;
                 return new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue);
-            });
+            }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
