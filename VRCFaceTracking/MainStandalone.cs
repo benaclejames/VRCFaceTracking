@@ -114,8 +114,19 @@ namespace VRCFaceTracking
                     UnifiedTrackingData.LatestLipData);
 
                 var messages = ConstructMessages(_relevantParams);
-                var bundle = new OscBundle(messages);
-                OscMain.Send(bundle.Data);
+                while (messages.Count > 0)
+                {
+                    var msgCount = 16;
+                    var msgList = new List<OscMessage>();
+                    while (messages.Count > 0 && msgCount+messages[0].Data.Length+4 < 4096)
+                    {
+                        msgList.Add(messages[0]);
+                        msgCount += messages[0].Data.Length+4;
+                        messages.RemoveAt(0);
+                    }
+                    var bundle = new OscBundle(msgList);
+                    OscMain.Send(bundle.Data);
+                }
             }
         }
     }
