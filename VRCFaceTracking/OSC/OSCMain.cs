@@ -39,8 +39,11 @@ namespace VRCFaceTracking.OSC
             {
                 SenderClient.Connect(new IPEndPoint(IPAddress.Parse(address), outPort));
                 senderSuccess = true;
+                
+                ReceiverClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(address), inPort));
                 receiverSuccess = true;
+                
                 ReceiverClient.ReceiveTimeout = 1000;
                 
                 _receiveThread = new Thread(() =>
@@ -48,6 +51,7 @@ namespace VRCFaceTracking.OSC
                     while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                         Recv();
                 });
+                
                 _receiveThread.Start();
             }
             catch (Exception)
