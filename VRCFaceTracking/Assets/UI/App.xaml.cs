@@ -6,16 +6,23 @@ namespace VRCFaceTracking.Assets.UI
 {
     public partial class App
     {
-        private readonly Thread _oscThread = new Thread(MainStandalone.Initialize);
+        private readonly MainStandalone Standalone;
+        private readonly Thread ProcessingThread;
         
         public App()
         {
             BindingOperations.EnableCollectionSynchronization(Logger.ConsoleOutput, Logger.ConsoleLock);
-            _oscThread.Start();
+            Standalone = new MainStandalone();
+            ProcessingThread = new Thread(Standalone.Initialize);
+            ProcessingThread.Start();
         }
 
-        ~App() => MainStandalone.Teardown();
+        ~App()
+        {
+            ProcessingThread.Abort();
+            Standalone.Dispose();
+        }
 
-        private void App_OnExit(object sender, ExitEventArgs e) => MainStandalone.Teardown();
+        private void App_OnExit(object sender, ExitEventArgs e) => Standalone.Dispose();
     }
 }

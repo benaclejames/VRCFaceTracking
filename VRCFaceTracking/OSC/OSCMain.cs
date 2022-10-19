@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using VRCFaceTracking.OSC.Query;
 
 namespace VRCFaceTracking.OSC
 {
@@ -26,10 +27,13 @@ namespace VRCFaceTracking.OSC
         }
     }
 
-    public class OscMain
+    public class OscMain : IDisposable
     {
+        private const int FallbackPort = 6969;
+        
         private static readonly Socket SenderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private static readonly Socket ReceiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private QueryRegistrar _queryRegistrar;
         private static Thread _receiveThread;
 
         public (bool senderSuccess, bool receiverSuccess) Bind(string address, int outPort, int inPort)
@@ -43,37 +47,58 @@ namespace VRCFaceTracking.OSC
                 receiverSuccess = true;
                 ReceiverClient.ReceiveTimeout = 1000;
                 
-                _receiveThread = new Thread(() =>
-                {
-                    while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
-                        Recv();
-                });
-                _receiveThread.Start();
+                _receiveThread = new Thread(SocketRecvLoop);
             }
             catch (Exception)
             {
-                return (senderSuccess, receiverSuccess);
+                if (!receiverSuccess)
+                {
+                    _queryRegistrar = new QueryRegistrar();
+                    _receiveThread = _queryRegistrar.RegisterOscListener("VRCFT", FallbackPort, ParseRaw);
+                    Logger.Msg($"Receiver failed to bind. Using falling back to OSCQuery service discovery on port {FallbackPort}.");
+                }
             }
-            return (true, true);
+            
+            _receiveThread.Start();
+            
+            return (senderSuccess, receiverSuccess);
         }
 
-        private void Recv()
+        private void SocketRecvLoop()
         {
-            byte[] buffer = new byte[2048];
-            try
+            while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
             {
-                ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                byte[] buffer = new byte[2048];
+                try
+                {
+                    ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                }
+                catch (SocketException)
+                {
+                    // Ignore as this is most likely a timeout exception
+                    return;
+                }
+                
+                ParseRaw(buffer);
             }
-            catch (SocketException)
-            {
-                // Ignore as this is most likely a timeout exception
-                return;
-            }
-            var newMsg = new OscMessage(buffer);
+        }
+
+        private static void ParseRaw(byte[] rawBytes)
+        {
+            var newMsg = new OscMessage(rawBytes);
             if (newMsg.Address == "/avatar/change")
                 ConfigParser.ParseNewAvatar((string) newMsg.Value);
         }
 
         public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);
+        
+        public void Dispose()
+        {
+            _receiveThread.Abort();
+            
+            SenderClient.Dispose();
+            ReceiverClient.Dispose();
+            _queryRegistrar?.Dispose();
+        }
     }
 }

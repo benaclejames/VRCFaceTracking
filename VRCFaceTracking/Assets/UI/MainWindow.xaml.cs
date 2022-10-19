@@ -50,11 +50,6 @@ namespace VRCFaceTracking.Assets.UI
 
             // use the application icon as the icon for the tray
             TrayIcon.DoubleClick += ShowWindow;
-            TrayIcon.ContextMenu = new ContextMenu(new[]
-            {
-                new MenuItem("Exit", (sender, args) => MainStandalone.Teardown()),
-                new MenuItem("Show", ShowWindow)
-            });
             
             // Is this running as admin?
             // If not, disable the re-int button

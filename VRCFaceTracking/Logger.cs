@@ -13,8 +13,10 @@ namespace VRCFaceTracking
         {
             var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + msgStr;
             
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "White"));
-        
+            // Ensure this isn't during a collectionchanged event
+            lock (ConsoleLock)
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "White"));
+
             Console.WriteLine(formattedStr);
         }
 
@@ -22,7 +24,8 @@ namespace VRCFaceTracking
         {
             var formattedStr = "["+DateTime.Now.ToString("HH:mm:ss") + "] [WARNING] " + warningStr;
             
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "Yellow"));
+            lock (ConsoleLock)
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "Yellow"));
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(formattedStr);
@@ -33,7 +36,8 @@ namespace VRCFaceTracking
         {
             var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] [ERROR] " + errorStr;
             
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr,"Red"));
+            lock (ConsoleLock)
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr,"Red"));
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(formattedStr);
             Console.ResetColor();

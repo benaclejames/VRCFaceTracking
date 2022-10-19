@@ -6,8 +6,10 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using MeaMod.DNS.Multicast;
 using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.OSC;
+using VRCFaceTracking.OSC.Query;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
@@ -25,9 +27,9 @@ using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking
 {
-    public static class MainStandalone
+    public class MainStandalone : IDisposable
     {
-        public static OscMain OscMain;
+        private static OscMain _oscMain = new OscMain();
 
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
@@ -44,10 +46,11 @@ namespace VRCFaceTracking
 
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
-        public static void Teardown()
+        public void Dispose()
         {
             // Kill our threads
             MasterCancellationTokenSource.Cancel();
+            _oscMain.Dispose();
             
             Utils.TimeEndPeriod(1);
             Logger.Msg("VRCFT Standalone Exiting!");
@@ -57,7 +60,7 @@ namespace VRCFaceTracking
             Application.Current?.Shutdown();
         }
         
-        public static void Initialize()
+        public void Initialize()
         {
             Logger.Msg("VRCFT Initializing!");
             
@@ -82,10 +85,7 @@ namespace VRCFaceTracking
             UnifiedLibManager.Initialize();
 
             // Initialize Locals
-            OscMain = new OscMain();
-            var bindResults = OscMain.Bind(_ip, _outPort, _inPort);
-            if (!bindResults.receiverSuccess)
-                Logger.Error("Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
+            var bindResults = _oscMain.Bind(_ip, _outPort, _inPort);
             
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
@@ -125,7 +125,7 @@ namespace VRCFaceTracking
                         messages.RemoveAt(0);
                     }
                     var bundle = new OscBundle(msgList);
-                    OscMain.Send(bundle.Data);
+                    _oscMain.Send(bundle.Data);
                 }
             }
         }

@@ -57,6 +57,7 @@
     <Compile Include="OSC\OSCMain.cs" />
     <Compile Include="OSC\OSCMessage.cs" />
     <Compile Include="OSC\OSCParams.cs" />
+    <Compile Include="OSC\Query\QueryRegistrar.cs" />
     <Compile Include="Params\Eye\EyeTrackingParams.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Assets\Images\VRCFT.ico" />
     <EmbeddedResource Include="TrackingLibs\SRanipal\libHTC_License.dll" />
@@ -92,6 +94,9 @@
     <EmbeddedResource Include="TrackingLibs\SRanipal\ViveSR_Client.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="MeaMod.DNS, Version=1.0.70.2032, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MeaMod.DNS.1.0.70\lib\net47\MeaMod.DNS.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0-preview.1.22076.8\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
       <Private>True</Private>
