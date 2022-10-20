@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="VRCFaceTracking" Language="1033" Version="!(bind.FileVersion.MainExe)" Manufacturer="benaclejames" UpgradeCode="234a097c-c7ac-41e5-b0d9-7e2f53632650">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <!-- UI -->
+    <UIRef Id="WixUI_InstallDirEULA"/>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing VRCFaceTracking. This project wouldn't be the same without you &#60;3" />
+    <WixVariable Id="WixUILicenseRtf" Value="eula.rtf" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of VRCFaceTracking is already installed." />
+		<MediaTemplate EmbedCab="yes"/>
+
+    <Icon Id="icon.ico" SourceFile="..\VRCFaceTracking\Assets\Images\VRCFT.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+    <WixVariable Id="WixUIDialogBmp" Value="UIDialog.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="UIBanner.bmp" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="VRCFaceTracking" />
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="VRCFaceTracking"/>
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="234a097c-c7ac-41e5-b0d9-7e2f53632650">
+        <!-- Create start menu shortcut -->
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="VRCFaceTracking"
+                  Description="VRChat Face Tracking"
+                  Target="[#MainExe]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <!-- Create Uninstaller -->
+        <Shortcut Id="UninstallProduct"
+                          Name="Uninstall My Application"
+                          Description="Uninstalls My Application"
+                          Target="[System64Folder]msiexec.exe"
+                          Arguments="/x [ProductCode]"/>
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\benaclejames\VRCFaceTracking" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+		<Feature Id="ProductFeature" Title="VRCFaceTracking" Level="1">
+      <Component Id="ProductComponent" Directory="INSTALLFOLDER">
+          <File Id="MainExe" Source="$(var.VRCFaceTracking.TargetPath)" />
+      </Component>
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+	</Product>
+</Wix>
