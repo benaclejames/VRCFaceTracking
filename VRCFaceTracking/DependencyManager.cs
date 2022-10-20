@@ -119,13 +119,20 @@ namespace VRCFaceTracking
         
         [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadLibrary(string lpFileName);
+        
+        
+        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern bool FreeLibrary(IntPtr hModule);
 
-        private static void LoadAssembly(string path)
+        private static IntPtr LoadAssembly(string path)
         {
-            if (LoadLibrary(path) == IntPtr.Zero)
+            IntPtr hModule = LoadLibrary(path);
+            if (hModule == IntPtr.Zero)
                 Logger.Error("Unable to load library " + path);
             else
                 Logger.Msg("Loaded library " + path);
+
+            return hModule;
         }
     }
 }

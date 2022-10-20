@@ -20,7 +20,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />
-    <Compile Include="WixUI_InstallDirEULA.wxs" />
+    <Compile Include="WixUI_FeatureTreeEULA.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj">

@@ -12,8 +12,9 @@ namespace VRCFaceTracking.SRanipal
 {
     public class SRanipalExtTrackingInterface : ExtTrackingModule
     {
-        LipData_v2 lipData = default;
-        EyeData_v2 eyeData = default;
+        private LipData_v2 _lipData;
+        private EyeData_v2 _eyeData;
+        private static bool _wirelessMoment; // Flag to force execution to halt until a successful connection is made.
         private static CancellationTokenSource _cancellationToken;
         
         public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
@@ -60,7 +61,7 @@ namespace VRCFaceTracking.SRanipal
                 UnifiedTrackingData.LatestLipData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
                 UnifiedTrackingData.LatestLipData.ImageData = new byte[UnifiedTrackingData.LatestLipData.ImageSize.x *
                                                                        UnifiedTrackingData.LatestLipData.ImageSize.y];
-                lipData.image = Marshal.AllocCoTaskMem(UnifiedTrackingData.LatestLipData.ImageSize.x *
+                _lipData.image = Marshal.AllocCoTaskMem(UnifiedTrackingData.LatestLipData.ImageSize.x *
                                                        UnifiedTrackingData.LatestLipData.ImageSize.y);
             }
 
@@ -70,16 +71,29 @@ namespace VRCFaceTracking.SRanipal
         private static (bool eyeSuccess, bool lipSuccess) HandleSrErrors(Error eyeError, Error lipError)
         {
             bool eyeEnabled = false, lipEnabled = false;
-            
-            if (eyeError == Error.WORK)
-                eyeEnabled = true;
 
-            if (lipError == Error.FOXIP_SO)
-                while (lipError == Error.FOXIP_SO)
-                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
             
-            if (lipError == Error.WORK)
-                lipEnabled = true;
+            if (_wirelessMoment || SRanipal_Eye_API.IsViveProEye())
+                while (eyeError != Error.WORK)
+                {
+                    Logger.Warning($"Eye tracking failed to initialize with error {eyeError}, retrying in 10 seconds.");
+                    Thread.Sleep(15000);
+                    eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+                }
+            
+            eyeEnabled = eyeError == Error.WORK;
+
+            if (lipError == Error.FOXIP_SO || _wirelessMoment)
+                while (lipError != Error.WORK)
+                {
+                    Logger.Warning($"Lip tracking failed to initialize with error {lipError}, retrying in 10 seconds.");
+                    Thread.Sleep(15000);
+                    lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+                }
+
+            lipEnabled = lipError == Error.WORK;
+
+            _wirelessMoment = false;
 
             return (eyeEnabled, lipEnabled);
         }
@@ -128,18 +142,18 @@ namespace VRCFaceTracking.SRanipal
                 {
                     if (Status.LipState == ModuleState.Active && UpdateMouth() != Error.WORK)
                     {
-                        Logger.Msg("An error occured while getting lip data. This might be a wireless crash.");
-                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
-                        Thread.Sleep(30000);
+                        Logger.Warning("An error occured while getting eye data. Attempting to reinitialize.");
+                        Thread.Sleep(15000);
+                        _wirelessMoment = true;  // Make sure we remember that we initially initialized with wireless fine
                         UnifiedLibManager.Initialize();
                         return;
                     }
 
                     if (Status.EyeState == ModuleState.Active && UpdateEye() != Error.WORK)
                     {
-                        Logger.Msg("An error occured while getting eye data. This might be a wireless crash.");
-                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
-                        Thread.Sleep(30000);
+                        Logger.Warning("An error occured while getting lip data. Attempting to reinitialize.");
+                        Thread.Sleep(15000);
+                        _wirelessMoment = true;
                         UnifiedLibManager.Initialize();
                         return;
                     }
@@ -174,8 +188,8 @@ namespace VRCFaceTracking.SRanipal
         
         private Error UpdateEye()
         {
-            var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
-            UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
+            var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref _eyeData);
+            UnifiedTrackingData.LatestEyeData.UpdateData(_eyeData);
             
             if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return updateResult;
             
@@ -206,12 +220,12 @@ namespace VRCFaceTracking.SRanipal
 
         private Error UpdateMouth()
         {
-            var updateResult = SRanipal_Lip_API.GetLipData_v2(ref lipData);
-            UnifiedTrackingData.LatestLipData.UpdateData(lipData);
+            var updateResult = SRanipal_Lip_API.GetLipData_v2(ref _lipData);
+            UnifiedTrackingData.LatestLipData.UpdateData(_lipData);
             
-            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return updateResult;
+            if (!MainWindow.IsLipPageVisible || _lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return updateResult;
             
-            Marshal.Copy(lipData.image, UnifiedTrackingData.LatestLipData.ImageData, 0, UnifiedTrackingData.LatestLipData.ImageSize.x *
+            Marshal.Copy(_lipData.image, UnifiedTrackingData.LatestLipData.ImageData, 0, UnifiedTrackingData.LatestLipData.ImageSize.x *
                 UnifiedTrackingData.LatestLipData.ImageSize.y);
 
             return updateResult;

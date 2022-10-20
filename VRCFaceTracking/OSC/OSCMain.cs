@@ -76,7 +76,7 @@ namespace VRCFaceTracking.OSC
                 catch (SocketException)
                 {
                     // Ignore as this is most likely a timeout exception
-                    return;
+                    continue;
                 }
                 
                 ParseRaw(buffer);

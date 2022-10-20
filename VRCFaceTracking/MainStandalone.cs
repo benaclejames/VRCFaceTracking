@@ -6,10 +6,8 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
-using MeaMod.DNS.Multicast;
 using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.OSC;
-using VRCFaceTracking.OSC.Query;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
@@ -17,8 +15,7 @@ using VRCFaceTracking.OSC.Query;
 [assembly: AssemblyProduct("VRCFaceTracking")]
 [assembly: AssemblyCopyright("Copyright © benaclejames 2022")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("3.0.1.0")]
-[assembly: AssemblyFileVersion("3.0.1.0")]
+[assembly: AssemblyVersion("4.0.0.1")]
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None,
