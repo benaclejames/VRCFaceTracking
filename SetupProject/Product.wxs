@@ -45,17 +45,17 @@
       </Component>
     </DirectoryRef>
         
-        <Feature Id="VRCFT" Title="VRCFaceTracking" Level="1" Description="VRChat Face Tracking OSC Application">
+        <Feature Id="VRCFT" Title="VRCFaceTracking" Level="1" Description="VRChat Face Tracking OSC Application" TypicalDefault="install" Display="expand">
             <Component Directory="INSTALLFOLDER">
                 <File Id="MainExe" Source="$(var.VRCFaceTracking.TargetPath)" />
             </Component>
             <ComponentRef Id="ApplicationShortcut" />
+
+            <Feature Id="AutoStartFeature" Title="Auto Start" Description="Automatically start VRCFT with OpenVR" Level="2" TypicalDefault="advertise">
+                <Component Directory="INSTALLFOLDER">
+                    <File Id="Manifest" Source="$(var.VRCFaceTracking.TargetDir)app.vrmanifest" />
+                </Component>
+            </Feature>
         </Feature>
-        <Feature Id="AutoStartFeature" Title="Auto Start" Description="Automatically start VRCFT with OpenVR" Level="10" AllowAdvertise="no">
-            <Component Directory="INSTALLFOLDER">
-                <File Id="Manifest" Source="$(var.VRCFaceTracking.TargetDir)app.vrmanifest" />
-            </Component>
-        </Feature>
-        
 	</Product>
 </Wix>
