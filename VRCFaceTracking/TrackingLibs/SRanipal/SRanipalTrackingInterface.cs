@@ -74,7 +74,7 @@ namespace VRCFaceTracking.SRanipal
 
             
             if (_wirelessMoment || SRanipal_Eye_API.IsViveProEye())
-                while (eyeError != Error.WORK)
+                while (eyeError != Error.WORK && !MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                 {
                     Logger.Warning($"Eye tracking failed to initialize with error {eyeError}, retrying in 10 seconds.");
                     Thread.Sleep(15000);
@@ -84,7 +84,7 @@ namespace VRCFaceTracking.SRanipal
             eyeEnabled = eyeError == Error.WORK;
 
             if (lipError == Error.FOXIP_SO || _wirelessMoment)
-                while (lipError != Error.WORK)
+                while (lipError != Error.WORK && !MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
                 {
                     Logger.Warning($"Lip tracking failed to initialize with error {lipError}, retrying in 10 seconds.");
                     Thread.Sleep(15000);

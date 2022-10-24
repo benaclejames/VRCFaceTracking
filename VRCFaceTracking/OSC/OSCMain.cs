@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Text.Json;
 using System.Threading;
 using VRCFaceTracking.OSC.Query;
 
@@ -55,13 +54,38 @@ namespace VRCFaceTracking.OSC
                 {
                     _queryRegistrar = new QueryRegistrar();
                     _receiveThread = _queryRegistrar.RegisterOscListener("VRCFT", FallbackPort, ParseRaw);
+
                     Logger.Msg($"Receiver failed to bind. Using falling back to OSCQuery service discovery on port {FallbackPort}.");
                 }
             }
             
             _receiveThread.Start();
             
+            var resp = GetAddressValue("/avatar/change");
+            if (resp != null && !string.IsNullOrEmpty(resp.VALUE))
+                ConfigParser.ParseNewAvatar(resp.VALUE);
+            
             return (senderSuccess, receiverSuccess);
+        }
+        
+        private ConfigParser.QueryResponse GetAddressValue(string value)
+        {
+            // GET request on http://address:inport/avatar/change
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"http://{MainStandalone.Ip}:{MainStandalone.InPort}{value}");
+            request.Method = "GET";
+            var resp = (HttpWebResponse)request.GetResponse();
+                    
+            // Ensure we have OK response
+            if (resp.StatusCode != HttpStatusCode.OK)
+                return null;
+                    
+            // Parse response json
+            var stream = resp.GetResponseStream();
+            var reader = new System.IO.StreamReader(stream);
+            var json = reader.ReadToEnd();
+                    
+            // Parse json to the QueryResponse class
+            return JsonSerializer.Deserialize<ConfigParser.QueryResponse>(json);
         }
 
         private void SocketRecvLoop()
@@ -90,8 +114,12 @@ namespace VRCFaceTracking.OSC
                 ConfigParser.ParseNewAvatar((string) newMsg.Value);
         }
 
-        public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);
-        
+        public void Send(byte[] data)
+        {
+            if (SenderClient.Connected)
+                SenderClient.Send(data, data.Length, SocketFlags.None);
+        }
+
         public void Dispose()
         {
             _receiveThread.Abort();

@@ -9,6 +9,15 @@ namespace VRCFaceTracking
 {
     public static class ConfigParser
     {
+        public class QueryResponse
+        {
+            public int ACCESS { get; set; }
+            public string DESCRIPTION { get; set; }
+            public string FULL_PATH { get; set; }
+            public string TYPE { get; set; }
+            public string VALUE { get; set; }
+        }
+        
         public class InputOutputDef
         {
             public string address { get; set; }
