@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using VRCFaceTracking.Params.Lip;
 
 namespace ViveSR
 {
@@ -17,13 +18,13 @@ namespace ViveSR
                 public const int WeightingCount = 37;
                 private static Error LastUpdateResult = Error.FAILED;
                 public static LipData_v2 LipData;
-                private static Dictionary<LipShape_v2, float> Weightings;
+                private static Dictionary<LipShape_v3, float> Weightings;
 
                 static SRanipal_Lip_v2()
                 {
                     LipData.image = Marshal.AllocCoTaskMem(ImageWidth * ImageHeight * ImageChannel);
-                    Weightings = new Dictionary<LipShape_v2, float>();
-                    for (int i = 0; i < WeightingCount; ++i) Weightings.Add((LipShape_v2)i, 0.0f);
+                    Weightings = new Dictionary<LipShape_v3, float>();
+                    for (int i = 0; i < WeightingCount; ++i) Weightings.Add((LipShape_v3)i, 0.0f);
                 }
 
                 private static unsafe bool UpdateData()
@@ -33,7 +34,7 @@ namespace ViveSR
                     {
                         for (int i = 0; i < WeightingCount; ++i)
                         {
-                            Weightings[(LipShape_v2)i] = LipData.prediction_data.blend_shape_weight[i];
+                            Weightings[(LipShape_v3)i] = LipData.prediction_data.blend_shape_weight[i];
                         }
                     }
                     return LastUpdateResult == Error.WORK;
@@ -44,7 +45,7 @@ namespace ViveSR
                 /// </summary>
                 /// <param name="shapes">Weighting values obtained from anipal's Lip module.</param>
                 /// <returns>Indicates whether the values received are new.</returns>
-                public static bool GetLipWeightingsAndImage(out Dictionary<LipShape_v2, float> shapes, out IntPtr image)
+                public static bool GetLipWeightingsAndImage(out Dictionary<LipShape_v3, float> shapes, out IntPtr image)
                 {
                     bool update = UpdateData();
                     shapes = Weightings;
