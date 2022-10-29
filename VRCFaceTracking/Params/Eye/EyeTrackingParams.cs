@@ -168,6 +168,26 @@
 
             #endregion
 
+            #region EyeBrow
+
+            new EParam(v2 => v2.Left.Brow.InnerUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerUp : v2.Right.Brow.InnerUp, "EyebrowsInnerUp"),
+            new EParam(v2 => v2.Left.Brow.InnerUp, "LeftEyeBrowInnerUp"),
+            new EParam(v2 => v2.Right.Brow.InnerUp, "RightEyeBrowInnerUp"),
+
+            new EParam(v2 => v2.Left.Brow.OuterUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.OuterUp : v2.Right.Brow.OuterUp, "EyebrowsOuterUp"),
+            new EParam(v2 => v2.Left.Brow.OuterUp, "LeftEyeBrowOuterUp"),
+            new EParam(v2 => v2.Right.Brow.OuterUp, "RightEyeBrowOuterUp"),
+
+            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "EyebrowsInnerDown"),
+            new EParam(v2 => v2.Left.Brow.InnerDown, "LeftEyeBrowInnerDown"),
+            new EParam(v2 => v2.Right.Brow.InnerDown, "RightEyeBrowInnerDown"),
+
+            new EParam(v2 => v2.Left.Brow.OuterDown > v2.Right.Brow.OuterDown ? v2.Left.Brow.OuterDown : v2.Right.Brow.OuterDown, "EyebrowsOuterDown"),
+            new EParam(v2 => v2.Left.Brow.OuterDown, "LeftEyeBrowOuterDown"),
+            new EParam(v2 => v2.Right.Brow.OuterDown, "RightEyeBrowOuterDown"),
+            
+            #endregion
+
             #region Status
 
             new BoolParameter(v2 => UnifiedLibManager.EyeStatus.Equals(ModuleState.Active), "EyeTrackingActive"),
