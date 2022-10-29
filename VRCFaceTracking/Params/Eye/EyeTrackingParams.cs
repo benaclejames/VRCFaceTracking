@@ -16,11 +16,17 @@
             new EParam(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
             new EParam(v2 => v2.Left.Widen, "LeftEyeWiden"),
             new EParam(v2 => v2.Right.Widen, "RightEyeWiden"),
-            
+
             #endregion
-            
+
+            #region Squint
+            new EParam(v2 => v2.Left.Squint > v2.Right.Squint ? v2.Left.Squint : v2.Right.Squint, "EyebrowsSquint"),
+            new EParam(v2 => v2.Left.Squint, "LeftEyeSquint"),
+            new EParam(v2 => v2.Right.Squint, "RightEyeSquint"),
+            #endregion
+
             #region Squeeze
-            
+
             new EParam(v2 => v2.Combined.Squeeze, "EyesSqueeze"),
             new EParam(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
             new EParam(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
