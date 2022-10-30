@@ -8,7 +8,7 @@ namespace ViveSR
     {
         namespace Lip
         {
-            // LipShape_v2 => LipShape_v3 moved to LipShapes
+            // LipShape_v2 => VRCFTLipShape moved to LipShapes
 
             [StructLayout(LayoutKind.Sequential)]
             public struct PredictionData_v2

@@ -45,16 +45,12 @@
         #endregion
 
         #region Custom Shapes
-        BrowLowererL,
-        BrowLowererR,
         CheekRaiserL,
         CheekRaiserR,
         ChinRaiserB,
         ChinRaiserT,
         DimplerL,
         DimplerR,
-        InnerBrowRaiserL,
-        InnerBrowRaiserR,
         LipFunnelerLB,
         LipFunnelerLT,
         LipFunnelerRB,
@@ -75,8 +71,6 @@
         LowerLipDepressorR,
         NoseWrinklerL,
         NoseWrinklerR,
-        OuterBrowRaiserL,
-        OuterBrowRaiserR,
         Max
         #endregion
 
@@ -90,6 +84,12 @@
         * CheekPuffR
         * CheekSuckL
         * CheekSuckR
+        * BrowLowererL // Eye Shapes not tracked in Lip Shapes
+        * BrowLowererR // Eye Shapes not tracked in Lip Shapes
+        * InnerBrowRaiserL // Eye Shapes not tracked in Lip Shapes
+        * InnerBrowRaiserR v
+        * OuterBrowRaiserL // Eye Shapes not tracked in Lip Shapes
+        * OuterBrowRaiserR // Eye Shapes not tracked in Lip Shapes
         * EyesClosedL // Eye Shapes not tracked in Lip Shapes
         * EyesClosedR // Eye Shapes not tracked in Lip Shapes
         * EyesLookDownL // Eye Shapes not tracked in Lip Shapes
