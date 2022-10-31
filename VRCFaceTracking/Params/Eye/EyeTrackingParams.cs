@@ -20,7 +20,7 @@
             #endregion
 
             #region Squint
-            new EParam(v2 => v2.Left.Squint > v2.Right.Squint ? v2.Left.Squint : v2.Right.Squint, "EyebrowsSquint"),
+            new EParam(v2 => v2.Left.Squint > v2.Right.Squint ? v2.Left.Squint : v2.Right.Squint, "EyesSquint"),
             new EParam(v2 => v2.Left.Squint, "LeftEyeSquint"),
             new EParam(v2 => v2.Right.Squint, "RightEyeSquint"),
             #endregion
@@ -176,21 +176,17 @@
 
             #region EyeBrow
 
-            new EParam(v2 => v2.Left.Brow.InnerUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerUp : v2.Right.Brow.InnerUp, "EyebrowsInnerUp"),
-            new EParam(v2 => v2.Left.Brow.InnerUp, "LeftEyeBrowInnerUp"),
-            new EParam(v2 => v2.Right.Brow.InnerUp, "RightEyeBrowInnerUp"),
+            new EParam(v2 => v2.Left.Brow.InnerUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerUp : v2.Right.Brow.InnerUp, "BrowsInnerUp"),
+            new EParam(v2 => v2.Left.Brow.InnerUp, "BrowInnerUpLeft"),
+            new EParam(v2 => v2.Right.Brow.InnerUp, "BrowInnerUpRight"),
 
-            new EParam(v2 => v2.Left.Brow.OuterUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.OuterUp : v2.Right.Brow.OuterUp, "EyebrowsOuterUp"),
-            new EParam(v2 => v2.Left.Brow.OuterUp, "LeftEyeBrowOuterUp"),
-            new EParam(v2 => v2.Right.Brow.OuterUp, "RightEyeBrowOuterUp"),
+            new EParam(v2 => v2.Left.Brow.OuterUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.OuterUp : v2.Right.Brow.OuterUp, "BrowsOuterUp"),
+            new EParam(v2 => v2.Left.Brow.OuterUp, "BrowOuterUpLeft"),
+            new EParam(v2 => v2.Right.Brow.OuterUp, "BrowOuterUpRight"),
 
-            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "EyebrowsInnerDown"),
-            new EParam(v2 => v2.Left.Brow.InnerDown, "LeftEyeBrowInnerDown"),
-            new EParam(v2 => v2.Right.Brow.InnerDown, "RightEyeBrowInnerDown"),
-
-            new EParam(v2 => v2.Left.Brow.OuterDown > v2.Right.Brow.OuterDown ? v2.Left.Brow.OuterDown : v2.Right.Brow.OuterDown, "EyebrowsOuterDown"),
-            new EParam(v2 => v2.Left.Brow.OuterDown, "LeftEyeBrowOuterDown"),
-            new EParam(v2 => v2.Right.Brow.OuterDown, "RightEyeBrowOuterDown"),
+            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "BrowsDown"),
+            new EParam(v2 => v2.Left.Brow.InnerDown, "BrowDownLeft"),
+            new EParam(v2 => v2.Right.Brow.InnerDown, "BrowDownRight"),
             
             #endregion
 
