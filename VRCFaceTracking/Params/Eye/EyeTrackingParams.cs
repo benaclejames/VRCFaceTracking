@@ -184,13 +184,9 @@
             new EParam(v2 => v2.Left.Brow.OuterUp, "BrowOuterUpLeft"),
             new EParam(v2 => v2.Right.Brow.OuterUp, "BrowOuterUpRight"),
 
-            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "BrowsInnerDown"),
-            new EParam(v2 => v2.Left.Brow.InnerDown, "BrowInnerDownLeft"),
-            new EParam(v2 => v2.Right.Brow.InnerDown, "BrowInnerDownRight"),
-
-            new EParam(v2 => v2.Left.Brow.OuterDown > v2.Right.Brow.OuterDown ? v2.Left.Brow.OuterDown : v2.Right.Brow.OuterDown, "BrowsOuterDown"),
-            new EParam(v2 => v2.Left.Brow.OuterDown, "BrowOuterDownLeft"),
-            new EParam(v2 => v2.Right.Brow.OuterDown, "BrowOuterDownLeft"),
+            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "BrowsDown"),
+            new EParam(v2 => v2.Left.Brow.InnerDown, "BrowDownLeft"),
+            new EParam(v2 => v2.Right.Brow.InnerDown, "BrowDownRight"),
             
             #endregion
 
