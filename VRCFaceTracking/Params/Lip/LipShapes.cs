@@ -1,9 +1,8 @@
 ﻿namespace VRCFaceTracking.Params.Lip
 {
-    // TODO Remove duplicate expressions post testing!
-    public enum VRCFTLipShape
+    // TODO: Create expressions map to relate legacy shapes to new ones
+    public enum UnifiedExpression
     {
-        #region SRanipal
         JawRight, // +JawX
         JawLeft, // -JawX
         JawForward,
@@ -42,9 +41,7 @@
         TongueDownLeftMorph,
         TongueDownRightMorph,
         SRanipalMax,
-        #endregion
 
-        #region Custom Shapes
         CheekRaiserL,
         CheekRaiserR,
         ChinRaiserB,
@@ -72,52 +69,5 @@
         NoseWrinklerL,
         NoseWrinklerR,
         Max
-        #endregion
-
-        #region Remarks
-        /* 
-        * TODO: Add ARKit shapes
-        * ...
-        * 
-        * FACS Shapes not tracked:
-        * CheekPuffL
-        * CheekPuffR
-        * CheekSuckL
-        * CheekSuckR
-        * BrowLowererL // Eye Shapes not tracked in Lip Shapes
-        * BrowLowererR // Eye Shapes not tracked in Lip Shapes
-        * InnerBrowRaiserL // Eye Shapes not tracked in Lip Shapes
-        * InnerBrowRaiserR v
-        * OuterBrowRaiserL // Eye Shapes not tracked in Lip Shapes
-        * OuterBrowRaiserR // Eye Shapes not tracked in Lip Shapes
-        * EyesClosedL // Eye Shapes not tracked in Lip Shapes
-        * EyesClosedR // Eye Shapes not tracked in Lip Shapes
-        * EyesLookDownL // Eye Shapes not tracked in Lip Shapes
-        * EyesLookDownR // Eye Shapes not tracked in Lip Shapes
-        * EyesLookLeftL // Eye Shapes not tracked in Lip Shapes
-        * EyesLookLeftR // Eye Shapes not tracked in Lip Shapes
-        * EyesLookRightL // Eye Shapes not tracked in Lip Shapes
-        * EyesLookRightR // Eye Shapes not tracked in Lip Shapes
-        * EyesLookUpL // Eye Shapes not tracked in Lip Shapes
-        * EyesLookUpR // Eye Shapes not tracked in Lip Shapes
-        * JawDrop // Jaw Open
-        * JawSidewaysLeft // Jaw Left
-        * JawSidewaysRight // Jaw Right
-        * JawThrust // Jaw Forward
-        * LidTightenerL Added to eye shape!
-        * LidTightenerR Added to eye shape!
-        * LipCornerDepressorL // Mouth Sad Left
-        * LipCornerDepressorR // Mouth Sad Right
-        * LipCornerPullerL // Mouth Smile Left
-        * LipCornerPullerR // Mouth Smile Right
-        * LipsToward // MouthUpperOverturn
-        * MouthLeft
-        * MouthRight
-        * UpperLidRaiserL // MouthUpperUpLeft
-        * UpperLidRaiserR // MouthUpperUpRight
-        * UpperLipRaiserL // MouthUpperDownLeft
-        * UpperLipRaiserR // MouthUpperDownRight
-        */
-        #endregion Remarks
     }
 }

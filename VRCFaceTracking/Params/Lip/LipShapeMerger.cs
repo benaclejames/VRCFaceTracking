@@ -11,143 +11,143 @@ namespace VRCFaceTracking.Params.LipMerging
         private static readonly Dictionary<string, ICombinedShape> MergedShapes =
             new Dictionary<string, ICombinedShape>
             {
-                {"JawX", new PositiveNegativeShape(VRCFTLipShape.JawRight, VRCFTLipShape.JawLeft)},
-                {"MouthUpper", new PositiveNegativeShape(VRCFTLipShape.MouthUpperRight, VRCFTLipShape.MouthUpperLeft)},
-                {"MouthLower", new PositiveNegativeShape(VRCFTLipShape.MouthLowerRight, VRCFTLipShape.MouthLowerLeft)},
-                {"MouthX", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperRight, VRCFTLipShape.MouthLowerRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperLeft, VRCFTLipShape.MouthLowerLeft}, true)},
-                {"SmileSadRight", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthSadRight)},
-                {"SmileSadLeft", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSadLeft)},
-                {"SmileSad", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthSadLeft, VRCFTLipShape.MouthSadRight})},
-                {"TongueY", new PositiveNegativeShape(VRCFTLipShape.TongueUp, VRCFTLipShape.TongueDown)},
-                {"TongueX", new PositiveNegativeShape(VRCFTLipShape.TongueRight, VRCFTLipShape.TongueLeft)},
-                {"PuffSuckRight", new PositiveNegativeShape(VRCFTLipShape.CheekPuffRight, VRCFTLipShape.CheekSuck)},
-                {"PuffSuckLeft", new PositiveNegativeShape(VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.CheekSuck)},
-                {"PuffSuck", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.CheekPuffRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekSuck}, true)},
+                {"JawX", new PositiveNegativeShape(UnifiedExpression.JawRight, UnifiedExpression.JawLeft)},
+                {"MouthUpper", new PositiveNegativeShape(UnifiedExpression.MouthUpperRight, UnifiedExpression.MouthUpperLeft)},
+                {"MouthLower", new PositiveNegativeShape(UnifiedExpression.MouthLowerRight, UnifiedExpression.MouthLowerLeft)},
+                {"MouthX", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperRight, UnifiedExpression.MouthLowerRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperLeft, UnifiedExpression.MouthLowerLeft}, true)},
+                {"SmileSadRight", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthSadRight)},
+                {"SmileSadLeft", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSadLeft)},
+                {"SmileSad", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthSadLeft, UnifiedExpression.MouthSadRight})},
+                {"TongueY", new PositiveNegativeShape(UnifiedExpression.TongueUp, UnifiedExpression.TongueDown)},
+                {"TongueX", new PositiveNegativeShape(UnifiedExpression.TongueRight, UnifiedExpression.TongueLeft)},
+                {"PuffSuckRight", new PositiveNegativeShape(UnifiedExpression.CheekPuffRight, UnifiedExpression.CheekSuck)},
+                {"PuffSuckLeft", new PositiveNegativeShape(UnifiedExpression.CheekPuffLeft, UnifiedExpression.CheekSuck)},
+                {"PuffSuck", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft, UnifiedExpression.CheekPuffRight}, new UnifiedExpression[]{UnifiedExpression.CheekSuck}, true)},
 
                 //Additional combined shapes created with the help of the VRCFT Discord!
 
                 //JawOpen based params
-                {"JawOpenApe", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.MouthApeShape)},
-                {"JawOpenPuff", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.JawOpen}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.CheekPuffRight})},
-                {"JawOpenPuffRight", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.CheekPuffRight)},
-                {"JawOpenPuffLeft", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.CheekPuffLeft)},
-                {"JawOpenSuck", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.CheekSuck)},
-                {"JawOpenForward", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.JawForward)},
-                {"JawOpenOverlay", new PositiveNegativeShape(VRCFTLipShape.JawOpen, VRCFTLipShape.MouthLowerOverlay)},
+                {"JawOpenApe", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.MouthApeShape)},
+                {"JawOpenPuff", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.JawOpen}, new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft, UnifiedExpression.CheekPuffRight})},
+                {"JawOpenPuffRight", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.CheekPuffRight)},
+                {"JawOpenPuffLeft", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.CheekPuffLeft)},
+                {"JawOpenSuck", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.CheekSuck)},
+                {"JawOpenForward", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.JawForward)},
+                {"JawOpenOverlay", new PositiveNegativeShape(UnifiedExpression.JawOpen, UnifiedExpression.MouthLowerOverlay)},
 
                 //MouthUpperUpRight based params
-                {"MouthUpperUpRightUpperInside", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.MouthUpperInside)},
-                {"MouthUpperUpRightPuffRight", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.CheekPuffRight)},
-                {"MouthUpperUpRightApe", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.MouthApeShape)},
-                {"MouthUpperUpRightPout", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.MouthPout)},
-                {"MouthUpperUpRightOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.MouthLowerOverlay)},
-                {"MouthUpperUpRightSuck", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpRight, VRCFTLipShape.CheekSuck)},
+                {"MouthUpperUpRightUpperInside", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.MouthUpperInside)},
+                {"MouthUpperUpRightPuffRight", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.CheekPuffRight)},
+                {"MouthUpperUpRightApe", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.MouthApeShape)},
+                {"MouthUpperUpRightPout", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.MouthPout)},
+                {"MouthUpperUpRightOverlay", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.MouthLowerOverlay)},
+                {"MouthUpperUpRightSuck", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpRight, UnifiedExpression.CheekSuck)},
                 
                 //MouthUpperUpLeft based params
-                {"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperInside)},
-                {"MouthUpperUpLeftPuffLeft", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.CheekPuffLeft)},
-                {"MouthUpperUpLeftApe", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthApeShape)},
-                {"MouthUpperUpLeftPout", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthPout)},
-                {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthLowerOverlay)},
-                {"MouthUpperUpLeftSuck", new PositiveNegativeShape(VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.CheekSuck)},
+                {"MouthUpperUpLeftUpperInside", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperInside)},
+                {"MouthUpperUpLeftPuffLeft", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.CheekPuffLeft)},
+                {"MouthUpperUpLeftApe", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthApeShape)},
+                {"MouthUpperUpLeftPout", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthPout)},
+                {"MouthUpperUpLeftOverlay", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthLowerOverlay)},
+                {"MouthUpperUpLeftSuck", new PositiveNegativeShape(UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.CheekSuck)},
 
                 // MouthUpperUp Left+Right base params
-                {"MouthUpperUpUpperInside", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperInside })},
-                {"MouthUpperUpInside", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperInside, VRCFTLipShape.MouthLowerInside}, true)},
-                {"MouthUpperUpPuff", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.CheekPuffRight})},
-                {"MouthUpperUpPuffLeft", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft})},
-                {"MouthUpperUpPuffRight", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight})},
-                {"MouthUpperUpApe", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthApeShape})},
-                {"MouthUpperUpPout", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthPout})},
-                {"MouthUpperUpOverlay", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerOverlay})},
-                {"MouthUpperUpSuck", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthUpperUpLeft, VRCFTLipShape.MouthUpperUpRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekSuck})},
+                {"MouthUpperUpUpperInside", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperInside })},
+                {"MouthUpperUpInside", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperInside, UnifiedExpression.MouthLowerInside}, true)},
+                {"MouthUpperUpPuff", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft, UnifiedExpression.CheekPuffRight})},
+                {"MouthUpperUpPuffLeft", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft})},
+                {"MouthUpperUpPuffRight", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffRight})},
+                {"MouthUpperUpApe", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.MouthApeShape})},
+                {"MouthUpperUpPout", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.MouthPout})},
+                {"MouthUpperUpOverlay", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.MouthLowerOverlay})},
+                {"MouthUpperUpSuck", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthUpperUpLeft, UnifiedExpression.MouthUpperUpRight}, new UnifiedExpression[]{UnifiedExpression.CheekSuck})},
 
                 //MouthLowerDownRight based params
-                {"MouthLowerDownRightLowerInside", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.MouthLowerInside)},
-                {"MouthLowerDownRightPuffRight", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.CheekPuffRight)},
-                {"MouthLowerDownRightApe", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.MouthApeShape)},
-                {"MouthLowerDownRightPout", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.MouthPout)},
-                {"MouthLowerDownRightOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.MouthLowerOverlay)},
-                {"MouthLowerDownRightSuck", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownRight, VRCFTLipShape.CheekSuck)},
+                {"MouthLowerDownRightLowerInside", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.MouthLowerInside)},
+                {"MouthLowerDownRightPuffRight", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.CheekPuffRight)},
+                {"MouthLowerDownRightApe", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.MouthApeShape)},
+                {"MouthLowerDownRightPout", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.MouthPout)},
+                {"MouthLowerDownRightOverlay", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.MouthLowerOverlay)},
+                {"MouthLowerDownRightSuck", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownRight, UnifiedExpression.CheekSuck)},
 
                 //MouthLowerDownLeft based params
-                {"MouthLowerDownLeftLowerInside", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerInside)},
-                {"MouthLowerDownLeftPuffLeft", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.CheekPuffLeft)},
-                {"MouthLowerDownLeftApe", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthApeShape)},
-                {"MouthLowerDownLeftPout", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthPout)},
-                {"MouthLowerDownLeftOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerOverlay)},
-                {"MouthLowerDownLeftSuck", new PositiveNegativeShape(VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.CheekSuck)},
+                {"MouthLowerDownLeftLowerInside", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerInside)},
+                {"MouthLowerDownLeftPuffLeft", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.CheekPuffLeft)},
+                {"MouthLowerDownLeftApe", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthApeShape)},
+                {"MouthLowerDownLeftPout", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthPout)},
+                {"MouthLowerDownLeftOverlay", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerOverlay)},
+                {"MouthLowerDownLeftSuck", new PositiveNegativeShape(UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.CheekSuck)},
 
                 // MouthLowerDown Left+Right base params
-                {"MouthLowerDownLowerInside", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerInside})},
-                {"MouthLowerDownInside", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperInside, VRCFTLipShape.MouthLowerInside}, true)},
-                {"MouthLowerDownPuff", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.CheekPuffRight})},
-                {"MouthLowerDownPuffLeft", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft})},
-                {"MouthLowerDownPuffRight", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight})},
-                {"MouthLowerDownApe", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthApeShape})},
-                {"MouthLowerDownPout", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthPout})},
-                {"MouthLowerDownOverlay", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerOverlay})},
-                {"MouthLowerDownSuck", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthLowerDownLeft, VRCFTLipShape.MouthLowerDownRight}, new VRCFTLipShape[]{VRCFTLipShape.CheekSuck})},
+                {"MouthLowerDownLowerInside", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.MouthLowerInside})},
+                {"MouthLowerDownInside", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperInside, UnifiedExpression.MouthLowerInside}, true)},
+                {"MouthLowerDownPuff", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft, UnifiedExpression.CheekPuffRight})},
+                {"MouthLowerDownPuffLeft", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft})},
+                {"MouthLowerDownPuffRight", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.CheekPuffRight})},
+                {"MouthLowerDownApe", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.MouthApeShape})},
+                {"MouthLowerDownPout", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.MouthPout})},
+                {"MouthLowerDownOverlay", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.MouthLowerOverlay})},
+                {"MouthLowerDownSuck", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthLowerDownLeft, UnifiedExpression.MouthLowerDownRight}, new UnifiedExpression[]{UnifiedExpression.CheekSuck})},
 
 				// MouthInsideOverturn based params
-				{"MouthUpperInsideOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthUpperInside, VRCFTLipShape.MouthUpperOverturn)},
-				{"MouthLowerInsideOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthLowerInside, VRCFTLipShape.MouthLowerOverturn)},
+				{"MouthUpperInsideOverturn", new PositiveNegativeShape(UnifiedExpression.MouthUpperInside, UnifiedExpression.MouthUpperOverturn)},
+				{"MouthLowerInsideOverturn", new PositiveNegativeShape(UnifiedExpression.MouthLowerInside, UnifiedExpression.MouthLowerOverturn)},
 				
                 //SmileRight based params; Recommend using these if you already have SmileSadLeft setup!
-                {"SmileRightUpperOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthUpperOverturn)},
-                {"SmileRightLowerOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthLowerOverturn)},
-                {"SmileRightOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn})},
-                {"SmileRightApe", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthApeShape)},
-                {"SmileRightOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthLowerOverlay)},
-                {"SmileRightPout", new PositiveNegativeShape(VRCFTLipShape.MouthSmileRight, VRCFTLipShape.MouthPout)},
+                {"SmileRightUpperOverturn", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthUpperOverturn)},
+                {"SmileRightLowerOverturn", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthLowerOverturn)},
+                {"SmileRightOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn})},
+                {"SmileRightApe", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthApeShape)},
+                {"SmileRightOverlay", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthLowerOverlay)},
+                {"SmileRightPout", new PositiveNegativeShape(UnifiedExpression.MouthSmileRight, UnifiedExpression.MouthPout)},
 
                 //SmileLeft based params; Recommend using these if you already have SmileSadRight setup!
-                {"SmileLeftUpperOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthUpperOverturn)},
-                {"SmileLeftLowerOverturn", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthLowerOverturn)},
-                {"SmileLeftOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn})},
-                {"SmileLeftApe", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthApeShape)},
-                {"SmileLeftOverlay", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthLowerOverlay)},
-                {"SmileLeftPout", new PositiveNegativeShape(VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthPout)},
+                {"SmileLeftUpperOverturn", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthUpperOverturn)},
+                {"SmileLeftLowerOverturn", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthLowerOverturn)},
+                {"SmileLeftOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn})},
+                {"SmileLeftApe", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthApeShape)},
+                {"SmileLeftOverlay", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthLowerOverlay)},
+                {"SmileLeftPout", new PositiveNegativeShape(UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthPout)},
 
                 //Smile Left+Right based params
-                {"SmileUpperOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn})},
-                {"SmileLowerOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerOverturn})},
-                {"SmileOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn})},
-                {"SmileApe", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthApeShape})},
-                {"SmileOverlay", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerOverlay})},
-                {"SmilePout", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.MouthSmileLeft, VRCFTLipShape.MouthSmileRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthPout})},
+                {"SmileUpperOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn})},
+                {"SmileLowerOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthLowerOverturn})},
+                {"SmileOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn})},
+                {"SmileApe", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthApeShape})},
+                {"SmileOverlay", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthLowerOverlay})},
+                {"SmilePout", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.MouthSmileLeft, UnifiedExpression.MouthSmileRight}, new UnifiedExpression[]{UnifiedExpression.MouthPout})},
 
                 //CheekPuffRight based params
-                {"PuffRightUpperOverturn", new PositiveNegativeShape(VRCFTLipShape.CheekPuffRight, VRCFTLipShape.MouthUpperOverturn)},
-                {"PuffRightLowerOverturn", new PositiveNegativeShape(VRCFTLipShape.CheekPuffRight, VRCFTLipShape.MouthLowerOverturn)},
-                {"PuffRightOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn}, true)},
+                {"PuffRightUpperOverturn", new PositiveNegativeShape(UnifiedExpression.CheekPuffRight, UnifiedExpression.MouthUpperOverturn)},
+                {"PuffRightLowerOverturn", new PositiveNegativeShape(UnifiedExpression.CheekPuffRight, UnifiedExpression.MouthLowerOverturn)},
+                {"PuffRightOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffRight}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn}, true)},
 
                 //CheekPuffLeft based params
-                {"PuffLeftUpperOverturn", new PositiveNegativeShape(VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.MouthUpperOverturn)},
-                {"PuffLeftLowerOverturn", new PositiveNegativeShape(VRCFTLipShape.CheekPuffLeft, VRCFTLipShape.MouthLowerOverturn)},
-                {"PuffLeftOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffLeft}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn}, true)},
+                {"PuffLeftUpperOverturn", new PositiveNegativeShape(UnifiedExpression.CheekPuffLeft, UnifiedExpression.MouthUpperOverturn)},
+                {"PuffLeftLowerOverturn", new PositiveNegativeShape(UnifiedExpression.CheekPuffLeft, UnifiedExpression.MouthLowerOverturn)},
+                {"PuffLeftOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffLeft}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn}, true)},
 
                 //CheekPuff Left+Right based params
-                {"PuffUpperOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight, VRCFTLipShape.CheekPuffLeft}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn})},
-                {"PuffLowerOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight, VRCFTLipShape.CheekPuffLeft}, new VRCFTLipShape[]{VRCFTLipShape.MouthLowerOverturn})},
-                {"PuffOverturn", new PositiveNegativeAveragedShape(new VRCFTLipShape[]{VRCFTLipShape.CheekPuffRight, VRCFTLipShape.CheekPuffLeft}, new VRCFTLipShape[]{VRCFTLipShape.MouthUpperOverturn, VRCFTLipShape.MouthLowerOverturn}, true)},
+                {"PuffUpperOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffRight, UnifiedExpression.CheekPuffLeft}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn})},
+                {"PuffLowerOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffRight, UnifiedExpression.CheekPuffLeft}, new UnifiedExpression[]{UnifiedExpression.MouthLowerOverturn})},
+                {"PuffOverturn", new PositiveNegativeAveragedShape(new UnifiedExpression[]{UnifiedExpression.CheekPuffRight, UnifiedExpression.CheekPuffLeft}, new UnifiedExpression[]{UnifiedExpression.MouthUpperOverturn, UnifiedExpression.MouthLowerOverturn}, true)},
 
                 //Combine both TongueSteps (-1 fully in, 0 on edge, 1 fully out)
-                {"TongueSteps", new PositiveNegativeShape(VRCFTLipShape.TongueLongStep1, VRCFTLipShape.TongueLongStep2, true)},
+                {"TongueSteps", new PositiveNegativeShape(UnifiedExpression.TongueLongStep1, UnifiedExpression.TongueLongStep2, true)},
             };
         
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters, and add GetLipActivatedStatus
         public static readonly IParameter[] AllLipParameters =
             GetAllLipShapes().Union(GetOptimizedLipParameters()).Union(GetLipActivatedStatus()).ToArray();
 
-        public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out VRCFTLipShape shape);
+        public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out UnifiedExpression shape);
         
         private static IEnumerable<EParam> GetOptimizedLipParameters() => MergedShapes
             .Select(shape => new EParam((eye, lip) => 
                 shape.Value.GetBlendedLipShape(lip.LatestShapes), shape.Key, 0.0f));
 
         private static IEnumerable<EParam> GetAllLipShapes() =>
-            ((VRCFTLipShape[]) Enum.GetValues(typeof(VRCFTLipShape))).ToList().Select(shape =>
+            ((UnifiedExpression[]) Enum.GetValues(typeof(UnifiedExpression))).ToList().Select(shape =>
                 new EParam((eye, lip) => lip.LatestShapes[(int)shape],
                     shape.ToString(), 0.0f));
 

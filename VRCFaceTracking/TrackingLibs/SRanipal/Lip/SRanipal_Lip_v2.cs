@@ -18,13 +18,13 @@ namespace ViveSR
                 public const int WeightingCount = 37;
                 private static Error LastUpdateResult = Error.FAILED;
                 public static LipData_v2 LipData;
-                private static Dictionary<VRCFTLipShape, float> Weightings;
+                private static Dictionary<UnifiedExpression, float> Weightings;
 
                 static SRanipal_Lip_v2()
                 {
                     LipData.image = Marshal.AllocCoTaskMem(ImageWidth * ImageHeight * ImageChannel);
-                    Weightings = new Dictionary<VRCFTLipShape, float>();
-                    for (int i = 0; i < WeightingCount; ++i) Weightings.Add((VRCFTLipShape)i, 0.0f);
+                    Weightings = new Dictionary<UnifiedExpression, float>();
+                    for (int i = 0; i < WeightingCount; ++i) Weightings.Add((UnifiedExpression)i, 0.0f);
                 }
 
                 private static unsafe bool UpdateData()
@@ -34,7 +34,7 @@ namespace ViveSR
                     {
                         for (int i = 0; i < WeightingCount; ++i)
                         {
-                            Weightings[(VRCFTLipShape)i] = LipData.prediction_data.blend_shape_weight[i];
+                            Weightings[(UnifiedExpression)i] = LipData.prediction_data.blend_shape_weight[i];
                         }
                     }
                     return LastUpdateResult == Error.WORK;
@@ -45,7 +45,7 @@ namespace ViveSR
                 /// </summary>
                 /// <param name="shapes">Weighting values obtained from anipal's Lip module.</param>
                 /// <returns>Indicates whether the values received are new.</returns>
-                public static bool GetLipWeightingsAndImage(out Dictionary<VRCFTLipShape, float> shapes, out IntPtr image)
+                public static bool GetLipWeightingsAndImage(out Dictionary<UnifiedExpression, float> shapes, out IntPtr image)
                 {
                     bool update = UpdateData();
                     shapes = Weightings;

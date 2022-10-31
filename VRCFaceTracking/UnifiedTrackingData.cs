@@ -110,7 +110,7 @@ namespace VRCFaceTracking
         public byte[] ImageData;
         public bool SupportsImage;
 
-        public float[] LatestShapes = new float[(int) VRCFTLipShape.Max + 1];
+        public float[] LatestShapes = new float[(int) UnifiedExpression.Max + 1];
 
         // Updates only SRanipal_Lip_v2 data. Shapes beyond SRanipal are exposed to module developers, and must be updated manually
         public void UpdateData(LipData_v2 lipData)
