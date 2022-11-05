@@ -5,6 +5,7 @@ using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.Eye;
+using VRCFaceTracking.Params.Lip;
 using VRCFaceTracking.Params.LipMerging;
 using Vector2 = VRCFaceTracking.Params.Vector2;
 
@@ -14,21 +15,28 @@ namespace VRCFaceTracking
     public struct Eye
     {
         public Vector2 Look;
+        public EyeBrow Brow;
         public float Openness;
         public float Widen, Squeeze;
+        public float Squint;
 
-        
         public void Update(SingleEyeData eyeData, SingleEyeExpression? expression = null)
         {
             if (eyeData.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
                 Look = eyeData.gaze_direction_normalized.Invert();
 
             Openness = eyeData.eye_openness;
-            
+
             if (expression == null) return; // This is null when we use this as a combined eye, so don't try read data from it
-            
+
             Widen = expression.Value.eye_wide;
             Squeeze = expression.Value.eye_squeeze;
+        }
+
+        public struct EyeBrow
+        {
+            public float InnerUp, InnerDown;
+            public float OuterUp, OuterDown;
         }
     }
     
@@ -102,8 +110,9 @@ namespace VRCFaceTracking
         public byte[] ImageData;
         public bool SupportsImage;
 
-        public float[] LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
+        public float[] LatestShapes = new float[(int) UnifiedExpression.Max + 1];
 
+        // Updates only SRanipal_Lip_v2 data. Shapes beyond SRanipal are exposed to module developers, and must be updated manually
         public void UpdateData(LipData_v2 lipData)
         {
             unsafe
