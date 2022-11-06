@@ -539,13 +539,13 @@ namespace VRCFaceTracking.SRanipal
             expressions[FBExpression.Lid_Tightener_L] = Math.Max(0, expressions[FBExpression.Lid_Tightener_L] - 0.5f);
             expressions[FBExpression.Lid_Tightener_R] = Math.Max(0, expressions[FBExpression.Lid_Tightener_R] - 0.5f);
 
-            expressions[FBExpression.Inner_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] * 3f);// * 4;
+            expressions[FBExpression.Inner_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] );// * 4;
             expressions[FBExpression.Brow_Lowerer_L] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] * 3f);// * 4;
-            expressions[FBExpression.Outer_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_L] * 3f);// * 4;
+            expressions[FBExpression.Outer_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_L] );// * 4;
 
-            expressions[FBExpression.Inner_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] * 3f);// * 4;
+            expressions[FBExpression.Inner_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] );// * 4;
             expressions[FBExpression.Brow_Lowerer_R] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] * 3f);// * 4;
-            expressions[FBExpression.Outer_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_R] * 3f);// * 4;
+            expressions[FBExpression.Outer_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_R] );// * 4;
 
             
             expressions[FBExpression.Eyes_Look_Up_L] = expressions[FBExpression.Eyes_Look_Up_L] * 0.55f;
@@ -558,56 +558,61 @@ namespace VRCFaceTracking.SRanipal
             expressions[FBExpression.Eyes_Look_Left_R] = expressions[FBExpression.Eyes_Look_Left_R] * 0.85f;
             expressions[FBExpression.Eyes_Look_Right_R] = expressions[FBExpression.Eyes_Look_Right_R] * 0.85f;
 
-            
+
 
 
             // hack: turn rots to looks
             //pitch = 29(left)-- > -29(right)
             //yaw = -27(down)-- > 27(up)
 
-            float sranimul = 0.75f;
+            //Angle Degree Limits calibrated to SRanipal eye tracking
+            float eyeLookUpLimit = 43;
+            float eyeLookDownLimit = 55;
+            float eyeLookOutLimit = 47;
+            float eyeLookInLimit = 47;
+            
           
             if (pitch_L > 0)
             {
-                expressions[FBExpression.Eyes_Look_Left_L] = Math.Min(1, (float)(pitch_L / 29.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Left_L] = Math.Min(1, (float)(pitch_L / eyeLookOutLimit));
                 expressions[FBExpression.Eyes_Look_Right_L] = 0;
             }
             else
             {
                 expressions[FBExpression.Eyes_Look_Left_L] = 0;
-                expressions[FBExpression.Eyes_Look_Right_L] = Math.Min(1, (float)((-pitch_L) / 29.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Right_L] = Math.Min(1, (float)((-pitch_L) / eyeLookInLimit));
             }
             if(yaw_L > 0)
             {
-                expressions[FBExpression.Eyes_Look_Up_L] = Math.Min(1, (float)(yaw_L / 27.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Up_L] = Math.Min(1, (float)(yaw_L / eyeLookUpLimit));
                 expressions[FBExpression.Eyes_Look_Down_L] = 0;
             }
             else
             {
                 expressions[FBExpression.Eyes_Look_Up_L] = 0;
-                expressions[FBExpression.Eyes_Look_Down_L] = Math.Min(1, (float)((-yaw_L) / 27.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Down_L] = Math.Min(1, (float)((-yaw_L) / eyeLookDownLimit));
             }
 
             
             if (pitch_R > 0)
             {
-                expressions[FBExpression.Eyes_Look_Left_R] = Math.Min(1, (float)(pitch_R / 29.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Left_R] = Math.Min(1, (float)(pitch_R / eyeLookInLimit));
                 expressions[FBExpression.Eyes_Look_Right_R] = 0;
             }
             else
             {
                 expressions[FBExpression.Eyes_Look_Left_R] = 0;
-                expressions[FBExpression.Eyes_Look_Right_R] = Math.Min(1, (float)((-pitch_R) / 29.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Right_R] = Math.Min(1, (float)((-pitch_R) / eyeLookOutLimit));
             }
             if (yaw_R > 0)
             {
-                expressions[FBExpression.Eyes_Look_Up_R] = Math.Min(1, (float)(yaw_R / 27.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Up_R] = Math.Min(1, (float)(yaw_R / eyeLookUpLimit));
                 expressions[FBExpression.Eyes_Look_Down_R] = 0;
             }
             else
             {
                 expressions[FBExpression.Eyes_Look_Up_R] = 0;
-                expressions[FBExpression.Eyes_Look_Down_R] = Math.Min(1, (float)((-yaw_R) / 27.0)) * sranimul;
+                expressions[FBExpression.Eyes_Look_Down_R] = Math.Min(1, (float)((-yaw_R) / eyeLookDownLimit));
             }
 
 
