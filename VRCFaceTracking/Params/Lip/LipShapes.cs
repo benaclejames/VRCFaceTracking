@@ -68,6 +68,7 @@
         LowerLipDepressorRight,
         NoseWrinklerLeft,
         NoseWrinklerRight,
+        LipsTowards,
         Max
     }
 }
