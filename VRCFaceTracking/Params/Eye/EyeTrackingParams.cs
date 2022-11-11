@@ -19,12 +19,6 @@
 
             #endregion
 
-            #region Squint
-            new EParam(v2 => v2.Left.Squint > v2.Right.Squint ? v2.Left.Squint : v2.Right.Squint, "EyesSquint"),
-            new EParam(v2 => v2.Left.Squint, "EyeSquintLeft"),
-            new EParam(v2 => v2.Right.Squint, "EyeSquintRight"),
-            #endregion
-
             #region Squeeze
 
             new EParam(v2 => v2.Combined.Squeeze, "EyesSqueeze"),
@@ -172,22 +166,6 @@
             new BoolParameter(v2 => v2.Right.Squeeze > 1-v2.Right.Openness, "RightEyeSqueezeToggle"),
             new BoolParameter(v2 => v2.Combined.Squeeze > 1-v2.Combined.Openness, "EyesSqueezeToggle"),
 
-            #endregion
-
-            #region EyeBrow
-
-            new EParam(v2 => v2.Left.Brow.InnerUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerUp : v2.Right.Brow.InnerUp, "BrowsInnerUp"),
-            new EParam(v2 => v2.Left.Brow.InnerUp, "BrowInnerUpLeft"),
-            new EParam(v2 => v2.Right.Brow.InnerUp, "BrowInnerUpRight"),
-
-            new EParam(v2 => v2.Left.Brow.OuterUp > v2.Right.Brow.InnerUp ? v2.Left.Brow.OuterUp : v2.Right.Brow.OuterUp, "BrowsOuterUp"),
-            new EParam(v2 => v2.Left.Brow.OuterUp, "BrowOuterUpLeft"),
-            new EParam(v2 => v2.Right.Brow.OuterUp, "BrowOuterUpRight"),
-
-            new EParam(v2 => v2.Left.Brow.InnerDown > v2.Right.Brow.InnerUp ? v2.Left.Brow.InnerDown : v2.Right.Brow.InnerDown, "BrowsDown"),
-            new EParam(v2 => v2.Left.Brow.InnerDown, "BrowDownLeft"),
-            new EParam(v2 => v2.Right.Brow.InnerDown, "BrowDownRight"),
-            
             #endregion
 
             #region Status
