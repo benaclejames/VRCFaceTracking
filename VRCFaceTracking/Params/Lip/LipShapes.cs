@@ -42,33 +42,34 @@
         TongueDownRightMorph,
         SRanipalMax,
 
-        CheekRaiserLeft,
-        CheekRaiserRight,
-        ChinRaiserBottom,
-        ChinRaiserTop,
-        DimplerLeft,
-        DimplerRight,
-        LipFunnelerLeftBottom,
-        LipFunnelerLeftTop,
-        LipFunnelerRightBottom,
-        LipFunnelerRightTop,
-        LipPressorLeft,
-        LipPressorRight,
+        //Expanded Face Tracking Parameters
+        CheekSquintLeft,
+        CheekSquintRight,
+        MouthRaiserUpper,
+        MouthRaiserLower,
+        MouthDimpleLeft,
+        MouthDimpleRight,
+        LipFunnelBottom,
+        LipFunnelBottomLeft,
+        LipFunnelBottomRight,
+        LipFunnelTop,
+        LipFunnelTopRight,
+        LipFunnelTopLeft,
+        MouthPressLeft,
+        MouthPressRight,
         LipPuckerLeft, // Mouth Pout but not combined
         LipPuckerRight, // Mouth Pout but not combined
-        LipStretcherLeft,
-        LipStretcherRight,
-        LipSuckLeftBottom, // Cheek Suck but not combined
-        LipSuckLeftTop, // Cheek Suck but not combined
-        LipSuckRightBottom, // Cheek Suck but not combined
-        LipSuckRightTop, // Cheek Suck but not combined
-        LipTightenerLeft,
-        LipTightenerRight,
-        LowerLipDepressorLeft,
-        LowerLipDepressorRight,
-        NoseWrinklerLeft,
-        NoseWrinklerRight,
-        LipsTowards,
+        MouthStretchLeft,
+        MouthStretchRight,
+        LipSuckTopLeft, // Cheek Suck but not combined
+        LipSuckTopRight, // Cheek Suck but not combined
+        LipSuckBottomLeft, // Cheek Suck but not combined
+        LipSuckBottomRight, // Cheek Suck but not combined        
+        MouthTightenerLeft,
+        MouthTightenerRight,
+        MouthClosed,
+        NoseSneerLeft,
+        NoseSneerRight,    
         Max
     }
 }

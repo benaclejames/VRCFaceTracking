@@ -21,8 +21,8 @@
 
             #region Squint
             new EParam(v2 => v2.Left.Squint > v2.Right.Squint ? v2.Left.Squint : v2.Right.Squint, "EyesSquint"),
-            new EParam(v2 => v2.Left.Squint, "LeftEyeSquint"),
-            new EParam(v2 => v2.Right.Squint, "RightEyeSquint"),
+            new EParam(v2 => v2.Left.Squint, "EyeSquintLeft"),
+            new EParam(v2 => v2.Right.Squint, "EyeSquintRight"),
             #endregion
 
             #region Squeeze
