@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking", "VRCFaceT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFT Module Example", "VRCFT Module Example\VRCFT Module Example.csproj", "{296110E5-3AE7-4D9F-BE09-890194CDD76E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALVRTrackingInterface", "ALVRTrackingInterface\ALVRTrackingInterface.csproj", "{E007AB65-CB96-4A59-B187-59162F2D71C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,8 @@ Global
 		{296110E5-3AE7-4D9F-BE09-890194CDD76E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{296110E5-3AE7-4D9F-BE09-890194CDD76E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{296110E5-3AE7-4D9F-BE09-890194CDD76E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E007AB65-CB96-4A59-B187-59162F2D71C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E007AB65-CB96-4A59-B187-59162F2D71C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
