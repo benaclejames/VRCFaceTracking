@@ -331,54 +331,6 @@ namespace VRCFaceTracking.SRanipal
             return (true, true);
         }
 
-        public enum CustomExpression
-        {
-            //Quest Pro Expanded Expressions
-            BrowsInnerUp,
-            BrowInnerUpLeft,
-            BrowInnerUpRight,
-            BrowsOuterUp,
-            BrowOuterUpLeft,
-            BrowOuterUpRight,
-            BrowsDown,
-            BrowDownLeft,
-            BrowDownRight,
-            EyesSquint,
-            EyeSquintLeft,
-            EyeSquintRight,
-            CheekSquintLeft,
-            CheekSquintRight,
-            MouthRaiserUpper,
-            MouthRaiserLower,
-            MouthDimpleLeft,
-            MouthDimpleRight,
-            LipFunnelBottom,
-            LipFunnelBottomLeft,
-            LipFunnelBottomRight,
-            LipFunnelTop,
-            LipFunnelTopRight,
-            LipFunnelTopLeft,
-            MouthPress,
-            MouthPressLeft,
-            MouthPressRight,
-            LipPuckerLeft, // Mouth Pout but not combined
-            LipPuckerRight, // Mouth Pout but not combined
-            MouthStretchLeft,
-            MouthStretchRight,
-            LipSuckTopLeft, // Cheek Suck but not combined
-            LipSuckTopRight, // Cheek Suck but not combined
-            LipSuckBottomLeft, // Cheek Suck but not combined
-            LipSuckBottomRight, // Cheek Suck but not combined        
-            MouthTightener,
-            MouthTightenerLeft,
-            MouthTightenerRight,
-            MouthClosed,
-            NoseSneerLeft,
-            NoseSneerRight,
-            JawDrop, // TESTING MOUTH APE SHAPE CONTROL
-            Max
-        }
-
         private bool ConnectToTCP()
         {
             try
@@ -516,7 +468,35 @@ namespace VRCFaceTracking.SRanipal
 
         // Preprocess our expressions per the Meta Documentation
         private void PrepareUpdate()
-        {   
+        {
+
+            //The following code is hack to fix look down eyes closed bug with with the quest pro eye tracking. This code may be null if eye tracking is changed.
+
+            /*
+            if(expressions[FBExpression.Eyes_Look_Down_L] == expressions[FBExpression.Eyes_Look_Up_L] && expressions[FBExpression.Eyes_Closed_L] > 0.25f)
+            { // wonky eyelid case, eyes are actually closed now
+                expressions[FBExpression.Eyes_Closed_L] = 0; //0.9f - (expressions[FBExpression.Lid_Tightener_L] * 3);
+            }
+            else
+            {
+                expressions[FBExpression.Eyes_Closed_L] = 0.9f - ((expressions[FBExpression.Eyes_Closed_L] * 3) / (1 + expressions[FBExpression.Eyes_Look_Down_L] * 3));
+            }
+
+            if (expressions[FBExpression.Eyes_Look_Down_R] == expressions[FBExpression.Eyes_Look_Up_R] && expressions[FBExpression.Eyes_Closed_R] > 0.25f)
+            { // wonky eyelid case, eyes are actually closed now
+                expressions[FBExpression.Eyes_Closed_R] = 0; //0.9f - (expressions[FBExpression.Lid_Tightener_R] * 3);
+            }
+            else
+            {
+                expressions[FBExpression.Eyes_Closed_R] = 0.9f - ((expressions[FBExpression.Eyes_Closed_R] * 3) / (1 + expressions[FBExpression.Eyes_Look_Down_R] * 3));
+            }
+
+            if (1 - expressions[FBExpression.Eyes_Closed_L] < expressions[FBExpression.Lid_Tightener_L])
+                expressions[FBExpression.Lid_Tightener_L] = (1 - expressions[FBExpression.Eyes_Closed_L]) - 0.01f;
+
+            if (1 - expressions[FBExpression.Eyes_Closed_R] < expressions[FBExpression.Lid_Tightener_R])
+                expressions[FBExpression.Lid_Tightener_R] = (1 - expressions[FBExpression.Eyes_Closed_R]) - 0.01f;
+            */           
 
             // pitch = 47(left)-- > -47(right)
             // yaw = -55(down)-- > 43(up)
@@ -567,7 +547,13 @@ namespace VRCFaceTracking.SRanipal
                 expressions[FBExpression.Eyes_Look_Down_R] = Math.Min(1, (float)((-yaw_R) / eyeLookDownLimit));
             }
 
-
+            // Recover true eye closed values
+            // from FaceTrackingSystem.CS from Movement Aura Scene in https://github.com/oculus-samples/Unity-Movement
+            expressions[FBExpression.Eyes_Closed_L] += expressions[FBExpression.Eyes_Look_Down_L] * 0.8f;
+            expressions[FBExpression.Eyes_Closed_R] += expressions[FBExpression.Eyes_Look_Down_R] * 0.8f;
+            // Add Lid tightener to eye lid close to help get value closed
+            expressions[FBExpression.Eyes_Closed_L] += expressions[FBExpression.Lid_Tightener_L] * 0.25f;
+            expressions[FBExpression.Eyes_Closed_R] += expressions[FBExpression.Lid_Tightener_R] * 0.25f;
         }
 
 
@@ -584,7 +570,7 @@ namespace VRCFaceTracking.SRanipal
             public const float CheekSuck = 2.72f;
             public const float CheekRaiser = 1.1f;
             public const float JawDrop = 1.1f;
-            public const float MouthTowards = 2.0f;
+            public const float MouthTowards = 1.75f;
             public const float JawX = 1.0f;
             public const float JawThrust = 1.0f;
             public const float LipPucker = 1.21f;
@@ -604,40 +590,17 @@ namespace VRCFaceTracking.SRanipal
             public const float MouthPress = 10f;
             public const float MouthTightener = 2.13f;
             public const float NoseSneer = 3.16f;
+
+
         }
-
-
         // Thank you @adjerry on the VRCFT discord for these conversions! https://docs.google.com/spreadsheets/d/118jo960co3Mgw8eREFVBsaJ7z0GtKNr52IB4Bz99VTA/edit#gid=0
         private void UpdateExpressions()
         {
-            // Lid Tightener has problems with being mapped to squeeze - Disabled
-            // Subtract eye close
-            //float squeezeL = Math.Max(0, expressions[FBExpression.Lid_Tightener_L] - expressions[FBExpression.Eyes_Closed_L] * 1.0f);
-            //float squeezeR = Math.Max(0, expressions[FBExpression.Lid_Tightener_R] - expressions[FBExpression.Eyes_Closed_R] * 1.0f);
-            float squeezeL = 0;
-            float squeezeR = 0;
 
-            // Recover true eye closed values
-            // from FaceTrackingSystem.CS from Movement Aura Scene in https://github.com/oculus-samples/Unity-Movement
-            float eyeClosedL = Math.Min(1, expressions[FBExpression.Eyes_Closed_L] + expressions[FBExpression.Eyes_Look_Down_L] * 0.4f);
-            float eyeClosedR = Math.Min(1, expressions[FBExpression.Eyes_Closed_R] + expressions[FBExpression.Eyes_Look_Down_R] * 0.4f);
-            
-            // Add Lid tightener to eye lid close to help get value closed
-            eyeClosedL = Math.Min(1, eyeClosedL + expressions[FBExpression.Lid_Tightener_L] * 0.5f);
-            eyeClosedR = Math.Min(1, eyeClosedR + expressions[FBExpression.Lid_Tightener_R] * 0.5f);
 
             //Convert from Eye Closed to Eye Openness
-            float openessL = Math.Max(0, 1 - eyeClosedL * TrackingSensitivity.EyeLid);
-            float openessR = Math.Max(0, 1 - eyeClosedR * TrackingSensitivity.EyeLid);
-
-            // As eye opens there is an issue flickering between eye wide and eye not fully open with the combined eye lid parameters. Need to reduce the eye widen value until openess is closer to value of 1. When not fully open will do constant value to reduce the eye widen.
-            float eyeWidenL = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden - 3.0f * (1 - openessL));
-            float eyeWidenR = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden - 3.0f * (1 - openessR));
-
-            // Feedback eye widen to openess
-            openessL += eyeWidenL;
-            openessR += eyeWidenR;
-
+            expressions[FBExpression.Eyes_Closed_L] = Math.Max(0, 1 - expressions[FBExpression.Eyes_Closed_L] * TrackingSensitivity.EyeLid);
+            expressions[FBExpression.Eyes_Closed_R] = Math.Max(0, 1 - expressions[FBExpression.Eyes_Closed_R] * TrackingSensitivity.EyeLid);
 
             UnifiedTrackingData.LatestEyeData.Left = MakeEye
             (
@@ -645,9 +608,9 @@ namespace VRCFaceTracking.SRanipal
                 LookRight: expressions[FBExpression.Eyes_Look_Right_L],
                 LookUp: expressions[FBExpression.Eyes_Look_Up_L],
                 LookDown: expressions[FBExpression.Eyes_Look_Down_L],
-                Openness: Math.Min(1, openessL),
-                Squeeze: Math.Min(1, squeezeL),   
-                Widen: Math.Min(1, eyeWidenL)
+                Openness: Math.Min(1, expressions[FBExpression.Eyes_Closed_L]),
+                Squeeze: 0,     //Quest Pro does not track squeeze
+                Widen: Math.Min(1, expressions[FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden)
             );
 
             UnifiedTrackingData.LatestEyeData.Right = MakeEye
@@ -656,9 +619,9 @@ namespace VRCFaceTracking.SRanipal
                 LookRight: expressions[FBExpression.Eyes_Look_Right_R],
                 LookUp: expressions[FBExpression.Eyes_Look_Up_R],
                 LookDown: expressions[FBExpression.Eyes_Look_Down_R],
-                Openness: Math.Min(1, openessR),
-                Squeeze: Math.Min(1, squeezeR),     
-                Widen: Math.Min(1, eyeWidenR)
+                Openness: Math.Max(0, expressions[FBExpression.Eyes_Closed_R] * TrackingSensitivity.EyeLid),
+                Squeeze: 0,     //Quest Pro does not track squeeze
+                Widen: Math.Min(1, expressions[FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden)
             );
 
             UnifiedTrackingData.LatestEyeData.Combined = MakeEye
@@ -667,9 +630,9 @@ namespace VRCFaceTracking.SRanipal
                 LookRight: (expressions[FBExpression.Eyes_Look_Right_L] + expressions[FBExpression.Eyes_Look_Right_R]) / 2.0f,
                 LookUp: (expressions[FBExpression.Eyes_Look_Up_L] + expressions[FBExpression.Eyes_Look_Up_R]) / 2.0f,
                 LookDown: (expressions[FBExpression.Eyes_Look_Down_L] + expressions[FBExpression.Eyes_Look_Down_R]) / 2.0f,
-                Openness: Math.Min(1, (openessL + openessR) / 2.0f),
-                Squeeze: Math.Min(1, (squeezeL + squeezeR) / 2.0f),
-                Widen: Math.Min(1, (eyeWidenL + eyeWidenR) / 2.0f)
+                Openness: Math.Min(1, TrackingSensitivity.EyeLid * (expressions[FBExpression.Eyes_Closed_L] + expressions[FBExpression.Eyes_Closed_R]) / 2.0f),
+                Squeeze: 0,     //Quest Pro does not track squeeze
+                Widen: Math.Min(1, TrackingSensitivity.EyeWiden * (expressions[FBExpression.Upper_Lid_Raiser_L] + expressions[FBExpression.Upper_Lid_Raiser_R]) / 2.0f)
             );
 
             UnifiedTrackingData.LatestEyeData.EyesDilation = 0.73f;
@@ -683,8 +646,7 @@ namespace VRCFaceTracking.SRanipal
             // Mouth Ape Shape is not shape by itself and is combination with JawOpen. If JawOpen mouth ApeShapeShape should be Zero, but not certain.
             // If not LipTowards need to be handled as seperate parameter to allow creaters to not be limited to the legacy MouthApeShape 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] = Math.Min(1, expressions[FBExpression.Lips_Toward] * TrackingSensitivity.MouthTowards);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = Math.Min(1, Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 1.0f);
-            
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = Math.Min(0, Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape]);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawDrop] = Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop); //TESTING MOUTH APE CONTROL - NON COMPENSATED VALUE
 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawLeft] = Math.Min(1, expressions[FBExpression.Jaw_Sideways_Left] * TrackingSensitivity.JawX);
@@ -709,8 +671,7 @@ namespace VRCFaceTracking.SRanipal
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.UpperLipRaiser);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.UpperLipRaiser);
 
-            // Mapping of Quest Pro FACS to VRCFT Unique Shapes     
-            // Custom Brow Tracking Expanded Set
+            // Brow Tracking Expanded Set
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.BrowsInnerUp] = Math.Min(1, (expressions[FBExpression.Inner_Brow_Raiser_L] + expressions[FBExpression.Inner_Brow_Raiser_R]) / 2.0f * TrackingSensitivity.BrowInnerUp);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.BrowInnerUpLeft] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] * TrackingSensitivity.BrowInnerUp);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.BrowInnerUpRight] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] * TrackingSensitivity.BrowInnerUp);
@@ -721,12 +682,13 @@ namespace VRCFaceTracking.SRanipal
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.BrowDownLeft] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.BrowDownRight] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown);
 
-            // Custom Eye Tracking Expanded Set
+            // Eye Tracking Expanded Set
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.EyesSquint] = Math.Min(1, (expressions[FBExpression.Lid_Tightener_L] + expressions[FBExpression.Lid_Tightener_R]) / 2.0f * TrackingSensitivity.EyeSquint);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.EyeSquintLeft] = Math.Min(1, expressions[FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.EyeSquintRight] = Math.Min(1, expressions[FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint);
 
-            // Custom Face Tracking Expanded Set               
+            // Face Tracking Expanded Set
+            // Mapping of Quest Pro FACS to VRCFT Unique Shapes        
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekSquintLeft] = Math.Min(1, expressions[FBExpression.Cheek_Raiser_L] * TrackingSensitivity.CheekRaiser);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekSquintRight] = Math.Min(1, expressions[FBExpression.Cheek_Raiser_R] * TrackingSensitivity.CheekRaiser);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthRaiserUpper] = Math.Min(1, expressions[FBExpression.Chin_Raiser_B] * TrackingSensitivity.ChinRaiserBottom);
@@ -754,8 +716,7 @@ namespace VRCFaceTracking.SRanipal
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthClosed] = Math.Min(1, (expressions[FBExpression.Lips_Toward]) * TrackingSensitivity.MouthTowards);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseSneerLeft] = Math.Min(1, expressions[FBExpression.Nose_Wrinkler_L] * TrackingSensitivity.NoseSneer);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseSneerRight] = Math.Min(1, expressions[FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer);
-
-            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)CustomExpression.NoseSneerRight] = Math.Min(1, expressions[FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer);
+          
         }
 
         private Eye MakeEye(float LookLeft, float LookRight, float LookUp, float LookDown, float Openness, float Squeeze, float Widen)
