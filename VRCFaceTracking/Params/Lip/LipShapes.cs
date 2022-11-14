@@ -43,18 +43,6 @@
         SRanipalMax,
 
         //Expanded Face Tracking Parameters
-        BrowsInnerUp,
-        BrowInnerUpLeft,
-        BrowInnerUpRight,
-        BrowsOuterUp,
-        BrowOuterUpLeft,
-        BrowOuterUpRight,
-        BrowsDown,
-        BrowDownLeft,
-        BrowDownRight,
-        EyesSquint,
-        EyeSquintLeft,
-        EyeSquintRight,
         CheekSquintLeft,
         CheekSquintRight,
         MouthRaiserUpper,
@@ -67,7 +55,6 @@
         LipFunnelTop,
         LipFunnelTopRight,
         LipFunnelTopLeft,
-        MouthPress,
         MouthPressLeft,
         MouthPressRight,
         LipPuckerLeft, // Mouth Pout but not combined
@@ -78,13 +65,11 @@
         LipSuckTopRight, // Cheek Suck but not combined
         LipSuckBottomLeft, // Cheek Suck but not combined
         LipSuckBottomRight, // Cheek Suck but not combined        
-        MouthTightener,
         MouthTightenerLeft,
         MouthTightenerRight,
         MouthClosed,
         NoseSneerLeft,
-        NoseSneerRight,
-        JawDrop, // TESTING MOUTH APE SHAPE CONTROL
+        NoseSneerRight,    
         Max
     }
 }
