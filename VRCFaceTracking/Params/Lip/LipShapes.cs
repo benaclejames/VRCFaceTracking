@@ -81,10 +81,10 @@
         MouthTightener,
         MouthTightenerLeft,
         MouthTightenerRight,
-        //MouthClosed,
+        MouthClosed,
         NoseSneerLeft,
         NoseSneerRight,
-        //JawDrop, // TESTING MOUTH APE SHAPE CONTROL
+        JawDrop, // TESTING MOUTH APE SHAPE CONTROL
         Max
     }
 }
