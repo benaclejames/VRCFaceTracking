@@ -11,7 +11,6 @@ using VRCFaceTracking.Params.Lip;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Collections.Generic;
 
 namespace VRCFaceTracking.SRanipal
 {
@@ -326,7 +325,6 @@ namespace VRCFaceTracking.SRanipal
                 return (false, false);
             }
 
-            LoadQuestProSensitivity();
             ConnectToTCP();
 
             Logger.Msg("ALXR handshake successful! Data will be broadcast to VRCFaceTracking.");
@@ -345,40 +343,6 @@ namespace VRCFaceTracking.SRanipal
 
                 stream = client.GetStream();
                 connected = true;
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.Message);
-                return false;
-            }
-        }
-
-        private bool LoadQuestProSensitivity()
-        {
-            try
-            {
-                Dictionary<String, float> multipliers = LoadMultiplierDict();
-                
-                Logger.Msg("Successful loading Quest Pro custom sensitivity:");
-
-                Logger.Msg("Loaded custom Quest Pro multipliers:");
-                foreach (string s in multipliers.Keys)
-                {
-                    var field = typeof(TrackingSensitivity).GetField(s, BindingFlags.Static | BindingFlags.Public);
-                    if (field == null)
-                        Logger.Msg("Invalid sensitivity name: " + s);
-                    else
-                    {
-                        if ((float)field.GetValue(s) != multipliers[s])
-                        {
-                            Logger.Msg(s + ": " + field.GetValue(s) + " >> " + multipliers[s]);
-                            field.SetValue(null, multipliers[s]);
-                        }
-                                               
-                    }                                               
-                }
 
                 return true;
             }
@@ -453,6 +417,22 @@ namespace VRCFaceTracking.SRanipal
                 // We then need to convert this byte array to a float array. Thankfully, this can all be done in a single line of code.
                 Buffer.BlockCopy(rawExpressions, 0, expressions, 0, expressionsSize * 4 + (8 * 2 * 4));
 
+                
+                // temp
+                //Logger.Msg(" ");
+                //Logger.Msg("Inner_Brow_Raiser_R: " + expressions[FBExpression.Inner_Brow_Raiser_R].ToString());
+                //Logger.Msg("Outer_Brow_Raiser_R: " + expressions[FBExpression.Outer_Brow_Raiser_R].ToString());
+                //Logger.Msg("Brow_Lowerer_R: " + expressions[FBExpression.Brow_Lowerer_R].ToString());
+                //Logger.Msg(expressions[FBExpression.Brow_Lowerer_R].ToString());
+
+                //Logger.Msg("DownPre: " + expressions[FBExpression.Eyes_Look_Down_L].ToString());
+                //Logger.Msg("UpPre: " + expressions[FBExpression.Eyes_Look_Up_L].ToString());
+                //Logger.Msg("ClosedPre: " + expressions[FBExpression.Eyes_Closed_L].ToString());
+                //Logger.Msg("EyeCloseLeft: " + expressions[FBExpression.Eyes_Closed_L].ToString());
+                //Logger.Msg("LidTightenerL: " + expressions[FBExpression.Lid_Tightener_L].ToString());
+                //Logger.Msg("LidWidenL: " + expressions[FBExpression.Upper_Lid_Raiser_L].ToString());
+
+
                 double q_x = expressions[64];
                 double q_y = expressions[65];
                 double q_z = expressions[66];
@@ -485,62 +465,39 @@ namespace VRCFaceTracking.SRanipal
             }
         }
 
-        private Dictionary<String, float> LoadMultiplierDict()
-        {
-            
-            Dictionary<String, float> multipliers = new Dictionary<String, float>();
-            string filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "questProSensitivity.ini");
-            string text = File.ReadAllText(filePath).Trim();
-            if (File.Exists(filePath))
-            {              
-                foreach (string line in text.Split('\n'))
-                {
-                    if (line.Length > 3 && !line.Contains("#") && !line.Contains("[") && !line.Contains(";"))
-                    {
-                        string cleaned = line.Replace(" ", "").Trim(); // trim spaces for safer parsing (We dont need them anyway)
-                        string[] pair = cleaned.Split('=');
-
-                        multipliers[pair[0]] = float.Parse(pair[1]);
-                    }
-                }
-            }
-
-            return multipliers;
-        }
-
-        public class TrackingSensitivity
+        public static class TrackingSensitivity
         {
             // Tracking Sensitivity Multipliers
-            public static float EyeLid = 1.1f;
-            public static float EyeSquint = 1.0f;
-            public static float EyeWiden = 1.0f;
-            public static float BrowInnerUp = 1.0f;
-            public static float BrowOuterUp = 1.0f;
-            public static float BrowDown = 1.0f;
-            public static float CheekPuff = 1.4f;
-            public static float CheekSuck = 2.72f;
-            public static float CheekRaiser = 1.1f;
-            public static float JawOpen = 1.1f;
-            public static float MouthApeShape = 2.0f;
-            public static float JawX = 1.0f;
-            public static float JawForward = 1.0f;
-            public static float LipPucker = 1.21f;
-            public static float MouthX = 1.0f;
-            public static float MouthSmile = 1.22f;
-            public static float MouthFrown = 1.1f;
-            public static float LipFunnelTop = 1.13f;
-            public static float LipFunnelBottom = 8.0f;  //VERY NOT SENSITIVE
-            public static float LipSuckTop = 1.0f;
-            public static float LipSuckBottom = 1.0f;
-            public static float ChinRaiserTop = 0.75f;
-            public static float ChinRaiserBottom = 0.7f;
-            public static float MouthLowerDown = 2.87f;
-            public static float MouthUpperUp = 1.75f;
-            public static float MouthDimpler = 4.3f;
-            public static float MouthStretch = 3.0f;
-            public static float MouthPress = 10f;        //VERY NOT SENSITIVE
-            public static float MouthTightener = 2.13f;
-            public static float NoseSneer = 3.16f;
+            public const float EyeLid = 1.1f;
+            public const float EyeSquint = 1.0f;
+            public const float EyeWiden = 1.0f;
+            public const float BrowInnerUp = 1.0f;
+            public const float BrowOuterUp = 1.0f;
+            public const float BrowDown = 1.0f;
+            public const float CheekPuff = 1.4f;
+            public const float CheekSuck = 2.72f;
+            public const float CheekRaiser = 1.1f;
+            public const float JawDrop = 1.1f;
+            public const float MouthTowards = 2.0f;
+            public const float JawX = 1.0f;
+            public const float JawThrust = 1.0f;
+            public const float LipPucker = 1.21f;
+            public const float MouthX = 1.0f;
+            public const float LipCornerPuller = 1.22f;
+            public const float LipCornerDepressor = 1.1f;
+            public const float LipFunnelTop = 1.13f;
+            public const float LipFunnelBottom = 8.0f;  //VERY NOT SENSITIVE
+            public const float LipSuckTop = 1.0f;
+            public const float LipSuckBottom = 1.0f;
+            public const float ChinRaiserTop = 0.75f;
+            public const float ChinRaiserBottom = 0.7f;
+            public const float LowerLipDepressor = 2.87f;
+            public const float UpperLipRaiser = 1.75f;
+            public const float MouthDimpler = 4.3f;
+            public const float MouthStretch = 3.0f;
+            public const float MouthPress = 10f;        //VERY NOT SENSITIVE
+            public const float MouthTightener = 2.13f;
+            public const float NoseSneer = 3.16f;
         }
 
         // Preprocess our expressions per the Meta Documentation
@@ -556,8 +513,12 @@ namespace VRCFaceTracking.SRanipal
             eyeClosedR = Math.Min(1, eyeClosedR + expressions[FBExpression.Lid_Tightener_R] * 0.5f);
 
             // Convert from Eye Closed to Eye Openness and limit from going negative. Set the max higher than normal to offset the eye lid to help keep eye lid open.
-            float openessL = Math.Min(1, Math.Max(0, 1.1f - eyeClosedL * TrackingSensitivity.EyeLid));
-            float openessR = Math.Min(1, Math.Max(0, 1.1f - eyeClosedR * TrackingSensitivity.EyeLid));
+            float openessL = Math.Max(0, 1.1f - eyeClosedL * TrackingSensitivity.EyeLid);
+            float openessR = Math.Max(0, 1.1f - eyeClosedR * TrackingSensitivity.EyeLid);
+
+            // limit openess to max value of 1.
+            openessL = Math.Min(1, openessL);
+            openessR = Math.Min(1, openessR);
 
             // As eye opens there is an issue flickering between eye wide and eye not fully open with the combined eye lid parameters. Need to reduce the eye widen value until openess is closer to value of 1. When not fully open will do constant value to reduce the eye widen.
             float eyeWidenL = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden - 3.0f * (1 - openessL));
@@ -673,15 +634,15 @@ namespace VRCFaceTracking.SRanipal
             // Mapping to existing parameters
 
             // Mouth Ape Shape is combination of shapes. The shape by itself and is combination with Lips Towards and Lip Corner Depressors.              
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] = Math.Min(1, expressions[FBExpression.Lips_Toward] * TrackingSensitivity.MouthApeShape + expressions[FBExpression.Lips_Toward] * (expressions[FBExpression.Lip_Corner_Depressor_L] + expressions[FBExpression.Lip_Corner_Depressor_R]) * 0.9f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] = Math.Min(1, expressions[FBExpression.Lips_Toward] * TrackingSensitivity.MouthTowards + expressions[FBExpression.Lips_Toward] * (expressions[FBExpression.Lip_Corner_Depressor_L] + expressions[FBExpression.Lip_Corner_Depressor_R]) / 1.1f);
             // Subtract ApeShapeShape as Jaw Open will go towards zero as ape shape increase.
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = Math.Min(1, Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawOpen) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 0.9f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = Math.Min(1, Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 0.9f);
             
             //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawDrop] = Math.Min(1, expressions[FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop); //TESTING MOUTH APE CONTROL - NON COMPENSATED VALUE
 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawLeft] = Math.Min(1, expressions[FBExpression.Jaw_Sideways_Left] * TrackingSensitivity.JawX);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawRight] = Math.Min(1, expressions[FBExpression.Jaw_Sideways_Right] * TrackingSensitivity.JawX);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawForward] = Math.Min(1, expressions[FBExpression.Jaw_Thrust] * TrackingSensitivity.JawForward);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawForward] = Math.Min(1, expressions[FBExpression.Jaw_Thrust] * TrackingSensitivity.JawThrust);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthPout] = Math.Min(1, (expressions[FBExpression.Lip_Pucker_L] + expressions[FBExpression.Lip_Pucker_R]) / 2.0f * TrackingSensitivity.LipPucker);
 
             // Cheek puff can be triggered by low values of lip pucker (around 0.1), subtract cheek puff with mouth pout values.
@@ -693,22 +654,22 @@ namespace VRCFaceTracking.SRanipal
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerLeft] = Math.Min(1, expressions[FBExpression.Mouth_Left] * TrackingSensitivity.MouthX);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperRight] = Math.Min(1, expressions[FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerRight] = Math.Min(1, expressions[FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileLeft] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_L] * TrackingSensitivity.MouthSmile) ;
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_R] * TrackingSensitivity.MouthSmile);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileLeft] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_L] * TrackingSensitivity.LipCornerPuller) ;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_R] * TrackingSensitivity.LipCornerPuller);
 
             // Lip corner depressors are part of mouth ape shape, will subtract the current value of mouthApeShape from lip corner depressor to compensate
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadLeft] = Math.Max(0, Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_L] * TrackingSensitivity.MouthFrown) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight] = Math.Max(0, Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_R] * TrackingSensitivity.MouthFrown) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 1.0f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadLeft] = Math.Max(0, Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_L] * TrackingSensitivity.LipCornerDepressor) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 1.0f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight] = Math.Max(0, Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_R] * TrackingSensitivity.LipCornerDepressor) - UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] * 1.0f);
             
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperOverturn] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_LT] + expressions[FBExpression.Lip_Funneler_RT]) / 2.0f * TrackingSensitivity.LipFunnelTop);
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverturn] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_LB] + expressions[FBExpression.Lip_Funneler_RB]) / 2.0f * TrackingSensitivity.LipFunnelBottom); 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperInside] = Math.Min(1, (expressions[FBExpression.Lip_Suck_LT] + expressions[FBExpression.Lip_Suck_RT]) / 2.0f * TrackingSensitivity.LipSuckTop); 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerInside] = Math.Min(1, (expressions[FBExpression.Lip_Suck_LB] + expressions[FBExpression.Lip_Suck_RB]) / 2.0f * TrackingSensitivity.LipSuckBottom); 
             UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverlay] = Math.Min(1, expressions[FBExpression.Chin_Raiser_T] * TrackingSensitivity.ChinRaiserTop);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownLeft] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_L] * TrackingSensitivity.MouthLowerDown);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownRight] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_R] * TrackingSensitivity.MouthLowerDown);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.MouthUpperUp);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.MouthUpperUp);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownLeft] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_L] * TrackingSensitivity.LowerLipDepressor);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownRight] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_R] * TrackingSensitivity.LowerLipDepressor);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.UpperLipRaiser);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.UpperLipRaiser);
 
             // Mapping of Quest Pro FACS to VRCFT Unique Shapes     
             // Custom Brow Tracking Expanded Set
