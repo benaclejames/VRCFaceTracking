@@ -436,6 +436,7 @@ namespace VRCFaceTracking.SRanipal
 
                 double yaw = Math.Atan2(2.0 * (q_y * q_z + q_w * q_x), q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z);
                 double pitch = Math.Asin(-2.0 * (q_x * q_z - q_w * q_y));
+                //double roll = Math.Atan2(2.0 * (q_x * q_y + q_w * q_z), q_w * q_w + q_x * q_x - q_y * q_y - q_z * q_z);
 
                 pitch_L = (180.0 / Math.PI) * pitch; // from radians
                 yaw_L = (180.0 / Math.PI) * yaw;
@@ -451,6 +452,34 @@ namespace VRCFaceTracking.SRanipal
                 pitch_R = (180.0 / Math.PI) * pitch; // from radians
                 yaw_R = (180.0 / Math.PI) * yaw;
 
+                //Logger.Msg(expressions[63].ToString()); // confidence
+                //Logger.Msg(((180.0 / Math.PI) * pitch).ToString());
+                //Logger.Msg(((180.0 / Math.PI) * yaw).ToString());
+                //Logger.Msg(((180.0 / Math.PI) * roll).ToString());
+
+                //Logger.Msg(expressions[68].ToString());
+                //Logger.Msg(expressions[69].ToString());
+                //Logger.Msg(expressions[70].ToString());
+
+                //Logger.Msg(pitch_L.ToString());
+                //Logger.Msg(yaw_L.ToString());
+
+                //Logger.Msg(pitch_R.ToString());
+                //Logger.Msg(yaw_R.ToString());
+
+                //Logger.Msg(expressions[69].ToString());
+                //Logger.Msg(expressions[70].ToString());
+                //Logger.Msg(expressions[71].ToString());
+
+
+                //Logger.Msg(expressions[63].ToString());
+                //Logger.Msg(expressions[64].ToString());
+                //Logger.Msg(expressions[65].ToString());
+                //Logger.Msg(expressions[66].ToString());
+                //Logger.Msg(expressions[67].ToString());
+                //Logger.Msg(expressions[68].ToString());
+                //Logger.Msg(expressions[69].ToString());
+
                 PrepareUpdate();
                 UpdateExpressions();
             }
@@ -465,13 +494,22 @@ namespace VRCFaceTracking.SRanipal
         // Preprocess our expressions per the Meta Documentation
         private void PrepareUpdate()
         {
+            //expressions[FBExpression.Eyes_Closed_L] = ((
+            //    (expressions[FBExpression.Eyes_Closed_L] -
+            //        Math.Min(expressions[FBExpression.Eyes_Look_Down_L],
+            //        expressions[FBExpression.Eyes_Look_Down_R])))); // temporary
+            //expressions[FBExpression.Eyes_Closed_R] = ((
+            //    (expressions[FBExpression.Eyes_Closed_R] -
+            //        Math.Min(expressions[FBExpression.Eyes_Look_Down_L],
+            //        expressions[FBExpression.Eyes_Look_Down_R])))); // temporary
+
             if(expressions[FBExpression.Eyes_Look_Down_L] == expressions[FBExpression.Eyes_Look_Up_L] && expressions[FBExpression.Eyes_Closed_L] > 0.25f)
             { // wonky eyelid case, eyes are actually closed now
                 expressions[FBExpression.Eyes_Closed_L] = 0; //0.9f - (expressions[FBExpression.Lid_Tightener_L] * 3);
             }
             else
             {
-                expressions[FBExpression.Eyes_Closed_L] = 0.9f - ((expressions[FBExpression.Eyes_Closed_L] * 3) / (1 + expressions[FBExpression.Eyes_Look_Down_L] * 3));
+                expressions[FBExpression.Eyes_Closed_L] = 0.9f - ((expressions[FBExpression.Eyes_Closed_L] * 3) / (1+ expressions[FBExpression.Eyes_Look_Down_L] * 3));
             }
 
             if (expressions[FBExpression.Eyes_Look_Down_R] == expressions[FBExpression.Eyes_Look_Up_R] && expressions[FBExpression.Eyes_Closed_R] > 0.25f)
@@ -483,44 +521,57 @@ namespace VRCFaceTracking.SRanipal
                 expressions[FBExpression.Eyes_Closed_R] = 0.9f - ((expressions[FBExpression.Eyes_Closed_R] * 3) / (1 + expressions[FBExpression.Eyes_Look_Down_R] * 3));
             }
 
+            //expressions[FBExpression.Lid_Tightener_L] = 0.8f-expressions[FBExpression.Eyes_Closed_L]; // sad: fix combined param instead
+            //expressions[FBExpression.Lid_Tightener_R] = 0.8f-expressions[FBExpression.Eyes_Closed_R]; // sad: fix combined param instead
+
             if (1 - expressions[FBExpression.Eyes_Closed_L] < expressions[FBExpression.Lid_Tightener_L])
                 expressions[FBExpression.Lid_Tightener_L] = (1 - expressions[FBExpression.Eyes_Closed_L]) - 0.01f;
 
             if (1 - expressions[FBExpression.Eyes_Closed_R] < expressions[FBExpression.Lid_Tightener_R])
                 expressions[FBExpression.Lid_Tightener_R] = (1 - expressions[FBExpression.Eyes_Closed_R]) - 0.01f;
 
-            expressions[FBExpression.Upper_Lid_Raiser_L] = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_L] );
-            expressions[FBExpression.Upper_Lid_Raiser_R] = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_R] );
+            //expressions[FBExpression.Lid_Tightener_L] = Math.Max(0, expressions[FBExpression.Lid_Tightener_L] - 0.15f);
+            //expressions[FBExpression.Lid_Tightener_R] = Math.Max(0, expressions[FBExpression.Lid_Tightener_R] - 0.15f);
 
-            expressions[FBExpression.Lid_Tightener_L] = Math.Max(0, expressions[FBExpression.Lid_Tightener_L] );
-            expressions[FBExpression.Lid_Tightener_R] = Math.Max(0, expressions[FBExpression.Lid_Tightener_R] );
+            expressions[FBExpression.Upper_Lid_Raiser_L] = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_L] - 0.5f);
+            expressions[FBExpression.Upper_Lid_Raiser_R] = Math.Max(0, expressions[FBExpression.Upper_Lid_Raiser_R] - 0.5f);
 
-            expressions[FBExpression.Inner_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] );
-            expressions[FBExpression.Brow_Lowerer_L] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] );
-            expressions[FBExpression.Outer_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_L] );
+            expressions[FBExpression.Lid_Tightener_L] = Math.Max(0, expressions[FBExpression.Lid_Tightener_L] - 0.5f);
+            expressions[FBExpression.Lid_Tightener_R] = Math.Max(0, expressions[FBExpression.Lid_Tightener_R] - 0.5f);
 
-            expressions[FBExpression.Inner_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] );
-            expressions[FBExpression.Brow_Lowerer_R] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] );
-            expressions[FBExpression.Outer_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_R] );
+            expressions[FBExpression.Inner_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] );// * 4;
+            expressions[FBExpression.Brow_Lowerer_L] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] * 3f);// * 4;
+            expressions[FBExpression.Outer_Brow_Raiser_L] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_L] );// * 4;
+
+            expressions[FBExpression.Inner_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] );// * 4;
+            expressions[FBExpression.Brow_Lowerer_R] = Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] * 3f);// * 4;
+            expressions[FBExpression.Outer_Brow_Raiser_R] = Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_R] );// * 4;
+
             
-            //expressions[FBExpression.Eyes_Look_Up_L] = expressions[FBExpression.Eyes_Look_Up_L] * 0.55f;
-            //expressions[FBExpression.Eyes_Look_Up_R] = expressions[FBExpression.Eyes_Look_Up_R] * 0.55f;
-            //expressions[FBExpression.Eyes_Look_Down_L] = expressions[FBExpression.Eyes_Look_Down_L] * 1.5f;
-            //expressions[FBExpression.Eyes_Look_Down_R] = expressions[FBExpression.Eyes_Look_Down_R] * 1.5f;
+            expressions[FBExpression.Eyes_Look_Up_L] = expressions[FBExpression.Eyes_Look_Up_L] * 0.55f;
+            expressions[FBExpression.Eyes_Look_Up_R] = expressions[FBExpression.Eyes_Look_Up_R] * 0.55f;
+            expressions[FBExpression.Eyes_Look_Down_L] = expressions[FBExpression.Eyes_Look_Down_L] * 1.5f;
+            expressions[FBExpression.Eyes_Look_Down_R] = expressions[FBExpression.Eyes_Look_Down_R] * 1.5f;
 
-            //expressions[FBExpression.Eyes_Look_Left_L] = expressions[FBExpression.Eyes_Look_Left_L] * 0.85f;
-            //expressions[FBExpression.Eyes_Look_Right_L] = expressions[FBExpression.Eyes_Look_Right_L] * 0.85f;
-            //expressions[FBExpression.Eyes_Look_Left_R] = expressions[FBExpression.Eyes_Look_Left_R] * 0.85f;
-            //expressions[FBExpression.Eyes_Look_Right_R] = expressions[FBExpression.Eyes_Look_Right_R] * 0.85f;
+            expressions[FBExpression.Eyes_Look_Left_L] = expressions[FBExpression.Eyes_Look_Left_L] * 0.85f;
+            expressions[FBExpression.Eyes_Look_Right_L] = expressions[FBExpression.Eyes_Look_Right_L] * 0.85f;
+            expressions[FBExpression.Eyes_Look_Left_R] = expressions[FBExpression.Eyes_Look_Left_R] * 0.85f;
+            expressions[FBExpression.Eyes_Look_Right_R] = expressions[FBExpression.Eyes_Look_Right_R] * 0.85f;
+
+
+
 
             // hack: turn rots to looks
-            // pitch = 47(left)-- > -47(right)
-            // yaw = -55(down)-- > 43(up)
-            // Eye look angle (degrees) limits calibrated to SRanipal eye tracking
+            //pitch = 29(left)-- > -29(right)
+            //yaw = -27(down)-- > 27(up)
+
+            //Angle Degree Limits calibrated to SRanipal eye tracking
             float eyeLookUpLimit = 43;
             float eyeLookDownLimit = 55;
             float eyeLookOutLimit = 47;
-            float eyeLookInLimit = 47;      
+            float eyeLookInLimit = 47;
+            
+          
             if (pitch_L > 0)
             {
                 expressions[FBExpression.Eyes_Look_Left_L] = Math.Min(1, (float)(pitch_L / eyeLookOutLimit));
@@ -542,6 +593,7 @@ namespace VRCFaceTracking.SRanipal
                 expressions[FBExpression.Eyes_Look_Down_L] = Math.Min(1, (float)((-yaw_L) / eyeLookDownLimit));
             }
 
+            
             if (pitch_R > 0)
             {
                 expressions[FBExpression.Eyes_Look_Left_R] = Math.Min(1, (float)(pitch_R / eyeLookInLimit));
@@ -562,29 +614,27 @@ namespace VRCFaceTracking.SRanipal
                 expressions[FBExpression.Eyes_Look_Up_R] = 0;
                 expressions[FBExpression.Eyes_Look_Down_R] = Math.Min(1, (float)((-yaw_R) / eyeLookDownLimit));
             }
+
+
         }
 
         // Thank you @adjerry on the VRCFT discord for these conversions! https://docs.google.com/spreadsheets/d/118jo960co3Mgw8eREFVBsaJ7z0GtKNr52IB4Bz99VTA/edit#gid=0
         private void UpdateExpressions()
         {
-            // Scaling Values
-            
-            
-            // Mapping to SRanipal
             UnifiedTrackingData.LatestEyeData.Left = MakeEye
             (
                 LookLeft: expressions[FBExpression.Eyes_Look_Left_L],
                 LookRight: expressions[FBExpression.Eyes_Look_Right_L],
                 LookUp: expressions[FBExpression.Eyes_Look_Up_L],
                 LookDown: expressions[FBExpression.Eyes_Look_Down_L],
-                Openness: expressions[FBExpression.Eyes_Closed_L] ,
-                Squint: Math.Min(1, expressions[FBExpression.Lid_Tightener_L] * 1.0f),
-                Squeeze: Math.Min(1, expressions[FBExpression.Lid_Tightener_L] * 1.0f),
-                Widen: Math.Min(1, expressions[FBExpression.Upper_Lid_Raiser_L] * 1.0f),
-                InnerUp: Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_L] * 1.0f),
-                InnerDown: Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] * 1.0f),
-                OuterUp: Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_L] * 1.0f),
-                OuterDown: Math.Min(1, expressions[FBExpression.Brow_Lowerer_L] * 1.0f)
+                Openness: expressions[FBExpression.Eyes_Closed_L],
+                Squint: expressions[FBExpression.Lid_Tightener_L],
+                Squeeze: expressions[FBExpression.Lid_Tightener_L],
+                Widen: expressions[FBExpression.Upper_Lid_Raiser_L],
+                InnerUp: expressions[FBExpression.Inner_Brow_Raiser_L],
+                InnerDown: expressions[FBExpression.Brow_Lowerer_L],
+                OuterUp: expressions[FBExpression.Outer_Brow_Raiser_L],
+                OuterDown: expressions[FBExpression.Brow_Lowerer_L]
             );
 
             UnifiedTrackingData.LatestEyeData.Right = MakeEye
@@ -594,70 +644,55 @@ namespace VRCFaceTracking.SRanipal
                 LookUp: expressions[FBExpression.Eyes_Look_Up_R],
                 LookDown: expressions[FBExpression.Eyes_Look_Down_R],
                 Openness: expressions[FBExpression.Eyes_Closed_R],
-                Squint: Math.Min(1, expressions[FBExpression.Lid_Tightener_R] * 1.0f),
-                Squeeze: Math.Min(1, expressions[FBExpression.Lid_Tightener_R] * 1.0f),
-                Widen: Math.Min(1, expressions[FBExpression.Upper_Lid_Raiser_R] * 1.0f),
-                InnerUp: Math.Min(1, expressions[FBExpression.Inner_Brow_Raiser_R] * 1.0f),
-                InnerDown: Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] * 1.0f),
-                OuterUp: Math.Min(1, expressions[FBExpression.Outer_Brow_Raiser_R] * 1.0f),
-                OuterDown: Math.Min(1, expressions[FBExpression.Brow_Lowerer_R] * 1.0f)
+                Squint: expressions[FBExpression.Lid_Tightener_R],
+                Squeeze: expressions[FBExpression.Lid_Tightener_R],
+                Widen: expressions[FBExpression.Upper_Lid_Raiser_R],
+                InnerUp: expressions[FBExpression.Inner_Brow_Raiser_R],
+                InnerDown: expressions[FBExpression.Brow_Lowerer_R],
+                OuterUp: expressions[FBExpression.Outer_Brow_Raiser_R],
+                OuterDown: expressions[FBExpression.Brow_Lowerer_R]
             );
 
 
 
             UnifiedTrackingData.LatestEyeData.Combined = MakeEye
             (
-                LookLeft: (expressions[FBExpression.Eyes_Look_Left_L]+expressions[FBExpression.Eyes_Look_Left_R]) / 2.0f,
-                LookRight: (expressions[FBExpression.Eyes_Look_Right_L]+expressions[FBExpression.Eyes_Look_Right_R]) / 2.0f,
-                LookUp: (expressions[FBExpression.Eyes_Look_Up_L]+expressions[FBExpression.Eyes_Look_Up_R]) / 2.0f,
-                LookDown: (expressions[FBExpression.Eyes_Look_Down_L]+expressions[FBExpression.Eyes_Look_Down_R]) / 2.0f,
-                Openness: (expressions[FBExpression.Eyes_Closed_L]+expressions[FBExpression.Eyes_Closed_R]) / 2.0f,
-                Squint: Math.Min(1, 1.0f * (expressions[FBExpression.Lid_Tightener_L]+expressions[FBExpression.Lid_Tightener_R]) / 2.0f),
-                Squeeze: Math.Min(1, 1.0f * (expressions[FBExpression.Lid_Tightener_L]+expressions[FBExpression.Lid_Tightener_R]) / 2.0f),
-                Widen: Math.Min(1, 1.0f *(expressions[FBExpression.Upper_Lid_Raiser_L]+expressions[FBExpression.Upper_Lid_Raiser_R]) / 2.0f),
-                InnerUp: Math.Min(1, 1.0f * (expressions[FBExpression.Inner_Brow_Raiser_L]+expressions[FBExpression.Inner_Brow_Raiser_R]) / 2.0f),
-                InnerDown: Math.Min(1, 1.0f * (expressions[FBExpression.Brow_Lowerer_L]+expressions[FBExpression.Brow_Lowerer_R]) / 2.0f),
-                OuterUp: Math.Min(1, 1.0f * (expressions[FBExpression.Outer_Brow_Raiser_L] + expressions[FBExpression.Outer_Brow_Raiser_R]) / 2.0f),
-                OuterDown: Math.Min(1, 1.0f * (expressions[FBExpression.Brow_Lowerer_L] + expressions[FBExpression.Brow_Lowerer_R]) / 2.0f)
+                LookLeft: (expressions[FBExpression.Eyes_Look_Left_R]+expressions[FBExpression.Eyes_Look_Left_R])/2.0f,
+                LookRight: (expressions[FBExpression.Eyes_Look_Right_R]+expressions[FBExpression.Eyes_Look_Right_R]) / 2.0f,
+                LookUp: (expressions[FBExpression.Eyes_Look_Up_R]+expressions[FBExpression.Eyes_Look_Up_R]) / 2.0f,
+                LookDown: (expressions[FBExpression.Eyes_Look_Down_R]+expressions[FBExpression.Eyes_Look_Down_R]) / 2.0f,
+                Openness: (expressions[FBExpression.Eyes_Closed_R]+expressions[FBExpression.Eyes_Closed_R]) / 2.0f,
+                Squint: (expressions[FBExpression.Lid_Tightener_R]+expressions[FBExpression.Lid_Tightener_R]) / 2.0f,
+                Squeeze: (expressions[FBExpression.Lid_Tightener_R]+expressions[FBExpression.Lid_Tightener_R]) / 2.0f,
+                Widen: (expressions[FBExpression.Upper_Lid_Raiser_R]+expressions[FBExpression.Upper_Lid_Raiser_R]) / 2.0f,
+                InnerUp: (expressions[FBExpression.Inner_Brow_Raiser_R]+expressions[FBExpression.Inner_Brow_Raiser_R]) / 2.0f,
+                InnerDown: (expressions[FBExpression.Brow_Lowerer_R]+expressions[FBExpression.Brow_Lowerer_R]) / 2.0f,
+                OuterUp: (expressions[FBExpression.Outer_Brow_Raiser_R]+expressions[FBExpression.Outer_Brow_Raiser_R]) / 2.0f,
+                OuterDown: (expressions[FBExpression.Brow_Lowerer_R]+expressions[FBExpression.Brow_Lowerer_R]) / 2.0f
             );
 
             UnifiedTrackingData.LatestEyeData.EyesDilation = 0.5f;
             UnifiedTrackingData.LatestEyeData.EyesPupilDiameter = 0.0035f;
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekPuffLeft] = Math.Min(1, 1.13f * expressions[FBExpression.Cheek_Puff_L]);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekPuffRight] = Math.Min(1, 1.13f * expressions[FBExpression.Cheek_Puff_R]);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekSuck] = Math.Min(1, 2.72f * (expressions[FBExpression.Cheek_Suck_L] + expressions[FBExpression.Cheek_Suck_R]) / 2);
-            
-            //Mouth Ape Shape is not shape by itself and is combinaiton with JawOpen
-            //TODO - allow compatiblity
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] = Math.Min(1, expressions[FBExpression.Lips_Toward] * 2.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = Math.Min(1, expressions[FBExpression.Jaw_Drop] * 1.1f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekPuffLeft] = expressions[FBExpression.Cheek_Puff_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekPuffRight] = expressions[FBExpression.Cheek_Puff_R];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekSuck] = (expressions[FBExpression.Cheek_Suck_L] + expressions[FBExpression.Cheek_Suck_R]) / 2;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawOpen] = expressions[FBExpression.Jaw_Drop];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawLeft] = expressions[FBExpression.Jaw_Sideways_Left];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawRight] = expressions[FBExpression.Jaw_Sideways_Right];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawForward] = expressions[FBExpression.Jaw_Thrust];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthPout] = (expressions[FBExpression.Lip_Pucker_L] + expressions[FBExpression.Lip_Pucker_R]) / 3;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperLeft] = expressions[FBExpression.Mouth_Left];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerLeft] = (expressions[FBExpression.Mouth_Left] + expressions[FBExpression.Lip_Funneler_LB]) / 2;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperRight] = expressions[FBExpression.Mouth_Right];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerRight] = (expressions[FBExpression.Mouth_Right] + expressions[FBExpression.Lip_Funneler_RB]) / 2;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileLeft] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_L] * 1.2f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_R] * 1.2f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadLeft] = Math.Min(1, (expressions[FBExpression.Lip_Corner_Depressor_L] + expressions[FBExpression.Lip_Stretcher_L]) * 0.75f);//Math.Min(1, (expressions[FBExpression.Lip_Corner_Depressor_L]) * 1.5f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight] = Math.Min(1, (expressions[FBExpression.Lip_Corner_Depressor_R] + expressions[FBExpression.Lip_Stretcher_R]) * 0.75f);//Math.Min(1, (expressions[FBExpression.Lip_Corner_Depressor_R]) * 1.5f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperOverturn] = (expressions[FBExpression.Lips_Toward] + expressions[FBExpression.Lip_Funneler_LT] + expressions[FBExpression.Lip_Funneler_RT]) / 3;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverturn] = (expressions[FBExpression.Lips_Toward] + expressions[FBExpression.Lip_Funneler_LB] + expressions[FBExpression.Lip_Funneler_RB]) / 3;
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawLeft] = Math.Min(1, expressions[FBExpression.Jaw_Sideways_Left] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawRight] = Math.Min(1, expressions[FBExpression.Jaw_Sideways_Right] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawForward] = Math.Min(1, expressions[FBExpression.Jaw_Thrust] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthPout] = Math.Min(1, 1.21f * (expressions[FBExpression.Lip_Pucker_L] + expressions[FBExpression.Lip_Pucker_R]) / 2);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperLeft] = Math.Min(1, expressions[FBExpression.Mouth_Left] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerLeft] = Math.Min(1, expressions[FBExpression.Mouth_Left] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperRight] = Math.Min(1, expressions[FBExpression.Mouth_Right] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerRight] = Math.Min(1, expressions[FBExpression.Mouth_Right] * 1.0f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileLeft] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_L] * 1.22f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] = Math.Min(1, expressions[FBExpression.Lip_Corner_Puller_R] * 1.22f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadLeft] = Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_L] * 1.1f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight] = Math.Min(1, expressions[FBExpression.Lip_Corner_Depressor_R] * 1.1f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperOverturn] = Math.Min(1, 1.13f * (expressions[FBExpression.Lip_Funneler_LT] + expressions[FBExpression.Lip_Funneler_RT]) / 2);
-
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverturn] = Math.Min(1, 8f * (expressions[FBExpression.Lip_Funneler_LB] + expressions[FBExpression.Lip_Funneler_RB]) / 2); 
-
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperInside] = Math.Min(1, 1.0f * (expressions[FBExpression.Lip_Suck_LT] + expressions[FBExpression.Lip_Suck_RT]) / 2); // CAUSING PROBLEMS
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerInside] = Math.Min(1, 1.0f * (expressions[FBExpression.Lip_Suck_LB] + expressions[FBExpression.Lip_Suck_RB]) / 2); // CAUSING PROBLEMS
-
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverlay] = Math.Min(1, + expressions[FBExpression.Chin_Raiser_T] * 1.0f);
-
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownLeft] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_L] * 2.87f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownRight] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_R] * 2.87f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_L] * 1.75f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = Math.Min(1, expressions[FBExpression.Upper_Lip_Raiser_R] * 1.75f);
 
             // solve issue with smilesad combined blendshape
             if (UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileLeft] > UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadLeft])
@@ -670,49 +705,78 @@ namespace VRCFaceTracking.SRanipal
             else if (UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] < UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight])
                 UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSmileRight] /= 1 + UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthSadRight];
 
-            // FACS Shapes
-            // Lip funnel bottom not sensitive
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerLeftBottom] = Math.Min(1, expressions[FBExpression.Lip_Funneler_LB] * 8f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerRightBottom] = Math.Min(1, expressions[FBExpression.Lip_Funneler_RB] * 8f);
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = (expressions[FBExpression.Upper_Lip_Raiser_L] + expressions[FBExpression.Lip_Funneler_LT]) / 2;
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = (expressions[FBExpression.Upper_Lip_Raiser_R] + expressions[FBExpression.Lip_Funneler_RT]) / 2;
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerLeftTop] = Math.Min(1, expressions[FBExpression.Lip_Funneler_LT] * 1.13f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerRightTop] = Math.Min(1, expressions[FBExpression.Lip_Funneler_RT] * 1.13f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerLeftBottom] = expressions[FBExpression.Lip_Funneler_LB];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerRightBottom] = expressions[FBExpression.Lip_Funneler_RB];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerLeftTop] = expressions[FBExpression.Lip_Funneler_LT];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipFunnelerRightTop] = expressions[FBExpression.Lip_Funneler_RT];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekRaiserLeft] = Math.Min(1, expressions[FBExpression.Cheek_Raiser_L] * 1.1f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekRaiserRight] = Math.Min(1, expressions[FBExpression.Cheek_Raiser_R] * 1.1f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekRaiserLeft] = expressions[FBExpression.Cheek_Raiser_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.CheekRaiserRight] = expressions[FBExpression.Cheek_Raiser_R];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.ChinRaiserBottom] = expressions[FBExpression.Chin_Raiser_B];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.ChinRaiserTop] = expressions[FBExpression.Chin_Raiser_T];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.ChinRaiserBottom] = Math.Min(1, expressions[FBExpression.Chin_Raiser_B] * 1.24f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.ChinRaiserTop] = Math.Min(1, expressions[FBExpression.Chin_Raiser_T] * 0.75f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.DimplerLeft] = expressions[FBExpression.Dimpler_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.DimplerRight] = expressions[FBExpression.Dimpler_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.DimplerLeft] = Math.Min(1, expressions[FBExpression.Dimpler_L] * 4.3f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.DimplerRight] = Math.Min(1, expressions[FBExpression.Dimpler_R] * 4.3f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPressorLeft] = expressions[FBExpression.Lip_Pressor_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPressorRight] = expressions[FBExpression.Lip_Pressor_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPuckerLeft] = Math.Min(1, expressions[FBExpression.Lip_Pucker_L] * 1.21f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPuckerRight] = Math.Min(1, expressions[FBExpression.Lip_Pucker_R] * 1.21f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPuckerLeft] = expressions[FBExpression.Lip_Pucker_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPuckerRight] = expressions[FBExpression.Lip_Pucker_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipStretcherLeft] = Math.Min(1, expressions[FBExpression.Lip_Stretcher_L] * 3f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipStretcherRight] = Math.Min(1, expressions[FBExpression.Lip_Stretcher_R] * 3f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipStretcherLeft] = expressions[FBExpression.Lip_Stretcher_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipStretcherRight] = expressions[FBExpression.Lip_Stretcher_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPressorLeft] = Math.Min(1, expressions[FBExpression.Lip_Pressor_L] * 10f);  
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipPressorRight] = Math.Min(1, expressions[FBExpression.Lip_Pressor_R] * 10f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckLeftBottom] = expressions[FBExpression.Lip_Suck_LB];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckLeftTop] = expressions[FBExpression.Lip_Suck_LT];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckRightBottom] = expressions[FBExpression.Lip_Suck_RB];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckRightTop] = expressions[FBExpression.Lip_Suck_RT];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckLeftBottom] = Math.Min(1, expressions[FBExpression.Lip_Suck_LB] * 2f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckRightBottom] = Math.Min(1, expressions[FBExpression.Lip_Suck_RB] * 2f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipTightenerLeft] = expressions[FBExpression.Lip_Tightener_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipTightenerRight] = expressions[FBExpression.Lip_Tightener_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckRightTop] = Math.Min(1, expressions[FBExpression.Lip_Suck_RT] * 1.77f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipSuckLeftTop] = Math.Min(1, expressions[FBExpression.Lip_Suck_LT] * 1.77f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LowerLipDepressorLeft] = expressions[FBExpression.Lower_Lip_Depressor_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LowerLipDepressorRight] = expressions[FBExpression.Lower_Lip_Depressor_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipTightenerLeft] = Math.Min(1, expressions[FBExpression.Lip_Tightener_L] * 2.13f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipTightenerRight] = Math.Min(1, expressions[FBExpression.Lip_Tightener_R] * 2.13f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseWrinklerLeft] = expressions[FBExpression.Nose_Wrinkler_L];
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseWrinklerRight] = expressions[FBExpression.Nose_Wrinkler_R];
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LowerLipDepressorLeft] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_L] * 1.58f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LowerLipDepressorRight] = Math.Min(1, expressions[FBExpression.Lower_Lip_Depressor_R] * 1.58f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthApeShape] = Math.Min(1, expressions[FBExpression.Lips_Toward] * 1.4f * (0.5f+expressions[FBExpression.Jaw_Drop]));
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseWrinklerLeft] = Math.Min(1, expressions[FBExpression.Nose_Wrinkler_L] * 3.16f);
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.NoseWrinklerRight] = Math.Min(1, expressions[FBExpression.Nose_Wrinkler_R] * 3.16f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperInside] = (expressions[FBExpression.Lip_Suck_LT] + expressions[FBExpression.Lip_Suck_RT]) / 2;
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerInside] = (expressions[FBExpression.Lip_Suck_LB] + expressions[FBExpression.Lip_Suck_RB]) / 2;
 
-            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.LipsTowards] = Math.Min(1, (expressions[FBExpression.Lips_Toward]) * 6.47f);
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownLeft] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_LB] + expressions[FBExpression.Lower_Lip_Depressor_L]));
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownRight] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_RB] + expressions[FBExpression.Lower_Lip_Depressor_R]));
 
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpLeft] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_LT] + expressions[FBExpression.Upper_Lip_Raiser_L]*2));
+            UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperUpRight] = Math.Min(1, (expressions[FBExpression.Lip_Funneler_RT] + expressions[FBExpression.Upper_Lip_Raiser_R]*2));
+
+
+            // Possible matches
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerOverlay = FBData.faceData.ChinRaiserB;
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthUpperInside = FBData.faceData.ChinRaiserB;
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerInside = FBData.faceData.ChinRaiserT;
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownLeft = FBData.faceData.LowerLipDepressorL;
+            //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthLowerDownRight = FBData.faceData.LowerLipDepressorR;
+
+            // Expressions reported by @aero that look the best - would be best to get a side by side comparison
+            //LeftEyeX = data[E["EYESLOOKRIGHTL"] - data[E["EYESLOOKLEFTL"]]
+            //RightEyeX = data[E["EYESLOOKRIGHTR"] - data[E["EYESLOOKLEFTR"]]
+            //EyesY = (((data[E["EYESLOOKUPL"] + data[E["EYESLOOKUPR"]) / 1.6) - (data[E["EYESLOOKDOWNL"] + data[E["EYESLOOKDOWNR"])) / 2
+            //LeftEyeLid = data[E["EYESCLOSEDL"] + min(data[E["EYESLOOKDOWNL"], data[E["EYESLOOKDOWNR"])
+            //RightEyeLid = data[E["EYESCLOSEDR"] + min(data[E["EYESLOOKDOWNL"], data[E["EYESLOOKDOWNR"])
+            //JawOpen = data[E["JAWDROP"]]
+            //MouthPout = (data[E["LIPPUCKERL"] + data[E["LIPPUCKERR"]) / 2
+            //JawX = (data[E["MOUTHRIGHT"] - data[E["MOUTHLEFT"]) * 2
+            //JawForward = data[E["JAWTHRUST"]]
+            //CheekPuffLeft = data[E["CHEEKPUFFL"] * 4
+            //CheekPuffRight = data[E["CHEEKPUFFR"] * 4
+            //SmileSadLeft = (data[E["DIMPLERL"] + (data[E["UPPERLIPRAISERL"] * 2)) - ((data[E["LOWERLIPDEPRESSORL"]) * 4)
+            //SmileSadRight = (data[E["DIMPLERR"] + (data[E["UPPERLIPRAISERR"] * 2)) - ((data[E["LOWERLIPDEPRESSORR"]) * 4)
         }
 
         private Eye MakeEye(float LookLeft, float LookRight, float LookUp, float LookDown, float Openness, float Squint, float Squeeze, float Widen, float InnerUp, float InnerDown, float OuterUp, float OuterDown)
