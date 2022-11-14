@@ -60,7 +60,6 @@
     <Compile Include="Params\Eye\EyeTrackingParams.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
-    <Compile Include="Params\Lip\LipShapes.cs" />
     <Compile Include="Params\ParamContainers.cs" />
     <Compile Include="Params\Vector2.cs" />
     <Compile Include="Params\Vector3.cs" />

@@ -15,7 +15,7 @@ namespace VRCFaceTracking.Params.Lip
         private float _positiveCache, _negativeCache;
         private bool _steps;
         
-        public PositiveNegativeShape(UnifiedExpression positiveShape, UnifiedExpression negativeShape, bool steps = false)
+        public PositiveNegativeShape(LipShape_v2 positiveShape, LipShape_v2 negativeShape, bool steps = false)
         {
             _positiveShape = (int)positiveShape;
             _negativeShape = (int)negativeShape;
@@ -37,7 +37,7 @@ namespace VRCFaceTracking.Params.Lip
         private readonly int _positiveCount, _negativeCount;
         private readonly bool _useMax;
 
-        public PositiveNegativeAveragedShape(UnifiedExpression[] positiveShapes, UnifiedExpression[] negativeShapes)
+        public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes)
         {
             _positiveShapes = positiveShapes.Select(s => (int)s).ToArray();
             _negativeShapes = negativeShapes.Select(s => (int)s).ToArray();
@@ -47,7 +47,7 @@ namespace VRCFaceTracking.Params.Lip
             _negativeCount = negativeShapes.Length;
         }
 
-        public PositiveNegativeAveragedShape(UnifiedExpression[] positiveShapes, UnifiedExpression[] negativeShapes, bool useMax)
+        public PositiveNegativeAveragedShape(LipShape_v2[] positiveShapes, LipShape_v2[] negativeShapes, bool useMax)
         {
             _positiveShapes = positiveShapes.Select(s => (int)s).ToArray();
             _negativeShapes = negativeShapes.Select(s => (int)s).ToArray();
