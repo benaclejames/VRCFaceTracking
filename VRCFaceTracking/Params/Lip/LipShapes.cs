@@ -20,9 +20,9 @@
 
         #region Eye Expressions
 
-        EyeSquintLeft,
+        EyeSquintLeft, // Eye Squeeze from SRanipal (excluding brow movements), with additional consideration for Quest Pro's squint tracking
         EyeSquintRight,
-        EyeClosedLeft,
+        EyeClosedLeft, // EyeBlink
         EyeClosedRight,
         EyeWideLeft,
         EyeWideRight,
@@ -55,7 +55,7 @@
 
         #region Cheek Expressions
 
-        CheekSquintLeft,
+        CheekSquintLeft, // Raises cheeks exclusively
         CheekSquintRight,
         CheekPuffLeft,
         CheekPuffRight,
@@ -71,41 +71,41 @@
         JawRight,
         JawForward,
 
-        MouthApeShape,
+        MouthApeShape, // Map like SRanipal's MouthApeShape
 
         #endregion
 
         #region Lip Expressions
 
-        LipSuckTopRight,
+        LipSuckTopRight, // Mouth Upper Inside uncombined
         LipSuckTopLeft,
-        LipSuckBottomRight,
+        LipSuckBottomRight, // Mouth Lower Inside uncombined
         LipSuckBottomLeft,
-        LipFunnelTopRight,
+        LipFunnelTopRight, // Mouth makes a funnel shape (unlike SRanipal's Mouth Upper/Lower Overturn, it also opens the mouth into a funnel)
         LipFunnelTopLeft,
         LipFunnelBottomRight,
         LipFunnelBottomLeft,
-        LipPuckerLeft,
+        LipPuckerLeft, // Lip Pout uncombined
         LipPuckerRight,
         MouthUpperUpLeft,
         MouthUpperUpRight,
         MouthLowerDownLeft,
         MouthLowerDownRight,
-        MouthUpperLeft, //Orig MouthTopLeft
-        MouthUpperRight, //Orig MouthTopRight
-        MouthLowerLeft, //Orig MouthBottomLeft
-        MouthLowerRight, //Orig MouthBottomRight
+        MouthTopLeft, // Mouth Upper Left
+        MouthTopRight, // Mouth Upper Right
+        MouthBottomLeft, // Mouth Lower Left
+        MouthBottomRight, // Mouth Lower Right
         MouthSmileLeft,
         MouthSmileRight,
         MouthFrownLeft,
         MouthFrownRight,
         MouthDimpleLeft,
         MouthDimpleRight,
-        MouthRaiserUpper,
-        MouthRaiserLower,
+        MouthRaiserUpper, // Raises the upper lip of the mouth
+        MouthRaiserLower, // Raises the lower lip of the mouth (and may also track Mouth Lower Overlay as well)
         // MouthShrugLower, // Duplicate shape to MouthRaiserLower
-        MouthPressLeft,
-        MouthPressRight,
+        MouthPressLeft, // Squeezes the lips together
+        MouthPressRight, // Squeezes the lips together
         MouthTightenerLeft,
         MouthTightenerRight,
         MouthStretchLeft,
@@ -115,7 +115,7 @@
 
         #region Tongue Expressions
 
-        TongueOut,
+        TongueOut, // Combined LongStep1 and LongStep2 into one shape, as it can be emulated in-animation
         TongueDown,
         TongueUp,
         TongueLeft,
