@@ -54,6 +54,6 @@
         /// LegacyShapes[(int)SRanipal_LipShape_V2.JawOpen] = JawOpen;
         /// </code>
         /// </remarks>
-        public float[] LegacyShapes = new float[37];
+        public float[] LegacyShapes = new float[38];
     }
 }
