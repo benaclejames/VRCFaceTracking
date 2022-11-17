@@ -9,7 +9,7 @@
         public (int x, int y) ImageSize;
 
         /// <summary>
-        /// Tuple that represents the horizontal and vertical size of the image (in pixels).
+        /// Byte that contains the image's data.
         /// </summary>
         public byte[] ImageData;
 
