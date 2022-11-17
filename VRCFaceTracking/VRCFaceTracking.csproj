@@ -49,7 +49,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Params\UnifiedExpressions.cs" />
     <Compile Include="ConfigParser.cs" />
+    <Compile Include="Types\ImageData.cs" />
     <Compile Include="DependencyManager.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainStandalone.cs" />
@@ -57,14 +59,15 @@
     <Compile Include="OSC\OSCMain.cs" />
     <Compile Include="OSC\OSCMessage.cs" />
     <Compile Include="OSC\OSCParams.cs" />
+    <Compile Include="Params\UnifiedExpressionMerger.cs" />
     <Compile Include="Params\Eye\EyeTrackingParams.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />
     <Compile Include="Params\Lip\LipShapeMerger.cs" />
-    <Compile Include="Params\Lip\LipShapes.cs" />
+    <Compile Include="Params\UnifiedData.cs" />
     <Compile Include="Params\ParamContainers.cs" />
-    <Compile Include="Params\Vector2.cs" />
-    <Compile Include="Params\Vector3.cs" />
-    <Compile Include="Params\XYParam.cs" />
+    <Compile Include="Types\Vector2.cs" />
+    <Compile Include="Types\Vector3.cs" />
+    <Compile Include="Types\XYParam.cs" />
     <Compile Include="SDK\ExtTrackingModule.cs" />
     <Compile Include="VRChat.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeData.cs" />

@@ -38,7 +38,6 @@ namespace VRCFaceTracking
             }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static IEnumerable<OSCParams.BaseParam> _relevantParams_v2;
         private static int _relevantParamsCount = 416;
 
         private static string _ip = "127.0.0.1";
@@ -93,11 +92,11 @@ namespace VRCFaceTracking
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
             // Currently doesn't work due to uncompensated data structure changes
-            _relevantParams_V2 = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams_V2 = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase())
+                _relevantParams = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
 
                 // Reset calibration on parameter data.
