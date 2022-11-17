@@ -5,151 +5,153 @@
         public static readonly IParameter[] ParameterList = {
             #region XYParams
             
-            new XYParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
-            new XYParameter(v2 => v2.Left.Look, "LeftEyeX", "LeftEyeY"),
-            new XYParameter(v2 => v2.Right.Look, "RightEyeX", "RightEyeY"),
+            new XYParameter(exp => exp.ReadInternal().Eye.Combined.GazeNormalized, "EyesX", "EyesY"),
+            new XYParameter(exp => exp.ReadInternal().Eye.Left.GazeNormalized, "LeftEyeX", "LeftEyeY"),
+            new XYParameter(exp => exp.ReadInternal().Eye.Right.GazeNormalized, "RightEyeX", "RightEyeY"),
             
             #endregion
             
             #region Widen
 
-            new EParam(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
-            new EParam(v2 => v2.Left.Widen, "LeftEyeWiden"),
-            new EParam(v2 => v2.Right.Widen, "RightEyeWiden"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] 
+                ? exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] 
+                : exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight], "EyesWiden"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft], "LeftEyeWiden"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight], "RightEyeWiden"),
             
             #endregion
             
             #region Squeeze
             
-            new EParam(v2 => v2.Combined.Squeeze, "EyesSqueeze"),
-            new EParam(v2 => v2.Left.Squeeze, "LeftEyeSqueeze"),
-            new EParam(v2 => v2.Right.Squeeze, "RightEyeSqueeze"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight], "EyesSqueeze"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft], "LeftEyeSqueeze"),
+            new EParam(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight], "RightEyeSqueeze"),
             
             #endregion
             
             #region Dilation
             
-            new EParam(v2 => v2.EyesDilation, "EyesDilation"),
-            new EParam(v2 => v2.EyesPupilDiameter, "EyesPupilDiameter"),
+            new EParam(exp => exp.ReadInternal().Eye.Left.PupilDiameter_MM, "EyesDilation"),
+            new EParam(exp => exp.ReadInternal().Eye.Left.PupilDiameter_MM, "EyesPupilDiameter"),
             
             #endregion
             
             #region EyeLid
             
-            new EParam(v2 => v2.Left.Openness, "LeftEyeLid"),
-            new EParam(v2 => v2.Right.Openness, "RightEyeLid"),
-            new EParam(v2 => (v2.Left.Openness + v2.Right.Openness)/2, "CombinedEyeLid"),
+            new EParam(exp => exp.ReadInternal().Eye.Left.Openness, "LeftEyeLid"),
+            new EParam(exp => exp.ReadInternal().Eye.Right.Openness, "RightEyeLid"),
+            new EParam(exp => (exp.ReadInternal().Eye.Left.Openness + exp.ReadInternal().Eye.Right.Openness)/2, "CombinedEyeLid"),
             
             #endregion
             
             #region EyeLidExpanded
             
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Left.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen);
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft]);
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Left.Openness);
             }, "LeftEyeLidExpanded", 0.5f, true),
 
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Right.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen); 
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]); 
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Right.Openness);
             }, "RightEyeLidExpanded", 0.5f, true),
 
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Combined.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Combined.Widen); 
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
+                if ((exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f); 
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Combined.Openness);
             }, "CombinedEyeLidExpanded", 0.5f, true),
 
             #endregion
 
             #region EyeLidExpandedSqueeze
 
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Left.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Left.Widen); 
-                if (v2.Left.Squeeze > 0)
-                    return v2.Left.Squeeze * -1;     
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Left.Openness);
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft]); 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] * -1;     
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Left.Openness);
             } ,"LeftEyeLidExpandedSqueeze", 0.5f, true),
 
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Right.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Right.Widen); 
-                if (v2.Right.Squeeze > 0)
-                    return v2.Right.Squeeze * -1;        
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Right.Openness);
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]); 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] * -1;        
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Right.Openness);
             } ,"RightEyeLidExpandedSqueeze", 0.5f, true),
 
-            new EParam((v2, eye) =>
+            new EParam(exp =>
             {
-                if (v2.Combined.Widen > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, v2.Combined.Widen); 
-                if (v2.Combined.Squeeze > 0)
-                    return v2.Combined.Squeeze * -1;      
-                return NormalizeFloat(0, 1, 0, 0.8f, v2.Combined.Openness);
+                if ((exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f); 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] * -1;      
+                return NormalizeFloat(0, 1, 0, 0.8f, exp.ReadInternal().Eye.Combined.Openness);
             } ,"CombinedEyeLidExpandedSqueeze", 0.5f, true),
 
             #endregion
             
             #region EyeLidExpanded Binary
             
-            new BinaryParameter((v2, eye) =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Left.Widen > 0)
-                    return v2.Left.Widen;
-                return v2.Left.Openness;
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft];
+                return exp.ReadInternal().Eye.Left.Openness;
             }, "LeftEyeLidExpanded"),
 
-            new BinaryParameter((v2, eye) =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Right.Widen > 0)
-                    return v2.Right.Widen;
-                return v2.Right.Openness;
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight];
+                return exp.ReadInternal().Eye.Right.Openness;
             }, "RightEyeLidExpanded"),
 
-            new BinaryParameter((v2, eye) =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Combined.Widen > 0)
-                    return v2.Combined.Widen;
-                return v2.Combined.Openness;
+                if ((exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
+                    return (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f;
+                return exp.ReadInternal().Eye.Combined.Openness;
             }, "CombinedEyeLidExpanded"),
 
             #endregion
             
             #region EyeLidExpandedSqueeze Binary
             
-            new BinaryParameter(v2 =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Left.Widen > 0)
-                    return v2.Left.Widen; 
-                if (v2.Left.Squeeze > 0)
-                    return v2.Left.Squeeze;
-                return v2.Left.Openness;
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft]; 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft];
+                return exp.ReadInternal().Eye.Left.Openness;
             }, "LeftEyeLidExpandedSqueeze"),
             
-            new BinaryParameter(v2 =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Right.Widen > 0)
-                    return v2.Right.Widen; 
-                if (v2.Right.Squeeze > 0)
-                    return v2.Right.Squeeze;
-                return v2.Right.Openness;
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight]; 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight];
+                return exp.ReadInternal().Eye.Right.Openness;
             }, "RightEyeLidExpandedSqueeze"),
             
-            new BinaryParameter((v2, eye) =>
+            new BinaryParameter(exp =>
             {
-                if (v2.Combined.Widen > 0)
-                    return v2.Combined.Widen; 
-                if (v2.Combined.Squeeze > 0)
-                    return v2.Combined.Squeeze;
-                return v2.Combined.Openness;
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] / 2.0f > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] / 2.0f; 
+                if (exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] / 2.0f > 0)
+                    return exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] + exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] / 2.0f;
+                return exp.ReadInternal().Eye.Combined.Openness;
             }, "CombinedEyeLidExpandedSqueeze"),
             
             #endregion
@@ -158,19 +160,19 @@
 
             // These parameters are used to distinguish when EyeLidExpanded / EyeLidExpandedSqueeze
             // is returning a value as a Widen or Squeeze. Intended for the Bool or Binary param variant.
-            new BoolParameter(v2 => v2.Left.Widen > 0, "LeftEyeWidenToggle"),
-            new BoolParameter(v2 => v2.Right.Widen > 0, "RightEyeWidenToggle"),
-            new BoolParameter(v2 => v2.Combined.Widen > 0, "EyesWidenToggle"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0, "LeftEyeWidenToggle"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0, "RightEyeWidenToggle"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] 
+                ? exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0
+                : exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideRight] > 0
+                , "EyesWidenToggle"),
 
-            new BoolParameter(v2 => v2.Left.Squeeze > 0, "LeftEyeSqueezeToggle"),
-            new BoolParameter(v2 => v2.Right.Squeeze > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(v2 => v2.Combined.Squeeze > 0, "EyesSqueezeToggle"),
-
-            #endregion
-
-            #region Status
-
-            new BoolParameter(v2 => UnifiedLibManager.EyeStatus.Equals(ModuleState.Active), "EyeTrackingActive"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] > exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight]
+                ? exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0
+                : exp.ReadInternal().Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0
+                , "EyesSquintToggle"),
 
             #endregion
         };

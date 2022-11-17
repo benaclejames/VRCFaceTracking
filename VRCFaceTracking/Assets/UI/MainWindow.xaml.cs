@@ -87,17 +87,17 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (!IsLipPageVisible || UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
+            if (!IsLipPageVisible || UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestLipData.ImageSize.x,
-                    UnifiedTrackingData.LatestLipData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x,
+                    UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestLipData.ImageSize.x,
-                UnifiedTrackingData.LatestLipData.ImageSize.y), UnifiedTrackingData.LatestLipData.ImageData, 800, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x,
+                UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y), UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData, 800, 0);
             
             // Set the WPF image name LipImage 
             LipImage.Source = bitmap;
@@ -105,18 +105,18 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (!IsEyePageVisible || UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTrackingData.LatestExpressionData.EyeImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestEyeData.ImageSize.x,
-                    UnifiedTrackingData.LatestEyeData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x,
+                    UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
             
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestEyeData.ImageSize.x, 
-                UnifiedTrackingData.LatestEyeData.ImageSize.y), UnifiedTrackingData.LatestEyeData.ImageData, UnifiedTrackingData.LatestEyeData.ImageSize.x, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x, 
+                UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.y), UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageData, UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x, 0);
             
             // Set the WPF image name EyeImage 
             EyeImage.Source = bitmap;
@@ -145,10 +145,10 @@ namespace VRCFaceTracking.Assets.UI
 
         private void PauseClickMouth(object sender, RoutedEventArgs e)
         {
-            if (UnifiedLibManager.LipStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
+            if (UnifiedLibManager.ExpressionStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
                 return;
             
-            UnifiedLibManager.LipStatus = UnifiedLibManager.LipStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
+            UnifiedLibManager.ExpressionStatus = UnifiedLibManager.ExpressionStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
         }
 
         private void UpdateLogo(ModuleState eyeState, ModuleState lipState)

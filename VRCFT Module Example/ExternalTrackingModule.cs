@@ -4,13 +4,15 @@ using VRCFaceTracking;
 using VRCFaceTracking.Params;
 
 namespace VRCFT_Module_Example
-{
-    // Example "single-eye" data response.
+{ 
+    // Example "single-eye" data response.    
     public struct ExampleExternalTrackingDataEye
     {
         public float eye_lid_openness;
         public float eye_x;
         public float eye_y;
+
+        public bool eye_validity;
     }
     
     // Example "full-data" response from the external tracking system.
@@ -18,33 +20,58 @@ namespace VRCFT_Module_Example
     {
         public ExampleExternalTrackingDataEye left_eye;
         public ExampleExternalTrackingDataEye right_eye;
-    }   
-    
-    
+    }
+
+    // Example expression response from external tracking system.
+    public struct ExampleExternalTrackingDataExpressions
+    {
+        public float jaw_open;
+        public float tongue_out;
+    }
+
     // This class contains the overrides for any VRCFT Tracking Data struct functions
     public static class TrackingData
     {
-        // This function parses the external module's single-eye data into a VRCFT-Parseable format
-        public static void Update(ref Eye data, ExampleExternalTrackingDataEye external)
+
+        // This function parses the external module's full-data data into UnifiedExpressions' eye structure.
+        public static void UpdateEye(ref UnifiedExpressionsData data, ExampleExternalTrackingDataStruct external)
         {
-            data.Look = new Vector2(external.eye_x, external.eye_y);
-            data.Openness = external.eye_lid_openness;
+            data.Eye.Right.Openness = external.left_eye.eye_lid_openness;
+            data.Eye.Right.Openness = external.right_eye.eye_lid_openness;
+
+            data.Eye.Left.GazeNormalized = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
+            data.Eye.Right.GazeNormalized = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
+
+            // This will tell VRCFaceTracking if the eye data is accurate/usable or not.
+            data.Eye.Left.Valid = external.left_eye.eye_validity;
+            data.Eye.Right.Valid = external.right_eye.eye_validity;
         }
 
-        // This function parses the external module's full-data data into multiple VRCFT-Parseable single-eye structs
-        public static void Update(ref EyeTrackingData data, ExampleExternalTrackingDataStruct external)
+        // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
+        public static void UpdateExpressions(ref UnifiedExpressionsData data, ExampleExternalTrackingDataExpressions external)
         {
-            Update(ref data.Right, external.left_eye);
-            Update(ref data.Left, external.right_eye);
+            // Map to Shapes from the External structure the UnifiedExpressionData structure to access UnifiedExpression shapes.
+            data.Shapes[(int)UnifiedExpressions.JawOpen] = external.jaw_open;
+            data.Shapes[(int)UnifiedExpressions.TongueOut] = external.tongue_out;
+
+            // Map to LegacyShapes within the UnifiedExpressionData to access SRanipal shapes. This may become obsolete.
+            data.LegacyShapes[(int)SRanipal_LipShape_v2.JawOpen] = external.jaw_open;
+            data.LegacyShapes[(int)SRanipal_LipShape_v2.TongueLongStep1] = external.tongue_out;
+            data.LegacyShapes[(int)SRanipal_LipShape_v2.TongueLongStep2] = external.tongue_out;
         }
     }
     
     public class ExternalExtTrackingModule : ExtTrackingModule
     {
-        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
-        public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
+        // Example of the data coming from the tracking interface.
+        ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
+        ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
+        bool external_tracking_state;
 
-        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
+        public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
+
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eye, bool exp)
         {
             Console.WriteLine("Initializing inside external module");
             return (true, false);
@@ -55,9 +82,11 @@ namespace VRCFT_Module_Example
         {
             return () =>
             {
-                while (true)
+                while (external_tracking_state)
                 {
                     Update();
+
+                    // Have the update function work in-tandem with your tracking's update
                     Thread.Sleep(10);
                 }
             };
@@ -67,11 +96,20 @@ namespace VRCFT_Module_Example
         public void Update()
         {
             Console.WriteLine("Updating inside external module.");
-            
+
             if (Status.EyeState == ModuleState.Active)
+            {
                 Console.WriteLine("Eye data is being utilized.");
-            if (Status.LipState == ModuleState.Active)
-                Console.WriteLine("Lip data is being utilized.");
+                TrackingData.UpdateEye(ref UnifiedTrackingData.LatestExpressionData.LatestData, external_eye);
+            }
+            if (Status.ExpressionState == ModuleState.Active)
+            {
+                Console.WriteLine("Expression data is being utilized.");
+                TrackingData.UpdateExpressions(ref UnifiedTrackingData.LatestExpressionData.LatestData, external_expressions);
+            }
+
+            // Updates the parameter internally in VRCFT
+            UnifiedTrackingData.LatestExpressionData.UpdateData();
         }
 
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.

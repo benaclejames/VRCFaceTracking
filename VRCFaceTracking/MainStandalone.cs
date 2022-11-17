@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using VRCFaceTracking.Assets.UI;
+using VRCFaceTracking.Params;
 using VRCFaceTracking.OSC;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
@@ -37,6 +38,7 @@ namespace VRCFaceTracking
             }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
+        private static IEnumerable<OSCParams.BaseParam> _relevantParams_v2;
         private static int _relevantParamsCount = 416;
 
         private static string _ip = "127.0.0.1";
@@ -90,15 +92,20 @@ namespace VRCFaceTracking
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            // Currently doesn't work due to uncompensated data structure changes
+            _relevantParams_V2 = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase())
+                _relevantParams_V2 = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
-                UnifiedTrackingData.LatestEyeData.ResetThresholds();
+
+                // Reset calibration on parameter data.
+                //UnifiedTrackingData.LatestEyeData.ResetThresholds();
+                UnifiedTrackingData.LatestExpressionData.ResetCalibration();
+
                 _relevantParamsCount = _relevantParams.Count();
-                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + " parameters loaded");
+                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + "parameters loaded.");
             };
 
             // Begin main OSC update loop
@@ -110,8 +117,10 @@ namespace VRCFaceTracking
                 if (_relevantParamsCount <= 0)
                     continue;
 
-                UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
-                    UnifiedTrackingData.LatestLipData);
+                UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestExpressionData);
+
+                // Testing data transfer.
+                Logger.Msg(UnifiedTrackingData.LatestExpressionData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
 
                 var messages = ConstructMessages(_relevantParams);
                 while (messages.Count > 0)

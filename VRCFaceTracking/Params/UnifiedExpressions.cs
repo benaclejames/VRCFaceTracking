@@ -1,11 +1,15 @@
-﻿namespace VRCFaceTracking.Params.Lip
+﻿namespace VRCFaceTracking.Params
 {
     // TODO: Create expressions map to relate legacy shapes to new ones
-    public enum UnifiedExpression
+
+    /// <summary> 
+    /// Represents the type of Shape data being sent by UnifiedExpressionData, in the form of enumerated shapes.
+    /// </summary>
+    public enum UnifiedExpressions
     {
         #region Eye Gaze Expressions
 
-        // These are currently unused in the Lips expressions, and used in Eye Expressions.
+        // These are currently unused in the Lips expressions, and used in UnifiedEye.
 
         // EyeLookOutRight,
         // EyeLookInRight,
@@ -20,21 +24,23 @@
 
         #region Eye Expressions
 
+        // Biometrically accurate data. Included with UnifiedEye
+        //EyeClosedLeft, // EyeBlink
+        //EyeClosedRight,
+        //EyeDilationLeft,
+        //EyeDilationRight,
+        //EyeConstrictLeft,
+        //EyeConstrictRight,
+
         EyeSquintLeft, // Eye Squeeze from SRanipal (excluding brow movements), with additional consideration for Quest Pro's squint tracking
         EyeSquintRight,
-        EyeClosedLeft, // EyeBlink
-        EyeClosedRight,
-        EyeWideLeft,
+        EyeWideLeft, // Eye Squeeze from SRanipal (excluding brow movements), with additional consideration for Quest Pro's squint tracking
         EyeWideRight,
-        EyeDilationLeft,
-        EyeDilationRight,
-        EyeConstrictLeft,
-        EyeConstrictRight,
 
         #endregion
 
         #region EyeBrow Expressions
-        
+
         BrowInnerDownLeft,
         BrowInnerDownRight,
         BrowOuterDownLeft,
@@ -56,7 +62,7 @@
         #region Cheek Expressions
 
         CheekSquintLeft, // Raises cheeks exclusively
-        CheekSquintRight,
+        CheekSquintRight, // Raises cheeks exclusively
         CheekPuffLeft,
         CheekPuffRight,
         CheekSuckLeft,
@@ -103,7 +109,7 @@
         MouthDimpleRight,
         MouthRaiserUpper, // Raises the upper lip of the mouth
         MouthRaiserLower, // Raises the lower lip of the mouth (and may also track Mouth Lower Overlay as well)
-        // MouthShrugLower, // Duplicate shape to MouthRaiserLower
+        //MouthShrugLower, // Duplicate shape to MouthRaiserLower
         MouthPressLeft, // Squeezes the lips together
         MouthPressRight, // Squeezes the lips together
         MouthTightenerLeft,
@@ -120,8 +126,58 @@
         TongueUp,
         TongueLeft,
         TongueRight,
-        TongueRoll
+        TongueRoll,
 
         #endregion
+
+        Max
+    }
+    /// <summary> 
+    /// Represents the type of Legacy Shape data being sent by UnifiedExpressionData, in the form of enumerated SRanipal shapes.
+    /// </summary>
+    /// <remarks>
+    /// This enum is not intended to be used directly by modules in the final iteration, and instead will be used as a compatibility layer for making the new Unified system backwards compatible with older avatars. May be removed at a later date.
+    /// </remarks>
+    public enum SRanipal_LipShape_v2
+    {
+        //None = -1,
+        JawRight = 0, // +JawX
+        JawLeft = 1, // -JawX
+        JawForward = 2,
+        JawOpen = 3,
+        MouthApeShape = 4,
+        MouthUpperRight = 5, // +MouthUpper
+        MouthUpperLeft = 6, // -MouthUpper
+        MouthLowerRight = 7, // +MouthLower
+        MouthLowerLeft = 8, // -MouthLower
+        MouthUpperOverturn = 9,
+        MouthLowerOverturn = 10,
+        MouthPout = 11,
+        MouthSmileRight = 12, // +SmileSadRight
+        MouthSmileLeft = 13, // +SmileSadLeft
+        MouthSadRight = 14, // -SmileSadRight
+        MouthSadLeft = 15, // -SmileSadLeft
+        CheekPuffRight = 16,
+        CheekPuffLeft = 17,
+        CheekSuck = 18,
+        MouthUpperUpRight = 19,
+        MouthUpperUpLeft = 20,
+        MouthLowerDownRight = 21,
+        MouthLowerDownLeft = 22,
+        MouthUpperInside = 23,
+        MouthLowerInside = 24,
+        MouthLowerOverlay = 25,
+        TongueLongStep1 = 26,
+        TongueLongStep2 = 32,
+        TongueDown = 30, // -TongueY
+        TongueUp = 29, // +TongueY
+        TongueRight = 28, // +TongueX
+        TongueLeft = 27, // -TongueX
+        TongueRoll = 31,
+        TongueUpLeftMorph = 34,
+        TongueUpRightMorph = 33,
+        TongueDownLeftMorph = 36,
+        TongueDownRightMorph = 35,
+        Max = 37,
     }
 }
