@@ -87,17 +87,17 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (!IsLipPageVisible || UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData == null)   // If the image is not initialized
+            if (!IsLipPageVisible || UnifiedTracking.AllData.LipImageData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x,
-                    UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.AllData.LipImageData.ImageSize.x,
+                    UnifiedTracking.AllData.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x,
-                UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y), UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData, 800, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.AllData.LipImageData.ImageSize.x,
+                UnifiedTracking.AllData.LipImageData.ImageSize.y), UnifiedTracking.AllData.LipImageData.ImageData, 800, 0);
             
             // Set the WPF image name LipImage 
             LipImage.Source = bitmap;
@@ -105,18 +105,18 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (!IsEyePageVisible || UnifiedTrackingData.LatestExpressionData.EyeImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTracking.AllData.EyeImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x,
-                    UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.AllData.EyeImageData.ImageSize.x,
+                    UnifiedTracking.AllData.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
             
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x, 
-                UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.y), UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageData, UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize.x, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.AllData.EyeImageData.ImageSize.x, 
+                UnifiedTracking.AllData.EyeImageData.ImageSize.y), UnifiedTracking.AllData.EyeImageData.ImageData, UnifiedTracking.AllData.EyeImageData.ImageSize.x, 0);
             
             // Set the WPF image name EyeImage 
             EyeImage.Source = bitmap;
