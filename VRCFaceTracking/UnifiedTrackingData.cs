@@ -37,7 +37,7 @@ namespace VRCFaceTracking
         /// <summary>
         /// Updates the Internal Expression Data buffer with the Latest Expression Data.
         /// </summary>
-        public void UpdateData() 
+        public void UpdateData()
         {
             UpdatedExpressionData = LatestExpressionData;
         }
@@ -49,7 +49,7 @@ namespace VRCFaceTracking
     }
 
     /// <summary>
-    /// Structure that holds everything that VRCFaceTracking needs to take tracking data from modules and output them into formatted parameters.
+    /// Structure that holds everything that VRCFaceTracking needs to take tracking data from modules to a formatted output.
     /// </summary>
     public static class UnifiedTracking
     {

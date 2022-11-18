@@ -214,8 +214,8 @@ namespace VRCFaceTracking.SRanipal
 
         private void UpdateEyeParameters(ref UnifiedEyeData data, VerboseData external)
         {
-            data.Left.GazeNormalized = external.left.gaze_direction_normalized;
-            data.Right.GazeNormalized = external.right.gaze_direction_normalized;
+            data.Left.GazeNormalized = external.left.gaze_direction_normalized.FlipXCoordinates();
+            data.Right.GazeNormalized = external.right.gaze_direction_normalized.FlipXCoordinates();
 
             data.Left.Openness = external.left.eye_openness;
             data.Right.Openness = external.right.eye_openness;
