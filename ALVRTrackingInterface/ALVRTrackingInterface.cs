@@ -27,9 +27,6 @@ namespace ALVRTrackingInterface
 
         private double pitch_L, yaw_L, pitch_R, yaw_R; // eye rotations
 
-        private UnifiedExpressionsData unifiedExpressions;
-        private UnifiedEyeData unifiedEye;
-
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eye, bool lip)
@@ -198,10 +195,10 @@ namespace ALVRTrackingInterface
                 pitch_R = (180.0 / Math.PI) * pitch; // from radians
                 yaw_R = (180.0 / Math.PI) * yaw;
 
-                UpdateEye(ref UnifiedTrackingData.LatestExpressionData.LatestData.Eye, ref expressions);
-                UpdateExpressions(ref UnifiedTrackingData.LatestExpressionData.LatestData.Shapes, ref expressions);
+                UpdateEye(ref UnifiedTracking.AllData.LatestExpressionData.Eye, ref expressions);
+                UpdateExpressions(ref UnifiedTracking.AllData.LatestExpressionData.Shapes, ref expressions);
 
-                UnifiedTrackingData.LatestExpressionData.UpdateData();
+                UnifiedTracking.AllData.UpdateData();
             }
             catch (SocketException e)
             {
@@ -287,8 +284,8 @@ namespace ALVRTrackingInterface
             eye.Right.Openness = Math.Min(1, Math.Max(0, 1.1f - eyeClosedR * TrackingSensitivity.EyeLid));
 
             // As eye opens there is an issue flickering between eye wide and eye not fully open with the combined eye lid parameters. Need to reduce the eye widen value until openess is closer to value of 1. When not fully open will do constant value to reduce the eye widen.
-            float eyeWidenL = Math.Max(0, expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden - 3.0f * (1 - unifiedEye.Left.Openness));
-            float eyeWidenR = Math.Max(0, expressions[(int)FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden - 3.0f * (1 - unifiedEye.Right.Openness));
+            float eyeWidenL = Math.Max(0, expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden - 3.0f * (1 - eye.Left.Openness));
+            float eyeWidenR = Math.Max(0, expressions[(int)FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden - 3.0f * (1 - eye.Right.Openness));
 
             // Feedback eye widen to openess, this will help drive the openness value higher from eye widen values
             eye.Left.Openness += eyeWidenL;
@@ -369,7 +366,7 @@ namespace ALVRTrackingInterface
                 LookRight: expressions[(int)FBExpression.Eyes_Look_Right_L],
                 LookUp: expressions[(int)FBExpression.Eyes_Look_Up_L],
                 LookDown: expressions[(int)FBExpression.Eyes_Look_Down_L],
-                Openness: Math.Min(1, unifiedEye.Left.Openness)
+                Openness: Math.Min(1, eye.Left.Openness)
             );
 
             eye.Right = MakeEye
@@ -378,7 +375,7 @@ namespace ALVRTrackingInterface
                 LookRight: expressions[(int)FBExpression.Eyes_Look_Right_R],
                 LookUp: expressions[(int)FBExpression.Eyes_Look_Up_R],
                 LookDown: expressions[(int)FBExpression.Eyes_Look_Down_R],
-                Openness: Math.Min(1, unifiedEye.Right.Openness)
+                Openness: Math.Min(1, eye.Right.Openness)
             );
 
             eye.Combined = MakeEye
@@ -387,7 +384,7 @@ namespace ALVRTrackingInterface
                 LookRight: (expressions[(int)FBExpression.Eyes_Look_Right_L] + expressions[(int)FBExpression.Eyes_Look_Right_R]) / 2.0f,
                 LookUp: (expressions[(int)FBExpression.Eyes_Look_Up_L] + expressions[(int)FBExpression.Eyes_Look_Up_R]) / 2.0f,
                 LookDown: (expressions[(int)FBExpression.Eyes_Look_Down_L] + expressions[(int)FBExpression.Eyes_Look_Down_R]) / 2.0f,
-                Openness: Math.Min(1, (unifiedEye.Left.Openness + unifiedEye.Right.Openness) / 2.0f)
+                Openness: Math.Min(1, (eye.Left.Openness + eye.Right.Openness) / 2.0f)
             );
 
             // Eye dilation code, automated process maybe?
@@ -515,7 +512,7 @@ namespace ALVRTrackingInterface
 
             // Updating VRCFT
 
-            UnifiedTrackingData.LatestExpressionData.UpdateData();
+            UnifiedTracking.AllData.UpdateData();
         }
 
         private UnifiedSingleEyeData MakeEye(float LookLeft, float LookRight, float LookUp, float LookDown, float Openness)

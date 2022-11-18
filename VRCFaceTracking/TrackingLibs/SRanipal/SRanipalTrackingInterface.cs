@@ -51,19 +51,19 @@ namespace VRCFaceTracking.SRanipal
                         if (module.ModuleName == "EyeCameraDevice.dll")
                             _offset = module.BaseAddress + (_process.MainModule.FileVersionInfo.FileVersion == "1.3.2.0" ? 0x19190 : 0x19100);
                     
-                    UnifiedTrackingData.LatestExpressionData.EyeImageData.SupportsImage = true;
-                    UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageSize = (200, 100);
+                    UnifiedTracking.AllData.EyeImageData.SupportsImage = true;
+                    UnifiedTracking.AllData.EyeImageData.ImageSize = (200, 100);
                 }
             }
             
             if (lipEnabled)
             {
-                UnifiedTrackingData.LatestExpressionData.LipImageData.SupportsImage = true;
-                UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
-                UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData = new byte[UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x *
-                                                                       UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y];
-                lipData.image = Marshal.AllocCoTaskMem(UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x *
-                                                       UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x);
+                UnifiedTracking.AllData.LipImageData.SupportsImage = true;
+                UnifiedTracking.AllData.LipImageData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
+                UnifiedTracking.AllData.LipImageData.ImageData = new byte[UnifiedTracking.AllData.LipImageData.ImageSize.x *
+                                                                       UnifiedTracking.AllData.LipImageData.ImageSize.y];
+                lipData.image = Marshal.AllocCoTaskMem(UnifiedTracking.AllData.LipImageData.ImageSize.x *
+                                                       UnifiedTracking.AllData.LipImageData.ImageSize.x);
             }
 
             return (eyeEnabled, lipEnabled);
@@ -180,12 +180,12 @@ namespace VRCFaceTracking.SRanipal
         {
             var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
 
-            UpdateEyeParameters(ref UnifiedTrackingData.LatestExpressionData.LatestData, eyeData.verbose_data);
-            UpdateEyeExpressions(ref UnifiedTrackingData.LatestExpressionData.LatestData, eyeData.expression_data);
+            UpdateEyeParameters(ref UnifiedTracking.AllData.LatestExpressionData.Eye, eyeData.verbose_data);
+            UpdateEyeExpressions(ref UnifiedTracking.AllData.LatestExpressionData.Shapes, eyeData.expression_data);
 
-            UnifiedTrackingData.LatestExpressionData.UpdateData();
+            UnifiedTracking.AllData.UpdateData();
             
-            if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestExpressionData.EyeImageData.SupportsImage) return updateResult;
+            if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTracking.AllData.EyeImageData.SupportsImage) return updateResult;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
             var imageBytes = ReadMemory(_offset, 20000);
@@ -207,60 +207,60 @@ namespace VRCFaceTracking.SRanipal
             }
 
             // Write the image to the latest eye data
-            UnifiedTrackingData.LatestExpressionData.EyeImageData.ImageData = imageBytes;
+            UnifiedTracking.AllData.EyeImageData.ImageData = imageBytes;
 
             return updateResult;
         }
 
-        private void UpdateEyeParameters(ref UnifiedExpressionsData data, VerboseData external)
+        private void UpdateEyeParameters(ref UnifiedEyeData data, VerboseData external)
         {
-            data.Eye.Left.GazeNormalized = external.left.gaze_direction_normalized;
-            data.Eye.Right.GazeNormalized = external.right.gaze_direction_normalized;
+            data.Left.GazeNormalized = external.left.gaze_direction_normalized;
+            data.Right.GazeNormalized = external.right.gaze_direction_normalized;
 
-            data.Eye.Left.Openness = external.left.eye_openness;
-            data.Eye.Right.Openness = external.right.eye_openness;
+            data.Left.Openness = external.left.eye_openness;
+            data.Right.Openness = external.right.eye_openness;
 
-            data.Eye.Left.PupilDiameter_MM = external.left.pupil_diameter_mm;
-            data.Eye.Right.PupilDiameter_MM = external.right.pupil_diameter_mm;
+            data.Left.PupilDiameter_MM = external.left.pupil_diameter_mm;
+            data.Right.PupilDiameter_MM = external.right.pupil_diameter_mm;
         }
 
-        private void UpdateEyeExpressions(ref UnifiedExpressionsData data, EyeExpression external)
+        private void UpdateEyeExpressions(ref float[] data, EyeExpression external)
         {
-            data.Shapes[(int)UnifiedExpressions.EyeWideLeft] = external.left.eye_wide;
-            data.Shapes[(int)UnifiedExpressions.EyeWideRight] = external.right.eye_wide;
+            data[(int)UnifiedExpressions.EyeWideLeft] = external.left.eye_wide;
+            data[(int)UnifiedExpressions.EyeWideRight] = external.right.eye_wide;
 
-            data.Shapes[(int)UnifiedExpressions.EyeSquintLeft] = external.left.eye_squeeze;
-            data.Shapes[(int)UnifiedExpressions.EyeSquintRight] = external.right.eye_squeeze;
+            data[(int)UnifiedExpressions.EyeSquintLeft] = external.left.eye_squeeze;
+            data[(int)UnifiedExpressions.EyeSquintRight] = external.right.eye_squeeze;
 
             // Emulator expressions for Unified Expressions. These are essentially already baked into Legacy eye expressions (SRanipal)
 
             float browOuterOffset = 0.66f;
 
-            data.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft] = external.left.eye_wide;
-            data.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft] = external.left.eye_wide;
+            data[(int)UnifiedExpressions.BrowInnerUpLeft] = external.left.eye_wide;
+            data[(int)UnifiedExpressions.BrowOuterUpLeft] = external.left.eye_wide;
 
-            data.Shapes[(int)UnifiedExpressions.BrowInnerUpRight] = external.right.eye_wide;
-            data.Shapes[(int)UnifiedExpressions.BrowOuterUpRight] = external.right.eye_wide;
+            data[(int)UnifiedExpressions.BrowInnerUpRight] = external.right.eye_wide;
+            data[(int)UnifiedExpressions.BrowOuterUpRight] = external.right.eye_wide;
 
-            data.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft] = external.left.eye_squeeze;
-            data.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft] = external.left.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowInnerDownLeft] = external.left.eye_squeeze;
+            data[(int)UnifiedExpressions.BrowOuterDownLeft] = external.left.eye_squeeze * browOuterOffset;
 
-            data.Shapes[(int)UnifiedExpressions.BrowInnerDownRight] = external.right.eye_squeeze;
-            data.Shapes[(int)UnifiedExpressions.BrowOuterDownRight] = external.right.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowInnerDownRight] = external.right.eye_squeeze;
+            data[(int)UnifiedExpressions.BrowOuterDownRight] = external.right.eye_squeeze * browOuterOffset;
         }
 
         private Error UpdateMouth()
         {
             var updateResult = SRanipal_Lip_API.GetLipData_v2(ref lipData);
 
-            UpdateMouthExpressions(ref UnifiedTrackingData.LatestExpressionData.LatestData, lipData.prediction_data);
+            UpdateMouthExpressions(ref UnifiedTracking.AllData.LatestExpressionData, lipData.prediction_data);
 
-            UnifiedTrackingData.LatestExpressionData.UpdateData();
+            UnifiedTracking.AllData.UpdateData();
             
-            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestExpressionData.LipImageData.SupportsImage) return updateResult;
+            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTracking.AllData.LipImageData.SupportsImage) return updateResult;
             
-            Marshal.Copy(lipData.image, UnifiedTrackingData.LatestExpressionData.LipImageData.ImageData, 0, UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.x *
-                UnifiedTrackingData.LatestExpressionData.LipImageData.ImageSize.y);
+            Marshal.Copy(lipData.image, UnifiedTracking.AllData.LipImageData.ImageData, 0, UnifiedTracking.AllData.LipImageData.ImageSize.x *
+                UnifiedTracking.AllData.LipImageData.ImageSize.y);
 
             return updateResult;
         }
@@ -269,7 +269,7 @@ namespace VRCFaceTracking.SRanipal
         {
             unsafe
             {
-                // Direct Legacy map to SRanipal
+                // Direct Legacy map to SRanipal. Will remove later once Unified Expressions emulates SRanipal.
                 for (int i = 0; i < data.LegacyShapes.Length; i++)
                 {
                     data.LegacyShapes[i] = external.blend_shape_weight[i];

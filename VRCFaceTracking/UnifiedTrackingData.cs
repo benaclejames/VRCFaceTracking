@@ -9,10 +9,10 @@ namespace VRCFaceTracking
     /// <summary>
     /// Class that represents all Expression Tracking Data.
     /// </summary>
-    public class ExpressionTrackingData
+    public class UnifiedTrackingData
     {
         /// <summary>
-        /// Images sent from all modules.
+        /// Image data sent from all modules. May make into an enumerable structure for add-in support for more images.
         /// </summary>
         public Image EyeImageData = new Image();
         public Image LipImageData = new Image();
@@ -20,26 +20,26 @@ namespace VRCFaceTracking
         /// <summary>
         /// Latest Expression Data sent from all VRCFaceTracking modules.
         /// </summary>
-        public UnifiedExpressionsData LatestData = new UnifiedExpressionsData();
+        public UnifiedExpressionsData LatestExpressionData = new UnifiedExpressionsData();
 
         /// <summary>
         /// Internal Expression Data after being processed by VRCFaceTracking.
         /// </summary>
         // Internal VRCFT structure, used to drive the parameters internally.
-        private UnifiedExpressionsData UpdatedData = new UnifiedExpressionsData();
+        private UnifiedExpressionsData UpdatedExpressionData = new UnifiedExpressionsData();
 
         /// <summary>
-        /// Function to read the Internal Expression Data that was processesed by VRCFaceTracking.
+        /// Function that reads the Internal Expression Data that was processesed by VRCFaceTracking.
         /// </summary>
         /// <returns>Returns the processed Expression Data.</returns>
-        public UnifiedExpressionsData ReadInternal() => UpdatedData;
+        public UnifiedExpressionsData ReadInternal() => UpdatedExpressionData;
 
         /// <summary>
-        /// Updates the Internal Expression Data buffer with the Latest Expression Data
+        /// Updates the Internal Expression Data buffer with the Latest Expression Data.
         /// </summary>
         public void UpdateData() 
         {
-            UpdatedData = LatestData;
+            UpdatedExpressionData = LatestExpressionData;
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace VRCFaceTracking
     }
 
     /// <summary>
-    /// Structure that holds all data sent, used, and processed for use in VRCFaceTracking.
+    /// Structure that holds everything that VRCFaceTracking needs to take tracking data from modules and output them into formatted parameters.
     /// </summary>
-    public class UnifiedTrackingData
+    public static class UnifiedTracking
     {
         /// <summary>
         /// Version 1 (VRCFaceTracking SRanipal) of all accessible output parameters.
@@ -67,11 +67,11 @@ namespace VRCFaceTracking
         /// <summary>
         /// Central update action for all expression data to subscribe to.
         /// </summary>
-        public static Action<ExpressionTrackingData> OnUnifiedDataUpdated;
+        public static Action<UnifiedExpressionsData> OnUnifiedDataUpdated;
 
         /// <summary>
-        /// Accessible data that modules can interact with, and what VRCFaceTracking internally looks at for tracking data.
+        /// All data that modules can interact with, and what VRCFaceTracking internally looks at for getting data.
         /// </summary>
-        public static ExpressionTrackingData LatestExpressionData = new ExpressionTrackingData();
+        public static UnifiedTrackingData AllData = new UnifiedTrackingData();
     }
 }

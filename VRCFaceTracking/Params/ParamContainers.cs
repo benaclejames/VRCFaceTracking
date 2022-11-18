@@ -7,10 +7,10 @@ namespace VRCFaceTracking.Params
 {
     public class FloatParameter : OSCParams.FloatBaseParam, IParameter
     {
-        public FloatParameter(Func<ExpressionTrackingData, float?> getValueFunc,
+        public FloatParameter(Func<UnifiedExpressionsData, float?> getValueFunc,
             string paramName)
             : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
             {
                 //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
                 var value = getValueFunc.Invoke(expression);
@@ -23,9 +23,9 @@ namespace VRCFaceTracking.Params
 
     public class XYParameter : XYParam, IParameter
     {
-        public XYParameter(Func<ExpressionTrackingData, Vector2?> getValueFunc, string xParamName, string yParamName)
+        public XYParameter(Func<UnifiedExpressionsData, Vector2?> getValueFunc, string xParamName, string yParamName)
             : base(new OSCParams.FloatBaseParam(xParamName), new OSCParams.FloatBaseParam(yParamName)) =>
-            UnifiedTrackingData.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
             {
                 var value = getValueFunc.Invoke(expression);
                 if (value.HasValue)
@@ -39,9 +39,9 @@ namespace VRCFaceTracking.Params
 
     public class BoolParameter : OSCParams.BoolBaseParam, IParameter
     {
-        public BoolParameter(Func<ExpressionTrackingData, bool?> getValueFunc,
+        public BoolParameter(Func<UnifiedExpressionsData, bool?> getValueFunc,
             string paramName) : base(paramName) =>
-            UnifiedTrackingData.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
             {
                 var value = getValueFunc.Invoke(expression);
                 if (value.HasValue)
@@ -56,10 +56,10 @@ namespace VRCFaceTracking.Params
 
     public class BinaryParameter : OSCParams.BinaryBaseParameter, IParameter
     {
-        public BinaryParameter(Func<ExpressionTrackingData, float?> getValueFunc,
+        public BinaryParameter(Func<UnifiedExpressionsData, float?> getValueFunc,
             string paramName) : base(paramName)
         {
-            UnifiedTrackingData.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
             {
                 var value = getValueFunc.Invoke(expression);
                 if (value.HasValue)
@@ -84,7 +84,7 @@ namespace VRCFaceTracking.Params
         private readonly IParameter[] _parameter;
         private readonly string Name;
 
-        public EParam(Func<ExpressionTrackingData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
+        public EParam(Func<UnifiedExpressionsData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
             var paramLiterals = new List<IParameter>
             {

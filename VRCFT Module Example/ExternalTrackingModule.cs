@@ -34,17 +34,17 @@ namespace VRCFT_Module_Example
     {
 
         // This function parses the external module's full-data data into UnifiedExpressions' eye structure.
-        public static void UpdateEye(ref UnifiedExpressionsData data, ExampleExternalTrackingDataStruct external)
+        public static void UpdateEye(ref UnifiedEyeData data, ExampleExternalTrackingDataStruct external)
         {
-            data.Eye.Right.Openness = external.left_eye.eye_lid_openness;
-            data.Eye.Right.Openness = external.right_eye.eye_lid_openness;
+            data.Right.Openness = external.left_eye.eye_lid_openness;
+            data.Right.Openness = external.right_eye.eye_lid_openness;
 
-            data.Eye.Left.GazeNormalized = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
-            data.Eye.Right.GazeNormalized = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
+            data.Left.GazeNormalized = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
+            data.Right.GazeNormalized = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
 
             // This will tell VRCFaceTracking if the eye data is accurate/usable or not.
-            data.Eye.Left.Valid = external.left_eye.eye_validity;
-            data.Eye.Right.Valid = external.right_eye.eye_validity;
+            data.Left.Valid = external.left_eye.eye_validity;
+            data.Right.Valid = external.right_eye.eye_validity;
         }
 
         // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
@@ -63,7 +63,7 @@ namespace VRCFT_Module_Example
     
     public class ExternalExtTrackingModule : ExtTrackingModule
     {
-        // Example of the data coming from the tracking interface.
+        // Example of data coming from the outside tracking interface.
         ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
         bool external_tracking_state;
@@ -100,16 +100,16 @@ namespace VRCFT_Module_Example
             if (Status.EyeState == ModuleState.Active)
             {
                 Console.WriteLine("Eye data is being utilized.");
-                TrackingData.UpdateEye(ref UnifiedTrackingData.LatestExpressionData.LatestData, external_eye);
+                TrackingData.UpdateEye(ref UnifiedTracking.AllData.LatestExpressionData.Eye, external_eye);
             }
             if (Status.ExpressionState == ModuleState.Active)
             {
                 Console.WriteLine("Expression data is being utilized.");
-                TrackingData.UpdateExpressions(ref UnifiedTrackingData.LatestExpressionData.LatestData, external_expressions);
+                TrackingData.UpdateExpressions(ref UnifiedTracking.AllData.LatestExpressionData, external_expressions);
             }
 
             // Updates the parameter internally in VRCFT
-            UnifiedTrackingData.LatestExpressionData.UpdateData();
+            UnifiedTracking.AllData.UpdateData();
         }
 
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.

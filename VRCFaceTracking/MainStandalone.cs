@@ -91,17 +91,16 @@ namespace VRCFaceTracking
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            // Currently doesn't work due to uncompensated data structure changes
-            _relevantParams = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams = UnifiedTrackingData.AllParameters_v2.SelectMany(p => p.GetBase())
+                _relevantParams = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
 
                 // Reset calibration on parameter data.
                 //UnifiedTrackingData.LatestEyeData.ResetThresholds();
-                UnifiedTrackingData.LatestExpressionData.ResetCalibration();
+                UnifiedTracking.AllData.ResetCalibration();
 
                 _relevantParamsCount = _relevantParams.Count();
                 Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + "parameters loaded.");
@@ -116,10 +115,12 @@ namespace VRCFaceTracking
                 if (_relevantParamsCount <= 0)
                     continue;
 
-                UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestExpressionData);
+                UnifiedTracking.OnUnifiedDataUpdated.Invoke(UnifiedTracking.AllData.ReadInternal());
 
                 // Testing data transfer.
-                Logger.Msg(UnifiedTrackingData.LatestExpressionData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
+                Logger.Msg("Raw Eye Wide Data: " + UnifiedTracking.AllData.LatestExpressionData.Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
+                Logger.Msg("Transformed Eye Wide Shape: " + UnifiedTracking.AllData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
+                Logger.Msg("Eye Wide Message: " + UnifiedTracking.AllData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
 
                 var messages = ConstructMessages(_relevantParams);
                 while (messages.Count > 0)
