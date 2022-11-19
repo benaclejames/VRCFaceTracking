@@ -133,13 +133,16 @@ namespace VRCFaceTracking
         {
             Logger.Msg("Finding and initializing runtimes...");
 
+            // Get a list of external modules
+            IEnumerable<Type> externalModuleSet = LoadExternalModules();
+            
             // Get a list of our own built-in modules
-            var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
+            IEnumerable<Type> stockModuleSet = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
 
             // Concat both our own modules and the external ones
-            trackingModules = trackingModules.Union(LoadExternalModules());
-            
+            var trackingModules = externalModuleSet.Union(stockModuleSet);
+           
             foreach (var module in trackingModules)
             {
                 Logger.Msg("Initializing module: " + module.Name);
