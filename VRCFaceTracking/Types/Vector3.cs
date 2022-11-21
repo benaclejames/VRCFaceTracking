@@ -17,7 +17,7 @@ namespace VRCFaceTracking.Params
         }
         
         // Make a method that multiplies the vector by a scalar
-        public Vector3 Invert()
+        public Vector3 FlipXCoordinates()
         {
             x *= -1;
             

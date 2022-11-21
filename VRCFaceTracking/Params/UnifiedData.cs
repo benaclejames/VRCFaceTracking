@@ -42,7 +42,7 @@
         /// Shapes[(int)UnifiedExpression.JawOpen] = JawOpen;
         /// </code>
         /// </remarks>
-        public float[] Shapes = new float[127];
+        public float[] Shapes = new float[(int)UnifiedExpressions.Max + 1];
 
         /// <summary>
         /// Struct that holds all VRCFaceTracking SRanipal data. 
@@ -54,6 +54,6 @@
         /// LegacyShapes[(int)SRanipal_LipShape_V2.JawOpen] = JawOpen;
         /// </code>
         /// </remarks>
-        public float[] LegacyShapes = new float[38];
+        public float[] LegacyShapes = new float[(int)UnifiedExpressions.Max + 1];
     }
 }

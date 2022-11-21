@@ -25,7 +25,6 @@ namespace VRCFaceTracking
         /// <summary>
         /// Internal Expression Data after being processed by VRCFaceTracking.
         /// </summary>
-        // Internal VRCFT structure, used to drive the parameters internally.
         private UnifiedExpressionsData UpdatedExpressionData = new UnifiedExpressionsData();
 
         /// <summary>
@@ -37,13 +36,10 @@ namespace VRCFaceTracking
         /// <summary>
         /// Updates the Internal Expression Data buffer with the Latest Expression Data.
         /// </summary>
-        public void UpdateData()
-        {
-            UpdatedExpressionData = LatestExpressionData;
-        }
+        public void UpdateData() => UpdatedExpressionData = UnifiedExpressionsMutator.MutateData(LatestExpressionData);
 
         /// <summary>
-        /// TODO: Resets all calibration and automated normalization done within VRCFaceTracking.
+        /// TODO: Resets all calibration and automated normalization done within UnifiedExpressionsMutator.
         /// </summary>
         public void ResetCalibration() { }
     }
@@ -57,7 +53,7 @@ namespace VRCFaceTracking
         /// Version 1 (VRCFaceTracking SRanipal) of all accessible output parameters.
         /// </summary>
         /// <remarks>These parameters are going to be unsupported in the near future, and will be directly emulated by Version 2 (Unified Expressions) parameters.</remarks>
-        public static readonly IParameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters.ToArray();
+        public static readonly IParameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters;
 
         /// <summary>
         /// Version 2 (Unified Expression) of all accessible output parameters.

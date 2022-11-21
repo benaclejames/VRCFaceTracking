@@ -117,11 +117,6 @@ namespace VRCFaceTracking
 
                 UnifiedTracking.OnUnifiedDataUpdated.Invoke(UnifiedTracking.AllData.ReadInternal());
 
-                // Testing data transfer.
-                Logger.Msg("Raw Eye Wide Data: " + UnifiedTracking.AllData.LatestExpressionData.Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
-                Logger.Msg("Transformed Eye Wide Shape: " + UnifiedTracking.AllData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
-                Logger.Msg("Eye Wide Message: " + UnifiedTracking.AllData.ReadInternal().Shapes[(int)UnifiedExpressions.EyeWideLeft].ToString());
-
                 var messages = ConstructMessages(_relevantParams);
                 while (messages.Count > 0)
                 {

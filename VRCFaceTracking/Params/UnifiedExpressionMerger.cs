@@ -44,7 +44,7 @@ namespace VRCFaceTracking.Params
             new EParam(exp => (exp.Eye.Right.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] * 0.5f), "RightEyeOpenExpanded"),
 
             new EParam(exp => 
-            (exp.Eye.Right.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] * 0.5f) + (exp.Eye.Left.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] * 0.5f) / 2.0f
+            (exp.Eye.Right.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight] * 0.5f) + (exp.Eye.Left.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] * 0.5f) / 2.0f
             , "EyeOpenExpanded"),
             
             #endregion
@@ -69,8 +69,5 @@ namespace VRCFaceTracking.Params
             ((UnifiedExpressions[])Enum.GetValues(typeof(UnifiedExpressions))).ToList().Select(shape =>
                new EParam(exp => exp.Shapes[(int)shape],
                    shape.ToString(), 0.0f));
-
-        private static float NormalizeFloat(float minInput, float maxInput, float minOutput, float maxOutput,
-            float value) => (maxOutput - minOutput) / (maxInput - minInput) * (value - maxInput) + maxOutput;
     }
 }

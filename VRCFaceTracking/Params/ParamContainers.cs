@@ -86,17 +86,25 @@ namespace VRCFaceTracking.Params
 
         public EParam(Func<UnifiedExpressionsData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
-            var paramLiterals = new List<IParameter>
-            {
-                new BoolParameter((expression) => getValueFunc.Invoke(expression) < minBoolThreshold, paramName),
-                new FloatParameter(getValueFunc, paramName),
-            };
-            
             if (!skipBinaryParamCreation)
-             paramLiterals.Add(new BinaryParameter(getValueFunc, paramName));
+            {
+                _parameter = new IParameter[]
+                {
+                    new BoolParameter((expression) => getValueFunc.Invoke(expression) < minBoolThreshold, paramName),
+                    new FloatParameter(getValueFunc, paramName),
+                };
+            }
+            else
+            {
+                _parameter = new IParameter[]
+                {
+                    new BoolParameter((expression) => getValueFunc.Invoke(expression) < minBoolThreshold, paramName),
+                    new FloatParameter(getValueFunc, paramName),
+                    new BinaryParameter(getValueFunc, paramName)
+                };
+            }
 
             Name = paramName;
-            _parameter = paramLiterals.ToArray();
         }
 
         OSCParams.BaseParam[] IParameter.GetBase() => 
