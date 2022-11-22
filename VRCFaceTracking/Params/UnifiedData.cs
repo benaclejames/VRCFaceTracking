@@ -50,17 +50,5 @@
         /// </code>
         /// </remarks>
         public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
-
-        /// <summary>
-        /// Struct that holds all VRCFaceTracking SRanipal data. 
-        /// </summary>
-        /// <remarks>
-        /// Example of useage:
-        /// <code>
-        /// // Update JawOpen shape in Expression Data.
-        /// LegacyShapes[(int)SRanipal_LipShape_V2.JawOpen] = JawOpen;
-        /// </code>
-        /// </remarks>
-        public float[] LegacyShapes = new float[(int)UnifiedExpressions.Max + 1];
     }
 }

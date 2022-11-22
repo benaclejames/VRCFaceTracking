@@ -100,7 +100,7 @@ namespace VRCFaceTracking
 
                 // Reset calibration on parameter data.
                 //UnifiedTrackingData.LatestEyeData.ResetThresholds();
-                UnifiedTracking.AllData.ResetCalibration();
+                UnifiedExpressionsMutator.ResetCalibration();
 
                 _relevantParamsCount = _relevantParams.Count();
                 Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + "parameters loaded.");
