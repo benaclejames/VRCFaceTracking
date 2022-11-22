@@ -395,65 +395,65 @@ namespace ALVRTrackingInterface
         }
 
         // Thank you @adjerry on the VRCFT discord for these conversions! https://docs.google.com/spreadsheets/d/118jo960co3Mgw8eREFVBsaJ7z0GtKNr52IB4Bz99VTA/edit#gid=0
-        private void UpdateExpressions(ref float[] unifiedExpressions, ref float[] expressions)
+        private void UpdateExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref float[] expressions)
         {
 
             // Mapping to existing parameters
 
             #region Eye Expressions Set
 
-            unifiedExpressions[(int)UnifiedExpressions.EyeWideLeft] = Math.Min(1, expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden);
-            unifiedExpressions[(int)UnifiedExpressions.EyeWideRight] = Math.Min(1, expressions[(int)FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden);
+            unifiedExpressions[(int)UnifiedExpressions.EyeWideLeft].weight = Math.Min(1, expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden);
+            unifiedExpressions[(int)UnifiedExpressions.EyeWideRight].weight = Math.Min(1, expressions[(int)FBExpression.Upper_Lid_Raiser_R] * TrackingSensitivity.EyeWiden);
 
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft] = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint);
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight] = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint);
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint);
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].weight = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint);
 
             #endregion
 
             #region Base Face Expressions Set
 
             // Mouth Ape Shape is combination of shapes. The shape by itself and is combination with Lips Towards and Lip Corner Depressors.              
-            unifiedExpressions[(int)UnifiedExpressions.MouthApeShape] = Math.Min(1, expressions[(int)FBExpression.Lips_Toward] * TrackingSensitivity.MouthApeShape + expressions[(int)FBExpression.Lips_Toward] * (expressions[(int)FBExpression.Lip_Corner_Depressor_L] + expressions[(int)FBExpression.Lip_Corner_Depressor_R]) * 0.9f);
+            unifiedExpressions[(int)UnifiedExpressions.MouthApeShape].weight = Math.Min(1, expressions[(int)FBExpression.Lips_Toward] * TrackingSensitivity.MouthApeShape + expressions[(int)FBExpression.Lips_Toward] * (expressions[(int)FBExpression.Lip_Corner_Depressor_L] + expressions[(int)FBExpression.Lip_Corner_Depressor_R]) * 0.9f);
             // Subtract ApeShapeShape as Jaw Open will go towards zero as ape shape increase.
-            unifiedExpressions[(int)UnifiedExpressions.JawOpen] = Math.Min(1, Math.Min(1, expressions[(int)FBExpression.Jaw_Drop] * TrackingSensitivity.JawOpen) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape] * 0.9f);
+            unifiedExpressions[(int)UnifiedExpressions.JawOpen].weight = Math.Min(1, Math.Min(1, expressions[(int)FBExpression.Jaw_Drop] * TrackingSensitivity.JawOpen) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape].weight * 0.9f);
             
             //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.JawDrop] = Math.Min(1, expressions[(int)FBExpression.Jaw_Drop] * TrackingSensitivity.JawDrop); //TESTING MOUTH APE CONTROL - NON COMPENSATED VALUE
 
-            unifiedExpressions[(int)UnifiedExpressions.JawLeft] = Math.Min(1, expressions[(int)FBExpression.Jaw_Sideways_Left] * TrackingSensitivity.JawX);
-            unifiedExpressions[(int)UnifiedExpressions.JawRight] = Math.Min(1, expressions[(int)FBExpression.Jaw_Sideways_Right] * TrackingSensitivity.JawX);
-            unifiedExpressions[(int)UnifiedExpressions.JawForward] = Math.Min(1, expressions[(int)FBExpression.Jaw_Thrust] * TrackingSensitivity.JawForward);
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_R] * TrackingSensitivity.LipPucker);
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_L] * TrackingSensitivity.LipPucker);
+            unifiedExpressions[(int)UnifiedExpressions.JawLeft].weight = Math.Min(1, expressions[(int)FBExpression.Jaw_Sideways_Left] * TrackingSensitivity.JawX);
+            unifiedExpressions[(int)UnifiedExpressions.JawRight].weight = Math.Min(1, expressions[(int)FBExpression.Jaw_Sideways_Right] * TrackingSensitivity.JawX);
+            unifiedExpressions[(int)UnifiedExpressions.JawForward].weight = Math.Min(1, expressions[(int)FBExpression.Jaw_Thrust] * TrackingSensitivity.JawForward);
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_R] * TrackingSensitivity.LipPucker);
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_L] * TrackingSensitivity.LipPucker);
 
             // Cheek puff can be triggered by low values of lip pucker (around 0.1), subtract cheek puff with mouth pout values.
-            unifiedExpressions[(int)UnifiedExpressions.CheekPuffLeft] = Math.Min(1, expressions[(int)FBExpression.Cheek_Puff_L] * TrackingSensitivity.CheekPuff);
-            unifiedExpressions[(int)UnifiedExpressions.CheekPuffRight] = Math.Min(1, expressions[(int)FBExpression.Cheek_Puff_R] * TrackingSensitivity.CheekPuff);
+            unifiedExpressions[(int)UnifiedExpressions.CheekPuffLeft].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Puff_L] * TrackingSensitivity.CheekPuff);
+            unifiedExpressions[(int)UnifiedExpressions.CheekPuffRight].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Puff_R] * TrackingSensitivity.CheekPuff);
             
-            unifiedExpressions[(int)UnifiedExpressions.CheekSuckLeft] = Math.Min(1, expressions[(int)FBExpression.Cheek_Suck_L] * TrackingSensitivity.CheekSuck);
-            unifiedExpressions[(int)UnifiedExpressions.CheekSuckRight] = Math.Min(1, expressions[(int)FBExpression.Cheek_Suck_R] * TrackingSensitivity.CheekSuck);
-            unifiedExpressions[(int)UnifiedExpressions.MouthTopLeft] = Math.Min(1, expressions[(int)FBExpression.Mouth_Left] * TrackingSensitivity.MouthX);
-            unifiedExpressions[(int)UnifiedExpressions.MouthBottomLeft] = Math.Min(1, expressions[(int)FBExpression.Mouth_Left] * TrackingSensitivity.MouthX);
-            unifiedExpressions[(int)UnifiedExpressions.MouthTopRight] = Math.Min(1, expressions[(int)FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
-            unifiedExpressions[(int)UnifiedExpressions.MouthBottomRight] = Math.Min(1, expressions[(int)FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
-            unifiedExpressions[(int)UnifiedExpressions.MouthSmileLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Puller_L] * TrackingSensitivity.MouthSmile) ;
-            unifiedExpressions[(int)UnifiedExpressions.MouthSmileRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Puller_R] * TrackingSensitivity.MouthSmile);
+            unifiedExpressions[(int)UnifiedExpressions.CheekSuckLeft].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Suck_L] * TrackingSensitivity.CheekSuck);
+            unifiedExpressions[(int)UnifiedExpressions.CheekSuckRight].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Suck_R] * TrackingSensitivity.CheekSuck);
+            unifiedExpressions[(int)UnifiedExpressions.MouthTopLeft].weight = Math.Min(1, expressions[(int)FBExpression.Mouth_Left] * TrackingSensitivity.MouthX);
+            unifiedExpressions[(int)UnifiedExpressions.MouthBottomLeft].weight = Math.Min(1, expressions[(int)FBExpression.Mouth_Left] * TrackingSensitivity.MouthX);
+            unifiedExpressions[(int)UnifiedExpressions.MouthTopRight].weight = Math.Min(1, expressions[(int)FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
+            unifiedExpressions[(int)UnifiedExpressions.MouthBottomRight].weight = Math.Min(1, expressions[(int)FBExpression.Mouth_Right] * TrackingSensitivity.MouthX);
+            unifiedExpressions[(int)UnifiedExpressions.MouthSmileLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Puller_L] * TrackingSensitivity.MouthSmile) ;
+            unifiedExpressions[(int)UnifiedExpressions.MouthSmileRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Puller_R] * TrackingSensitivity.MouthSmile);
 
             // Lip corner depressors are part of mouth ape shape, will subtract the current value of mouthApeShape from lip corner depressor to compensate
-            unifiedExpressions[(int)UnifiedExpressions.MouthFrownLeft] = Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Depressor_L] * TrackingSensitivity.MouthFrown) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape] * 1.0f);
-            unifiedExpressions[(int)UnifiedExpressions.MouthFrownRight] = Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Depressor_R] * TrackingSensitivity.MouthFrown) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape] * 1.0f);
+            unifiedExpressions[(int)UnifiedExpressions.MouthFrownLeft].weight = Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Depressor_L] * TrackingSensitivity.MouthFrown) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape].weight * 1.0f);
+            unifiedExpressions[(int)UnifiedExpressions.MouthFrownRight].weight = Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Lip_Corner_Depressor_R] * TrackingSensitivity.MouthFrown) - unifiedExpressions[(int)UnifiedExpressions.MouthApeShape].weight * 1.0f);
             
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LT] * TrackingSensitivity.LipFunnelTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RT] * TrackingSensitivity.LipFunnelTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LB] * TrackingSensitivity.LipFunnelBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RB] * TrackingSensitivity.LipFunnelBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LT] * TrackingSensitivity.LipSuckTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RT] * TrackingSensitivity.LipSuckTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LB] * TrackingSensitivity.LipSuckBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RB] * TrackingSensitivity.LipSuckBottom);
-            unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownLeft] = Math.Min(1, expressions[(int)FBExpression.Lower_Lip_Depressor_L] * TrackingSensitivity.MouthLowerDown);
-            unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownRight] = Math.Min(1, expressions[(int)FBExpression.Lower_Lip_Depressor_R] * TrackingSensitivity.MouthLowerDown);
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpLeft] = Math.Min(1, expressions[(int)FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.MouthUpperUp);
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpRight] = Math.Min(1, expressions[(int)FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.MouthUpperUp);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LT] * TrackingSensitivity.LipFunnelTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RT] * TrackingSensitivity.LipFunnelTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LB] * TrackingSensitivity.LipFunnelBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RB] * TrackingSensitivity.LipFunnelBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LT] * TrackingSensitivity.LipSuckTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RT] * TrackingSensitivity.LipSuckTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LB] * TrackingSensitivity.LipSuckBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RB] * TrackingSensitivity.LipSuckBottom);
+            unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lower_Lip_Depressor_L] * TrackingSensitivity.MouthLowerDown);
+            unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownRight].weight = Math.Min(1, expressions[(int)FBExpression.Lower_Lip_Depressor_R] * TrackingSensitivity.MouthLowerDown);
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpLeft].weight = Math.Min(1, expressions[(int)FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.MouthUpperUp);
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpRight].weight = Math.Min(1, expressions[(int)FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.MouthUpperUp);
 
             #endregion
 
@@ -461,50 +461,50 @@ namespace ALVRTrackingInterface
 
             #region Brow Expressions Set
 
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpLeft] = Math.Min(1, expressions[(int)FBExpression.Inner_Brow_Raiser_L] * TrackingSensitivity.BrowInnerUp);
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpRight] = Math.Min(1, expressions[(int)FBExpression.Inner_Brow_Raiser_R] * TrackingSensitivity.BrowInnerUp);
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpLeft] = Math.Min(1, expressions[(int)FBExpression.Outer_Brow_Raiser_L] * TrackingSensitivity.BrowOuterUp);
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpRight] = Math.Min(1, expressions[(int)FBExpression.Outer_Brow_Raiser_R] * TrackingSensitivity.BrowOuterUp);
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownLeft] = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown);
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownLeft] = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown);
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownRight] = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown);
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownRight] = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown);
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpLeft].weight = Math.Min(1, expressions[(int)FBExpression.Inner_Brow_Raiser_L] * TrackingSensitivity.BrowInnerUp);
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpRight].weight = Math.Min(1, expressions[(int)FBExpression.Inner_Brow_Raiser_R] * TrackingSensitivity.BrowInnerUp);
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpLeft].weight = Math.Min(1, expressions[(int)FBExpression.Outer_Brow_Raiser_L] * TrackingSensitivity.BrowOuterUp);
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpRight].weight = Math.Min(1, expressions[(int)FBExpression.Outer_Brow_Raiser_R] * TrackingSensitivity.BrowOuterUp);
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownLeft].weight = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown);
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownLeft].weight = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown);
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownRight].weight = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown);
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownRight].weight = Math.Min(1, expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown);
 
             #endregion
 
             #region Additonal Eye Tracking Expressions Set
 
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft] = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint);
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight] = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint);
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint);
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].weight = Math.Min(1, expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint);
 
             #endregion
 
             #region Additional Face Tracking Expressions Set  
 
-            unifiedExpressions[(int)UnifiedExpressions.CheekSquintLeft] = Math.Min(1, expressions[(int)FBExpression.Cheek_Raiser_L] * TrackingSensitivity.CheekRaiser);
-            unifiedExpressions[(int)UnifiedExpressions.CheekSquintRight] = Math.Min(1, expressions[(int)FBExpression.Cheek_Raiser_R] * TrackingSensitivity.CheekRaiser);
-            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper] = Math.Min(1, expressions[(int)FBExpression.Chin_Raiser_B] * TrackingSensitivity.ChinRaiserBottom);
-            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower] = Math.Min(1, expressions[(int)FBExpression.Chin_Raiser_T] * TrackingSensitivity.ChinRaiserTop);
-            unifiedExpressions[(int)UnifiedExpressions.MouthDimpleLeft] = Math.Min(1, expressions[(int)FBExpression.Dimpler_L] * TrackingSensitivity.MouthDimpler);
-            unifiedExpressions[(int)UnifiedExpressions.MouthDimpleRight] = Math.Min(1, expressions[(int)FBExpression.Dimpler_R] * TrackingSensitivity.MouthDimpler);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LB] * TrackingSensitivity.LipFunnelBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RB] * TrackingSensitivity.LipFunnelBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LT] * TrackingSensitivity.LipFunnelTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RT] * TrackingSensitivity.LipFunnelTop);
-            unifiedExpressions[(int)UnifiedExpressions.MouthPressLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Pressor_L] * TrackingSensitivity.MouthPress);  
-            unifiedExpressions[(int)UnifiedExpressions.MouthPressRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Pressor_R] * TrackingSensitivity.MouthPress);
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_L] * TrackingSensitivity.LipPucker);
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_R] * TrackingSensitivity.LipPucker);
-            unifiedExpressions[(int)UnifiedExpressions.MouthStretchLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Stretcher_L] * TrackingSensitivity.MouthStretch);
-            unifiedExpressions[(int)UnifiedExpressions.MouthStretchRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Stretcher_R] * TrackingSensitivity.MouthStretch);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LB] * TrackingSensitivity.LipSuckBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RB] * TrackingSensitivity.LipSuckBottom);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RT] * TrackingSensitivity.LipSuckTop);
-            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LT] * TrackingSensitivity.LipSuckTop);
-            unifiedExpressions[(int)UnifiedExpressions.MouthTightenerLeft] = Math.Min(1, expressions[(int)FBExpression.Lip_Tightener_L] * TrackingSensitivity.MouthTightener);
-            unifiedExpressions[(int)UnifiedExpressions.MouthTightenerRight] = Math.Min(1, expressions[(int)FBExpression.Lip_Tightener_R] * TrackingSensitivity.MouthTightener);            
-            unifiedExpressions[(int)UnifiedExpressions.NoseSneerLeft] = Math.Min(1, expressions[(int)FBExpression.Nose_Wrinkler_L] * TrackingSensitivity.NoseSneer);
-            unifiedExpressions[(int)UnifiedExpressions.NoseSneerRight] = Math.Min(1, expressions[(int)FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer);
+            unifiedExpressions[(int)UnifiedExpressions.CheekSquintLeft].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Raiser_L] * TrackingSensitivity.CheekRaiser);
+            unifiedExpressions[(int)UnifiedExpressions.CheekSquintRight].weight = Math.Min(1, expressions[(int)FBExpression.Cheek_Raiser_R] * TrackingSensitivity.CheekRaiser);
+            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper].weight = Math.Min(1, expressions[(int)FBExpression.Chin_Raiser_B] * TrackingSensitivity.ChinRaiserBottom);
+            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower].weight = Math.Min(1, expressions[(int)FBExpression.Chin_Raiser_T] * TrackingSensitivity.ChinRaiserTop);
+            unifiedExpressions[(int)UnifiedExpressions.MouthDimpleLeft].weight = Math.Min(1, expressions[(int)FBExpression.Dimpler_L] * TrackingSensitivity.MouthDimpler);
+            unifiedExpressions[(int)UnifiedExpressions.MouthDimpleRight].weight = Math.Min(1, expressions[(int)FBExpression.Dimpler_R] * TrackingSensitivity.MouthDimpler);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LB] * TrackingSensitivity.LipFunnelBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RB] * TrackingSensitivity.LipFunnelBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_LT] * TrackingSensitivity.LipFunnelTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipFunnelTopRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Funneler_RT] * TrackingSensitivity.LipFunnelTop);
+            unifiedExpressions[(int)UnifiedExpressions.MouthPressLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pressor_L] * TrackingSensitivity.MouthPress);  
+            unifiedExpressions[(int)UnifiedExpressions.MouthPressRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pressor_R] * TrackingSensitivity.MouthPress);
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_L] * TrackingSensitivity.LipPucker);
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Pucker_R] * TrackingSensitivity.LipPucker);
+            unifiedExpressions[(int)UnifiedExpressions.MouthStretchLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Stretcher_L] * TrackingSensitivity.MouthStretch);
+            unifiedExpressions[(int)UnifiedExpressions.MouthStretchRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Stretcher_R] * TrackingSensitivity.MouthStretch);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LB] * TrackingSensitivity.LipSuckBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckBottomRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RB] * TrackingSensitivity.LipSuckBottom);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_RT] * TrackingSensitivity.LipSuckTop);
+            unifiedExpressions[(int)UnifiedExpressions.LipSuckTopLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Suck_LT] * TrackingSensitivity.LipSuckTop);
+            unifiedExpressions[(int)UnifiedExpressions.MouthTightenerLeft].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Tightener_L] * TrackingSensitivity.MouthTightener);
+            unifiedExpressions[(int)UnifiedExpressions.MouthTightenerRight].weight = Math.Min(1, expressions[(int)FBExpression.Lip_Tightener_R] * TrackingSensitivity.MouthTightener);            
+            unifiedExpressions[(int)UnifiedExpressions.NoseSneerLeft].weight = Math.Min(1, expressions[(int)FBExpression.Nose_Wrinkler_L] * TrackingSensitivity.NoseSneer);
+            unifiedExpressions[(int)UnifiedExpressions.NoseSneerRight].weight = Math.Min(1, expressions[(int)FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer);
 
             //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthClosed] = Math.Min(1, (expressions[(int)FBExpression.Lips_Toward]) * TrackingSensitivity.MouthTowards);
 

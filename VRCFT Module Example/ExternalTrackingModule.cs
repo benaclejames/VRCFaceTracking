@@ -51,13 +51,8 @@ namespace VRCFT_Module_Example
         public static void UpdateExpressions(ref UnifiedExpressionsData data, ExampleExternalTrackingDataExpressions external)
         {
             // Map to Shapes from the External structure the UnifiedExpressionData structure to access UnifiedExpression shapes.
-            data.Shapes[(int)UnifiedExpressions.JawOpen] = external.jaw_open;
-            data.Shapes[(int)UnifiedExpressions.TongueOut] = external.tongue_out;
-
-            // Map to LegacyShapes within the UnifiedExpressionData to access SRanipal shapes. This may become obsolete.
-            data.LegacyShapes[(int)SRanipal_LipShape_v2.JawOpen] = external.jaw_open;
-            data.LegacyShapes[(int)SRanipal_LipShape_v2.TongueLongStep1] = external.tongue_out;
-            data.LegacyShapes[(int)SRanipal_LipShape_v2.TongueLongStep2] = external.tongue_out;
+            data.Shapes[(int)UnifiedExpressions.JawOpen].weight = external.jaw_open;
+            data.Shapes[(int)UnifiedExpressions.TongueOut].weight = external.tongue_out;
         }
     }
     
@@ -108,7 +103,7 @@ namespace VRCFT_Module_Example
                 TrackingData.UpdateExpressions(ref UnifiedTracking.AllData.LatestExpressionData, external_expressions);
             }
 
-            // Updates the parameter internally in VRCFT
+            // Updates the parameters internally to the latest shape data
             UnifiedTracking.AllData.UpdateData();
         }
 
