@@ -22,6 +22,13 @@
         public UnifiedSingleEyeData Left, Right, Combined;
     }
 
+    public struct UnifiedExpressionShape
+    {
+        public float weight;
+        public float calibrationMultiplier;
+        public float smoothingMultiplier;
+    }
+
     /// <summary>
     /// Struct that represents the data accessible by modules and parameters used with VRCFaceTracking.
     /// </summary>
@@ -42,7 +49,7 @@
         /// Shapes[(int)UnifiedExpression.JawOpen] = JawOpen;
         /// </code>
         /// </remarks>
-        public float[] Shapes = new float[(int)UnifiedExpressions.Max + 1];
+        public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
 
         /// <summary>
         /// Struct that holds all VRCFaceTracking SRanipal data. 

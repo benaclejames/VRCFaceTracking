@@ -139,15 +139,12 @@ namespace VRCFaceTracking.Params.LipMerging
         public static readonly IParameter[] AllLipParameters =
             GetAllLipShapes().Union(GetOptimizedLipParameters()).ToArray();
 
-        public static bool IsLipShapeName(string name) => MergedShapes.ContainsKey(name) || Enum.TryParse(name, out SRanipal_LipShape_v2 shape);
-
         private static IEnumerable<EParam> GetOptimizedLipParameters() => MergedShapes
             .Select(shape => new EParam(exp => 
-                shape.Value.GetBlendedLipShape(exp.LegacyShapes), shape.Key, 0.0f));
+                shape.Value.GetBlendedLipShape(exp), shape.Key, 0.0f));
 
         private static IEnumerable<EParam> GetAllLipShapes() =>
-            ((SRanipal_LipShape_v2[]) Enum.GetValues(typeof(SRanipal_LipShape_v2))).ToList().Select(shape =>
-                new EParam(exp => exp.LegacyShapes[(int)shape],
-                    shape.ToString(), 0.0f));
+            ((SRanipal_LipShape_v2[])Enum.GetValues(typeof(SRanipal_LipShape_v2))).ToList().Select(shape =>
+               new EParam(exp => UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(shape, exp), shape.ToString(), 0.0f));
     }
 }

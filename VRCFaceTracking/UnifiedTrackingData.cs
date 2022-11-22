@@ -37,11 +37,6 @@ namespace VRCFaceTracking
         /// Updates the Internal Expression Data buffer with the Latest Expression Data.
         /// </summary>
         public void UpdateData() => UpdatedExpressionData = UnifiedExpressionsMutator.MutateData(LatestExpressionData);
-
-        /// <summary>
-        /// TODO: Resets all calibration and automated normalization done within UnifiedExpressionsMutator.
-        /// </summary>
-        public void ResetCalibration() { }
     }
 
     /// <summary>
@@ -53,12 +48,12 @@ namespace VRCFaceTracking
         /// Version 1 (VRCFaceTracking SRanipal) of all accessible output parameters.
         /// </summary>
         /// <remarks>These parameters are going to be unsupported in the near future, and will be directly emulated by Version 2 (Unified Expressions) parameters.</remarks>
-        public static readonly IParameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters;
+        public static readonly IParameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters.Union(EyeTrackingParams.ParameterList).ToArray();
 
         /// <summary>
-        /// Version 2 (Unified Expression) of all accessible output parameters.
+        /// Version 2 (Unified Expressions) of all accessible output parameters.
         /// </summary>
-        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionMerger.ExpressionParameters.Union(EyeTrackingParams.ParameterList).ToArray();
+        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsMerger.ExpressionParameters;
 
         /// <summary>
         /// Central update action for all expression data to subscribe to.

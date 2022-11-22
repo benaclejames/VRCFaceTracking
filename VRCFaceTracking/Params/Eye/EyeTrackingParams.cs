@@ -13,19 +13,19 @@
             
             #region Widen
 
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > exp.Shapes[(int)UnifiedExpressions.EyeWideRight] 
-                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] 
-                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight], "EyesWiden"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft], "LeftEyeWiden"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight], "RightEyeWiden"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight
+                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight, "EyesWiden"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight, "LeftEyeWiden"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight, "RightEyeWiden"),
             
             #endregion
             
             #region Squeeze
             
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight], "EyesSqueeze"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft], "LeftEyeSqueeze"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight], "RightEyeSqueeze"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight, "EyesSqueeze"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight, "LeftEyeSqueeze"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight, "RightEyeSqueeze"),
             
             #endregion
             
@@ -48,22 +48,22 @@
             
             new EParam(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideLeft]);
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight);
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Left.Openness);
             }, "LeftEyeLidExpanded", 0.5f, true),
 
             new EParam(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideRight]); 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight); 
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Right.Openness);
             }, "RightEyeLidExpanded", 0.5f, true),
 
             new EParam(exp =>
             {
-                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f); 
+                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f); 
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Combined.Openness);
             }, "CombinedEyeLidExpanded", 0.5f, true),
 
@@ -73,28 +73,28 @@
 
             new EParam(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideLeft]); 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] * -1;     
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight); 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight * -1;     
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Left.Openness);
             } ,"LeftEyeLidExpandedSqueeze", 0.5f, true),
 
             new EParam(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideRight]); 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] * -1;        
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight); 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight * -1;        
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Right.Openness);
             } ,"RightEyeLidExpandedSqueeze", 0.5f, true),
 
             new EParam(exp =>
             {
-                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
-                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f); 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] * -1;      
+                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f > 0)
+                    return NormalizeFloat(0, 1, 0.8f, 1, (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f); 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight * -1;      
                 return NormalizeFloat(0, 1, 0, 0.8f, exp.Eye.Combined.Openness);
             } ,"CombinedEyeLidExpandedSqueeze", 0.5f, true),
 
@@ -104,22 +104,22 @@
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft];
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight;
                 return exp.Eye.Left.Openness;
             }, "LeftEyeLidExpanded"),
 
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight];
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight;
                 return exp.Eye.Right.Openness;
             }, "RightEyeLidExpanded"),
 
             new BinaryParameter(exp =>
             {
-                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f > 0)
-                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight]) / 2.0f;
+                if ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f > 0)
+                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight) / 2.0f;
                 return exp.Eye.Combined.Openness;
             }, "CombinedEyeLidExpanded"),
 
@@ -129,28 +129,28 @@
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft]; 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft];
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight; 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight;
                 return exp.Eye.Left.Openness;
             }, "LeftEyeLidExpandedSqueeze"),
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight]; 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight];
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight; 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight;
                 return exp.Eye.Right.Openness;
             }, "RightEyeLidExpandedSqueeze"),
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight] / 2.0f > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] + exp.Shapes[(int)UnifiedExpressions.EyeWideRight] / 2.0f; 
-                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] / 2.0f > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] / 2.0f;
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight / 2.0f > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight / 2.0f; 
+                if (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight / 2.0f > 0)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight / 2.0f;
                 return exp.Eye.Combined.Openness;
             }, "CombinedEyeLidExpandedSqueeze"),
             
@@ -160,18 +160,18 @@
 
             // These parameters are used to distinguish when EyeLidExpanded / EyeLidExpandedSqueeze
             // is returning a value as a Widen or Squeeze. Intended for the Bool or Binary param variant.
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0, "LeftEyeWidenToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0, "RightEyeWidenToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > exp.Shapes[(int)UnifiedExpressions.EyeWideRight] 
-                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft] > 0
-                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight] > 0
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0, "LeftEyeWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0, "RightEyeWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight > 0
+                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight > 0
                 , "EyesWidenToggle"),
 
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight]
-                ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft] > 0
-                : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight] > 0
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight > 0, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight > 0, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].weight > 0
+                : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].weight > 0
                 , "EyesSquintToggle"),
 
             #endregion
