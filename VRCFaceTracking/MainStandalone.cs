@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Resources;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows;
 using VRCFaceTracking.Assets.UI;
@@ -25,7 +27,58 @@ using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking
 {
-    public static class MainStandalone
+
+  public class Globals
+  {
+    private static string _ip, _opMode;
+    private static int _inPort, _outPort;
+    public static string ip
+    {
+      get
+      {
+        return _ip;
+      }
+      set
+      {
+        _ip = value;
+      }
+    }
+    public static string opMode
+    {
+      get
+      {
+        return _opMode;
+      }
+      set
+      {
+        _opMode = value;
+      }
+    }
+    public static int inPort
+    {
+      get
+      {
+        return _inPort;
+      }
+      set
+      {
+        _inPort = value;
+      }
+    }
+    public static int outPort
+    {
+      get
+      {
+        return _outPort;
+      }
+      set
+      {
+        _outPort = value;
+      }
+    }
+
+  }
+  public static class MainStandalone
     {
         public static OscMain OscMain;
         
@@ -39,9 +92,9 @@ namespace VRCFaceTracking
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
 
-        private static string _ip = "127.0.0.1";
+        private static string _ip = "127.0.0.1", _opMode = "auto";
         private static int _inPort = 9001, _outPort = 9000;
-
+       
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
         public static void Teardown()
@@ -63,25 +116,85 @@ namespace VRCFaceTracking
             
             // Parse Arguments
 
-            (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
+            (_outPort, _ip, _inPort, _opMode) = ArgsHandler.HandleArgs();
+
+            // if auto opMode is active (default behaviour), detect running app and start in correct mode 
+            if (_opMode == "auto")
+            {
+              Logger.Msg("Operating mode auto detecting.");
+              bool _noset1 = false;
+              bool _noset2 = false;
+              if (CVR.IsCVRRunning())
+              {
+                Logger.Msg("ChilloutVR running switching opMode to cvr");
+                _opMode = "cvr";
+              }
+              else
+              {
+                _noset1 |= true;
+              }
+              if (VRChat.IsVRChatRunning())
+              {
+                Logger.Msg("VRChat running switching opMode to vrc");
+                _opMode = "vrc";
+              }
+              else
+              {
+                _noset2 |= true;
+              }
+
+              if( _noset1&& _noset2)
+              {
+                Logger.Error(
+                      "Neither VRChat or ChilloutVR detected as running.\n" +
+                      "opMode falling back to vrc");
+                _opMode = "vrc";
+              }
+            }
+
             Logger.Msg("InPort = " + _inPort + " , OutPort = " + _outPort + " , target IP = " + _ip);
-            
+            Logger.Msg("Operating Mode = " + _opMode);
+            // setup global values
+            Globals.inPort = _inPort;
+            Globals.outPort = _outPort;
+            Globals.ip = _ip;
+            Globals.opMode = _opMode;
+
+
             // Load dependencies
             DependencyManager.Load();
 
-            // Ensure OSC is enabled
-            if (VRChat.ForceEnableOsc())  // If osc was previously not enabled
+            if (Globals.opMode == "vrc")
             {
+              // Ensure OSC is enabled
+              if (VRChat.ForceEnableOsc())  // If osc was previously not enabled
+              {
                 Logger.Warning("VRCFT detected OSC was disabled and automatically enabled it.");
                 // If we were launched after VRChat
                 if (VRChat.IsVRChatRunning())
-                    Logger.Error(
-                        "However, VRChat was running while this change was made.\n" + 
-                        "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
+                  Logger.Error(
+                      "However, VRChat was running while this change was made.\n" +
+                      "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
+              }
+              // Warn about mode if CVR detected running (as mode is currenty vrc)
+              if (CVR.IsCVRRunning())
+              {
+                Logger.Error("Operating mode is currenly VRChat but ChilloutVR is currently running. \n " +
+                  "you may want to set opMode to cvr");
+              }
             }
-            
-            // Initialize Tracking Runtimes
-            UnifiedLibManager.Initialize();
+            if (Globals.opMode == "cvr")
+            {
+              if (VRChat.IsVRChatRunning())
+              {
+                Logger.Error(
+                    "Operating mode is currenly set to ChilloutVR but VRChat is currently running. \n " +
+                    "you may want to set opMode to vrc");
+              }
+            }
+
+      // Initialize Tracking Runtimes
+      UnifiedLibManager.Initialize();
 
             // Initialize Locals
             OscMain = new OscMain();

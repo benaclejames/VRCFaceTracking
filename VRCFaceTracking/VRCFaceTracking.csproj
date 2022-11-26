@@ -66,6 +66,7 @@
     <Compile Include="Params\XYParam.cs" />
     <Compile Include="SDK\ExtTrackingModule.cs" />
     <Compile Include="VRChat.cs" />
+    <Compile Include="CVR.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeData.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_EyeDataType_v2.cs" />
     <Compile Include="TrackingLibs\SRanipal\Eye\SRanipal_Eye_API.cs" />

@@ -6,10 +6,10 @@ namespace VRCFaceTracking
     public static class ArgsHandler
     {
         
-        public static (int SendPort, string IP, int RecievePort) HandleArgs()
+        public static (int SendPort, string IP, int RecievePort, string opMode) HandleArgs()
         {
             Logger.Msg("Loading Defaults");
-            (int SendPort, string IP, int RecievePort) = (9000, "127.0.0.1", 9001);
+            (int SendPort, string IP, int RecievePort, string opMode) = (9000, "127.0.0.1", 9001, "auto");
 
             foreach (var arg in Environment.GetCommandLineArgs())
             {
@@ -17,6 +17,12 @@ namespace VRCFaceTracking
                 {
                    Logger.Msg("To set custom OSC port/IP config please use the following");
                    Logger.Msg("--osc=<OutPort>:<IP>:<InPort>");
+                   Logger.Msg("To set operating mode please use the following");
+                   Logger.Msg("--mode=vrc or --mode=cvr");
+                }
+                if (arg.StartsWith("--mode"))
+                {
+                  opMode = arg;
                 }
                 if (arg.StartsWith("--osc="))
                 {
@@ -65,7 +71,7 @@ namespace VRCFaceTracking
                 }
             }
 
-            return (SendPort, IP, RecievePort);
+            return (SendPort, IP, RecievePort, opMode);
         }
     }
 }
