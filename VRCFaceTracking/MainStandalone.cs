@@ -92,8 +92,8 @@ namespace VRCFaceTracking
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
 
-        private static string _ip = "127.0.0.1", _opMode = "auto";
-        private static int _inPort = 9001, _outPort = 9000;
+        private static string _ip, _opMode;
+        private static int _inPort, _outPort;
        
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
@@ -118,7 +118,7 @@ namespace VRCFaceTracking
 
             (_outPort, _ip, _inPort, _opMode) = ArgsHandler.HandleArgs();
 
-            // if auto opMode is active (default behaviour), detect running app and start in correct mode 
+            // if auto opMode is active (default behavior), detect running app and start in correct mode 
             if (_opMode == "auto")
             {
               Logger.Msg("Operating mode auto detecting.");
@@ -152,17 +152,18 @@ namespace VRCFaceTracking
               }
             }
 
-            Logger.Msg("InPort = " + _inPort + " , OutPort = " + _outPort + " , target IP = " + _ip);
-            Logger.Msg("Operating Mode = " + _opMode);
+
             // setup global values
             Globals.inPort = _inPort;
             Globals.outPort = _outPort;
             Globals.ip = _ip;
             Globals.opMode = _opMode;
+            Logger.Msg("InPort = " + Globals.inPort + " , OutPort = " + Globals.outPort + " , target IP = " + Globals.ip);
+            Logger.Msg("Operating Mode = '" + Globals.opMode + "'");
 
 
-            // Load dependencies
-            DependencyManager.Load();
+      // Load dependencies
+      DependencyManager.Load();
 
             if (Globals.opMode == "vrc")
             {
@@ -176,10 +177,10 @@ namespace VRCFaceTracking
                       "However, VRChat was running while this change was made.\n" +
                       "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
               }
-              // Warn about mode if CVR detected running (as mode is currenty vrc)
+              // Warn about mode if CVR detected running (as mode is currently vrc)
               if (CVR.IsCVRRunning())
               {
-                Logger.Error("Operating mode is currenly VRChat but ChilloutVR is currently running. \n " +
+                Logger.Error("Operating mode is currently VRChat but ChilloutVR is currently running. \n " +
                   "you may want to set opMode to cvr");
               }
             }
@@ -188,7 +189,7 @@ namespace VRCFaceTracking
               if (VRChat.IsVRChatRunning())
               {
                 Logger.Error(
-                    "Operating mode is currenly set to ChilloutVR but VRChat is currently running. \n " +
+                    "Operating mode is currently set to ChilloutVR but VRChat is currently running. \n " +
                     "you may want to set opMode to vrc");
               }
             }
