@@ -38,7 +38,8 @@ namespace VRCFaceTracking
 
         public static void ParseNewAvatar(string newId)
         {
-            
+            Logger.Msg("-------------------------------------------------");
+            Logger.Msg("avatar id = " + newId);
             //check what mode we are in
             if(Globals.opMode == "vrc")
             {
@@ -50,8 +51,7 @@ namespace VRCFaceTracking
               Logger.Msg("Loading Avatar from ChilloutVR");
               _oscDir = CVR.CVROSCDirectory;
             }
-
-            
+                    
             AvatarConfigSpec avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(_oscDir))
             {
