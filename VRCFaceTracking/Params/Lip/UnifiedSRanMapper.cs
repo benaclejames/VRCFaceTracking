@@ -5,13 +5,13 @@ namespace VRCFaceTracking.Params.Lip
 {
     class UnifiedSRanMapper
     {
-        private static Dictionary<SRanipal_LipShape_v2, Func<UnifiedExpressionsData, float?>> ShapeMap = new Dictionary<SRanipal_LipShape_v2, Func<UnifiedExpressionsData, float?>>
+        private static Dictionary<SRanipal_LipShape_v2, Func<UnifiedExpressionsData, float>> ShapeMap = new Dictionary<SRanipal_LipShape_v2, Func<UnifiedExpressionsData, float>>
         {
             { SRanipal_LipShape_v2.JawRight, exp => exp.Shapes[(int)UnifiedExpressions.JawRight].weight },
-            { SRanipal_LipShape_v2.JawLeft, exp => exp.Shapes[(int)UnifiedExpressions.JawOpen].weight },
+            { SRanipal_LipShape_v2.JawLeft, exp => exp.Shapes[(int)UnifiedExpressions.JawLeft].weight },
             { SRanipal_LipShape_v2.JawForward, exp => exp.Shapes[(int)UnifiedExpressions.JawForward].weight },
-            { SRanipal_LipShape_v2.JawOpen, exp => exp.Shapes[(int)UnifiedExpressions.JawOpen].weight },
-            { SRanipal_LipShape_v2.MouthApeShape, exp => exp.Shapes[(int)UnifiedExpressions.MouthApeShape].weight },
+            { SRanipal_LipShape_v2.JawOpen, exp => exp.Shapes[(int)UnifiedExpressions.JawOpen].weight - exp.Shapes[(int)UnifiedExpressions.MouthClosed].weight },
+            { SRanipal_LipShape_v2.MouthApeShape, exp => exp.Shapes[(int)UnifiedExpressions.MouthClosed].weight},
 
             { SRanipal_LipShape_v2.MouthUpperRight, exp => exp.Shapes[(int)UnifiedExpressions.MouthTopRight].weight},
             { SRanipal_LipShape_v2.MouthUpperLeft, exp => exp.Shapes[(int)UnifiedExpressions.MouthTopLeft].weight },
@@ -42,8 +42,8 @@ namespace VRCFaceTracking.Params.Lip
 
             { SRanipal_LipShape_v2.MouthLowerOverlay, exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserLower].weight},
 
-            { SRanipal_LipShape_v2.TongueLongStep1, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].weight / 2.0f},
-            { SRanipal_LipShape_v2.TongueLongStep2, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].weight / 2.0f},
+            { SRanipal_LipShape_v2.TongueLongStep1, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].weight},
+            { SRanipal_LipShape_v2.TongueLongStep2, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].weight},
 
             { SRanipal_LipShape_v2.TongueDown, exp => exp.Shapes[(int)UnifiedExpressions.TongueDown].weight},
             { SRanipal_LipShape_v2.TongueUp, exp => exp.Shapes[(int)UnifiedExpressions.TongueUp].weight},
@@ -61,6 +61,6 @@ namespace VRCFaceTracking.Params.Lip
         };
 
         public static float GetSRanipalShapeFromUnifiedShapes(SRanipal_LipShape_v2 sr_shape, UnifiedExpressionsData expData) =>
-            (float)ShapeMap[sr_shape].Invoke(expData);
+            ShapeMap[sr_shape].Invoke(expData);
     }
 }

@@ -12,14 +12,6 @@ namespace VRCFaceTracking
     /// </summary>
     public static class UnifiedExpressionsMutator
     {
-        public static void Populate<T>(this T[] arr, T value)
-        {
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = value;
-            }
-        }
-
         static float SimpleLerp(float input, float previousInput, float value)
         {
             return input * (1 - value) + previousInput * value;
@@ -56,7 +48,7 @@ namespace VRCFaceTracking
              */
 
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
-                SimpleLerp(data.Shapes[i].weight, UnifiedTracking.AllData.ReadInternal().Shapes[i].weight, 0.25f);
+                SimpleLerp(data.Shapes[i].weight, UnifiedTracking.AllData.ReadInternal().Shapes[i].weight, data.Shapes[i].smoothingMultiplier);
         }
 
         /// <summary>

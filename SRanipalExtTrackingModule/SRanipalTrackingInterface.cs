@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking;
 using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.Params;
 
-namespace VRCFaceTracking.SRanipal
+namespace SRanipalExtTrackingInterface
 {
     public class SRanipalExtTrackingInterface : ExtTrackingModule
     {
@@ -20,16 +22,17 @@ namespace VRCFaceTracking.SRanipal
         
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
-        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eye, bool lip)
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize()
         {
+            // Look for SRanipal assemblies here.
+            Directory.SetCurrentDirectory(Utils.PersistentDataDirectory + "/CustomLibs/ModuleLibs");
+
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
-            if (eye)
-                // Only try to init if we're actually using the only headset that supports SRanipal eye tracking
-                eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
-            
-            if (lip)
-                lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            // Only try to init if we're actually using the only headset that supports SRanipal eye tracking
+            eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+
+            lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
@@ -73,6 +76,7 @@ namespace VRCFaceTracking.SRanipal
         {
             bool eyeEnabled = false, lipEnabled = false;
             
+
             if (eyeError == Error.WORK)
                 eyeEnabled = true;
 
@@ -271,11 +275,11 @@ namespace VRCFaceTracking.SRanipal
             {
                 #region Direct Jaw
 
-                data.Shapes[(int)UnifiedExpressions.JawOpen].weight = external.blend_shape_weight[(int)LipShape_v2.JawOpen];
+                data.Shapes[(int)UnifiedExpressions.JawOpen].weight = external.blend_shape_weight[(int)LipShape_v2.JawOpen] - external.blend_shape_weight[(int)LipShape_v2.MouthApeShape];
                 data.Shapes[(int)UnifiedExpressions.JawLeft].weight = external.blend_shape_weight[(int)LipShape_v2.JawLeft];
                 data.Shapes[(int)UnifiedExpressions.JawRight].weight = external.blend_shape_weight[(int)LipShape_v2.JawRight];
                 data.Shapes[(int)UnifiedExpressions.JawForward].weight = external.blend_shape_weight[(int)LipShape_v2.JawForward];
-                data.Shapes[(int)UnifiedExpressions.MouthApeShape].weight = external.blend_shape_weight[(int)LipShape_v2.MouthApeShape];
+                data.Shapes[(int)UnifiedExpressions.MouthClosed].weight = external.blend_shape_weight[(int)LipShape_v2.MouthApeShape];
 
                 #endregion
 

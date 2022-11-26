@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -31,7 +34,7 @@ namespace VRCFaceTracking.Assets.UI
             Show();
             WindowState = WindowState.Normal;
         }
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -55,9 +58,13 @@ namespace VRCFaceTracking.Assets.UI
                 new MenuItem("Exit", (sender, args) => MainStandalone.Teardown()),
                 new MenuItem("Show", ShowWindow)
             });
-            
+
+            // List box containing all selectable modules that implement ExtTrackingModule.
+            moduleListBox.ItemsSource = UnifiedLibManager.GetModuleList();
+
             // Is this running as admin?
             // If not, disable the re-int button
+            /*
             if (!Utils.HasAdmin)
             {
                 // Apparently, windows form buttons don't allow for text wrapping
@@ -66,6 +73,7 @@ namespace VRCFaceTracking.Assets.UI
                 ReinitializeButton.FontSize = 10f;
                 ReinitializeButton.IsEnabled = false;
             }
+            */
 
             UnifiedLibManager.OnTrackingStateUpdate += (eye, lip) =>
                 Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLogo(eye, lip)));
@@ -116,7 +124,7 @@ namespace VRCFaceTracking.Assets.UI
             }
             
             ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.AllData.EyeImageData.ImageSize.x, 
-                UnifiedTracking.AllData.EyeImageData.ImageSize.y), UnifiedTracking.AllData.EyeImageData.ImageData, UnifiedTracking.AllData.EyeImageData.ImageSize.x, 0);
+                UnifiedTracking.AllData.EyeImageData.ImageSize.y), UnifiedTracking.AllData.EyeImageData.ImageData, 800, 0);
             
             // Set the WPF image name EyeImage 
             EyeImage.Source = bitmap;
@@ -131,7 +139,8 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Reinitializing...");
+            Logger.Msg("Initializing selected modules in order of selection.");
+
             UnifiedLibManager.Initialize();
         }
 
@@ -173,6 +182,13 @@ namespace VRCFaceTracking.Assets.UI
         {
             IsEyePageVisible = TabController.SelectedIndex == 1;
             IsLipPageVisible = TabController.SelectedIndex == 2;
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            List<Type> moduleType = ((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList();
+
+            UnifiedLibManager.RequestModules(moduleType);
         }
     }
 }

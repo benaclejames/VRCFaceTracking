@@ -77,7 +77,7 @@
         JawRight,
         JawForward,
 
-        MouthApeShape, // Map like SRanipal's MouthApeShape
+        MouthClosed, // Map like SRanipal's MouthApeShape
 
         #endregion
 
@@ -136,7 +136,7 @@
     /// Represents the type of Legacy Shape data being sent by UnifiedExpressionData, in the form of enumerated SRanipal shapes.
     /// </summary>
     /// <remarks>
-    /// This enum is not intended to be used directly by modules in the final iteration, and instead will be used as a compatibility layer for making the new Unified system backwards compatible with older avatars. May be removed at a later date.
+    /// This enum is not intended to be used directly by modules in the final iteration, and instead will be used as a compatibility layer for making the new Unified system backwards compatible with older VRCFT avatars.
     /// </remarks>
     public enum SRanipal_LipShape_v2
     {

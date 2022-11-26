@@ -11,7 +11,7 @@ namespace VRCFaceTracking
         public (ModuleState EyeState, ModuleState ExpressionState) Status = (ModuleState.Uninitialized,
             ModuleState.Uninitialized);
 
-        public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eye, bool expression);
+        public abstract (bool eyeSuccess, bool expressionSuccess) Initialize();
 
         public abstract Action GetUpdateThreadFunc();
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
-
-namespace VRCFaceTracking.Params
+﻿namespace VRCFaceTracking.Params
 {
     /// <summary>
     /// Struct that represents a single eye.

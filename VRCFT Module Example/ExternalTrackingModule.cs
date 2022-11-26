@@ -62,14 +62,19 @@ namespace VRCFT_Module_Example
         ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
         bool external_tracking_state;
+        (bool, bool) moduleState;
 
         // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
-        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eye, bool exp)
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize()
         {
-            Console.WriteLine("Initializing inside external module");
-            return (true, false);
+            Logger.Msg("Initializing inside external module");
+
+            // Gets the library manager's tracking state to let the module know if it can initialize into an eye or expression module.
+            // This is courtesy; the manager will handle overlap between modules loaded in-order.
+
+            return (true, true);
         }
 
         // This will be run in the tracking thread. This is exposed so you can control when and if the tracking data is updated down to the lowest level.
@@ -77,9 +82,10 @@ namespace VRCFT_Module_Example
         {
             return () =>
             {
-                while (external_tracking_state)
+                while (true)
                 {
-                    Update();
+                    if (external_tracking_state)
+                        Update();
 
                     // Have the update function work in-tandem with your tracking's update
                     Thread.Sleep(10);
@@ -90,16 +96,16 @@ namespace VRCFT_Module_Example
         // The update function needs to be defined separately in case the user is running with the --vrcft-nothread launch parameter
         public void Update()
         {
-            Console.WriteLine("Updating inside external module.");
+            Logger.Msg("Updating inside external module.");
 
             if (Status.EyeState == ModuleState.Active)
             {
-                Console.WriteLine("Eye data is being utilized.");
+                Logger.Msg("Eye data is being utilized.");
                 TrackingData.UpdateEye(ref UnifiedTracking.AllData.LatestExpressionData.Eye, external_eye);
             }
             if (Status.ExpressionState == ModuleState.Active)
             {
-                Console.WriteLine("Expression data is being utilized.");
+                Logger.Msg("Expression data is being utilized.");
                 TrackingData.UpdateExpressions(ref UnifiedTracking.AllData.LatestExpressionData, external_expressions);
             }
 
@@ -110,7 +116,7 @@ namespace VRCFT_Module_Example
         // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
         public override void Teardown()
         {
-            Console.WriteLine("Teardown");
+            Logger.Msg("Teardown");
         }
     }
 }

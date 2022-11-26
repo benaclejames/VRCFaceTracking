@@ -1,9 +1,12 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Documents;
 
 namespace VRCFaceTracking
 {
@@ -23,36 +26,39 @@ namespace VRCFaceTracking
         #region Statuses
         public static ModuleState EyeStatus
         {
-            get => _eyeModule?.Status.EyeState ?? ModuleState.Uninitialized;
+            get => _loadedEyeModule?.Status.EyeState ?? ModuleState.Uninitialized;
             set
             {
-                if (_eyeModule != null)
-                    _eyeModule.Status.EyeState = value;
+                if (_loadedEyeModule != null)
+                    _loadedEyeModule.Status.EyeState = value;
                 OnTrackingStateUpdate.Invoke(value, ExpressionStatus);
             }
         }
 
         public static ModuleState ExpressionStatus
         {
-            get => _expressionModule?.Status.ExpressionState ?? ModuleState.Uninitialized;
+            get => _loadedExpressionModule?.Status.ExpressionState ?? ModuleState.Uninitialized;
             set
             {
-                if (_expressionModule != null)
-                    _expressionModule.Status.ExpressionState = value;
+                if (_loadedExpressionModule != null)
+                    _loadedExpressionModule.Status.ExpressionState = value;
                 OnTrackingStateUpdate.Invoke(EyeStatus, value);
             }
         }
         #endregion
 
         #region Modules
-        private static ExtTrackingModule _eyeModule, _expressionModule;
+        private static List<Type> _allModules;
+        private static List<Type> _requestedModules = null;
+        private static ExtTrackingModule _loadedEyeModule;
+        private static ExtTrackingModule _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
         #endregion
         
         private static Thread _initializeWorker;
 
-        public static void Initialize(bool eye = true, bool expression = true)
+        public static void Initialize()
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
             
@@ -61,12 +67,30 @@ namespace VRCFaceTracking
             {
                 // Kill lingering threads
                 TeardownAllAndReset();
-                
-                // Init
-                FindAndInitRuntimes(eye, expression);
+
+                // Load all available modules in CustomLibs
+                _allModules = LoadExternalModules();
+
+                // Attempt to initialize the requested runtime.
+                InitRequestedRuntimes(_requestedModules);
             });
             Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
+        }
+
+        public static void LoadRequestedModules()
+        {
+            Initialize();
+        }
+
+        public static void RequestModules(List<Type> moduleTypes)
+        {
+            _requestedModules = moduleTypes;
+        }
+
+        public static List<Type> GetModuleList()
+        {
+            return _allModules;
         }
 
         private static List<Type> LoadExternalModules()
@@ -129,31 +153,29 @@ namespace VRCFaceTracking
             thread.Start();
         }
 
-        private static void FindAndInitRuntimes(bool eye = true, bool expression = true)
+        private static void InitRequestedRuntimes(List<Type> moduleType)
         {
-            Logger.Msg("Finding and initializing runtimes...");
+            Logger.Msg("Initializing runtimes...");
 
-            // Get a list of our own built-in modules
-            var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
+            if (moduleType == null)
+            {
+                Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
+                return;
+            }
 
-            // Concat both our own modules and the external ones
-            trackingModules = trackingModules.Union(LoadExternalModules());
-            
-            foreach (var module in trackingModules)
+            foreach (Type module in moduleType)
             {
                 Logger.Msg("Initializing module: " + module.Name);
                 // Create module
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 
-                // If there is still a need for a module with eye or expression tracking and this module supports the current need, try initialize it
-                if (EyeStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsEye ||
-                    ExpressionStatus == ModuleState.Uninitialized && moduleObj.Supported.SupportsExpressions)
+                // Attempt to load up modules
+                if (moduleObj.Supported.SupportsEye || moduleObj.Supported.SupportsExpressions)
                 {
                     bool eyeSuccess, expressionSuccess;
                     try
                     {
-                        (eyeSuccess, expressionSuccess) = moduleObj.Initialize(eye, expression);
+                        (eyeSuccess, expressionSuccess) = moduleObj.Initialize();
                     }
                     catch(MissingMethodException)
                     {
@@ -167,17 +189,34 @@ namespace VRCFaceTracking
                         continue;
                     }
                     
-                    // If eyeSuccess or expressionSuccess was true, set the status to active
-                    if (eyeSuccess && _eyeModule == null)
+                    // If eyeSuccess is true, set the eye status to active and load the eye module slot.
+                    if (eyeSuccess && _loadedEyeModule == null)
                     {
-                        _eyeModule = moduleObj;
+                        _loadedEyeModule = moduleObj;
                         EyeStatus = ModuleState.Active;
                         EnsureModuleThreadStarted(moduleObj);
                     }
 
-                    if (expressionSuccess && _expressionModule == null)
+                    // If module is already loaded, initialize teardown and load up the requested module from the UI.
+                    if (eyeSuccess && _loadedEyeModule != null)
                     {
-                        _expressionModule = moduleObj;
+                        _loadedEyeModule = moduleObj;
+                        EyeStatus = ModuleState.Active;
+                        EnsureModuleThreadStarted(moduleObj);
+                    }
+
+                    // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot.
+                    if (expressionSuccess && _loadedExpressionModule == null)
+                    {
+                        _loadedExpressionModule = moduleObj;
+                        ExpressionStatus = ModuleState.Active;
+                        EnsureModuleThreadStarted(moduleObj);
+                    }
+
+                    // If module is already loaded, initialize teardown and load up the requested module from the UI.
+                    if (expressionSuccess && _loadedExpressionModule != null)
+                    {
+                        _loadedExpressionModule = moduleObj;
                         ExpressionStatus = ModuleState.Active;
                         EnsureModuleThreadStarted(moduleObj);
                     }
@@ -187,17 +226,11 @@ namespace VRCFaceTracking
                     break;    // Keep enumerating over all modules until we find ones we can use
             }
 
-            if (eye)
-            {
-                if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _eyeModule);
-                else Logger.Warning("Eye Tracking will be unavailable for this session.");
-            }
+            if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _loadedEyeModule);
+            else Logger.Warning("Eye Tracking will be unavailable for this session.");
 
-            if (expression)
-            {
-                if (ExpressionStatus != ModuleState.Uninitialized) Logger.Msg("Expression Tracking Initialized via " +  _expressionModule);
-                else Logger.Warning("Expression Tracking will be unavailable for this session.");
-            }
+            if (ExpressionStatus != ModuleState.Uninitialized) Logger.Msg("Expression Tracking Initialized via " +  _loadedExpressionModule);
+            else Logger.Warning("Expression Tracking will be unavailable for this session.");
         }
 
         // Signal all active modules to gracefully shut down their respective runtimes
@@ -215,8 +248,8 @@ namespace VRCFaceTracking
             EyeStatus = ModuleState.Uninitialized;
             ExpressionStatus = ModuleState.Uninitialized;
 
-            _eyeModule = null;
-            _expressionModule = null;
+            _loadedEyeModule = null;
+            _loadedExpressionModule = null;
         }
     }
 }

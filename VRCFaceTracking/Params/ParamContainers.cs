@@ -86,7 +86,7 @@ namespace VRCFaceTracking.Params
 
         public EParam(Func<UnifiedExpressionsData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
-            if (!skipBinaryParamCreation)
+            if (skipBinaryParamCreation)
             {
                 _parameter = new IParameter[]
                 {
