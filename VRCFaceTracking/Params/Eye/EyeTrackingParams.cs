@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace VRCFaceTracking.Params.Eye
+﻿namespace VRCFaceTracking.Params.Eye
 {
     public static class EyeTrackingParams
     {
-        public static readonly List<IParameter> ParameterList = new List<IParameter>
-        {
+        public static readonly IParameter[] ParameterList = {
             #region XYParams
             
             new XYParameter(v2 => v2.Combined.Look, "EyesX", "EyesY"),
@@ -33,6 +30,7 @@ namespace VRCFaceTracking.Params.Eye
             #region Dilation
             
             new EParam(v2 => v2.EyesDilation, "EyesDilation"),
+            new EParam(v2 => v2.EyesPupilDiameter, "EyesPupilDiameter"),
             
             #endregion
             
@@ -167,6 +165,12 @@ namespace VRCFaceTracking.Params.Eye
             new BoolParameter(v2 => v2.Left.Squeeze > 0, "LeftEyeSqueezeToggle"),
             new BoolParameter(v2 => v2.Right.Squeeze > 0, "RightEyeSqueezeToggle"),
             new BoolParameter(v2 => v2.Combined.Squeeze > 0, "EyesSqueezeToggle"),
+
+            #endregion
+
+            #region Status
+
+            new BoolParameter(v2 => UnifiedLibManager.EyeStatus.Equals(ModuleState.Active), "EyeTrackingActive"),
 
             #endregion
         };

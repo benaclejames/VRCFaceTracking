@@ -54,12 +54,18 @@ namespace VRCFaceTracking
 
         public static void Initialize(bool eye = true, bool lip = true)
         {
-            // Kill lingering threads
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            TeardownAllAndReset();
-
+            
             // Start Initialization
-            _initializeWorker = new Thread(() => FindAndInitRuntimes(eye, lip));
+            _initializeWorker = new Thread(() =>
+            {
+                // Kill lingering threads
+                TeardownAllAndReset();
+                
+                // Init
+                FindAndInitRuntimes(eye, lip);
+            });
+            Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
         }
 
@@ -76,10 +82,14 @@ namespace VRCFaceTracking
             // Load dotnet dlls from the VRCFTLibs folder
             foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
             {
+                if (RemoveZoneIdentifier(dll))
+                    // Skip the module which will most likely crash the app
+                    continue;
+
                 Logger.Msg("Loading " + dll);
 
                 Type module;
-                try 
+                try
                 {
                     var loadedModule = Assembly.LoadFrom(dll);
                     // Get the first class that implements ExtTrackingModule
@@ -92,6 +102,11 @@ namespace VRCFaceTracking
                         Logger.Error("LoaderException: " + loaderException.Message);
                     }
                     Logger.Error("Exception loading " + dll + ". Skipping.");
+                    continue;
+                }
+                catch (BadImageFormatException e)
+                {
+                    Logger.Error("Encountered a .dll with an invalid format: " + e.Message+". Skipping...");
                     continue;
                 }
                 
@@ -131,6 +146,7 @@ namespace VRCFaceTracking
             
             foreach (var module in trackingModules)
             {
+                Logger.Msg("Initializing module: " + module.Name);
                 // Create module
                 var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
                 
@@ -191,18 +207,43 @@ namespace VRCFaceTracking
         // Signal all active modules to gracefully shut down their respective runtimes
         public static void TeardownAllAndReset()
         {
-            EyeStatus = ModuleState.Uninitialized;
-            LipStatus = ModuleState.Uninitialized;
-            
             foreach (var module in UsefulThreads)
             {
+                Logger.Msg("Teardown: " + module.Key.GetType().Name);
                 module.Key.Teardown();
                 module.Value.Abort();
+                Logger.Msg("Teardown complete: " + module.Key.GetType().Name);
             }
             UsefulThreads.Clear();
+            
+            EyeStatus = ModuleState.Uninitialized;
+            LipStatus = ModuleState.Uninitialized;
 
             _eyeModule = null;
             _lipModule = null;
+        }
+
+        /* Removes the 'downloaded from the internet' attribute from a module
+        * @param DLL file path
+        * @return error; if true then the module should be skipped
+        */
+        private static bool RemoveZoneIdentifier(string path)
+        {
+            string zoneFile = path + ":Zone.Identifier";
+
+            if (Utils.GetFileAttributes(zoneFile) == 0xffffffff) // INVALID_FILE_ATTRIBUTES
+                //zone file doesn't exist, everything's good
+                return false;
+
+            if (Utils.DeleteFile(zoneFile))
+                Logger.Msg("Removing the downloaded file identifier from " + path);
+            else
+            {
+                Logger.Error("Couldn't removed the 'file downloaded' mark from the " + path + " module! Please unblock the file manually");
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -5,14 +5,20 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ContextMenu = System.Windows.Forms.ContextMenu;
+using MenuItem = System.Windows.Forms.MenuItem;
 
 namespace VRCFaceTracking.Assets.UI
 {
     public partial class MainWindow
     {
+        public static bool IsLipPageVisible { get; private set; }
+        public static bool IsEyePageVisible { get; private set; }
+
         public static readonly NotifyIcon TrayIcon = new NotifyIcon
         {
             Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream("VRCFaceTracking.Assets.Images.VRCFT.ico")), 
@@ -81,7 +87,7 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (TabController.SelectedIndex != 2 || UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
+            if (!IsLipPageVisible || UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
@@ -99,7 +105,7 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (TabController.SelectedIndex != 1 || UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
@@ -161,6 +167,12 @@ namespace VRCFaceTracking.Assets.UI
             {  
                 Hide();                 
             } 
+        }
+
+        private void TabController_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            IsEyePageVisible = TabController.SelectedIndex == 1;
+            IsLipPageVisible = TabController.SelectedIndex == 2;
         }
     }
 }

@@ -82,7 +82,7 @@
     </Window.Resources>
 
     <Grid Margin="0,0,-0.4,0">
-        <TabControl x:Name="TabController" Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" Background="#FF6E6E6E" >
+        <TabControl x:Name="TabController" Grid.ColumnSpan="2" Grid.RowSpan="2" BorderThickness="0,0,0,0" Background="#FF6E6E6E" SelectionChanged="TabController_OnSelectionChanged">
             <TabItem Header="Main" Foreground="White">
                 <Grid>
                     <Grid.ColumnDefinitions>

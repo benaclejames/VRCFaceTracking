@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using ViveSR;
 using ViveSR.anipal;
 using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
+using VRCFaceTracking.Assets.UI;
 
 namespace VRCFaceTracking.SRanipal
 {
@@ -88,9 +87,13 @@ namespace VRCFaceTracking.SRanipal
         public override void Teardown()
         {
             _cancellationToken.Cancel();
+            _cancellationToken.Dispose();
+            
+            Thread.Sleep(2000);
 
             if (Status.EyeState > ModuleState.Uninitialized)
             {
+                Logger.Msg("Teardown: Releasing Eye");
                 // Attempt to release this module and give up after 10 seconds because Vive Moment
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2));
                 killThread.Start();
@@ -104,14 +107,13 @@ namespace VRCFaceTracking.SRanipal
 
             if (Status.LipState > ModuleState.Uninitialized)
             {
+                Logger.Msg("Teardown: Releasing Lip");
                 // Same for lips
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2));
                 killThread.Start();
                 if (!killThread.Join(new TimeSpan(0,0,5)))
                     killThread.Abort();
             }
-            
-            _cancellationToken.Dispose();
         }
 
         #region Update
@@ -124,11 +126,25 @@ namespace VRCFaceTracking.SRanipal
             {
                 while (!_cancellationToken.IsCancellationRequested)
                 {
-                    if (Status.LipState == ModuleState.Active)
-                        UpdateMouth();
-            
-                    if (Status.EyeState == ModuleState.Active)
-                        UpdateEye();
+                    if (Status.LipState == ModuleState.Active && UpdateMouth() != Error.WORK)
+                    {
+                        Logger.Msg("An error occured while getting lip data. This might be a wireless crash.");
+                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
+                        Thread.Sleep(30000);
+                        UnifiedLibManager.Initialize();
+                        return;
+                    }
+
+                    if (Status.EyeState == ModuleState.Active && UpdateEye() != Error.WORK)
+                    {
+                        Logger.Msg("An error occured while getting eye data. This might be a wireless crash.");
+                        Logger.Msg("Waiting 30 seconds before reinitializing to account for wireless users.");
+                        Thread.Sleep(30000);
+                        UnifiedLibManager.Initialize();
+                        return;
+                    }
+                    
+                    Thread.Sleep(10);
                 }
             };
         }
@@ -156,41 +172,49 @@ namespace VRCFaceTracking.SRanipal
             return bytesRead != size ? null : buffer;
         }
         
-        private void UpdateEye()
+        private Error UpdateEye()
         {
-            SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
+            var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
             UnifiedTrackingData.LatestEyeData.UpdateData(eyeData);
             
-            if (_processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return;
+            if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTrackingData.LatestEyeData.SupportsImage) return updateResult;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
             var imageBytes = ReadMemory(_offset, 20000);
             
             // Concatenate the two images side by side instead of one after the other
-            var leftEye = imageBytes.Take(10000).ToList();
-            var rightEye = imageBytes.Skip(10000).ToList();
-            var concatImage = new List<byte>();
-            for (var i = 0; i < 100; i++)
+            byte[] leftEye = new byte[10000];
+            Array.Copy(imageBytes, 0, leftEye, 0, 10000);
+            byte[] rightEye = new byte[10000];
+            Array.Copy(imageBytes, 10000, rightEye, 0, 10000);
+            
+            for (var i = 0; i < 100; i++)   // 100 lines of 200 bytes
             {
-                concatImage.AddRange(leftEye.Take(100));
-                concatImage.AddRange(rightEye.Take(100));
-                leftEye.RemoveRange(0, 100);
-                rightEye.RemoveRange(0, 100);
+                // Add 100 bytes from the left eye to the left side of the image
+                int leftIndex = i * 100 * 2;
+                Array.Copy(leftEye,i*100, imageBytes, leftIndex, 100);
+
+                // Add 100 bytes from the right eye to the right side of the image
+                Array.Copy(rightEye, i*100, imageBytes, leftIndex + 100, 100);
             }
 
             // Write the image to the latest eye data
-            UnifiedTrackingData.LatestEyeData.ImageData = concatImage.ToArray();
+            UnifiedTrackingData.LatestEyeData.ImageData = imageBytes;
+
+            return updateResult;
         }
 
-        private void UpdateMouth()
+        private Error UpdateMouth()
         {
-            SRanipal_Lip_API.GetLipData_v2(ref lipData);
+            var updateResult = SRanipal_Lip_API.GetLipData_v2(ref lipData);
             UnifiedTrackingData.LatestLipData.UpdateData(lipData);
             
-            if (lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return;
+            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTrackingData.LatestLipData.SupportsImage) return updateResult;
             
             Marshal.Copy(lipData.image, UnifiedTrackingData.LatestLipData.ImageData, 0, UnifiedTrackingData.LatestLipData.ImageSize.x *
                 UnifiedTrackingData.LatestLipData.ImageSize.y);
+
+            return updateResult;
         }
 
         #endregion

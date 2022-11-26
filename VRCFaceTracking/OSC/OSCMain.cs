@@ -59,18 +59,19 @@ namespace VRCFaceTracking.OSC
 
         private void Recv()
         {
+            byte[] buffer = new byte[2048];
             try
             {
-                byte[] buffer = new byte[2048];
                 ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
-                var newMsg = new OscMessage(buffer);
-                if (newMsg.Address == "/avatar/change")
-                    ConfigParser.ParseNewAvatar((string) newMsg.Value);
             }
             catch (SocketException)
             {
                 // Ignore as this is most likely a timeout exception
+                return;
             }
+            var newMsg = new OscMessage(buffer);
+            if (newMsg.Address == "/avatar/change")
+                ConfigParser.ParseNewAvatar((string) newMsg.Value);
         }
 
         public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);

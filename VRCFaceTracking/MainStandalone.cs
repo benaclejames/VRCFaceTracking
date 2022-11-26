@@ -28,8 +28,8 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         public static OscMain OscMain;
-        
-        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) => 
+
+        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
             {
                 param.NeedsSend = false;
@@ -108,7 +108,7 @@ namespace VRCFaceTracking
             while (!MasterCancellationTokenSource.IsCancellationRequested)
             {
                 Thread.Sleep(10);
-                
+
                 if (_relevantParamsCount <= 0)
                     continue;
 
@@ -129,7 +129,6 @@ namespace VRCFaceTracking
                     var bundle = new OscBundle(msgList);
                     OscMain.Send(bundle.Data);
                 }
-                
             }
         }
     }
