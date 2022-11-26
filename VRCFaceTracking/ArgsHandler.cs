@@ -6,10 +6,10 @@ namespace VRCFaceTracking
     public static class ArgsHandler
     {
         
-        public static (int SendPort, string IP, int RecievePort, string opMode) HandleArgs()
+        public static (int SendPort, string IP, int ReceivePort, string opMode) HandleArgs()
         {
             Logger.Msg("Loading Defaults");
-            (int SendPort, string IP, int RecievePort, string opMode) = (9000, "127.0.0.1", 9001, "auto");
+            (int SendPort, string IP, int ReceivePort, string opMode) = (9000, "127.0.0.1", 9001, "auto");
 
             foreach (var arg in Environment.GetCommandLineArgs())
             {
@@ -20,9 +20,9 @@ namespace VRCFaceTracking
                    Logger.Msg("To set operating mode please use the following");
                    Logger.Msg("--mode=vrc or --mode=cvr");
                 }
-                if (arg.StartsWith("--mode"))
+                if (arg.StartsWith("--mode="))
                 {
-                  opMode = arg;
+                  opMode = arg.Remove(0, 7);
                 }
                 if (arg.StartsWith("--osc="))
                 {
@@ -60,18 +60,18 @@ namespace VRCFaceTracking
                     int parsedIntRP;
                     if (int.TryParse(oscConfig[2], out parsedIntRP))
                     {
-                        RecievePort = parsedIntRP;
-                        Logger.Msg("Loaded custom OSC RecievePort value, " + RecievePort);
+                        ReceivePort = parsedIntRP;
+                        Logger.Msg("Loaded custom OSC ReceivePort value, " + ReceivePort);
                     }
                     else
                     {
-                        Logger.Error("Malformed OSC RecievePort value " + oscConfig[2] + ", please ensure you set a number");
+                        Logger.Error("Malformed OSC ReceivePort value " + oscConfig[2] + ", please ensure you set a number");
                     }
             
                 }
             }
 
-            return (SendPort, IP, RecievePort, opMode);
+            return (SendPort, IP, ReceivePort, opMode);
         }
     }
 }
