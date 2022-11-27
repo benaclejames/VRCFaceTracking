@@ -149,7 +149,8 @@ namespace SRanipalExtTrackingInterface
                         UnifiedLibManager.Initialize();
                         return;
                     }
-                    
+
+                    UnifiedTracking.AllData.UpdateData();
                     Thread.Sleep(10);
                 }
             };
@@ -187,8 +188,6 @@ namespace SRanipalExtTrackingInterface
             UpdateEyeParameters(ref UnifiedTracking.AllData.LatestExpressionData.Eye, eyeData.verbose_data);
             UpdateEyeExpressions(ref UnifiedTracking.AllData.LatestExpressionData.Shapes, eyeData.expression_data);
 
-            UnifiedTracking.AllData.UpdateData();
-            
             if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTracking.AllData.EyeImageData.SupportsImage) return updateResult;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
@@ -259,12 +258,10 @@ namespace SRanipalExtTrackingInterface
 
             UpdateMouthExpressions(ref UnifiedTracking.AllData.LatestExpressionData, lipData.prediction_data);
 
-            UnifiedTracking.AllData.UpdateData();
-            
             if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTracking.AllData.LipImageData.SupportsImage) return updateResult;
-            
+
             Marshal.Copy(lipData.image, UnifiedTracking.AllData.LipImageData.ImageData, 0, UnifiedTracking.AllData.LipImageData.ImageSize.x *
-                UnifiedTracking.AllData.LipImageData.ImageSize.y);
+            UnifiedTracking.AllData.LipImageData.ImageSize.y);
 
             return updateResult;
         }

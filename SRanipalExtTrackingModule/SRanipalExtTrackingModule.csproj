@@ -83,11 +83,21 @@
     <Compile Include="SRWorks_Enums.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libHTC_License.dll" />
-    <None Include="nanomsg.dll" />
-    <None Include="SRanipal.dll" />
-    <None Include="SRWorks_Log.dll" />
-    <None Include="ViveSR_Client.dll" />
+    <AdditionalFiles Include="ModuleLibs\libHTC_License.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="ModuleLibs\nanomsg.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="ModuleLibs\SRanipal.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="ModuleLibs\SRWorks_Log.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="ModuleLibs\ViveSR_Client.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj">
@@ -96,4 +106,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y $(TargetPath) %25appdata%25\VRCFaceTracking\CustomLibs
+xcopy /y $(TargetDir)\ModuleLibs %25appdata%25\VRCFaceTracking\CustomLibs\ModuleLibs</PostBuildEvent>
+  </PropertyGroup>
 </Project>
