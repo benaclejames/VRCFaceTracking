@@ -83,6 +83,11 @@ namespace VRCFaceTracking
             Initialize();
         }
 
+        public static void ReloadModules()
+        {
+            _allModules = LoadExternalModules();
+        }
+
         public static void RequestModules(List<Type> moduleTypes)
         {
             _requestedModules = moduleTypes;
@@ -93,27 +98,52 @@ namespace VRCFaceTracking
             return _allModules;
         }
 
+        private static string[] GetAllModulePaths()
+        {
+            List<string> modulePaths = new List<string>();
+            
+            string customLibsAppData = Path.Combine(Utils.PersistentDataDirectory, "CustomLibs");
+            string customLibsExe = "CustomLibs";
+
+            // Alternative data path to look for modules that exist beside the EXE (for portability use for eg). VRCFT will not create this subdirectory, the subfolder must be explicitly included with the EXE. Comes first.
+            if (Directory.Exists(customLibsExe))
+                modulePaths.AddRange(Directory.GetFiles(customLibsExe, "*.dll"));
+
+            // 'Main' data path to look for modules that are properly installed into the CustomLibs in the appdata directory. Comes second to portable folder.
+            if (!Directory.Exists(customLibsAppData))
+            {
+                Directory.CreateDirectory(customLibsAppData);
+            }
+
+            modulePaths.AddRange(Directory.GetFiles(customLibsAppData, "*.dll"));
+
+            return modulePaths.ToArray();
+        }
+
         private static List<Type> LoadExternalModules()
         {
             var returnList = new List<Type>();
-            var customLibsPath = Path.Combine(Utils.PersistentDataDirectory, "CustomLibs");
-            
-            if (!Directory.Exists(customLibsPath))
-                Directory.CreateDirectory(customLibsPath);
-            
+            string[] allModuleFilePaths = GetAllModulePaths();
+
             Logger.Msg("Loading External Modules...");
 
-            // Load dotnet dlls from the VRCFTLibs folder
-            foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
+            // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
+            foreach (var dll in allModuleFilePaths)
             {
-                Logger.Msg("Loading " + dll);
-
                 Type module;
                 try
                 {
                     var loadedModule = Assembly.LoadFrom(dll);
                     // Get the first class that implements ExtTrackingModule
                     module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
+
+                    if (returnList.Contains(module)) 
+                    {
+                        Logger.Warning(module.Name + " already exists in the portable directory. Skipping...");
+                        continue;
+                    }
+
+                    Logger.Msg("Loading " + dll);
                 }
                 catch (ReflectionTypeLoadException e)
                 {
@@ -129,15 +159,15 @@ namespace VRCFaceTracking
                     Logger.Error("Encountered a .dll with an invalid format: " + e.Message+". Skipping...");
                     continue;
                 }
-                
+
                 if (module != null)
                 {
                     returnList.Add(module);
                     Logger.Msg("Loaded external tracking module: " + module.Name);
                     continue;
                 }
-                
-                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule");
+
+                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule, or already exists in the portable folder.");
             }
 
             return returnList;
@@ -149,6 +179,7 @@ namespace VRCFaceTracking
                 return;
             
             var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
+            //thread.IsBackground = true;
             UsefulThreads.Add(module, thread);
             thread.Start();
         }
@@ -188,8 +219,8 @@ namespace VRCFaceTracking
                         Logger.Error(e.Message);
                         continue;
                     }
-                    
-                    // If eyeSuccess is true, set the eye status to active and load the eye module slot.
+
+                    // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
                     if (eyeSuccess && _loadedEyeModule == null)
                     {
                         _loadedEyeModule = moduleObj;
@@ -197,24 +228,8 @@ namespace VRCFaceTracking
                         EnsureModuleThreadStarted(moduleObj);
                     }
 
-                    // If module is already loaded, initialize teardown and load up the requested module from the UI.
-                    if (eyeSuccess && _loadedEyeModule != null)
-                    {
-                        _loadedEyeModule = moduleObj;
-                        EyeStatus = ModuleState.Active;
-                        EnsureModuleThreadStarted(moduleObj);
-                    }
-
-                    // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot.
+                    // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
                     if (expressionSuccess && _loadedExpressionModule == null)
-                    {
-                        _loadedExpressionModule = moduleObj;
-                        ExpressionStatus = ModuleState.Active;
-                        EnsureModuleThreadStarted(moduleObj);
-                    }
-
-                    // If module is already loaded, initialize teardown and load up the requested module from the UI.
-                    if (expressionSuccess && _loadedExpressionModule != null)
                     {
                         _loadedExpressionModule = moduleObj;
                         ExpressionStatus = ModuleState.Active;

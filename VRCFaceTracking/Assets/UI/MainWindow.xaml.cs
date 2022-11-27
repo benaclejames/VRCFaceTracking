@@ -144,6 +144,14 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedLibManager.Initialize();
         }
 
+        private void ReloadModulesClick(object sender, RoutedEventArgs e)
+        {
+            Logger.Msg("Reloading available modules.");
+
+            UnifiedLibManager.ReloadModules();
+            moduleListBox.ItemsSource = UnifiedLibManager.GetModuleList();
+        }
+
         private void PauseClickEyes(object sender, RoutedEventArgs e)
         {
             if (UnifiedLibManager.EyeStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
@@ -187,7 +195,6 @@ namespace VRCFaceTracking.Assets.UI
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             List<Type> moduleType = ((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList();
-
             UnifiedLibManager.RequestModules(moduleType);
         }
     }

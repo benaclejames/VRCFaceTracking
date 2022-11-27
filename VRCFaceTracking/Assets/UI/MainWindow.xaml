@@ -100,6 +100,7 @@
                     <Button x:Name="PauseEyesButton" Content="Toggle Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="20,144,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes" BorderThickness="1,1,1,1" />
                     <Button x:Name="PauseMouthButton" Content="Toggle Lip Tracking" HorizontalAlignment="Left" Height="36" Margin="20,185,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickMouth" Grid.RowSpan="2"/>
                     <Button x:Name="ReinitializeButton" Content="Reinitialize" HorizontalAlignment="Left" Margin="186,213,0,289" Width="140" Click="ReinitializeClick" Grid.Column="1" Grid.RowSpan="2"/>
+                    <Button x:Name="ReloadButton" Content="Reload Modules" HorizontalAlignment="Left" Margin="331,213,0,289" Width="140" Click="ReloadModulesClick" Grid.Column="1" Grid.RowSpan="2"/>
                     <ScrollViewer x:Name="Scroller" Margin="20,49,20,0" HorizontalScrollBarVisibility="Auto" Grid.Row="1" Grid.ColumnSpan="2" Height="240" VerticalAlignment="Top">
                         <StackPanel Width="945" Visibility="Visible">
                             <ItemsControl ItemsSource="{Binding Source={x:Static local:Logger.ConsoleOutput}}" Width="940">
