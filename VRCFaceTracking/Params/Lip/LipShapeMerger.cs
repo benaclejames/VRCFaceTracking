@@ -89,9 +89,9 @@ namespace VRCFaceTracking.Params.LipMerging
                 {"MouthLowerDownOverlay", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.MouthLowerOverlay})},
                 {"MouthLowerDownSuck", new PositiveNegativeAveragedShape(new LipShape_v2[]{LipShape_v2.MouthLowerDownLeft, LipShape_v2.MouthLowerDownRight}, new LipShape_v2[]{LipShape_v2.CheekSuck})},
 
-				// MouthInsideOverturn based params
-				{"MouthUpperInsideOverturn", new PositiveNegativeShape(LipShape_v2.MouthUpperInside, LipShape_v2.MouthUpperOverturn)},
-				{"MouthLowerInsideOverturn", new PositiveNegativeShape(LipShape_v2.MouthLowerInside, LipShape_v2.MouthLowerOverturn)},
+                // MouthInsideOverturn based params
+                {"MouthUpperInsideOverturn", new PositiveNegativeShape(LipShape_v2.MouthUpperInside, LipShape_v2.MouthUpperOverturn)},
+                {"MouthLowerInsideOverturn", new PositiveNegativeShape(LipShape_v2.MouthLowerInside, LipShape_v2.MouthLowerOverturn)},
 				
                 //SmileRight based params; Recommend using these if you already have SmileSadLeft setup!
                 {"SmileRightUpperOverturn", new PositiveNegativeShape(LipShape_v2.MouthSmileRight, LipShape_v2.MouthUpperOverturn)},
