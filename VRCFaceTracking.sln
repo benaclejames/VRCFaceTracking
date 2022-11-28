@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRanipalExtTrackingModule",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMCTrackingInterface", "VMCTrackingInterface\VMCTrackingInterface.csproj", "{67F53C1D-812D-4401-B332-61E5233FE807}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TCPTrackingInterface", "TCPSocketsTrackingInterface\TCPTrackingInterface.csproj", "{6B48EA9B-2E7E-472D-A193-5849D5F500F5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,14 +61,6 @@ Global
 		{67F53C1D-812D-4401-B332-61E5233FE807}.Release|Any CPU.Build.0 = Release|Any CPU
 		{67F53C1D-812D-4401-B332-61E5233FE807}.Release|x64.ActiveCfg = Release|Any CPU
 		{67F53C1D-812D-4401-B332-61E5233FE807}.Release|x64.Build.0 = Release|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Debug|x64.Build.0 = Debug|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Release|x64.ActiveCfg = Release|Any CPU
-		{6B48EA9B-2E7E-472D-A193-5849D5F500F5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
