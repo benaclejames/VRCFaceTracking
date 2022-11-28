@@ -12,7 +12,7 @@ namespace VRCFaceTracking
     /// </summary>
     public class UnifiedExpressionsMutator
     {
-        public CalibratorState calibratorMode = CalibratorState.Active;
+        public CalibratorState calibratorMode = CalibratorState.Calibrating;
         public bool applySmoothing = false;
 
         static float SimpleLerp(float input, float previousInput, float value)
