@@ -33,10 +33,12 @@ namespace VRCFaceTracking
         /// <returns>Returns the processed Expression Data.</returns>
         public UnifiedExpressionsData ReadInternal() => UpdatedExpressionData;
 
+        public UnifiedExpressionsMutator Mutator = new UnifiedExpressionsMutator();
+
         /// <summary>
         /// Updates the Internal Expression Data buffer with the Latest Expression Data.
         /// </summary>
-        public void UpdateData() => UpdatedExpressionData = UnifiedExpressionsMutator.MutateData(LatestExpressionData);
+        public void UpdateData() => UpdatedExpressionData = Mutator.MutateData(LatestExpressionData);
     }
 
     /// <summary>

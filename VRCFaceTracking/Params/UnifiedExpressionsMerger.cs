@@ -14,9 +14,9 @@ namespace VRCFaceTracking.Params
             
             #region Eye Gaze
             
-            new XYParameter(exp => exp.Eye.Combined.GazeNormalized, "GazeX", "GazeY"),
-            new XYParameter(exp => exp.Eye.Left.GazeNormalized, "LeftGazeX", "LeftGazeY"),
-            new XYParameter(exp => exp.Eye.Right.GazeNormalized, "RightGazeX", "RightGazeY"),
+            new XYParameter(exp => exp.Eye.Combined().Gaze, "GazeX", "GazeY"),
+            new XYParameter(exp => exp.Eye.Left.Gaze, "LeftGazeX", "LeftGazeY"),
+            new XYParameter(exp => exp.Eye.Right.Gaze, "RightGazeX", "RightGazeY"),
             
             #endregion
 
@@ -31,27 +31,27 @@ namespace VRCFaceTracking.Params
             #region Eye Widen
 
             new EParam(exp =>
-                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight  > exp.Shapes[(int)UnifiedExpressions.EyeWideRight] .weight
-                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight
-                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight,
+                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeWideRight] .Weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight
+                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight,
                 "EyesWiden"),
             
             #endregion
 
             #region Eye Openess Expanded
 
-            new EParam(exp => (exp.Eye.Left.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight  * 0.5f), "LeftEyeOpenExpanded"),
-            new EParam(exp => (exp.Eye.Right.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight  * 0.5f), "RightEyeOpenExpanded"),
+            new EParam(exp => (exp.Eye.Left.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight  * 0.5f), "LeftEyeOpenExpanded"),
+            new EParam(exp => (exp.Eye.Right.Openness * 0.5f) + (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight  * 0.5f), "RightEyeOpenExpanded"),
 
             new EParam(exp => 
-            (exp.Eye.Right.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].weight  * 0.5f) + (exp.Eye.Left.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].weight  * 0.5f) / 2.0f
+            (exp.Eye.Right.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight  * 0.5f) + (exp.Eye.Left.Openness * 0.5f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight  * 0.5f) / 2.0f
             , "EyeOpenExpanded"),
             
             #endregion
 
             // Combined Expressions
 
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].weight + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].weight , "TestInnerBrow"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight , "TestInnerBrow"),
 
             #region Status
 
@@ -67,7 +67,7 @@ namespace VRCFaceTracking.Params
 
         private static IEnumerable<EParam> GetAllBaseExpressions() =>
             ((UnifiedExpressions[])Enum.GetValues(typeof(UnifiedExpressions))).ToList().Select(shape =>
-               new EParam(exp => exp.Shapes[(int)shape].weight,
+               new EParam(exp => exp.Shapes[(int)shape].Weight,
                    shape.ToString(), 0.0f));
     }
 }

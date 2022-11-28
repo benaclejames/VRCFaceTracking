@@ -1,6 +1,8 @@
 using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Configuration;
@@ -71,16 +73,11 @@ namespace VRCFaceTracking
                 // Load all available modules in CustomLibs
                 _allModules = LoadExternalModules();
 
-                // Attempt to initialize the requested runtime.
+                // Attempt to initialize the requested runtimes.
                 InitRequestedRuntimes(_requestedModules);
             });
             Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
-        }
-
-        public static void LoadRequestedModules()
-        {
-            Initialize();
         }
 
         public static void ReloadModules()
@@ -137,13 +134,13 @@ namespace VRCFaceTracking
                     // Get the first class that implements ExtTrackingModule
                     module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
 
+                    Logger.Msg("Loading " + dll);
+
                     if (returnList.Contains(module)) 
                     {
-                        Logger.Warning(module.Name + " already exists in the portable directory. Skipping...");
+                        Logger.Warning("Prioritizing " + module.Name + " module that exists in portable directory. Skipping...");
                         continue;
                     }
-
-                    Logger.Msg("Loading " + dll);
                 }
                 catch (ReflectionTypeLoadException e)
                 {

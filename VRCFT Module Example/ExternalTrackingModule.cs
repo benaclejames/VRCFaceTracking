@@ -36,23 +36,25 @@ namespace VRCFT_Module_Example
         // This function parses the external module's full-data data into UnifiedExpressions' eye structure.
         public static void UpdateEye(ref UnifiedEyeData data, ExampleExternalTrackingDataStruct external)
         {
-            data.Right.Openness = external.left_eye.eye_lid_openness;
-            data.Right.Openness = external.right_eye.eye_lid_openness;
+            if (external.left_eye.eye_validity) 
+            {
+                data.Left.Openness = external.left_eye.eye_lid_openness;
+                data.Left.Gaze = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
+            }
 
-            data.Left.GazeNormalized = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
-            data.Right.GazeNormalized = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
-
-            // This will tell VRCFaceTracking if the eye data is accurate/usable or not.
-            data.Left.Valid = external.left_eye.eye_validity;
-            data.Right.Valid = external.right_eye.eye_validity;
+            if (external.right_eye.eye_validity)
+            {
+                data.Right.Openness = external.right_eye.eye_lid_openness;
+                data.Right.Gaze = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
+            }
         }
 
         // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
         public static void UpdateExpressions(ref UnifiedExpressionsData data, ExampleExternalTrackingDataExpressions external)
         {
             // Map to Shapes from the External structure the UnifiedExpressionData structure to access UnifiedExpression shapes.
-            data.Shapes[(int)UnifiedExpressions.JawOpen].weight = external.jaw_open;
-            data.Shapes[(int)UnifiedExpressions.TongueOut].weight = external.tongue_out;
+            data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.jaw_open;
+            data.Shapes[(int)UnifiedExpressions.TongueOut].Weight = external.tongue_out;
         }
     }
     

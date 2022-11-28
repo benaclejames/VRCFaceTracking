@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using System.Windows;
 
 namespace VRCFaceTracking.Params
 {
@@ -9,27 +10,41 @@ namespace VRCFaceTracking.Params
     public struct UnifiedSingleEyeData
     {
         // Eye data.
-        public Vector2 GazeNormalized;
+        public Vector2 Gaze;
         public float PupilDiameter_MM;
         public float Openness;
-
-        // This is for letting VRCFT know if the sent eye data is usable or accurate.
-        public bool Valid;
     }
 
     /// <summary>
     /// Struct that represents all possible eye data. 
     /// </summary>
-    public struct UnifiedEyeData
+    public class UnifiedEyeData
     {
-        public UnifiedSingleEyeData Left, Right, Combined;
+        public UnifiedSingleEyeData Left, Right;
+        private float _minDilation = 999f;
+        private float _maxDilation = 0f;
+        public UnifiedSingleEyeData Combined()
+        {
+            if ((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f < _minDilation)
+                _minDilation = (Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f;
+
+            if ((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f > _maxDilation)
+                _maxDilation = (Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f;
+
+            return new UnifiedSingleEyeData
+            {
+                Gaze = (Left.Gaze + Right.Gaze) / 2.0f,
+                Openness = (Left.Openness + Right.Openness) / 2.0f,
+                PupilDiameter_MM = (((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f) - _minDilation) / (_maxDilation - _minDilation),
+            };
+        }
     }
 
     public struct UnifiedExpressionShape
     {
-        public float weight;
-        public float calibrationMultiplier;
-        public float smoothingMultiplier;
+        public float Weight;
+        public float CalibrationMultiplier;
+        public float SmoothingMultiplier;
     }
 
     /// <summary>
