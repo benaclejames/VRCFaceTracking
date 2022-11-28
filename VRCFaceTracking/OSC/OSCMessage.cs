@@ -59,33 +59,29 @@ namespace VRCFaceTracking.OSC
             Data = newFullArr;
         }
 
-        public OscMessage(byte[] bytes, bool noAddress = false)
+        public OscMessage(byte[] bytes)
         {
             int iter = 0;
 
-            if (noAddress)
+            var addressBytes = new List<byte>();
+            for (; iter < bytes.Length; iter++)
             {
-                var addressBytes = new List<byte>();
-                for (; iter < bytes.Length; iter++)
+                if (bytes[iter] == 0)
+                    break;
+
+                addressBytes.Add(bytes[iter]);
+            }
+
+            Address = Encoding.ASCII.GetString(addressBytes.ToArray());
+
+            // Increase iter until we find the type identifier
+            for (; iter < bytes.Length; iter++)
+            {
+                if (bytes[iter] == ',')
                 {
-                    if (bytes[iter] == 0)
-                        break;
-
-                    addressBytes.Add(bytes[iter]);
+                    iter++;
+                    break;
                 }
-
-                Address = Encoding.ASCII.GetString(addressBytes.ToArray());
-
-                // Increase iter until we find the type identifier
-                for (; iter < bytes.Length; iter++)
-                {
-                    if (bytes[iter] == ',')
-                    {
-                        iter++;
-                        break;
-                    }
-                }
-
             }
 
 
