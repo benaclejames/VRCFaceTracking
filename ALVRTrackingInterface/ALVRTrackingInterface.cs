@@ -417,8 +417,8 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft].Weight = expressions[(int)FBExpression.Lip_Pucker_L] * TrackingSensitivity.LipPucker;
 
             // Cheek puff can be triggered by low values of lip pucker (around 0.1), subtract cheek puff with mouth pout values.
-            unifiedExpressions[(int)UnifiedExpressions.CheekPuffLeft].Weight = 1.0f - expressions[(int)FBExpression.Cheek_Puff_L] * TrackingSensitivity.CheekPuff;
-            unifiedExpressions[(int)UnifiedExpressions.CheekPuffRight].Weight = 1.0f - expressions[(int)FBExpression.Cheek_Puff_R] * TrackingSensitivity.CheekPuff;
+            unifiedExpressions[(int)UnifiedExpressions.CheekPuffLeft].Weight = expressions[(int)FBExpression.Cheek_Puff_L] * TrackingSensitivity.CheekPuff;
+            unifiedExpressions[(int)UnifiedExpressions.CheekPuffRight].Weight = expressions[(int)FBExpression.Cheek_Puff_R] * TrackingSensitivity.CheekPuff;
             
             unifiedExpressions[(int)UnifiedExpressions.CheekSuckLeft].Weight = expressions[(int)FBExpression.Cheek_Suck_L] * TrackingSensitivity.CheekSuck;
             unifiedExpressions[(int)UnifiedExpressions.CheekSuckRight].Weight = expressions[(int)FBExpression.Cheek_Suck_R] * TrackingSensitivity.CheekSuck;
@@ -474,8 +474,8 @@ namespace ALVRTrackingInterface
 
             unifiedExpressions[(int)UnifiedExpressions.CheekSquintLeft].Weight = expressions[(int)FBExpression.Cheek_Raiser_L] * TrackingSensitivity.CheekRaiser;
             unifiedExpressions[(int)UnifiedExpressions.CheekSquintRight].Weight = expressions[(int)FBExpression.Cheek_Raiser_R] * TrackingSensitivity.CheekRaiser;
-            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper].Weight = 1.0f - expressions[(int)FBExpression.Chin_Raiser_T] * TrackingSensitivity.ChinRaiserBottom;
-            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower].Weight = 1.0f - expressions[(int)FBExpression.Chin_Raiser_B] * TrackingSensitivity.ChinRaiserTop;
+            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper].Weight = expressions[(int)FBExpression.Chin_Raiser_T] * TrackingSensitivity.ChinRaiserBottom;
+            unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower].Weight = expressions[(int)FBExpression.Chin_Raiser_B] * TrackingSensitivity.ChinRaiserTop;
             unifiedExpressions[(int)UnifiedExpressions.MouthDimpleLeft].Weight = expressions[(int)FBExpression.Dimpler_L] * TrackingSensitivity.MouthDimpler;
             unifiedExpressions[(int)UnifiedExpressions.MouthDimpleRight].Weight = expressions[(int)FBExpression.Dimpler_R] * TrackingSensitivity.MouthDimpler;
             unifiedExpressions[(int)UnifiedExpressions.LipFunnelBottomLeft].Weight = expressions[(int)FBExpression.Lip_Funneler_LB] * TrackingSensitivity.LipFunnelBottom;

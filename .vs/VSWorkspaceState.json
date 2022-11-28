@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\VRCFaceTracking",
+    "\\VRCFaceTracking\\Params",
+    "\\VRCFaceTracking\\Params\\Eye",
+    "\\VRCFaceTracking\\Params\\Lip"
+  ],
+  "SelectedNode": "\\VRCFaceTracking.sln",
+  "PreviewInSolutionExplorer": false
+}

@@ -197,5 +197,10 @@ namespace VRCFaceTracking.Assets.UI
             List<Type> moduleType = ((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList();
             UnifiedLibManager.RequestModules(moduleType);
         }
+
+        private void CalibrationClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
