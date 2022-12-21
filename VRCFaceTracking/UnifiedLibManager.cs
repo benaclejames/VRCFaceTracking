@@ -80,7 +80,7 @@ namespace VRCFaceTracking
             Logger.Msg("Loading External Modules...");
 
             // Load dotnet dlls from the VRCFTLibs folder
-            foreach (var dll in Directory.GetFiles(customLibsPath, "*.dll"))
+            foreach (var dll in Directory.EnumerateFiles(customLibsPath, "*.dll"))
             {
                 if (RemoveZoneIdentifier(dll))
                     // Skip the module which will most likely crash the app
