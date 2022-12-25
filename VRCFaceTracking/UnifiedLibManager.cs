@@ -124,7 +124,17 @@ namespace VRCFaceTracking
             if (UsefulThreads.ContainsKey(module))
                 return;
             
-            var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    module.GetUpdateThreadFunc().Invoke();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Exception in "+module.GetType().Name+" update thread: " + e.Message);
+                }
+            });
             UsefulThreads.Add(module, thread);
             thread.Start();
         }

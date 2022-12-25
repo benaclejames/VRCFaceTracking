@@ -73,19 +73,30 @@ namespace VRCFaceTracking.OSC
             // GET request on http://address:inport/avatar/change
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"http://{MainStandalone.Ip}:{MainStandalone.InPort}{value}");
             request.Method = "GET";
-            var resp = (HttpWebResponse)request.GetResponse();
-                    
-            // Ensure we have OK response
-            if (resp.StatusCode != HttpStatusCode.OK)
-                return null;
-                    
-            // Parse response json
-            var stream = resp.GetResponseStream();
-            var reader = new System.IO.StreamReader(stream);
-            var json = reader.ReadToEnd();
-                    
-            // Parse json to the QueryResponse class
-            return JsonSerializer.Deserialize<ConfigParser.QueryResponse>(json);
+            try
+            {
+                var resp = (HttpWebResponse)request.GetResponse();
+
+                // Ensure we have OK response
+                if (resp.StatusCode != HttpStatusCode.OK)
+                    return null;
+
+                // Parse response json
+                var stream = resp.GetResponseStream();
+                var reader = new System.IO.StreamReader(stream);
+                var json = reader.ReadToEnd();
+
+                // Parse json to the QueryResponse class
+                return JsonSerializer.Deserialize<ConfigParser.QueryResponse>(json);
+            }
+            catch (WebException e)
+            {
+                // If the web request cannot connect to the remote server, remind the user to make sure VRChat is running
+                if (e.Status == WebExceptionStatus.ConnectFailure)
+                    Logger.Warning("Could not connect to VRChat. Make sure VRChat is running and the IP address is correct.");
+            }
+            
+            return null;
         }
 
         private void SocketRecvLoop()
