@@ -54,7 +54,6 @@ namespace VRCFaceTracking.OSC
 
         public class FloatBaseParam : BaseParam
         {
-            private static Random meme = new Random();
             public FloatBaseParam(string name) : base(name, typeof(float))
             {
             }
@@ -63,8 +62,6 @@ namespace VRCFaceTracking.OSC
             {
                 set
                 {
-                    // set value to random between -1 and 1
-                    value = (float) meme.NextDouble() * 2 - 1;
                     var valueArr = BitConverter.GetBytes(value);
                     Array.Reverse(valueArr);
                     base.ParamValue = valueArr;
