@@ -73,15 +73,16 @@ namespace VRCFaceTracking.OSC
             }
 
             Address = Encoding.ASCII.GetString(addressBytes.ToArray());
-            // Increase iter until we find the type identifier
-            for (; iter < bytes.Length; iter++)
-            {
-                if (bytes[iter] == ',')
-                {
-                    iter++;
-                    break;
-                }
-            }
+            
+            // Currently we're at a null terminator for the string,
+            // We need to ensure we're at the beginning of the type identifier which will be at the next multiple of 4
+            // We need to pad the iterator to the next multiple of 4
+            iter = (iter + 4) & ~3;
+
+
+            // Ensure the next two bytes are zero and a comma
+            if (bytes[iter++] != ',')
+                throw new Exception("Invalid OSC message: No comma after address");
 
             byte type = bytes[iter];
             iter += 2; // Next multiple of 4

@@ -15,7 +15,7 @@ using VRCFaceTracking.OSC;
 [assembly: AssemblyProduct("VRCFaceTracking")]
 [assembly: AssemblyCopyright("Copyright © benaclejames 2022")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("4.0.0.1")]
+[assembly: AssemblyVersion("4.0.1.0")]
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None,

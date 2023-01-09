@@ -120,9 +120,15 @@ namespace VRCFaceTracking.OSC
 
         private static void ParseRaw(byte[] rawBytes)
         {
-            var newMsg = new OscMessage(rawBytes);
-            if (newMsg.Address == "/avatar/change")
-                ConfigParser.ParseNewAvatar((string) newMsg.Value);
+            try {
+                var newMsg = new OscMessage(rawBytes);
+                if (newMsg.Address == "/avatar/change")
+                    ConfigParser.ParseNewAvatar((string) newMsg.Value);
+            }
+            catch (Exception e)
+            {
+                // vrchat sending cringe packets smh
+            }
         }
 
         public void Send(byte[] data)
