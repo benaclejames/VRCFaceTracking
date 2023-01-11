@@ -50,7 +50,7 @@ namespace VRCFT_Module_Example
         }
 
         // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
-        public static void UpdateExpressions(ref UnifiedExpressionsData data, ExampleExternalTrackingDataExpressions external)
+        public static void UpdateExpressions(ref UnifiedTrackingData data, ExampleExternalTrackingDataExpressions external)
         {
             // Map to Shapes from the External structure the UnifiedExpressionData structure to access UnifiedExpression shapes.
             data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.jaw_open;
@@ -64,7 +64,6 @@ namespace VRCFT_Module_Example
         ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
         bool external_tracking_state;
-        (bool, bool) moduleState;
 
         // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
@@ -73,8 +72,7 @@ namespace VRCFT_Module_Example
         {
             Logger.Msg("Initializing inside external module");
 
-            // Gets the library manager's tracking state to let the module know if it can initialize into an eye or expression module.
-            // This is courtesy; the manager will handle overlap between modules loaded in-order.
+            // Gets the library manager's tracking state to let the module know if it can initialize into an eye and/or expression module.
 
             return (true, true);
         }
@@ -103,19 +101,15 @@ namespace VRCFT_Module_Example
             if (Status.EyeState == ModuleState.Active)
             {
                 Logger.Msg("Eye data is being utilized.");
-                TrackingData.UpdateEye(ref UnifiedTracking.AllData.LatestExpressionData.Eye, external_eye);
+                TrackingData.UpdateEye(ref UnifiedTracking.Data.Eye, external_eye);
             }
             if (Status.ExpressionState == ModuleState.Active)
             {
                 Logger.Msg("Expression data is being utilized.");
-                TrackingData.UpdateExpressions(ref UnifiedTracking.AllData.LatestExpressionData, external_expressions);
+                TrackingData.UpdateExpressions(ref UnifiedTracking.Data, external_expressions);
             }
-
-            // Updates the parameters internally to the latest shape data
-            UnifiedTracking.AllData.UpdateData();
         }
 
-        // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
         public override void Teardown()
         {
             Logger.Msg("Teardown");

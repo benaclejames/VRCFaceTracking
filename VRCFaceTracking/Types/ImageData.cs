@@ -9,12 +9,13 @@
         public (int x, int y) ImageSize;
 
         /// <summary>
-        /// Byte that contains the image's data.
+        /// Byte that contains the raw image data.
         /// </summary>
+        /// <remarks> ImageSize will be used to unwrap the image properly. </remarks>
         public byte[] ImageData;
 
         /// <summary>
-        /// Used to let VRCFaceTracking know if an image is able to be supported.
+        /// Used to let VRCFaceTracking know if an image is available from the tracking interface.
         /// </summary>
         public bool SupportsImage;
     }

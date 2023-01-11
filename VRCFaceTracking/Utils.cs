@@ -39,5 +39,9 @@ namespace VRCFaceTracking
                 {typeof(float), ('f', "Float")},
                 {typeof(int), ('i', "Int")},
             };
+        public static void PropogateConfiguration()
+        {
+
+        }
     }
 }

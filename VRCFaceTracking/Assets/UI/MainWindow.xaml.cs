@@ -12,8 +12,11 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using VRCFaceTracking.Params;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using ContextMenu = System.Windows.Forms.ContextMenu;
 using MenuItem = System.Windows.Forms.MenuItem;
+using Timer = System.Threading.Timer;
 
 namespace VRCFaceTracking.Assets.UI
 {
@@ -95,17 +98,17 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (!IsLipPageVisible || UnifiedTracking.AllData.LipImageData.ImageData == null)   // If the image is not initialized
+            if (!IsLipPageVisible || UnifiedTracking.LipImageData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTracking.AllData.LipImageData.ImageSize.x,
-                    UnifiedTracking.AllData.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.LipImageData.ImageSize.x,
+                    UnifiedTracking.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.AllData.LipImageData.ImageSize.x,
-                UnifiedTracking.AllData.LipImageData.ImageSize.y), UnifiedTracking.AllData.LipImageData.ImageData, 800, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.LipImageData.ImageSize.x,
+                UnifiedTracking.LipImageData.ImageSize.y), UnifiedTracking.LipImageData.ImageData, 800, 0);
             
             // Set the WPF image name LipImage 
             LipImage.Source = bitmap;
@@ -113,18 +116,18 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (!IsEyePageVisible || UnifiedTracking.AllData.EyeImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTracking.EyeImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTracking.AllData.EyeImageData.ImageSize.x,
-                    UnifiedTracking.AllData.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.EyeImageData.ImageSize.x,
+                    UnifiedTracking.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
             
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.AllData.EyeImageData.ImageSize.x, 
-                UnifiedTracking.AllData.EyeImageData.ImageSize.y), UnifiedTracking.AllData.EyeImageData.ImageData, 800, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.EyeImageData.ImageSize.x, 
+                UnifiedTracking.EyeImageData.ImageSize.y), UnifiedTracking.EyeImageData.ImageData, 800, 0);
             
             // Set the WPF image name EyeImage 
             EyeImage.Source = bitmap;
@@ -194,13 +197,40 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            List<Type> moduleType = ((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList();
-            UnifiedLibManager.RequestModules(moduleType);
+            UnifiedLibManager._requestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList());
         }
 
         private void CalibrationClick(object sender, RoutedEventArgs e)
         {
+            Logger.Msg("Initialized calibration test.");
 
+            UnifiedTracking.Data.ResetCalibration();
+
+            for (int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
+                UnifiedTracking.Data.Shapes[i].CalibrationMult = 999.99f;
+
+            UnifiedTracking.Mutator.calibrationWeight = 0.75f;
+            UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+        }
+
+        private void EnableSmoothing_Checked(object sender, RoutedEventArgs e)
+        {                   
+            UnifiedTracking.Mutator.smoothingMode = true;
+        }
+
+        private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UnifiedTracking.Mutator.smoothingMode = false;
+        }
+
+        private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            for(int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
+                UnifiedTracking.Data.Shapes[i].SmoothnessMult = (float)e.NewValue;
+
+            UnifiedTracking.Data.Eye.GazeSmoothness = (float)e.NewValue;
+            UnifiedTracking.Data.Eye.OpennessSmoothness = (float)e.NewValue;
+            UnifiedTracking.Data.Eye.PupilDiameterSmoothness = (float)e.NewValue;
         }
     }
 }

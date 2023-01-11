@@ -54,19 +54,19 @@ namespace SRanipalExtTrackingInterface
                         if (module.ModuleName == "EyeCameraDevice.dll")
                             _offset = module.BaseAddress + (_process.MainModule.FileVersionInfo.FileVersion == "1.3.2.0" ? 0x19190 : 0x19100);
                     
-                    UnifiedTracking.AllData.EyeImageData.SupportsImage = true;
-                    UnifiedTracking.AllData.EyeImageData.ImageSize = (200, 100);
+                    UnifiedTracking.EyeImageData.SupportsImage = true;
+                    UnifiedTracking.EyeImageData.ImageSize = (200, 100);
                 }
             }
             
             if (lipEnabled)
             {
-                UnifiedTracking.AllData.LipImageData.SupportsImage = true;
-                UnifiedTracking.AllData.LipImageData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
-                UnifiedTracking.AllData.LipImageData.ImageData = new byte[UnifiedTracking.AllData.LipImageData.ImageSize.x *
-                                                                       UnifiedTracking.AllData.LipImageData.ImageSize.y];
-                lipData.image = Marshal.AllocCoTaskMem(UnifiedTracking.AllData.LipImageData.ImageSize.x *
-                                                       UnifiedTracking.AllData.LipImageData.ImageSize.x);
+                UnifiedTracking.LipImageData.SupportsImage = true;
+                UnifiedTracking.LipImageData.ImageSize = (SRanipal_Lip_v2.ImageWidth, SRanipal_Lip_v2.ImageHeight);
+                UnifiedTracking.LipImageData.ImageData = new byte[UnifiedTracking.LipImageData.ImageSize.x *
+                                                                       UnifiedTracking.LipImageData.ImageSize.y];
+                lipData.image = Marshal.AllocCoTaskMem(UnifiedTracking.LipImageData.ImageSize.x *
+                                                       UnifiedTracking.LipImageData.ImageSize.x);
             }
 
             return (eyeEnabled, lipEnabled);
@@ -150,7 +150,6 @@ namespace SRanipalExtTrackingInterface
                         return;
                     }
 
-                    UnifiedTracking.AllData.UpdateData();
                     Thread.Sleep(10);
                 }
             };
@@ -185,10 +184,10 @@ namespace SRanipalExtTrackingInterface
         {
             var updateResult = SRanipal_Eye_API.GetEyeData_v2(ref eyeData);
 
-            UpdateEyeParameters(ref UnifiedTracking.AllData.LatestExpressionData.Eye, eyeData.verbose_data);
-            UpdateEyeExpressions(ref UnifiedTracking.AllData.LatestExpressionData.Shapes, eyeData.expression_data);
+            UpdateEyeParameters(ref UnifiedTracking.Data.Eye, eyeData.verbose_data);
+            UpdateEyeExpressions(ref UnifiedTracking.Data.Shapes, eyeData.expression_data);
 
-            if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTracking.AllData.EyeImageData.SupportsImage) return updateResult;
+            if (!MainWindow.IsEyePageVisible || _processHandle == IntPtr.Zero || !UnifiedTracking.EyeImageData.SupportsImage) return updateResult;
             
             // Read 20000 image bytes from the predefined offset. 10000 bytes per eye.
             var imageBytes = ReadMemory(_offset, 20000);
@@ -210,7 +209,7 @@ namespace SRanipalExtTrackingInterface
             }
 
             // Write the image to the latest eye data
-            UnifiedTracking.AllData.EyeImageData.ImageData = imageBytes;
+            UnifiedTracking.EyeImageData.ImageData = imageBytes;
 
             return updateResult;
         }
@@ -262,23 +261,23 @@ namespace SRanipalExtTrackingInterface
         {
             var updateResult = SRanipal_Lip_API.GetLipData_v2(ref lipData);
 
-            UpdateMouthExpressions(ref UnifiedTracking.AllData.LatestExpressionData, lipData.prediction_data);
+            UpdateMouthExpressions(ref UnifiedTracking.Data, lipData.prediction_data);
 
-            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTracking.AllData.LipImageData.SupportsImage) return updateResult;
+            if (!MainWindow.IsLipPageVisible || lipData.image == IntPtr.Zero || !UnifiedTracking.LipImageData.SupportsImage) return updateResult;
 
-            Marshal.Copy(lipData.image, UnifiedTracking.AllData.LipImageData.ImageData, 0, UnifiedTracking.AllData.LipImageData.ImageSize.x *
-            UnifiedTracking.AllData.LipImageData.ImageSize.y);
+            Marshal.Copy(lipData.image, UnifiedTracking.LipImageData.ImageData, 0, UnifiedTracking.LipImageData.ImageSize.x *
+            UnifiedTracking.LipImageData.ImageSize.y);
 
             return updateResult;
         }
 
-        private void UpdateMouthExpressions(ref UnifiedExpressionsData data, PredictionData_v2 external)
+        private void UpdateMouthExpressions(ref UnifiedTrackingData data, PredictionData_v2 external)
         {
             unsafe
             {
                 #region Direct Jaw
 
-                data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.blend_shape_weight[(int)LipShape_v2.JawOpen] - external.blend_shape_weight[(int)LipShape_v2.MouthApeShape];
+                data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.blend_shape_weight[(int)LipShape_v2.JawOpen] + external.blend_shape_weight[(int)LipShape_v2.MouthApeShape];
                 data.Shapes[(int)UnifiedExpressions.JawLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.JawLeft];
                 data.Shapes[(int)UnifiedExpressions.JawRight].Weight = external.blend_shape_weight[(int)LipShape_v2.JawRight];
                 data.Shapes[(int)UnifiedExpressions.JawForward].Weight = external.blend_shape_weight[(int)LipShape_v2.JawForward];
@@ -297,20 +296,20 @@ namespace SRanipalExtTrackingInterface
                 data.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
                 data.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
 
-                data.Shapes[(int)UnifiedExpressions.LipFunnelTopLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
-                data.Shapes[(int)UnifiedExpressions.LipFunnelTopRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
-                data.Shapes[(int)UnifiedExpressions.LipFunnelBottomLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
-                data.Shapes[(int)UnifiedExpressions.LipFunnelBottomRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
 
-                data.Shapes[(int)UnifiedExpressions.LipSuckTopLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperInside];
-                data.Shapes[(int)UnifiedExpressions.LipSuckTopRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperInside];
-                data.Shapes[(int)UnifiedExpressions.LipSuckBottomLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerInside];
-                data.Shapes[(int)UnifiedExpressions.LipSuckBottomRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerInside];
+                data.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperInside];
+                data.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperInside];
+                data.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerInside];
+                data.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerInside];
 
-                data.Shapes[(int)UnifiedExpressions.MouthTopLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperLeft];
-                data.Shapes[(int)UnifiedExpressions.MouthTopRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperRight];
-                data.Shapes[(int)UnifiedExpressions.MouthBottomLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerLeft];
-                data.Shapes[(int)UnifiedExpressions.MouthBottomRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerRight];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperLeft];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperRight];
+                data.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerLeft];
+                data.Shapes[(int)UnifiedExpressions.MouthLowerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerRight];
 
                 data.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileLeft];
                 data.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileRight];

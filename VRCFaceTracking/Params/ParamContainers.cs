@@ -7,13 +7,13 @@ namespace VRCFaceTracking.Params
 {
     public class FloatParameter : OSCParams.FloatBaseParam, IParameter
     {
-        public FloatParameter(Func<UnifiedExpressionsData, float?> getValueFunc,
+        public FloatParameter(Func<UnifiedTrackingData, float?> getValueFunc,
             string paramName)
             : base(paramName) =>
-            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += exp =>
             {
                 //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
-                var value = getValueFunc.Invoke(expression);
+                var value = getValueFunc.Invoke(exp);
                 if (value.HasValue)
                     ParamValue = value.Value;
             };
@@ -21,29 +21,13 @@ namespace VRCFaceTracking.Params
         public OSCParams.BaseParam[] GetBase() => new OSCParams.BaseParam[] {this};
     }
 
-    public class XYParameter : XYParam, IParameter
-    {
-        public XYParameter(Func<UnifiedExpressionsData, Vector2?> getValueFunc, string xParamName, string yParamName)
-            : base(new OSCParams.FloatBaseParam(xParamName), new OSCParams.FloatBaseParam(yParamName)) =>
-            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
-            {
-                var value = getValueFunc.Invoke(expression);
-                if (value.HasValue)
-                    ParamValue = value.Value;
-            };
-
-        public void ResetParam(ConfigParser.Parameter[] newParams) => ResetParams(newParams);
-
-        public OSCParams.BaseParam[] GetBase() => new OSCParams.BaseParam[] {X, Y};
-    }
-
     public class BoolParameter : OSCParams.BoolBaseParam, IParameter
     {
-        public BoolParameter(Func<UnifiedExpressionsData, bool?> getValueFunc,
+        public BoolParameter(Func<UnifiedTrackingData, bool?> getValueFunc,
             string paramName) : base(paramName) =>
-            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += exp =>
             {
-                var value = getValueFunc.Invoke(expression);
+                var value = getValueFunc.Invoke(exp);
                 if (value.HasValue)
                     ParamValue = value.Value;
             };
@@ -56,12 +40,12 @@ namespace VRCFaceTracking.Params
 
     public class BinaryParameter : OSCParams.BinaryBaseParameter, IParameter
     {
-        public BinaryParameter(Func<UnifiedExpressionsData, float?> getValueFunc,
+        public BinaryParameter(Func<UnifiedTrackingData, float?> getValueFunc,
             string paramName) : base(paramName)
         {
-            UnifiedTracking.OnUnifiedDataUpdated += (expression) =>
+            UnifiedTracking.OnUnifiedDataUpdated += exp =>
             {
-                var value = getValueFunc.Invoke(expression);
+                var value = getValueFunc.Invoke(exp);
                 if (value.HasValue)
                     ParamValue = value.Value;
             };
@@ -84,13 +68,13 @@ namespace VRCFaceTracking.Params
         private readonly IParameter[] _parameter;
         private readonly string Name;
 
-        public EParam(Func<UnifiedExpressionsData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
+        public EParam(Func<UnifiedTrackingData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
             if (skipBinaryParamCreation)
             {
                 _parameter = new IParameter[]
                 {
-                    new BoolParameter((expression) => getValueFunc.Invoke(expression) < minBoolThreshold, paramName),
+                    new BoolParameter(exp => getValueFunc.Invoke(exp) < minBoolThreshold, paramName),
                     new FloatParameter(getValueFunc, paramName),
                 };
             }
@@ -98,11 +82,27 @@ namespace VRCFaceTracking.Params
             {
                 _parameter = new IParameter[]
                 {
-                    new BoolParameter((expression) => getValueFunc.Invoke(expression) < minBoolThreshold, paramName),
+                    new BoolParameter(exp => getValueFunc.Invoke(exp) < minBoolThreshold, paramName),
                     new FloatParameter(getValueFunc, paramName),
                     new BinaryParameter(getValueFunc, paramName)
                 };
             }
+
+            Name = paramName;
+        }
+
+        public EParam(Func<UnifiedTrackingData, Vector2?> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
+        {
+            _parameter = new IParameter[]
+            {
+                new BoolParameter(exp => getValueFunc.Invoke(exp).Value.x < minBoolThreshold, paramName + "X"),
+                new FloatParameter(exp => getValueFunc.Invoke(exp).Value.x, paramName + "X"),
+                new BinaryParameter(exp => getValueFunc.Invoke(exp).Value.x, paramName + "X"),
+
+                new BoolParameter(exp => getValueFunc.Invoke(exp).Value.y < minBoolThreshold, paramName + "Y"),
+                new FloatParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y"),
+                new BinaryParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y")
+            };
 
             Name = paramName;
         }

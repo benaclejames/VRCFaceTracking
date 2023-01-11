@@ -145,6 +145,6 @@ namespace VRCFaceTracking.Params.LipMerging
 
         private static IEnumerable<EParam> GetAllLipShapes() =>
             ((SRanipal_LipShape_v2[])Enum.GetValues(typeof(SRanipal_LipShape_v2))).ToList().Select(shape =>
-               new EParam(exp => UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(shape, exp), shape.ToString(), 0.0f));
+               new EParam(exp => UnifiedSRanMapper.GetTransformedShape(shape, exp), shape.ToString(), 0.0f));
     }
 }

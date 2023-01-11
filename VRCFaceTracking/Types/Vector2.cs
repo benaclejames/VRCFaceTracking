@@ -28,5 +28,12 @@ namespace VRCFaceTracking.Params
         => new Vector2(a.x + b.x, a.y + b.x);
 
         public static Vector2 zero => new Vector2(0, 0);
+
+        public Vector2 FlipXCoordinates()
+        {
+            x *= -1;
+
+            return this;
+        }
     }
 }

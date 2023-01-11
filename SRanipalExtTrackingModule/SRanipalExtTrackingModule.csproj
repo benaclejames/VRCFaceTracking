@@ -68,8 +68,6 @@
   <ItemGroup>
     <Compile Include="Eye\SRanipal_EyeData.cs" />
     <Compile Include="Eye\SRanipal_EyeDataType_v2.cs" />
-    <Compile Include="Eye\SRanipal_EyeShapeTableDrawer.cs" />
-    <Compile Include="Eye\SRanipal_EyeShapeTableDrawer_v2.cs" />
     <Compile Include="Eye\SRanipal_Eye_API.cs" />
     <Compile Include="Eye\SRanipal_Eye_Enums.cs" />
     <Compile Include="Eye\SRanipal_Eye_v2.cs" />

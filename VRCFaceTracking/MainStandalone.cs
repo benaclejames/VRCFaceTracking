@@ -12,6 +12,7 @@ using VRCFaceTracking.Params;
 using VRCFaceTracking.OSC;
 using System.IO;
 using System.Text;
+using VRCFaceTracking.Types;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
@@ -32,6 +33,9 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         public static OscMain OscMain;
+        public static UnifiedConfig UnifiedConfig;
+
+        //private static string unifiedConfigPath = Utils.PersistentDataDirectory + "/Config.json";
 
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
@@ -41,7 +45,7 @@ namespace VRCFaceTracking
             }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static IEnumerable<OSCParams.BaseParam> _relevantParamsv2;
+        private static IEnumerable<OSCParams.BaseParam> _relevantParams_v2;
         private static int _relevantParamsCount = 416;
 
         private static string _ip = "127.0.0.1";
@@ -51,16 +55,6 @@ namespace VRCFaceTracking
 
         public static void Teardown()
         {
-            string fileName = Utils.PersistentDataDirectory + "/TrackingInformation.json";
-            
-            File.Delete(fileName);
-
-            using (Stream stream = File.OpenWrite(fileName))
-            {
-                JsonSerializer.Serialize(stream, UnifiedTracking.AllData.LatestExpressionData, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
-                stream.Dispose();
-            }
-
             // Kill our threads
             MasterCancellationTokenSource.Cancel();
             
@@ -89,7 +83,7 @@ namespace VRCFaceTracking
                         "However, VRChat was running while this change was made.\n" + 
                         "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
             }
-            
+
             // Initialize Tracking Runtimes
             UnifiedLibManager.Initialize();
 
@@ -103,24 +97,23 @@ namespace VRCFaceTracking
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
             _relevantParams = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-            //_relevantParamsv2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
 
             ConfigParser.OnConfigLoaded += () =>
             {
                 _relevantParams = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
-                //_relevantParamsv2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
-                //    .Where(param => param.Relevant);
+                _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
+                    .Where(param => param.Relevant);
 
                 // Reset calibration on parameter data.
-                //UnifiedTrackingData.LatestEyeData.ResetThresholds();
-                UnifiedTracking.AllData.Mutator.ResetCalibration();
+                UnifiedTracking.Data.ResetCalibration();
 
-                _relevantParamsCount = _relevantParams.Count();
-                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + "parameters loaded.");
+                _relevantParamsCount = _relevantParams.Count() + _relevantParams_v2.Count();
+                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + " parameters loaded.");
                 
                 if (_relevantParams.Count() > 0)
-                    Logger.Warning("Legacy parameters detected: " + _relevantParamsCount + " legacy parameters loaded. These are undocumented and outdated parameters.");
+                    Logger.Warning(_relevantParams.Count() + " legacy parameters loaded. These are undocumented and outdated parameters.");
             };
 
             // Begin main OSC update loop
@@ -132,7 +125,7 @@ namespace VRCFaceTracking
                 if (_relevantParamsCount <= 0)
                     continue;
 
-                UnifiedTracking.OnUnifiedDataUpdated.Invoke(UnifiedTracking.AllData.ReadInternal());
+                UnifiedTracking.UpdateData();
 
                 var messages = ConstructMessages(_relevantParams);
                 while (messages.Count > 0)

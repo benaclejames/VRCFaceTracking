@@ -60,7 +60,7 @@ namespace VRCFaceTracking
             
             Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
-            foreach (var parameter in UnifiedTracking.AllParameters_v1)
+            foreach (var parameter in UnifiedTracking.AllParameters_v1.Union(UnifiedTracking.AllParameters_v2).ToArray())
                 parameter.ResetParam(parameters);
 
             OnConfigLoaded();

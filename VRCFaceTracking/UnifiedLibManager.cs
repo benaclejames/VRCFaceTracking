@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Configuration;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Documents;
 
@@ -50,10 +51,9 @@ namespace VRCFaceTracking
         #endregion
 
         #region Modules
-        private static List<Type> _allModules;
-        private static List<Type> _requestedModules = null;
-        private static ExtTrackingModule _loadedEyeModule;
-        private static ExtTrackingModule _loadedExpressionModule;
+        private static List<Type> _availableModules;
+        internal static List<Type> _requestedModules;
+        private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
         #endregion
@@ -71,10 +71,13 @@ namespace VRCFaceTracking
                 TeardownAllAndReset();
 
                 // Load all available modules in CustomLibs
-                _allModules = LoadExternalModules();
+                _availableModules = LoadExternalModules();
 
                 // Attempt to initialize the requested runtimes.
-                InitRequestedRuntimes(_requestedModules);
+                if (_requestedModules != null)
+                    InitRequestedRuntimes(_requestedModules);
+                else Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
+
             });
             Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
@@ -82,17 +85,12 @@ namespace VRCFaceTracking
 
         public static void ReloadModules()
         {
-            _allModules = LoadExternalModules();
-        }
-
-        public static void RequestModules(List<Type> moduleTypes)
-        {
-            _requestedModules = moduleTypes;
+            _availableModules = LoadExternalModules();
         }
 
         public static List<Type> GetModuleList()
         {
-            return _allModules;
+            return _availableModules;
         }
 
         private static string[] GetAllModulePaths()
@@ -164,7 +162,7 @@ namespace VRCFaceTracking
                     continue;
                 }
 
-                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule, or already exists in the portable folder.");
+                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule.");
             }
 
             return returnList;
@@ -184,12 +182,6 @@ namespace VRCFaceTracking
         private static void InitRequestedRuntimes(List<Type> moduleType)
         {
             Logger.Msg("Initializing runtimes...");
-
-            if (moduleType == null)
-            {
-                Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
-                return;
-            }
 
             foreach (Type module in moduleType)
             {

@@ -7,4 +7,8 @@
     <ReferencePath>
     </ReferencePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartAction>Project</StartAction>
+    <StartProgram>C:\Users\lazlo\source\repos\VRCFaceTracking\VRCFaceTracking\bin\Release\VRCFaceTracking.exe</StartProgram>
+  </PropertyGroup>
 </Project>

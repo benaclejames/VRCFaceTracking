@@ -2,40 +2,40 @@
 
 namespace VRCFaceTracking.Params.Lip
 {
-    public interface ICombinedShape
+    internal interface ICombinedShape
     {
-        float GetBlendedLipShape(UnifiedExpressionsData inputMap);
+        float GetBlendedLipShape(UnifiedTrackingData inputMap);
     }
 
-    public class PositiveNegativeShape : ICombinedShape
+    internal class PositiveNegativeShape : ICombinedShape
     {
         private readonly SRanipal_LipShape_v2 _positiveShape, _negativeShape;
         private float _positiveCache, _negativeCache;
         private bool _steps;
-        
-        public PositiveNegativeShape(SRanipal_LipShape_v2 positiveShape, SRanipal_LipShape_v2 negativeShape, bool steps = false)
+
+        internal PositiveNegativeShape(SRanipal_LipShape_v2 positiveShape, SRanipal_LipShape_v2 negativeShape, bool steps = false)
         {
             _positiveShape = positiveShape;
             _negativeShape = negativeShape;
             _steps = steps;
         }
 
-        public float GetBlendedLipShape(UnifiedExpressionsData inputMap)
+        public float GetBlendedLipShape(UnifiedTrackingData inputMap)
         {
-            _positiveCache = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_positiveShape, inputMap);
-            _negativeCache = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_negativeShape, inputMap) * -1;
+            _positiveCache = UnifiedSRanMapper.GetTransformedShape(_positiveShape, inputMap);
+            _negativeCache = UnifiedSRanMapper.GetTransformedShape(_negativeShape, inputMap) * -1;
             return _steps ? (_positiveCache - _negativeCache) - 1 : _positiveCache + _negativeCache;
         }
     }
 
-    public class PositiveNegativeAveragedShape : ICombinedShape
+    internal class PositiveNegativeAveragedShape : ICombinedShape
     {
         private readonly SRanipal_LipShape_v2[] _positiveShapes, _negativeShapes;
         private readonly float[] _positiveCache, _negativeCache;
         private readonly int _positiveCount, _negativeCount;
         private readonly bool _useMax;
 
-        public PositiveNegativeAveragedShape(SRanipal_LipShape_v2[] positiveShapes, SRanipal_LipShape_v2[] negativeShapes)
+        internal PositiveNegativeAveragedShape(SRanipal_LipShape_v2[] positiveShapes, SRanipal_LipShape_v2[] negativeShapes)
         {
             _positiveShapes = positiveShapes;
             _negativeShapes = negativeShapes;
@@ -45,7 +45,7 @@ namespace VRCFaceTracking.Params.Lip
             _negativeCount = negativeShapes.Length;
         }
 
-        public PositiveNegativeAveragedShape(SRanipal_LipShape_v2[] positiveShapes, SRanipal_LipShape_v2[] negativeShapes, bool useMax)
+        internal PositiveNegativeAveragedShape(SRanipal_LipShape_v2[] positiveShapes, SRanipal_LipShape_v2[] negativeShapes, bool useMax)
         {
             _positiveShapes = positiveShapes;
             _negativeShapes = negativeShapes;
@@ -56,7 +56,7 @@ namespace VRCFaceTracking.Params.Lip
             _useMax = useMax;
         }
 
-        public float GetBlendedLipShape(UnifiedExpressionsData inputMap)
+        public float GetBlendedLipShape(UnifiedTrackingData inputMap)
         {                      
             if (!_useMax)
             {
@@ -64,12 +64,12 @@ namespace VRCFaceTracking.Params.Lip
                 float negative = 0;
 
                 for (int i = 0; i < _positiveCount; i++) {
-                        _positiveCache[i] = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_positiveShapes[i], inputMap);
+                        _positiveCache[i] = UnifiedSRanMapper.GetTransformedShape(_positiveShapes[i], inputMap);
                     positive += _positiveCache[i];
                 }
 
                 for (int i = 0; i < _negativeCount; i++) {
-                        _negativeCache[i] = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_negativeShapes[i], inputMap) * -1.0f;
+                        _negativeCache[i] = UnifiedSRanMapper.GetTransformedShape(_negativeShapes[i], inputMap) * -1.0f;
                     negative += _negativeCache[i];
                 }
 
@@ -77,11 +77,11 @@ namespace VRCFaceTracking.Params.Lip
             }
 
             for (int i = 0; i < _positiveCount; i++) {
-                     _positiveCache[i] = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_positiveShapes[i], inputMap);     
+                     _positiveCache[i] = UnifiedSRanMapper.GetTransformedShape(_positiveShapes[i], inputMap);     
             }
 
             for (int i = 0; i < _negativeCount; i++) {
-                    _negativeCache[i] = UnifiedSRanMapper.GetSRanipalShapeFromUnifiedShapes(_negativeShapes[i], inputMap);
+                    _negativeCache[i] = UnifiedSRanMapper.GetTransformedShape(_negativeShapes[i], inputMap);
             }
 
             return _positiveCache.Max() + (-1) * _negativeCache.Max();
