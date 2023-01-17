@@ -5,9 +5,10 @@ namespace VRCFaceTracking
 {
     public static class ArgsHandler
     {
-        public static (int SendPort, string IP, int RecievePort) HandleArgs()
+        public static (int SendPort, string IP, int RecievePort, bool EnableEye, bool EnableLip) HandleArgs()
         {
             (int SendPort, string IP, int RecievePort) = (9000, "127.0.0.1", 9001);
+            (bool EnableEye, bool EnableLip) = (true, true);
             
             foreach (var arg in Environment.GetCommandLineArgs())
             {
@@ -39,9 +40,17 @@ namespace VRCFaceTracking
                         break;
                     }
                 }
+                else if (arg.ToLower().Equals("--disable-eye"))
+                {
+                    EnableEye = false;
+                }
+                else if (arg.ToLower().Equals("--disable-lip"))
+                {
+                    EnableLip = false;
+                }
             }
 
-            return (SendPort, IP, RecievePort);
+            return (SendPort, IP, RecievePort, EnableEye, EnableLip);
         }
     }
 }

@@ -55,6 +55,12 @@ namespace VRCFaceTracking
         public static void Initialize(bool eye = true, bool lip = true)
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
+
+            if (!eye)
+                Logger.Warning("Eye Tracking disabled by --disable-eye for this session.");
+
+            if (!lip)
+                Logger.Warning("Lip Tracking disabled by --disable-lip for this session.");
             
             // Start Initialization
             _initializeWorker = new Thread(() =>

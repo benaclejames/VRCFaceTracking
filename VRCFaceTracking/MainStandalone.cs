@@ -42,6 +42,8 @@ namespace VRCFaceTracking
         private static string _ip = "127.0.0.1";
         private static int _inPort = 9001, _outPort = 9000;
 
+        private static bool _enableEye = true, _enableLip = true;
+
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
         public static void Teardown()
@@ -62,7 +64,7 @@ namespace VRCFaceTracking
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
-            (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
+            (_outPort, _ip, _inPort, _enableEye, _enableLip) = ArgsHandler.HandleArgs();
             
             // Load dependencies
             DependencyManager.Load();
@@ -79,7 +81,7 @@ namespace VRCFaceTracking
             }
             
             // Initialize Tracking Runtimes
-            UnifiedLibManager.Initialize();
+            UnifiedLibManager.Initialize(_enableEye, _enableLip);
 
             // Initialize Locals
             OscMain = new OscMain();
