@@ -2,33 +2,10 @@
 using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
+using VRCFT_Module_Example.Structures;
 
 namespace VRCFT_Module_Example
 { 
-    // Example "single-eye" data response.    
-    public struct ExampleExternalTrackingDataEye
-    {
-        public float eye_lid_openness;
-        public float eye_x;
-        public float eye_y;
-
-        public bool eye_validity;
-    }
-    
-    // Example "full-data" response from the external tracking system.
-    public struct ExampleExternalTrackingDataStruct
-    {
-        public ExampleExternalTrackingDataEye left_eye;
-        public ExampleExternalTrackingDataEye right_eye;
-    }
-
-    // Example expression response from external tracking system.
-    public struct ExampleExternalTrackingDataExpressions
-    {
-        public float jaw_open;
-        public float tongue_out;
-    }
-
     // This class contains the overrides for any VRCFT Tracking Data struct functions
     public static class TrackingData
     {
@@ -52,7 +29,6 @@ namespace VRCFT_Module_Example
         // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
         public static void UpdateExpressions(ref UnifiedTrackingData data, ExampleExternalTrackingDataExpressions external)
         {
-            // Map to Shapes from the External structure the UnifiedExpressionData structure to access UnifiedExpression shapes.
             data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.jaw_open;
             data.Shapes[(int)UnifiedExpressions.TongueOut].Weight = external.tongue_out;
         }
@@ -65,16 +41,20 @@ namespace VRCFT_Module_Example
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
         bool external_tracking_state;
 
-        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
+        // Lets Unified Library Manager know what type of data to expect.
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
-        public override (bool eyeSuccess, bool expressionSuccess) Initialize()
+        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
             Logger.Msg("Initializing inside external module");
 
-            // Gets the library manager's tracking state to let the module know if it can initialize into an eye and/or expression module.
+            // Use the incoming parameters to determine if the tracking interface can initialize into any available module slots.
+            // Then let the library manager know if your tracking interface has initialized properly
 
-            return (true, true);
+            var moduleState = (eyeAvailable, expressionAvailable);
+
+            return moduleState;
         }
 
         // This will be run in the tracking thread. This is exposed so you can control when and if the tracking data is updated down to the lowest level.

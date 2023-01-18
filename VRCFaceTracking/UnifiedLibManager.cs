@@ -60,27 +60,35 @@ namespace VRCFaceTracking
         
         private static Thread _initializeWorker;
 
-        public static void Initialize()
+        private static void CreateModuleInitializer(List<Type> modules)
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            
+
             // Start Initialization
             _initializeWorker = new Thread(() =>
             {
                 // Kill lingering threads
                 TeardownAllAndReset();
 
-                // Load all available modules in CustomLibs
-                _availableModules = LoadExternalModules();
-
                 // Attempt to initialize the requested runtimes.
-                if (_requestedModules != null)
-                    InitRequestedRuntimes(_requestedModules);
+                if (modules != null)
+                    InitRequestedRuntimes(modules);
                 else Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
 
             });
             Logger.Msg("Starting initialization thread");
             _initializeWorker.Start();
+        }
+
+        public static void Initialize()
+        {
+            _availableModules = LoadExternalModules();
+            CreateModuleInitializer(_availableModules);
+        }
+
+        public static void RequestInitialize()
+        {
+            CreateModuleInitializer(_requestedModules);
         }
 
         public static void ReloadModules()
@@ -195,7 +203,7 @@ namespace VRCFaceTracking
                     bool eyeSuccess, expressionSuccess;
                     try
                     {
-                        (eyeSuccess, expressionSuccess) = moduleObj.Initialize();
+                        (eyeSuccess, expressionSuccess) = moduleObj.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
                     }
                     catch(MissingMethodException)
                     {

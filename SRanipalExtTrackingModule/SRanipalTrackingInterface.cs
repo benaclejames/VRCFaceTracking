@@ -22,17 +22,18 @@ namespace SRanipalExtTrackingInterface
         
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
-        public override (bool eyeSuccess, bool expressionSuccess) Initialize()
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
             // Look for SRanipal assemblies here.
             Directory.SetCurrentDirectory(Utils.PersistentDataDirectory + "/CustomLibs/ModuleLibs");
 
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
-            // Only try to init if we're actually using the only headset that supports SRanipal eye tracking
-            eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
+            if (eyeAvailable)
+                eyeError = SRanipal_API.Initial(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2, IntPtr.Zero);
 
-            lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
+            if (expressionAvailable)
+                lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
             var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
 
