@@ -6,9 +6,9 @@ Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's
 
 ## 🎥 Demo
 
-[![](https://i.imgur.com/TKpyFVs.gif)](https://www.youtube.com/watch?v=5h4_mYDcgzM)
+[![](https://i.imgur.com/QHKTE6e.mp4)](https://youtu.be/5h4_mYDcgzM)
 
-https://www.youtube.com/watch?v=KbbfYW-hnMk
+https://youtu.be/5h4_mYDcgzM
 
 ## 🛠 Avatar Setup
 
