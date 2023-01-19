@@ -57,4 +57,4 @@ Use the following modules to add support for other hardware:
 
 * [VIVE](https://www.vive.com/) for the SRanipal SDK and their awesome hardware! ❤
 
-![](https://i.imgur.com/PkYdCNX.png)
+![](https://i.imgur.com/HDAhf8d.jpg)
