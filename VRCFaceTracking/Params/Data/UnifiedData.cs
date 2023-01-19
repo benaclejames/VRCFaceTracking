@@ -61,13 +61,13 @@ namespace VRCFaceTracking.Params
         /// <summary>
         /// Value that contains the specified Unified Expression raw value.
         /// </summary>
-        public float Weight;
+        [JsonIgnore] public float Weight;
 
         /// <summary>
         /// Value that contains an adjusted parameter value that drives the specified Unified Expression output.
         /// </summary>
         /// <remarks>This value is a result of the original Weight being mutated into this value.</remarks>
-        internal float AdjustedWeight;
+        [JsonIgnore] internal float AdjustedWeight;
 
         /// <summary>
         /// How much the Weight will be multiplied by the Mutator system to be within bounds of 0.0 - 1.0.

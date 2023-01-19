@@ -202,15 +202,35 @@ namespace VRCFaceTracking.Assets.UI
 
         private void CalibrationClick(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Initialized calibration test.");
+            bool fineTune = (bool)FineTuneCalibration.IsChecked;
 
-            UnifiedTracking.Data.ResetCalibration();
+            Thread _thread = new Thread(() =>
+            {
+                Logger.Msg("Initialized calibration.");
 
-            for (int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
-                UnifiedTracking.Data.Shapes[i].CalibrationMult = 999.99f;
+                UnifiedTracking.Data.ResetCalibration();
 
-            UnifiedTracking.Mutator.calibrationWeight = 0.75f;
-            UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+                for (int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
+                    UnifiedTracking.Data.Shapes[i].CalibrationMult = 10f;
+
+                UnifiedTracking.Mutator.calibrationWeight = 0.75f;
+                UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+
+                Logger.Msg("Calibrating Normalization for 30s.");
+                Thread.Sleep(30000);
+
+                if (fineTune)
+                {
+                    UnifiedTracking.Mutator.calibrationWeight = 0.25f;
+                    Logger.Msg("Fine-tuning Normalization for 90s.");
+                    Thread.Sleep(90000);
+                }
+
+                Logger.Msg("Calibration completed successfully! Values will be saved on exit.");
+                UnifiedTracking.Mutator.calibrationWeight = 0.25f;
+                UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
+            });
+            _thread.Start();
         }
 
         private void EnableSmoothing_Checked(object sender, RoutedEventArgs e)

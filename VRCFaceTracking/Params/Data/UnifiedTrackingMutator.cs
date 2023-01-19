@@ -13,8 +13,6 @@ namespace VRCFaceTracking
         public float calibrationWeight;
         public bool smoothingMode = false;
 
-        public Action<UnifiedTrackingData> ApplyMutatorsToExpressions;
-
         /// <summary>
         /// Represents the state of calibration within the mutator.
         /// </summary>

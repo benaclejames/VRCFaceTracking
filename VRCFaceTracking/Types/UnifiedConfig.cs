@@ -12,9 +12,11 @@ namespace VRCFaceTracking.Types
 {
     public class UnifiedConfig
     {
+        private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
+
         public List<string> RequestedModulePaths;
         public UnifiedTrackingData Data;
-        private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
+        public UnifiedTrackingMutator Mutator;
 
         public void ReadConfiguration()
         {
@@ -28,7 +30,7 @@ namespace VRCFaceTracking.Types
                 config = JsonSerializer.Deserialize<UnifiedConfig>(jsonString, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
                 if (config != null)
                 {
-                    if (config.RequestedModulePaths.Count > 0)
+                    if (config.RequestedModulePaths != null && config.RequestedModulePaths.Count > 0)
                     {
                         Logger.Msg("Saved module load order initialized.");
                         UnifiedLibManager._requestedModules = UnifiedLibManager.LoadExternalAssemblies(config.RequestedModulePaths.ToArray());
@@ -38,8 +40,16 @@ namespace VRCFaceTracking.Types
                         Logger.Msg("Load order not found; initializing default order scheme.");
                     }
 
+                    if (config.Mutator != null)
+                    {
+                        Logger.Msg("Saved data mutation settings loaded.");
+                        UnifiedTracking.Mutator = config.Mutator;
+                    }
+                    else Logger.Msg("Mutators not found; initializing default mutator.");
+
                     if (config.Data != null)
                     {
+                        Logger.Msg("Saved parameter data loaded.");
                         UnifiedTracking.Data = config.Data;
                     }
                 }
@@ -61,7 +71,13 @@ namespace VRCFaceTracking.Types
             {
                 UnifiedConfig tempConfig = new UnifiedConfig();
 
+                // UnifiedTrackingData
                 tempConfig.Data = UnifiedTracking.Data;
+
+                // UnifiedTrackingMutator
+                tempConfig.Mutator = UnifiedTracking.Mutator;
+
+                // Assembly load order.
                 tempConfig.RequestedModulePaths = new List<string>();
                 UnifiedLibManager._requestedModules.ForEach(a => tempConfig.RequestedModulePaths.Add(a.Location));
 
