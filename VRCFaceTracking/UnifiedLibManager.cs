@@ -239,8 +239,6 @@ namespace VRCFaceTracking
                 loadedModule = LoadExternalModule(module);
                 Logger.Msg("Initializing module: " + module.ToString());
                 AttemptModuleInitialize(loadedModule);
-
-                Logger.Msg("Initializing module: " + module.ToString());
             }
 
             if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _loadedEyeModule);
