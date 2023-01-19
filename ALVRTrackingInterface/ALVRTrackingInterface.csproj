@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ALVRTrackingInterface.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="FBData.cs" />
     <Compile Include="FBExpression.cs" />
   </ItemGroup>

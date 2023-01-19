@@ -9,7 +9,7 @@ namespace VRCFaceTracking.Types
 {
     public class UnifiedConfig
     {
-        public List<string> _requestedModules;
-        public UnifiedTrackingData data;
+        public List<string> RequestedModulePaths;
+        public UnifiedTrackingData Data;
     }
 }

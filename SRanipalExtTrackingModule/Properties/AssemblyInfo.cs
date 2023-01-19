@@ -1,18 +1,22 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using VRCFaceTracking.SDK;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SRanipal External Tracking Module")]
+[assembly: AssemblyTitle("SRanipal VRCFT External Tracking Module")]
 [assembly: AssemblyDescription("External Tracking Module that enables SRanipal compatible devices to interface with VRCFaceTracking.")]
 [assembly: AssemblyConfiguration("Assembly")]
 [assembly: AssemblyCompany("benaclejames")]
-[assembly: AssemblyProduct("SRanipal External Tracking Module")]
+[assembly: AssemblyProduct("SRanipal VRCFT External Tracking Module")]
 [assembly: AssemblyCopyright("Copyright © benaclejames 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+// VRCFaceTracking Loading Information
+[assembly: VRCFTModuleInfo(VRCFTModuleType.Both)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

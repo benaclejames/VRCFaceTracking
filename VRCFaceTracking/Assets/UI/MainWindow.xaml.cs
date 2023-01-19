@@ -197,7 +197,7 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UnifiedLibManager._requestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Type>().ToList());
+            UnifiedLibManager._requestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Assembly>().ToList());
         }
 
         private void CalibrationClick(object sender, RoutedEventArgs e)

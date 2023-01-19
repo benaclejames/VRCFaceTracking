@@ -13,6 +13,8 @@ using VRCFaceTracking.OSC;
 using System.IO;
 using System.Text;
 using VRCFaceTracking.Types;
+using System.Runtime.InteropServices.ComTypes;
+using System.Diagnostics;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
@@ -33,9 +35,9 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         public static OscMain OscMain;
-        public static UnifiedConfig UnifiedConfig;
+        public static UnifiedConfig unifiedConfig = new UnifiedConfig();
 
-        //private static string unifiedConfigPath = Utils.PersistentDataDirectory + "/Config.json";
+        private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
 
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
@@ -55,6 +57,18 @@ namespace VRCFaceTracking
 
         public static void Teardown()
         {
+            File.Delete(unifiedConfigPath);
+
+            using (Stream stream = File.OpenWrite(unifiedConfigPath))
+            {
+                unifiedConfig.Data = UnifiedTracking.Data;
+                unifiedConfig.RequestedModulePaths = new List<string>();
+                UnifiedLibManager._requestedModules.ForEach(a => unifiedConfig.RequestedModulePaths.Add(a.Location));
+
+                JsonSerializer.Serialize(stream, unifiedConfig, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
+                stream.Dispose();
+            }
+
             // Kill our threads
             MasterCancellationTokenSource.Cancel();
             
@@ -84,8 +98,40 @@ namespace VRCFaceTracking
                         "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
             }
 
-            // Initialize Tracking Runtimes
-            UnifiedLibManager.Initialize();
+            UnifiedLibManager.ReloadModules();
+
+            // Try to load config and try to initialize runtimes if they exist.
+            try
+            {
+                string jsonString = File.ReadAllText(unifiedConfigPath);
+                unifiedConfig = JsonSerializer.Deserialize<UnifiedConfig>(jsonString, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
+
+                if (unifiedConfig != null)
+                {
+                    if (unifiedConfig.RequestedModulePaths.Count > 0)
+                    {
+                        Logger.Msg("Saved module load order initialized.");
+                        UnifiedLibManager.LoadRequestedModulePaths(unifiedConfig.RequestedModulePaths.ToArray());
+                        UnifiedLibManager.RequestInitialize();
+                    }
+                    else
+                    {
+                        Logger.Msg("Load order not found; initializing default order scheme.");
+                        
+                        // Initialize Tracking Runtimes
+                        UnifiedLibManager.Initialize();
+                    }
+
+                    if (unifiedConfig.Data != null)
+                    {
+                        UnifiedTracking.Data = unifiedConfig.Data;
+                    }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Logger.Warning("Configuration file not found, will be created on proper exit of application.");
+            }
 
             // Initialize Locals
             OscMain = new OscMain();

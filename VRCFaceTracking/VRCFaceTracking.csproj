@@ -79,6 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ConfigParser.cs" />
+    <Compile Include="SDK\Attributes.cs" />
     <Compile Include="Types\ImageData.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainStandalone.cs" />

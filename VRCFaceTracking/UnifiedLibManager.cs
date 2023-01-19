@@ -51,8 +51,8 @@ namespace VRCFaceTracking
         #endregion
 
         #region Modules
-        private static List<Type> _availableModules;
-        internal static List<Type> _requestedModules;
+        private static List<Assembly> _availableModules;
+        internal static List<Assembly> _requestedModules;
         private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
@@ -60,7 +60,7 @@ namespace VRCFaceTracking
         
         private static Thread _initializeWorker;
 
-        private static void CreateModuleInitializer(List<Type> modules)
+        private static void CreateModuleInitializer(List<Assembly> modules)
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
 
@@ -82,7 +82,7 @@ namespace VRCFaceTracking
 
         public static void Initialize()
         {
-            _availableModules = LoadExternalModules();
+            _availableModules = LoadAvailableExternalAssemblies();
             CreateModuleInitializer(_availableModules);
         }
 
@@ -93,10 +93,10 @@ namespace VRCFaceTracking
 
         public static void ReloadModules()
         {
-            _availableModules = LoadExternalModules();
+            _availableModules = LoadAvailableExternalAssemblies();
         }
 
-        public static List<Type> GetModuleList()
+        public static List<Assembly> GetModuleList()
         {
             return _availableModules;
         }
@@ -114,63 +114,66 @@ namespace VRCFaceTracking
 
             // 'Main' data path to look for modules that are properly installed into the CustomLibs in the appdata directory. Comes second to portable folder.
             if (!Directory.Exists(customLibsAppData))
-            {
                 Directory.CreateDirectory(customLibsAppData);
-            }
 
             modulePaths.AddRange(Directory.GetFiles(customLibsAppData, "*.dll"));
 
             return modulePaths.ToArray();
         }
 
-        private static List<Type> LoadExternalModules()
+        private static ExtTrackingModule LoadExternalModule(Assembly dll)
         {
-            var returnList = new List<Type>();
-            string[] allModuleFilePaths = GetAllModulePaths();
+            Logger.Msg("Loading External Module " + dll.FullName);
 
-            Logger.Msg("Loading External Modules...");
+            Type module;
+            ExtTrackingModule moduleObj;
+            try
+            {
+                // Get the first class that implements ExtTrackingModule
+                module = dll.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
+                moduleObj = (ExtTrackingModule)Activator.CreateInstance(module);
+
+                return moduleObj;
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                foreach (var loaderException in e.LoaderExceptions)
+                {
+                    Logger.Error("LoaderException: " + loaderException.Message);
+                }
+                Logger.Error("Exception loading " + dll + ". Skipping.");
+            }
+            catch (BadImageFormatException e)
+            {
+                Logger.Error("Encountered a .dll with an invalid format: " + e.Message + ". Skipping...");
+            }
+            catch (TypeLoadException)
+            {
+                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule.");
+            }
+
+            return null;
+        }
+
+        internal static void LoadRequestedModulePaths(string[] modulePaths)
+        {
+            _requestedModules = new List<Assembly>();
+
+            // Load dotnet dlls from the paths provided.
+            foreach (var dll in modulePaths)
+            {
+                _requestedModules.Add(Assembly.LoadFrom(dll));
+            }
+        }
+
+        private static List<Assembly> LoadAvailableExternalAssemblies()
+        {
+            var returnList = new List<Assembly>();
 
             // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
-            foreach (var dll in allModuleFilePaths)
+            foreach (var dll in GetAllModulePaths())
             {
-                Type module;
-                try
-                {
-                    var loadedModule = Assembly.LoadFrom(dll);
-                    // Get the first class that implements ExtTrackingModule
-                    module = loadedModule.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(ExtTrackingModule)));
-
-                    Logger.Msg("Loading " + dll);
-
-                    if (returnList.Contains(module)) 
-                    {
-                        Logger.Warning("Prioritizing " + module.Name + " module that exists in portable directory. Skipping...");
-                        continue;
-                    }
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    foreach (var loaderException in e.LoaderExceptions)
-                    {
-                        Logger.Error("LoaderException: " + loaderException.Message);
-                    }
-                    Logger.Error("Exception loading " + dll + ". Skipping.");
-                    continue;
-                }
-                catch (BadImageFormatException e)
-                {
-                    Logger.Error("Encountered a .dll with an invalid format: " + e.Message+". Skipping...");
-                    continue;
-                }
-
-                if (module != null)
-                {
-                    returnList.Add(module);
-                    Logger.Msg("Loaded external tracking module: " + module.Name);
-                    continue;
-                }
-
-                Logger.Warning("Module " + dll + " does not implement ExtTrackingModule.");
+                returnList.Add(Assembly.LoadFrom(dll));
             }
 
             return returnList;
@@ -187,55 +190,57 @@ namespace VRCFaceTracking
             thread.Start();
         }
 
-        private static void InitRequestedRuntimes(List<Type> moduleType)
+        private static void AttemptModuleInitialize(ExtTrackingModule module)
+        {
+            if (module.Supported.SupportsEye || module.Supported.SupportsExpressions)
+            {
+                bool eyeSuccess = false;
+                bool expressionSuccess = false;
+                try
+                {
+                    (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
+                }
+                catch (MissingMethodException)
+                {
+                    Logger.Error(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Exception initializing " + module.GetType().Name + ". Skipping.");
+                    Logger.Error(e.Message);
+                }
+
+                // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
+                if (eyeSuccess && _loadedEyeModule == null)
+                {
+                    _loadedEyeModule = module;
+                    EyeStatus = ModuleState.Active;
+                    EnsureModuleThreadStarted(module);
+                }
+
+                // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
+                if (expressionSuccess && _loadedExpressionModule == null)
+                {
+                    _loadedExpressionModule = module;
+                    ExpressionStatus = ModuleState.Active;
+                    EnsureModuleThreadStarted(module);
+                }
+            }
+        }
+
+        private static void InitRequestedRuntimes(List<Assembly> moduleType)
         {
             Logger.Msg("Initializing runtimes...");
 
-            foreach (Type module in moduleType)
+            foreach (Assembly module in moduleType)
             {
-                Logger.Msg("Initializing module: " + module.Name);
-                // Create module
-                var moduleObj = (ExtTrackingModule) Activator.CreateInstance(module);
-                
-                // Attempt to load up modules
-                if (moduleObj.Supported.SupportsEye || moduleObj.Supported.SupportsExpressions)
-                {
-                    bool eyeSuccess, expressionSuccess;
-                    try
-                    {
-                        (eyeSuccess, expressionSuccess) = moduleObj.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
-                    }
-                    catch(MissingMethodException)
-                    {
-                        Logger.Error(moduleObj.GetType().Name+ " does not properly implement ExtTrackingModule. Skipping.");
-                        continue;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error("Exception initializing " + moduleObj.GetType().Name + ". Skipping.");
-                        Logger.Error(e.Message);
-                        continue;
-                    }
+                ExtTrackingModule loadedModule;
 
-                    // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
-                    if (eyeSuccess && _loadedEyeModule == null)
-                    {
-                        _loadedEyeModule = moduleObj;
-                        EyeStatus = ModuleState.Active;
-                        EnsureModuleThreadStarted(moduleObj);
-                    }
+                loadedModule = LoadExternalModule(module);
+                Logger.Msg("Initializing module: " + module.ToString());
+                AttemptModuleInitialize(loadedModule);
 
-                    // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
-                    if (expressionSuccess && _loadedExpressionModule == null)
-                    {
-                        _loadedExpressionModule = moduleObj;
-                        ExpressionStatus = ModuleState.Active;
-                        EnsureModuleThreadStarted(moduleObj);
-                    }
-                }
-
-                if (EyeStatus > ModuleState.Uninitialized && ExpressionStatus > ModuleState.Uninitialized) 
-                    break;    // Keep enumerating over all modules until we find ones we can use
+                Logger.Msg("Initializing module: " + module.ToString());
             }
 
             if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _loadedEyeModule);
