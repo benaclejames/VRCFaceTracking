@@ -52,7 +52,7 @@ namespace VRCFaceTracking
 
         #region Modules
         private static List<Assembly> _availableModules;
-        internal static List<Assembly> _requestedModules;
+        internal static List<Assembly> _requestedModules = new List<Assembly>();
         private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
@@ -82,18 +82,16 @@ namespace VRCFaceTracking
 
         public static void Initialize()
         {
-            _availableModules = LoadAvailableExternalAssemblies();
-            CreateModuleInitializer(_availableModules);
-        }
+            ReloadModules();
 
-        public static void RequestInitialize()
-        {
-            CreateModuleInitializer(_requestedModules);
+            if (_requestedModules != null && _requestedModules.Count > 0)
+                CreateModuleInitializer(_requestedModules);
+            else CreateModuleInitializer(_availableModules);
         }
 
         public static void ReloadModules()
         {
-            _availableModules = LoadAvailableExternalAssemblies();
+            _availableModules = LoadExternalAssemblies(GetAllModulePaths());
         }
 
         public static List<Assembly> GetModuleList()
@@ -155,23 +153,12 @@ namespace VRCFaceTracking
             return null;
         }
 
-        internal static void LoadRequestedModulePaths(string[] modulePaths)
-        {
-            _requestedModules = new List<Assembly>();
-
-            // Load dotnet dlls from the paths provided.
-            foreach (var dll in modulePaths)
-            {
-                _requestedModules.Add(Assembly.LoadFrom(dll));
-            }
-        }
-
-        private static List<Assembly> LoadAvailableExternalAssemblies()
+        public static List<Assembly> LoadExternalAssemblies(string[] path)
         {
             var returnList = new List<Assembly>();
 
             // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
-            foreach (var dll in GetAllModulePaths())
+            foreach (var dll in path)
             {
                 returnList.Add(Assembly.LoadFrom(dll));
             }

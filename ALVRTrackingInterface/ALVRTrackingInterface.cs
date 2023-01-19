@@ -19,6 +19,8 @@ namespace ALVRTrackingInterface
         private TcpClient client;
         private NetworkStream stream;
         private bool connected = false;
+        private bool eyeActive;
+        private bool lipActive;
 
 
         private const int expressionsSize = 63;
@@ -31,6 +33,11 @@ namespace ALVRTrackingInterface
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
+            // Using these to determine if we should be sending eye updates and/or lip updates to VRCFT.
+            // Will allow other modules such as SRanipal to overlap should we want that (in the case of using the Facial Tracker in place of the Quest's lip tracker).
+            eyeActive = eyeAvailable;
+            lipActive = expressionAvailable;
+
             string configPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "questProIP.txt");
             if (!File.Exists(configPath))
             {
@@ -46,11 +53,13 @@ namespace ALVRTrackingInterface
                 return (false, false);
             }
 
-            LoadQuestProSensitivity();
-            ConnectToTCP();
+            // Initialize server first before continuing.
+            if (!ConnectToTCP())
+                return (false, false);
 
-            Logger.Msg("ALXR handshake successful! Data will be broadcast to VRCFaceTracking.");
-            return (true, true);
+            LoadQuestProSensitivity();
+
+            return (eyeActive, lipActive);
         }
 
         private bool ConnectToTCP()
@@ -71,8 +80,9 @@ namespace ALVRTrackingInterface
             catch (Exception e)
             {
                 Logger.Error(e.Message);
-                return false;
             }
+
+            return false;
         }
 
         private bool LoadQuestProSensitivity()
@@ -195,8 +205,13 @@ namespace ALVRTrackingInterface
                 pitch_R = (180.0 / Math.PI) * pitch; // from radians
                 yaw_R = (180.0 / Math.PI) * yaw;
 
-                UpdateEye(ref UnifiedTracking.Data.Eye, ref expressions);
-                UpdateExpressions(ref UnifiedTracking.Data.Shapes, ref expressions);
+                if (eyeActive)
+                {
+                    UpdateEyeData(ref UnifiedTracking.Data.Eye, ref expressions);
+                    UpdateEyeExpressions(ref UnifiedTracking.Data.Shapes, ref expressions);
+                }
+                if (lipActive)
+                    UpdateMouthExpressions(ref UnifiedTracking.Data.Shapes, ref expressions);
             }
             catch (SocketException e)
             {
@@ -264,7 +279,7 @@ namespace ALVRTrackingInterface
         }
 
         // Preprocess our expressions per the Meta Documentation
-        private void UpdateEye(ref UnifiedEyeData eye, ref float[] expressions)
+        private void UpdateEyeData(ref UnifiedEyeData eye, ref float[] expressions)
         {
             #region Eye Data parsing
 
@@ -383,12 +398,8 @@ namespace ALVRTrackingInterface
             #endregion
         }
 
-        // Thank you @adjerry on the VRCFT discord for these conversions! https://docs.google.com/spreadsheets/d/118jo960co3Mgw8eREFVBsaJ7z0GtKNr52IB4Bz99VTA/edit#gid=0
-        private void UpdateExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref float[] expressions)
+        private void UpdateEyeExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref float[] expressions)
         {
-
-            // Mapping to existing parameters
-
             #region Eye Expressions Set
 
             unifiedExpressions[(int)UnifiedExpressions.EyeWideLeft].Weight = expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden;
@@ -398,6 +409,25 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].Weight = expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint;
 
             #endregion
+
+            #region Brow Expressions Set
+
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpLeft].Weight = expressions[(int)FBExpression.Inner_Brow_Raiser_L] * TrackingSensitivity.BrowInnerUp;
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpRight].Weight = expressions[(int)FBExpression.Inner_Brow_Raiser_R] * TrackingSensitivity.BrowInnerUp;
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_L] * TrackingSensitivity.BrowOuterUp;
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpRight].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_R] * TrackingSensitivity.BrowOuterUp;
+
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown;
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown;
+            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown;
+            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown;
+
+            #endregion
+        }
+
+        // Thank you @adjerry on the VRCFT discord for these conversions! https://docs.google.com/spreadsheets/d/118jo960co3Mgw8eREFVBsaJ7z0GtKNr52IB4Bz99VTA/edit#gid=0
+        private void UpdateMouthExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref float[] expressions)
+        {
 
             #region Base Face Expressions Set
             
@@ -441,28 +471,6 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownRight].Weight = expressions[(int)FBExpression.Lower_Lip_Depressor_R] * TrackingSensitivity.MouthLowerDown;
             unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L] * TrackingSensitivity.MouthUpperUp;
             unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R] * TrackingSensitivity.MouthUpperUp;
-
-            #endregion
-
-            // Mapping of Quest Pro FACS to VRCFT Unique Shapes
-
-            #region Brow Expressions Set
-
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpLeft].Weight = expressions[(int)FBExpression.Inner_Brow_Raiser_L] * TrackingSensitivity.BrowInnerUp;
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerUpRight].Weight = expressions[(int)FBExpression.Inner_Brow_Raiser_R] * TrackingSensitivity.BrowInnerUp;
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_L] * TrackingSensitivity.BrowOuterUp;
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpRight].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_R] * TrackingSensitivity.BrowOuterUp;
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown;
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L] * TrackingSensitivity.BrowDown;
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown;
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R] * TrackingSensitivity.BrowDown;
-
-            #endregion
-
-            #region Additonal Eye Tracking Expressions Set
-
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft].Weight = expressions[(int)FBExpression.Lid_Tightener_L] * TrackingSensitivity.EyeSquint;
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].Weight = expressions[(int)FBExpression.Lid_Tightener_R] * TrackingSensitivity.EyeSquint;
 
             #endregion
 

@@ -142,9 +142,9 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Initializing selected modules in order of selection.");
+            Logger.Msg("Initializing modules in selected order.");
 
-            UnifiedLibManager.RequestInitialize();
+            UnifiedLibManager.Initialize();
         }
 
         private void ReloadModulesClick(object sender, RoutedEventArgs e)
