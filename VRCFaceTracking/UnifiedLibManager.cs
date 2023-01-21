@@ -56,12 +56,6 @@ namespace VRCFaceTracking
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
 
-            if (!eye)
-                Logger.Warning("Eye Tracking disabled by --disable-eye for this session.");
-
-            if (!lip)
-                Logger.Warning("Lip Tracking disabled by --disable-lip for this session.");
-            
             // Start Initialization
             _initializeWorker = new Thread(() =>
             {
@@ -71,7 +65,8 @@ namespace VRCFaceTracking
                 // Init
                 FindAndInitRuntimes(eye, lip);
             });
-            Logger.Msg("Starting initialization thread");
+            
+            Logger.Msg("Starting initialization for " + (eye ? "eye" : "") + (eye && lip ? " and " : "") + (lip ? "lip" : "") + " tracking");
             _initializeWorker.Start();
         }
 
