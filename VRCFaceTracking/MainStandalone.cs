@@ -26,16 +26,16 @@ namespace VRCFaceTracking
 {
     public class MainStandalone : IDisposable
     {
-        private static OscMain _oscMain = new OscMain();
+        private static NetworkManager _networkManager = new NetworkManager();
 
-        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
+        private static List<OscMessage> ConstructMessages(IEnumerable<OSCBaseParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
             {
                 param.NeedsSend = false;
                 return new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue);
             }).ToList();
 
-        private static IEnumerable<OSCParams.BaseParam> _relevantParams;
+        private static IEnumerable<OSCBaseParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
 
         public static string Ip = "127.0.0.1";
@@ -47,7 +47,7 @@ namespace VRCFaceTracking
         {
             // Kill our threads
             MasterCancellationTokenSource.Cancel();
-            _oscMain.Dispose();
+            _networkManager.Dispose();
             
             Utils.TimeEndPeriod(1);
             Logger.Msg("VRCFT Standalone Exiting!");
@@ -59,7 +59,7 @@ namespace VRCFaceTracking
         
         public void Initialize()
         {
-            Logger.Msg("VRCFT Initializing!");
+            Logger.Msg("VRCFT Initializing...");
             
             // Parse Arguments
             (OutPort, Ip, InPort) = ArgsHandler.HandleArgs();
@@ -82,7 +82,7 @@ namespace VRCFaceTracking
             UnifiedLibManager.Initialize();
 
             // Initialize Locals
-            var bindResults = _oscMain.Bind(Ip, OutPort, InPort);
+            var bindResults = _networkManager.Bind(Ip, OutPort, InPort);
             
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
@@ -122,7 +122,7 @@ namespace VRCFaceTracking
                         messages.RemoveAt(0);
                     }
                     var bundle = new OscBundle(msgList);
-                    _oscMain.Send(bundle.Data);
+                    _networkManager.Send(bundle.Data);
                 }
             }
         }

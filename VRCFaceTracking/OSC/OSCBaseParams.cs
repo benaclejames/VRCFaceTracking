@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace VRCFaceTracking.OSC
 {
-    public class OSCParams
+    public class OSCBaseParams
     {
         public class BaseParam
         {

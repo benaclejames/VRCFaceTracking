@@ -127,10 +127,11 @@ namespace VRCFaceTracking
         private static IntPtr LoadAssembly(string path)
         {
             IntPtr hModule = LoadLibrary(path);
+            string moduleName = Path.GetFileName(path);
             if (hModule == IntPtr.Zero)
-                Logger.Error("Unable to load library " + path);
+                Logger.Error("Unable to load library: " + moduleName);
             else
-                Logger.Msg("Loaded library " + path);
+                Logger.Msg("Loaded library: " + moduleName);
 
             return hModule;
         }

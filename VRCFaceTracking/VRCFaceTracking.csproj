@@ -54,9 +54,9 @@
     <Compile Include="Logger.cs" />
     <Compile Include="MainStandalone.cs" />
     <Compile Include="OSC\OSCBundle.cs" />
-    <Compile Include="OSC\OSCMain.cs" />
+    <Compile Include="OSC\NetworkManager.cs" />
     <Compile Include="OSC\OSCMessage.cs" />
-    <Compile Include="OSC\OSCParams.cs" />
+    <Compile Include="OSC\OSCBaseParams.cs" />
     <Compile Include="OSC\Query\QueryRegistrar.cs" />
     <Compile Include="Params\Eye\EyeTrackingParams.cs" />
     <Compile Include="Params\Lip\LipShapeConversion.cs" />

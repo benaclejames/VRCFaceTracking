@@ -7,7 +7,7 @@ using VRCFaceTracking.OSC.Query;
 
 namespace VRCFaceTracking.OSC
 {
-    public static class OSCUtils
+    public static class NetUtils
     {
         public static byte[] EnsureCompliance(this byte[] inputArr)
         {
@@ -26,7 +26,7 @@ namespace VRCFaceTracking.OSC
         }
     }
 
-    public class OscMain : IDisposable
+    public class NetworkManager : IDisposable
     {
         private const int FallbackPort = 6969;
         

@@ -31,6 +31,17 @@ namespace VRCFaceTracking
                     return "["+type.Name+"] ";
                 }
             }
+            
+            // If we didn't find anything, walk the stack and find the calling type, and return that
+            for (var i = 0; i < stack.FrameCount; i++)
+            {
+                var frame = stack.GetFrame(i);
+                var type = frame.GetMethod().DeclaringType;
+                if (type != null && type != typeof(Logger))
+                {
+                    return "["+type.Name+"] ";
+                }
+            }
 
             return "";
         }
