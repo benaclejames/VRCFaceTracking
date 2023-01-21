@@ -55,7 +55,7 @@ namespace VRCFaceTracking
         public static void Initialize(bool eye = true, bool lip = true)
         {
             if (_initializeWorker != null && _initializeWorker.IsAlive) _initializeWorker.Abort();
-            
+
             // Start Initialization
             _initializeWorker = new Thread(() =>
             {
@@ -65,7 +65,8 @@ namespace VRCFaceTracking
                 // Init
                 FindAndInitRuntimes(eye, lip);
             });
-            Logger.Msg("Starting initialization thread");
+            
+            Logger.Msg("Starting initialization for " + (eye ? "eye" : "") + (eye && lip ? " and " : "") + (lip ? "lip" : "") + " tracking");
             _initializeWorker.Start();
         }
 

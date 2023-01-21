@@ -39,9 +39,6 @@ namespace VRCFaceTracking
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
 
-        private static string _ip = "127.0.0.1";
-        private static int _inPort = 9001, _outPort = 9000;
-
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
         public static void Teardown()
@@ -62,7 +59,7 @@ namespace VRCFaceTracking
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
-            (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
+            (int outPort, string ip, int inPort, bool enableEye, bool enableLip) = ArgsHandler.HandleArgs();
             
             // Load dependencies
             DependencyManager.Load();
@@ -79,11 +76,11 @@ namespace VRCFaceTracking
             }
             
             // Initialize Tracking Runtimes
-            UnifiedLibManager.Initialize();
+            UnifiedLibManager.Initialize(enableEye, enableLip);
 
             // Initialize Locals
             OscMain = new OscMain();
-            var bindResults = OscMain.Bind(_ip, _outPort, _inPort);
+            var bindResults = OscMain.Bind(ip, outPort, inPort);
             if (!bindResults.receiverSuccess)
                 Logger.Error("Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
             
