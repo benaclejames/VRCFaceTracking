@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
-using VRCFaceTracking.Params.Lip;
 
 namespace ALVRTrackingInterface
 {

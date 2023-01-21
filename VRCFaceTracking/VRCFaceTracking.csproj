@@ -79,6 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ConfigParser.cs" />
+    <Compile Include="Library\AttributeHandler.cs" />
     <Compile Include="SDK\Attributes.cs" />
     <Compile Include="Types\ImageData.cs" />
     <Compile Include="Logger.cs" />
@@ -102,7 +103,7 @@
     <Compile Include="Types\XYParam.cs" />
     <Compile Include="SDK\ExtTrackingModule.cs" />
     <Compile Include="VRChat.cs" />
-    <Compile Include="UnifiedLibManager.cs" />
+    <Compile Include="Library\UnifiedLibManager.cs" />
     <Compile Include="UnifiedTracking.cs" />
     <Compile Include="Params\IParameter.cs" />
     <Compile Include="Utils.cs" />

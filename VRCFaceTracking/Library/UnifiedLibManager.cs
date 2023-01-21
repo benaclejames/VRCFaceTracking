@@ -153,14 +153,19 @@ namespace VRCFaceTracking
             return null;
         }
 
-        public static List<Assembly> LoadExternalAssemblies(string[] path)
+        public static List<Assembly> LoadExternalAssemblies(string[] path, bool useAttributes = true)
         {
             var returnList = new List<Assembly>();
 
             // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
             foreach (var dll in path)
             {
-                returnList.Add(Assembly.LoadFrom(dll));
+                Assembly loaded = Assembly.LoadFrom(dll);
+                returnList.Add(loaded);
+            }
+            if (useAttributes) 
+            {
+                ModuleAttributeHandler.HandleModuleAttributes(ref returnList); 
             }
 
             return returnList;
@@ -172,7 +177,6 @@ namespace VRCFaceTracking
                 return;
             
             var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
-            //thread.IsBackground = true;
             UsefulThreads.Add(module, thread);
             thread.Start();
         }

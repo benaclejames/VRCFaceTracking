@@ -211,7 +211,7 @@ namespace VRCFaceTracking.Assets.UI
                 UnifiedTracking.Data.ResetCalibration();
 
                 for (int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
-                    UnifiedTracking.Data.Shapes[i].CalibrationMult = 10f;
+                    UnifiedTracking.Data.Shapes[i].CalibrationMult = 999.99f;
 
                 UnifiedTracking.Mutator.calibrationWeight = 0.75f;
                 UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;

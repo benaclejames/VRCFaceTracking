@@ -1,23 +1,23 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using VRCFaceTracking.SDK;
+using VRCFaceTracking;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ALVR Tracking Interface")]
+[assembly: AssemblyTitle("ALVRTrackingInterface")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ALVR Tracking Interface")]
-// [assembly: AssemblyCopyright("Copyright ©  2023")]
+[assembly: AssemblyCopyright("Copyright © 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// VRCFaceTracking Loading
-[assembly: VRCFTModuleLoadPrior("SRanipalExtTrackingModule")]
-[assembly: VRCFTModuleInfo(VRCFTModuleType.Both)]
+// VRCFaceTracking load order attributes
+[assembly: VRCFTModuleEnsureLoadPrior("9a1969a3-9cb4-40c6-9aa8-9162b00c2050")]
+[assembly: VRCFTModuleType(VRCFTModuleType.Both)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

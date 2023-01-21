@@ -38,7 +38,7 @@
 
         #endregion
 
-        #region EyeBrow Expressions
+        #region Eyebrow Expressions
 
         BrowInnerDownRight, // Inner right eyebrow pushes downward.
         BrowInnerDownLeft, // Inner left eyebrow pushes downward.
@@ -78,6 +78,8 @@
         JawRight, // Pushes the jawbone right.
         JawLeft, // Pushes the jawbone left.
         JawForward, // Pushes the jawbone forward.
+        JawClench, // Specific jaw muscles that forces the jaw closed. Causes the masseter muscle (visible close to the back of the jawline) to visibly flex.
+        JawMandibleRaise, // Raises mandible (jawbone).
 
         MouthClosed, // Closes the mouth relative to JawOpen.
 
@@ -142,8 +144,18 @@
         TongueSquish, // Tongue becomes thinner width-wise and slightly thicker height-wise.
         TongueFlat, // Tongue becomes thicker width-wise and slightly thinner height-wise.
 
-        TongueTwistRight, // Tongue tip rotates clockwise (from POV) with the rest of the tongue following gradually.
-        TongueTwistLeft, // Tongue tip rotates counter-clockwise (from POV) with the rest of the tongue following gradually.
+        TongueTwistRight, // Tongue tip rotates clockwise from POV with the rest of the tongue following gradually.
+        TongueTwistLeft, // Tongue tip rotates counter-clockwise from POV with the rest of the tongue following gradually.
+
+        #endregion
+
+        #region Throat/Neck Expressions
+
+        SoftPalateClose, // Visibly lowers the back of the throat (soft palate) inside the mouth to close off the throat.
+        ThroatSwallow, // Visibly causes the Adam's apple to pull upward into the throat as if swallowing.
+        
+        NeckFlexRight, // Flexes the Right side of the neck and face (causes the right corner of the face to stretch towards.)
+        NeckFlexLeft, // Flexes the left side of the neck and face (causes the left corner of the face to stretch towards.)
 
         #endregion
 
