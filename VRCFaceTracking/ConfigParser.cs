@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -9,6 +10,7 @@ namespace VRCFaceTracking
 {
     public static class ConfigParser
     {
+        private static string _oscDir;
         public class InputOutputDef
         {
             public string address { get; set; }
@@ -36,8 +38,22 @@ namespace VRCFaceTracking
 
         public static void ParseNewAvatar(string newId)
         {
+            Logger.Msg("-------------------------------------------------");
+            Logger.Msg("avatar id = " + newId);
+            //check what mode we are in
+            if(Globals.opMode == "vrc")
+            {
+              Logger.Msg("Loading Avatar from VRChat");
+              _oscDir = VRChat.VRCOSCDirectory;
+            }
+            if (Globals.opMode == "cvr")
+            {
+              Logger.Msg("Loading Avatar from ChilloutVR");
+              _oscDir = CVR.CVROSCDirectory;
+            }
+                    
             AvatarConfigSpec avatarConfig = null;
-            foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
+            foreach (var userFolder in Directory.GetDirectories(_oscDir))
             {
                 if (Directory.Exists(userFolder + "\\Avatars"))
                     foreach (var avatarFile in Directory.GetFiles(userFolder+"\\Avatars"))

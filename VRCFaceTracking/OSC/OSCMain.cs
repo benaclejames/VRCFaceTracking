@@ -63,15 +63,47 @@ namespace VRCFaceTracking.OSC
             try
             {
                 ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                if (Globals.opMode == "cvr")
+                {
+                  // restore catch as CVR has more potential OSC types
+                  var newMsg = new OscMessage(buffer);
+                
+                  if (newMsg.Address == "/avatar/change")
+                  {
+                    try
+                    {
+                      ConfigParser.ParseNewAvatar((string) newMsg.Value);
+                    }
+                    catch {
+                      Logger.Warning("ParseNewAvatar exception thrown");
+                    }
+                  }
+                }
             }
             catch (SocketException)
             {
+                Logger.Warning("OSC message exception thrown");
                 // Ignore as this is most likely a timeout exception
-                return;
+                if (Globals.opMode == "vrc")
+                {
+                 // keep current behviour for VRC
+                  return;
+                }
             }
-            var newMsg = new OscMessage(buffer);
-            if (newMsg.Address == "/avatar/change")
-                ConfigParser.ParseNewAvatar((string) newMsg.Value);
+            if (Globals.opMode == "vrc")
+            {
+              var newMsg = new OscMessage(buffer);
+              if (newMsg.Address == "/avatar/change")
+              {
+                try
+                {
+                  ConfigParser.ParseNewAvatar((string) newMsg.Value);
+                }
+                catch {
+                  Logger.Warning("ParseNewAvatar exception thrown");
+                }
+              }
+            }
         }
 
         public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);
