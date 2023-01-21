@@ -45,6 +45,8 @@ namespace VRCFaceTracking
         #endregion
 
         #region Modules
+        private static Type[] _modules = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule))).Union(LoadExternalModules()).ToArray();
         private static ExtTrackingModule _eyeModule, _lipModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
@@ -143,14 +145,7 @@ namespace VRCFaceTracking
         {
             Logger.Msg("Finding and initializing runtimes...");
 
-            // Get a list of our own built-in modules
-            var trackingModules = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(type => type.IsSubclassOf(typeof(ExtTrackingModule)));
-
-            // Concat both our own modules and the external ones
-            trackingModules = trackingModules.Union(LoadExternalModules());
-            
-            foreach (var module in trackingModules)
+            foreach (var module in _modules)
             {
                 Logger.Msg("Initializing module: " + module.Name);
                 // Create module
