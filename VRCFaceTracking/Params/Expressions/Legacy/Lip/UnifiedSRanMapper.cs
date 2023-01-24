@@ -42,8 +42,8 @@ namespace VRCFaceTracking.Params.Lip
 
             { SRanipal_LipShape_v2.MouthLowerOverlay, exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserLower].Weight},
 
-            { SRanipal_LipShape_v2.TongueLongStep1, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight},
-            { SRanipal_LipShape_v2.TongueLongStep2, exp => exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight},
+            { SRanipal_LipShape_v2.TongueLongStep1, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight * 2.0f)},
+            { SRanipal_LipShape_v2.TongueLongStep2, exp => Math.Min(1, (exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight * 2.0f) - 1.0f)},
 
             { SRanipal_LipShape_v2.TongueDown, exp => exp.Shapes[(int)UnifiedExpressions.TongueDown].Weight},
             { SRanipal_LipShape_v2.TongueUp, exp => exp.Shapes[(int)UnifiedExpressions.TongueUp].Weight},

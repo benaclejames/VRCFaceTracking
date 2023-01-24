@@ -136,7 +136,7 @@
             new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
                 ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight > 0
                 : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight > 0
-                , "EyesSquintToggle"),
+                , "EyesSqueezeToggle"),
 
             #endregion
         };

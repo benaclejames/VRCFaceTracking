@@ -56,8 +56,8 @@
         NoseDilationRight, // Right side nose's canal opens up.
         NoseDilationLeft, // Left side nose's canal opens up.
 
-        NoseWrinkleRight, // Outer part of the right side nose pulls upward.
-        NoseWrinkleLeft, // Outer part of the right side nose pulls upward.
+        NoseSneerRight, // Outer part of the right side nose pulls upward.
+        NoseSneerLeft, // Outer part of the right side nose pulls upward.
 
         #endregion
 
