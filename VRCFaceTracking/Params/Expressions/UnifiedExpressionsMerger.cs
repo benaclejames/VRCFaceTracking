@@ -76,7 +76,7 @@ namespace VRCFaceTracking.Params
                 Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight)) +
                 (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight) -
                 Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight)) / 2.0f,
-                "v2/LeftBrowY"),
+                "v2/BrowsY"),
 
             // Kinda complicated, basically reports the 'angle' of the brow normalized from -1.0 - 1.0, with -1.0 being angry and 1 being worried. Can be used in tandem with the
             // BrowY parameters to regain brow positioning but can be used by itself to control a simplified expression of the brows.
