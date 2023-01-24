@@ -51,12 +51,6 @@ namespace VRCFaceTracking
         /// <summary>
         /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.
         /// </summary>
-        public static void UpdateData()
-        {
-            // 'Push' model; Updates will push the latest data buffer from modules and mutates the output for parameters.
-            // All data pertaining to how the mutator transforms the latest data into mutated data is contained within Data itself.
-            Mutator.MutateData(Data);
-            OnUnifiedDataUpdated.Invoke(Data);
-        }
+        public static void UpdateData() => OnUnifiedDataUpdated.Invoke(Mutator.MutateData(ref Data));
     }
 }

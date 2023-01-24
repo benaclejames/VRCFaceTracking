@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace VRCFaceTracking
 {
-    internal static class ModuleAttributeHandler
+    public static class ModuleAttributeHandler
     {
         private static void HandleLoadPriorAttribute(Assembly assembly, ref List<Assembly> assemblies, List<Attribute> attributes)
         {
@@ -43,7 +43,16 @@ namespace VRCFaceTracking
             for (int i = 0; i < assemblies.Count; i++)
             {
                 // Get all attributes.
-                var attributes = assemblies[i].GetCustomAttributes().ToList();
+                List<Attribute> attributes = new List<Attribute>();
+                try
+                {
+                    attributes = assemblies[i].GetCustomAttributes().ToList();
+                }
+                catch (ArgumentNullException)
+                {
+                    Logger.Warning(assemblies[i].FullName + " contains an unimplemented attribute.");
+                    continue;
+                }
 
                 HandleLoadPriorAttribute(assemblies[i], ref assemblies, attributes);
             }

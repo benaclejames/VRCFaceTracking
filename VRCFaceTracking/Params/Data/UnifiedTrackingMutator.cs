@@ -1,27 +1,36 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using System.Windows.Markup;
 using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
 {
+    public struct Mutation
+    {
+        public float CalibrationMult; // The amount to multiply this parameter to normalize between 0-1.
+        //public float SigmoidMult; // How much should this parameter be affected by the sigmoid function. This makes the parameter act more like a toggle.
+        //public float LogitMult; // How much should this parameter be affected by the logit (inverse of sigmoid) function. This makes the parameter act more within the normalized range.
+        public float SmoothnessMult; // How much should this parameter be affected by the smoothing function.
+    }
+
+    public class MutationData
+    {
+        public Mutation[] ShapeMutations = new Mutation[(int)UnifiedExpressions.Max + 1];
+        public Mutation GazeMutations, OpennessMutations, PupilMutations = new Mutation();
+    }
+
     /// <summary>
     /// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
     /// </summary>
     public class UnifiedTrackingMutator
     {
-        public CalibratorState calibratorMode = CalibratorState.Inactive;
-        public float calibrationWeight;
-        public bool smoothingMode = false;
+        [JsonIgnore] public UnifiedTrackingData TrackingDataBuffer;
+        public MutationData MutationData = new MutationData();
 
-        /// <summary>
-        /// Represents the state of calibration within the mutator.
-        /// </summary>
-        public enum CalibratorState
-        {
-            Inactive,
-            Calibrating,
-            Calibrated
-        }
+        public CalibratorState CalibratorMode = CalibratorState.Inactive;
+        public float CalibrationWeight;
+
+        public bool SmoothingMode = false;
 
         static float SimpleLerp(float input, float previousInput, float value)
         {
@@ -33,7 +42,17 @@ namespace VRCFaceTracking
             return input * (1.0f - value) + previousInput * value;
         }
 
-        private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
+        /// <summary>
+        /// Represents the state of calibration within the mutator.
+        /// </summary>
+        public enum CalibratorState
+        {
+            Inactive,
+            Calibrating,
+            Calibrated
+        }
+
+        private void Calibrate(ref UnifiedTrackingData input, float calibrationWeight)
         {
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
             {
@@ -41,69 +60,92 @@ namespace VRCFaceTracking
                 if (calibrationWeight > 0.0f)
                 {
                     // Detecting if a parameter exceeds the 1.0f float threshold, then cap it with it's inverse; making sure to not fully enforce the calibration value immediately with a buffer.
-                    if (inputData.Shapes[i].Weight * inputData.Shapes[i].CalibrationMult > 1.0f)
-                        UnifiedTracking.Data.Shapes[i].CalibrationMult = SimpleLerp(1.0f / inputData.Shapes[i].Weight, inputData.Shapes[i].CalibrationMult, calibrationWeight);
+                    if (input.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult > 1.0f)
+                        MutationData.ShapeMutations[i].CalibrationMult = SimpleLerp(1.0f / input.Shapes[i].Weight, MutationData.ShapeMutations[i].CalibrationMult, calibrationWeight);
                 }
 
                 // Normalizer (after calibration/loaded calibration)
-                UnifiedTracking.Data.Shapes[i].AdjustedWeight = UnifiedTracking.Data.Shapes[i].Weight * UnifiedTracking.Data.Shapes[i].CalibrationMult;
+                input.Shapes[i].Weight = input.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult;
             }
         }
 
-        private void ApplyCalibrator(ref UnifiedTrackingData inputData)
+        private void ApplyCalibrator(ref UnifiedTrackingData input)
         {
             /* Example of continuous calibration to the UnifiedTrackingData.LatestExpressionData within the mutator:
              * This will be the first step to run so apply any sort of calibration to normalize the range of the base parameter between 0.0f -> 1.0f.
              * This also only applies a multiplier to each parameter as well, so the UnifiedTrackingData.LatestExpressionData passed through here will have a consistent UnifiedTrackingData.MutatedExpressionData.
              */
 
-            switch (calibratorMode)
+            switch (CalibratorMode)
             {
                 case CalibratorState.Inactive:
-                    Calibrate(ref inputData, 0.0f);
                     break;
                 case CalibratorState.Calibrating:
-                    Calibrate(ref inputData, calibrationWeight);
+                    Calibrate(ref input, CalibrationWeight);
                     break;
                 case CalibratorState.Calibrated:
-                    Calibrate(ref inputData, 0.0f);
+                    Calibrate(ref input, 0.0f);
                     break;
                 default:
                     throw new ArgumentException("Calibration state not found.");
             }
         }
 
-        private void ApplySmoothing(ref UnifiedTrackingData data)
+        private void ApplySmoothing(ref UnifiedTrackingData input)
         {
             // Example of applying smoothing to the data within the mutator:
-            if (smoothingMode)
+            if (SmoothingMode)
             {
-                for (int i = 0; i < data.Shapes.Length; i++)
-                    data.Shapes[i].AdjustedWeight =
+                for (int i = 0; i < input.Shapes.Length; i++)
+                    input.Shapes[i].Weight =
                         SimpleLerp(
-                            data.Shapes[i].Weight,
-                            data.Shapes[i].AdjustedWeight,
-                            data.Shapes[i].SmoothnessMult
+                            input.Shapes[i].Weight,
+                            TrackingDataBuffer.Shapes[i].Weight,
+                            MutationData.ShapeMutations[i].SmoothnessMult
                         );
 
-                data.AdjustedEye.Left.Openness = SimpleLerp(data.Eye.Left.Openness, data.AdjustedEye.Left.Openness, data.Eye.OpennessSmoothness);
-                data.AdjustedEye.Left.PupilDiameter_MM = SimpleLerp(data.Eye.Left.PupilDiameter_MM, data.AdjustedEye.Left.PupilDiameter_MM, data.Eye.GazeSmoothness);
-                data.AdjustedEye.Left.Gaze = SimpleLerp(data.Eye.Left.Gaze, data.AdjustedEye.Left.Gaze, data.Eye.PupilDiameterSmoothness);
+                input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, TrackingDataBuffer.Eye.Left.Openness, MutationData.OpennessMutations.SmoothnessMult);
+                input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, TrackingDataBuffer.Eye.Left.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
+                input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, TrackingDataBuffer.Eye.Left.Gaze, MutationData.GazeMutations.SmoothnessMult);
 
-                data.AdjustedEye.Right.Openness = SimpleLerp(data.Eye.Right.Openness, data.AdjustedEye.Right.Openness, data.Eye.OpennessSmoothness);
-                data.AdjustedEye.Right.PupilDiameter_MM = SimpleLerp(data.Eye.Right.PupilDiameter_MM, data.AdjustedEye.Right.PupilDiameter_MM, data.Eye.GazeSmoothness);
-                data.AdjustedEye.Right.Gaze = SimpleLerp(data.Eye.Right.Gaze, data.AdjustedEye.Right.Gaze, data.Eye.PupilDiameterSmoothness);
+                input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, TrackingDataBuffer.Eye.Right.Openness, MutationData.OpennessMutations.SmoothnessMult);
+                input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, TrackingDataBuffer.Eye.Right.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
+                input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, TrackingDataBuffer.Eye.Right.Gaze, MutationData.GazeMutations.SmoothnessMult);
             }
         }
 
         /// <summary>
-        /// Takes in the latest base expression Weight data from modules and mutates into the AdjustedWeight data for output parameters.
+        /// Takes in the latest base expression Weight data from modules and mutates into the Weight data for output parameters.
         /// </summary>
         /// <returns> Mutated Expression Data. </returns>
-        public void MutateData(UnifiedTrackingData inputData)
+        public UnifiedTrackingData MutateData(ref UnifiedTrackingData input)
         {
-            ApplyCalibrator(ref inputData);
-            ApplySmoothing(ref inputData);
+            ApplyCalibrator(ref input);
+            ApplySmoothing(ref input);
+            TrackingDataBuffer = input;
+            return TrackingDataBuffer;
+        }
+
+        public void SetCalibration(float setValue = 0.0f)
+        {
+            // Currently eye data does not get parsed by calibration.
+            MutationData.PupilMutations.CalibrationMult = setValue;
+            MutationData.GazeMutations.CalibrationMult = setValue;
+            MutationData.OpennessMutations.CalibrationMult = setValue;
+
+            for (int i = 0; i < MutationData.ShapeMutations.Length; i++)
+                MutationData.ShapeMutations[i].CalibrationMult = setValue;
+        }
+
+        public void SetSmoothness(float setValue = 0.0f)
+        {
+            // Currently eye data does not get parsed by calibration.
+            MutationData.PupilMutations.SmoothnessMult = setValue;
+            MutationData.GazeMutations.SmoothnessMult = setValue;
+            MutationData.OpennessMutations.SmoothnessMult = setValue;
+
+            for (int i = 0; i < MutationData.ShapeMutations.Length; i++)
+                MutationData.ShapeMutations[i].SmoothnessMult = setValue;
         }
     }
 }

@@ -208,49 +208,41 @@ namespace VRCFaceTracking.Assets.UI
             {
                 Logger.Msg("Initialized calibration.");
 
-                UnifiedTracking.Data.ResetCalibration();
+                UnifiedTracking.Mutator.SetCalibration(999.99f);
 
-                for (int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
-                    UnifiedTracking.Data.Shapes[i].CalibrationMult = 999.99f;
-
-                UnifiedTracking.Mutator.calibrationWeight = 0.75f;
-                UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+                UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
+                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
 
                 Logger.Msg("Calibrating Normalization for 30s.");
                 Thread.Sleep(30000);
 
                 if (fineTune)
                 {
-                    UnifiedTracking.Mutator.calibrationWeight = 0.25f;
+                    UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
                     Logger.Msg("Fine-tuning Normalization for 90s.");
                     Thread.Sleep(90000);
                 }
 
                 Logger.Msg("Calibration completed successfully! Values will be saved on exit.");
-                UnifiedTracking.Mutator.calibrationWeight = 0.25f;
-                UnifiedTracking.Mutator.calibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
+                UnifiedTracking.Mutator.CalibrationWeight = 0.0f;
+                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
             });
             _thread.Start();
         }
 
         private void EnableSmoothing_Checked(object sender, RoutedEventArgs e)
         {                   
-            UnifiedTracking.Mutator.smoothingMode = true;
+            UnifiedTracking.Mutator.SmoothingMode = true;
         }
 
         private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e)
         {
-            UnifiedTracking.Mutator.smoothingMode = false;
+            UnifiedTracking.Mutator.SmoothingMode = false;
         }
 
         private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            for(int i = 0; i < UnifiedTracking.Data.Shapes.Length; i++)
-                UnifiedTracking.Data.Shapes[i].SmoothnessMult = (float)e.NewValue;
-
-            UnifiedTracking.Data.Eye.GazeSmoothness = (float)e.NewValue;
-            UnifiedTracking.Data.Eye.OpennessSmoothness = (float)e.NewValue;
-            UnifiedTracking.Data.Eye.PupilDiameterSmoothness = (float)e.NewValue;
+            UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
         }
     }
 }
