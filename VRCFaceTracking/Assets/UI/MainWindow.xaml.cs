@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -61,9 +62,6 @@ namespace VRCFaceTracking.Assets.UI
                 new MenuItem("Exit", (sender, args) => MainStandalone.Teardown()),
                 new MenuItem("Show", ShowWindow)
             });
-
-            // List box containing all selectable modules that implement ExtTrackingModule.
-            moduleListBox.ItemsSource = UnifiedLibManager.GetModuleList();
 
             // Is this running as admin?
             // If not, disable the re-int button
@@ -152,7 +150,7 @@ namespace VRCFaceTracking.Assets.UI
             Logger.Msg("Reloading available modules.");
 
             UnifiedLibManager.ReloadModules();
-            moduleListBox.ItemsSource = UnifiedLibManager.GetModuleList();
+            moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
         }
 
         private void PauseClickEyes(object sender, RoutedEventArgs e)
@@ -189,6 +187,13 @@ namespace VRCFaceTracking.Assets.UI
             } 
         }
 
+        private void MainWindow_Loaded(object sender, EventArgs eventArgs)
+        {
+            // List box containing all selectable modules that implement ExtTrackingModule.
+            UnifiedLibManager.ReloadModules();
+            moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
+        }
+
         private void TabController_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             IsEyePageVisible = TabController.SelectedIndex == 1;
@@ -197,7 +202,7 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UnifiedLibManager._requestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Assembly>().ToList());
+            UnifiedLibManager.RequestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Assembly>().ToList());
         }
 
         private void CalibrationClick(object sender, RoutedEventArgs e)
@@ -213,14 +218,13 @@ namespace VRCFaceTracking.Assets.UI
                 UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
                 UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
 
-                Logger.Msg("Calibrating Normalization for 30s.");
+                Logger.Msg("Calibrating normalization for 30s.");
                 Thread.Sleep(30000);
 
                 if (fineTune)
                 {
                     UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
-                    Logger.Msg("Fine-tuning Normalization for 90s.");
-                    Thread.Sleep(90000);
+                    Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
                 }
 
                 Logger.Msg("Calibration completed successfully! Values will be saved on exit.");
@@ -238,6 +242,20 @@ namespace VRCFaceTracking.Assets.UI
         private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e)
         {
             UnifiedTracking.Mutator.SmoothingMode = false;
+        }
+
+        private void FineTuneCalibration_Checked(object sender, RoutedEventArgs e)
+        {
+            Logger.Msg("Fine-tuning normalization.");
+            UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
+            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+        }
+
+        private void FineTuneCalibration_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Logger.Msg("Fixed normalization.");
+            UnifiedTracking.Mutator.CalibrationWeight = 0.0f;
+            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
         }
 
         private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

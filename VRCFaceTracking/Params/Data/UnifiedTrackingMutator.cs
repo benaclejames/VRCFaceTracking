@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Text.Json.Serialization;
-using System.Windows.Input;
-using System.Windows.Markup;
 using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
@@ -119,12 +116,17 @@ namespace VRCFaceTracking
         /// Takes in the latest base expression Weight data from modules and mutates into the Weight data for output parameters.
         /// </summary>
         /// <returns> Mutated Expression Data. </returns>
-        public UnifiedTrackingData MutateData(ref UnifiedTrackingData input)
+        public UnifiedTrackingData MutateData(UnifiedTrackingData input)
         {
-            ApplyCalibrator(ref input);
-            ApplySmoothing(ref input);
-            TrackingDataBuffer.CopyPropertiesOf(input);
-            return TrackingDataBuffer;
+            if (CalibratorMode == CalibratorState.Inactive && SmoothingMode == false)
+                return input;
+
+            UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
+            inputBuffer.CopyPropertiesOf(input);
+            ApplyCalibrator(ref inputBuffer);
+            ApplySmoothing(ref inputBuffer);
+            TrackingDataBuffer.CopyPropertiesOf(inputBuffer);
+            return inputBuffer;
         }
 
         public void SetCalibration(float setValue = 0.0f)

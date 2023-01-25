@@ -6,15 +6,9 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
-using System.Text.Json;
 using VRCFaceTracking.Assets.UI;
-using VRCFaceTracking.Params;
 using VRCFaceTracking.OSC;
-using System.IO;
-using System.Text;
 using VRCFaceTracking.Types;
-using System.Runtime.InteropServices.ComTypes;
-using System.Diagnostics;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]

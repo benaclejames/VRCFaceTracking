@@ -21,9 +21,6 @@ namespace VRCFaceTracking.Types
         public void ReadConfiguration()
         {
             UnifiedConfig config = new UnifiedConfig();
-
-            UnifiedLibManager.ReloadModules();
-
             try
             {
                 string jsonString = File.ReadAllText(unifiedConfigPath);
@@ -33,7 +30,7 @@ namespace VRCFaceTracking.Types
                     if (config.RequestedModulePaths != null && config.RequestedModulePaths.Count > 0)
                     {
                         Logger.Msg("Saved module load order initialized.");
-                        UnifiedLibManager._requestedModules = UnifiedLibManager.LoadExternalAssemblies(config.RequestedModulePaths.ToArray());
+                        UnifiedLibManager.RequestedModules = UnifiedLibManager.LoadExternalAssemblies(config.RequestedModulePaths.ToArray());
                     }
                     else
                     {
@@ -79,7 +76,7 @@ namespace VRCFaceTracking.Types
 
                 // Assembly load order.
                 tempConfig.RequestedModulePaths = new List<string>();
-                UnifiedLibManager._requestedModules.ForEach(a => tempConfig.RequestedModulePaths.Add(a.Location));
+                UnifiedLibManager.RequestedModules.ForEach(a => tempConfig.RequestedModulePaths.Add(a.Location));
 
                 JsonSerializer.Serialize(stream, tempConfig, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
                 stream.Dispose();

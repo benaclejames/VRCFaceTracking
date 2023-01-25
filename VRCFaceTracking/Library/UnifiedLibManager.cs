@@ -51,8 +51,8 @@ namespace VRCFaceTracking
         #endregion
 
         #region Modules
-        private static List<Assembly> _availableModules;
-        internal static List<Assembly> _requestedModules = new List<Assembly>();
+        public static List<Assembly> AvailableModules { get; private set; }
+        internal static List<Assembly> RequestedModules = new List<Assembly>();
         private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
@@ -82,21 +82,14 @@ namespace VRCFaceTracking
 
         public static void Initialize()
         {
-            ReloadModules();
-
-            if (_requestedModules != null && _requestedModules.Count > 0)
-                CreateModuleInitializer(_requestedModules);
-            else CreateModuleInitializer(_availableModules);
+            if (RequestedModules != null && RequestedModules.Count > 0)
+                CreateModuleInitializer(RequestedModules);
+            else CreateModuleInitializer(AvailableModules);
         }
 
         public static void ReloadModules()
         {
-            _availableModules = LoadExternalAssemblies(GetAllModulePaths());
-        }
-
-        public static List<Assembly> GetModuleList()
-        {
-            return _availableModules;
+            AvailableModules = LoadExternalAssemblies(GetAllModulePaths());
         }
 
         private static string[] GetAllModulePaths()
@@ -152,8 +145,6 @@ namespace VRCFaceTracking
         public static List<Assembly> LoadExternalAssemblies(string[] path, bool useAttributes = true)
         {
             var returnList = new List<Assembly>();
-
-            // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
             foreach (var dll in path)
             {
                 try
@@ -205,8 +196,7 @@ namespace VRCFaceTracking
         {
             if (module.Supported.SupportsEye || module.Supported.SupportsExpressions)
             {
-                bool eyeSuccess = false;
-                bool expressionSuccess = false;
+                bool eyeSuccess = false, expressionSuccess = false;
                 try
                 {
                     (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
@@ -245,10 +235,11 @@ namespace VRCFaceTracking
 
             foreach (Assembly module in moduleType)
             {
-                ExtTrackingModule loadedModule;
+                if (_loadedEyeModule != null && _loadedExpressionModule != null)
+                    break;
 
-                loadedModule = LoadExternalModule(module);
                 Logger.Msg("Initializing module: " + module.ToString());
+                ExtTrackingModule loadedModule = LoadExternalModule(module);
                 AttemptModuleInitialize(loadedModule);
             }
 
