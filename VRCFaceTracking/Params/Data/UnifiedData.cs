@@ -48,6 +48,15 @@ namespace VRCFaceTracking.Params
                 PupilDiameter_MM = (((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f) - _minDilation) / (_maxDilation - _minDilation),
             };
         }
+        public void CopyPropertiesOf(UnifiedEyeData data)
+        {
+            this.Left.Gaze = data.Left.Gaze;
+            this.Left.Openness = data.Left.Openness;
+            this.Left.PupilDiameter_MM = data.Left.PupilDiameter_MM;
+            this.Right.Gaze = data.Right.Gaze;
+            this.Right.Openness = data.Right.Openness;
+            this.Right.PupilDiameter_MM = data.Right.PupilDiameter_MM;
+        }
     }
 
     /// <summary>
@@ -82,5 +91,12 @@ namespace VRCFaceTracking.Params
         /// </code>
         /// </remarks>
         [JsonIgnore] public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
+
+        public void CopyPropertiesOf(UnifiedTrackingData data) 
+        {
+            this.Eye.CopyPropertiesOf(data.Eye);
+            for(int i = 0; i < Shapes.Length; i++)
+                this.Shapes[i].Weight = data.Shapes[i].Weight;
+        }
     }
 }

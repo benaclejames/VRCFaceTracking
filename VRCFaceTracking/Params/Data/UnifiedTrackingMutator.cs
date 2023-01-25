@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using System.Windows.Input;
 using System.Windows.Markup;
 using VRCFaceTracking.Params;
 
@@ -24,7 +25,7 @@ namespace VRCFaceTracking
     /// </summary>
     public class UnifiedTrackingMutator
     {
-        [JsonIgnore] public UnifiedTrackingData TrackingDataBuffer;
+        private static UnifiedTrackingData TrackingDataBuffer = new UnifiedTrackingData();
         public MutationData MutationData = new MutationData();
 
         public CalibratorState CalibratorMode = CalibratorState.Inactive;
@@ -122,7 +123,7 @@ namespace VRCFaceTracking
         {
             ApplyCalibrator(ref input);
             ApplySmoothing(ref input);
-            TrackingDataBuffer = input;
+            TrackingDataBuffer.CopyPropertiesOf(input);
             return TrackingDataBuffer;
         }
 

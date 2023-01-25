@@ -112,7 +112,7 @@ namespace VRCFaceTracking
                     .Where(param => param.Relevant);
 
                 // Reset calibration on parameter data.
-                UnifiedTracking.Mutator.SetCalibration();
+                //UnifiedTracking.Mutator.SetCalibration();
 
                 _relevantParamsCount = _relevantParams.Count() + _relevantParams_v2.Count();
                 Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + " parameters loaded.");
