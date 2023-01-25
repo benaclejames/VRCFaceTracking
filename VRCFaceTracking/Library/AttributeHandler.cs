@@ -27,7 +27,7 @@ namespace VRCFaceTracking
                         {
                             Logger.Msg("Pushed " + assemblies[t].GetCustomAttribute<AssemblyTitleAttribute>().Title +
                             " into " + assemblies[t - 1].GetCustomAttribute<AssemblyTitleAttribute>().Title +
-                            " via LoadPrior.);
+                            " via LoadPrior.");
                             tempAssembly = assemblies[t];
                             assemblies[t] = assemblies[t - 1];
                             assemblies[t - 1] = tempAssembly;
