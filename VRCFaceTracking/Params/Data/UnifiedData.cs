@@ -21,8 +21,8 @@ namespace VRCFaceTracking.Params
     public class UnifiedEyeData
     {
         public UnifiedSingleEyeData Left, Right;
-        public float _minDilation = 999f;
-        public float _maxDilation = 0f;
+        public float _maxDilation, _minDilation = 999f;
+        public float GazeSmoothness, PupilDiameterSmoothness, OpennessSmoothness;
 
         /// <summary>
         /// Creates relevant data that combines the Left and Right single eye datas into a combined single eye data.
@@ -48,15 +48,6 @@ namespace VRCFaceTracking.Params
                 PupilDiameter_MM = (((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f) - _minDilation) / (_maxDilation - _minDilation),
             };
         }
-        public void CopyPropertiesOf(UnifiedEyeData data)
-        {
-            this.Left.Gaze = data.Left.Gaze;
-            this.Left.Openness = data.Left.Openness;
-            this.Left.PupilDiameter_MM = data.Left.PupilDiameter_MM;
-            this.Right.Gaze = data.Right.Gaze;
-            this.Right.Openness = data.Right.Openness;
-            this.Right.PupilDiameter_MM = data.Right.PupilDiameter_MM;
-        }
     }
 
     /// <summary>
@@ -65,9 +56,25 @@ namespace VRCFaceTracking.Params
     public struct UnifiedExpressionShape
     {
         /// <summary>
-        /// Value that contains the specified Unified Expression value.
+        /// Value that contains the specified Unified Expression raw value.
         /// </summary>
-        public float Weight;
+        [JsonIgnore] public float Weight;
+
+        /// <summary>
+        /// Value that contains an adjusted parameter value that drives the specified Unified Expression output.
+        /// </summary>
+        /// <remarks>This value is a result of the original Weight being mutated into this value.</remarks>
+        [JsonIgnore] internal float AdjustedWeight;
+
+        /// <summary>
+        /// How much the Weight will be multiplied by the Mutator system to be within bounds of 0.0 - 1.0.
+        /// </summary>
+        public float CalibrationMult;
+
+        /// <summary>
+        /// How much the Weight will be smoothed out by the Mutator system using the current and previous Weights.
+        /// </summary>
+        public float SmoothnessMult;
     }
 
     /// <summary>
@@ -79,6 +86,11 @@ namespace VRCFaceTracking.Params
         /// Container of all relevant Unified raw eye data. 
         /// </summary>
         public UnifiedEyeData Eye = new UnifiedEyeData();
+        
+        /// <summary>
+        /// Container of all updated Unified eye data. 
+        /// </summary>
+        internal UnifiedEyeData AdjustedEye = new UnifiedEyeData();
 
         /// <summary>
         /// Container of all Unified Expression expression data. 
@@ -90,13 +102,12 @@ namespace VRCFaceTracking.Params
         /// Shapes[(int)UnifiedExpression.JawOpen].Weight = JawOpen;
         /// </code>
         /// </remarks>
-        [JsonIgnore] public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
+        public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
 
-        public void CopyPropertiesOf(UnifiedTrackingData data) 
+        public void ResetCalibration()
         {
-            this.Eye.CopyPropertiesOf(data.Eye);
-            for(int i = 0; i < Shapes.Length; i++)
-                this.Shapes[i].Weight = data.Shapes[i].Weight;
+            for (int i = 0; i < Shapes.Length; i++)
+                Shapes[i].CalibrationMult = 0.0f;
         }
     }
 }
