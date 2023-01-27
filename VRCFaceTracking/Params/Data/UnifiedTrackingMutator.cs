@@ -96,7 +96,7 @@ namespace VRCFaceTracking
             ApplyCalibrator(ref inputBuffer);
             ApplySmoothing(ref inputBuffer);
 
-            TrackingDataBuffer.CopyPropertiesOf(inputBuffer);
+            trackingDataBuffer.CopyPropertiesOf(inputBuffer);
             return inputBuffer;
         } 
 
