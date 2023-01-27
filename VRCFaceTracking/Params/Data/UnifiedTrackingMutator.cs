@@ -51,7 +51,7 @@ namespace VRCFaceTracking
                 if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult > 1.0f) // Calibrator
                         MutationData.ShapeMutations[i].CalibrationMult = SimpleLerp(1.0f / inputData.Shapes[i].Weight, MutationData.ShapeMutations[i].CalibrationMult, calibrationWeight);
 
-                inputData.Shapes[i].Weight = inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult;
+                inputData.Shapes[i].Weight = Math.Min(1, (inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult));
             }
         }
 
