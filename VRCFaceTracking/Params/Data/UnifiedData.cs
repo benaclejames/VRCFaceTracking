@@ -21,11 +21,8 @@ namespace VRCFaceTracking.Params
     public class UnifiedEyeData
     {
         public UnifiedSingleEyeData Left, Right;
-        public float _minDilation = 999f;
-        public float _maxDilation = 0f;
-        public float GazeSmoothness;
-        public float PupilDiameterSmoothness;
-        public float OpennessSmoothness;
+        public float _maxDilation, _minDilation = 999f;
+        public float GazeSmoothness, PupilDiameterSmoothness, OpennessSmoothness;
 
         /// <summary>
         /// Creates relevant data that combines the Left and Right single eye datas into a combined single eye data.
