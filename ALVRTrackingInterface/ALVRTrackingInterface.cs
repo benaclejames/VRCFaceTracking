@@ -38,9 +38,11 @@ namespace ALVRTrackingInterface
             lipActive = expressionAvailable;
 
             string configPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "questProIP.txt");
+            Logger.Error(configPath);
             if (!File.Exists(configPath))
             {
-                Logger.Msg("Failed to find config JSON! Please maker sure it is present in the same directory as the DLL.");
+                Logger.Msg("Failed to find config JSON! A questProIP.txt file has been generated, please configure your Quest Pro's IP address into this text file.");
+                File.WriteAllText("192.168.254.254", configPath);
                 return (false, false);
             }
 

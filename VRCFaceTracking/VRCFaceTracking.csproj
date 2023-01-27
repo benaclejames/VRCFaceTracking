@@ -30,7 +30,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,6 +38,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32bit>false</Prefer32bit>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Assets/Images/VRCFT.ico</ApplicationIcon>
@@ -91,6 +92,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="Assets\Images\VRCFT.ico" />
+    <None Include="FodyWeavers.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -132,6 +136,9 @@
     <Resource Include="Assets\Images\ColorBars.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp">
+      <Version>4.7.0</Version>
+    </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>7.0.1</Version>
     </PackageReference>

@@ -87,12 +87,17 @@ namespace VRCFaceTracking
         /// <returns> Mutated Expression Data. </returns>
         public UnifiedTrackingData MutateData(UnifiedTrackingData input)
         {
-            var dataBuffer = new UnifiedTrackingData();
-            dataBuffer.CopyPropertiesOf(input);
-            ApplyCalibrator(ref dataBuffer);
-            ApplySmoothing(ref dataBuffer);
-            trackingDataBuffer.CopyPropertiesOf(dataBuffer);
-            return trackingDataBuffer;
+            if (CalibratorMode == CalibratorState.Inactive && SmoothingMode == false)
+                return input;
+
+            UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
+            inputBuffer.CopyPropertiesOf(input);
+
+            ApplyCalibrator(ref inputBuffer);
+            ApplySmoothing(ref inputBuffer);
+
+            TrackingDataBuffer.CopyPropertiesOf(inputBuffer);
+            return inputBuffer;
         } 
 
         public void SetCalibration(float setValue = 0.0f)
