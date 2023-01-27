@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VRCFaceTracking.SDK
+namespace VRCFaceTracking
 {
     public enum VRCFTModuleType
     {
@@ -12,35 +12,58 @@ namespace VRCFaceTracking.SDK
         Expression,
         Both
     }
-    public enum VRCFTFieldValueType
-    {
-        None,
-        Float,
-        Bool
-    }
 
+    /// <summary>
+    /// Specifies the module type info relevant for VRCFaceTracking.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class VRCFTModuleInfoAttribute : Attribute
+    public class VRCFTModuleTypeAttribute : Attribute
     {
+        /// <summary>
+        /// Container of the type of data the module is expected to send.
+        /// </summary>
         public VRCFTModuleType ModuleType { get; private set; }
 
-        public VRCFTModuleInfoAttribute(VRCFTModuleType moduleType)
+        public VRCFTModuleTypeAttribute(VRCFTModuleType moduleType)
         {
             ModuleType = moduleType;
         }
     }
 
+    /// <summary>
+    /// Specifies loading this module prior to the specified module GUID.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class VRCFTModuleLoadPriorAttribute : Attribute
+    public class VRCFTModuleEnsureLoadPriorAttribute : Attribute
     {
-        public string PostModule { get; private set; }
+        /// <summary>
+        /// Container of the referenced module GUID.
+        /// </summary>
+        public string ModuleGUID { get; private set; }
 
-        public VRCFTModuleLoadPriorAttribute(string moduleName)
+        public VRCFTModuleEnsureLoadPriorAttribute(string moduleGUID)
         {
-            PostModule = moduleName;
+            ModuleGUID = moduleGUID;
         }
     }
 
+    /// <summary>
+    /// Specifies loading this module directly after the specified module GUID.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class VRCFTModuleEnsureLoadAfterAttribute : Attribute
+    {
+        /// <summary>
+        /// Container of the referenced module GUID.
+        /// </summary>
+        public string ModuleGUID { get; private set; }
+
+        public VRCFTModuleEnsureLoadAfterAttribute(string moduleGUID)
+        {
+            ModuleGUID = moduleGUID;
+        }
+    }
+    /*
     [AttributeUsage(AttributeTargets.Field)]
     public class VRCFTModuleFieldAttribute : Attribute
     {
@@ -68,4 +91,5 @@ namespace VRCFaceTracking.SDK
             Type = VRCFTFieldValueType.None;
         }
     }
+    */
 }

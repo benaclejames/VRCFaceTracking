@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -17,6 +18,7 @@ namespace SRanipalExtTrackingInterface
     {
         LipData_v2 lipData = default;
         EyeData_v2 eyeData = default;
+        private static bool eyeEnabled = false, lipEnabled = false;
 
         private static CancellationTokenSource _cancellationToken;
         
@@ -35,7 +37,7 @@ namespace SRanipalExtTrackingInterface
             if (expressionAvailable)
                 lipError = SRanipal_API.Initial(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2, IntPtr.Zero);
 
-            var (eyeEnabled, lipEnabled) = HandleSrErrors(eyeError, lipError);
+            HandleSrErrors(eyeError, lipError);
 
             if (eyeEnabled && Utils.HasAdmin)
             {
@@ -53,9 +55,27 @@ namespace SRanipalExtTrackingInterface
                     // Find the EyeCameraDevice.dll module inside sr_runtime, get it's offset and add hex 19190 to it for the image stream.
                     foreach (ProcessModule module in _process.Modules)
                         if (module.ModuleName == "EyeCameraDevice.dll")
-                            _offset = module.BaseAddress + (_process.MainModule.FileVersionInfo.FileVersion == "1.3.2.0" ? 0x19190 : 0x19100);
-                    
-                    UnifiedTracking.EyeImageData.SupportsImage = true;
+                        {
+                            _offset = module.BaseAddress; 
+                            
+                            switch (_process.MainModule.FileVersionInfo.FileVersion)
+                            {
+                                case "1.3.2.0":
+                                    _offset += 0x19190;
+                                    UnifiedTracking.EyeImageData.SupportsImage = true;
+                                    break;
+                                case "1.3.1.1":
+                                    _offset += 0x19100;
+                                    UnifiedTracking.EyeImageData.SupportsImage = true;
+                                    break;
+                                default:
+                                    UnifiedTracking.EyeImageData.SupportsImage = false;
+                                    break;
+                            }
+
+                            //(_process.MainModule.FileVersionInfo.FileVersion == "1.3.2.0" ? 0x19190 : 0x19100);
+                        }
+                            
                     UnifiedTracking.EyeImageData.ImageSize = (200, 100);
                 }
             }
@@ -73,11 +93,8 @@ namespace SRanipalExtTrackingInterface
             return (eyeEnabled, lipEnabled);
         }
 
-        private static (bool eyeSuccess, bool lipSuccess) HandleSrErrors(Error eyeError, Error lipError)
+        private static void HandleSrErrors(Error eyeError, Error lipError)
         {
-            bool eyeEnabled = false, lipEnabled = false;
-            
-
             if (eyeError == Error.WORK)
                 eyeEnabled = true;
 
@@ -87,8 +104,6 @@ namespace SRanipalExtTrackingInterface
             
             if (lipError == Error.WORK)
                 lipEnabled = true;
-
-            return (eyeEnabled, lipEnabled);
         }
         
         public override void Teardown()
@@ -98,13 +113,13 @@ namespace SRanipalExtTrackingInterface
             
             Thread.Sleep(2000);
 
-            if (Status.EyeState > ModuleState.Uninitialized)
+            if (eyeEnabled)
             {
                 Logger.Msg("Teardown: Releasing Eye");
                 // Attempt to release this module and give up after 10 seconds because Vive Moment
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Eye_v2.ANIPAL_TYPE_EYE_V2));
                 killThread.Start();
-                if (!killThread.Join(new TimeSpan(0, 0, 5)))
+                if (!killThread.Join(new TimeSpan(0, 0, 15)))
                 {
                     killThread.Abort();
                     if (killThread.IsAlive)
@@ -112,13 +127,13 @@ namespace SRanipalExtTrackingInterface
                 }
             }
 
-            if (Status.ExpressionState > ModuleState.Uninitialized)
+            if (lipEnabled)
             {
                 Logger.Msg("Teardown: Releasing Lip");
                 // Same for lips
                 var killThread = new Thread(() => SRanipal_API.Release(SRanipal_Lip_v2.ANIPAL_TYPE_LIP_V2));
                 killThread.Start();
-                if (!killThread.Join(new TimeSpan(0,0,5)))
+                if (!killThread.Join(new TimeSpan(0,0,15)))
                     killThread.Abort();
             }
         }

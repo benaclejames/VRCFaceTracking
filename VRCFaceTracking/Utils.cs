@@ -31,6 +31,7 @@ namespace VRCFaceTracking
             new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
         
         public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
+        public static readonly string CustomLibsDirectory = PersistentDataDirectory + "\\CustomLibs";
 
         public static readonly Dictionary<Type, (char oscType, string configType)> TypeConversions =
             new Dictionary<Type, (char oscType, string configType)>
@@ -39,9 +40,5 @@ namespace VRCFaceTracking
                 {typeof(float), ('f', "Float")},
                 {typeof(int), ('i', "Int")},
             };
-        public static void PropogateConfiguration()
-        {
-
-        }
     }
 }

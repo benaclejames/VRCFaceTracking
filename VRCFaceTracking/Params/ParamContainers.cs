@@ -66,7 +66,6 @@ namespace VRCFaceTracking.Params
     public class EParam : IParameter
     {
         private readonly IParameter[] _parameter;
-        private readonly string Name;
 
         public EParam(Func<UnifiedTrackingData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
@@ -87,8 +86,6 @@ namespace VRCFaceTracking.Params
                     new BinaryParameter(getValueFunc, paramName)
                 };
             }
-
-            Name = paramName;
         }
 
         public EParam(Func<UnifiedTrackingData, Vector2?> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
@@ -103,8 +100,6 @@ namespace VRCFaceTracking.Params
                 new FloatParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y"),
                 new BinaryParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y")
             };
-
-            Name = paramName;
         }
 
         OSCParams.BaseParam[] IParameter.GetBase() => 

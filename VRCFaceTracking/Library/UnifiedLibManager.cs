@@ -51,8 +51,8 @@ namespace VRCFaceTracking
         #endregion
 
         #region Modules
-        private static List<Assembly> _availableModules;
-        internal static List<Assembly> _requestedModules = new List<Assembly>();
+        public static List<Assembly> AvailableModules { get; private set; }
+        internal static List<Assembly> RequestedModules = new List<Assembly>();
         private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
@@ -82,39 +82,28 @@ namespace VRCFaceTracking
 
         public static void Initialize()
         {
-            ReloadModules();
-
-            if (_requestedModules != null && _requestedModules.Count > 0)
-                CreateModuleInitializer(_requestedModules);
-            else CreateModuleInitializer(_availableModules);
+            if (RequestedModules != null && RequestedModules.Count > 0)
+                CreateModuleInitializer(RequestedModules);
+            else CreateModuleInitializer(AvailableModules);
         }
 
         public static void ReloadModules()
         {
-            _availableModules = LoadExternalAssemblies(GetAllModulePaths());
-        }
-
-        public static List<Assembly> GetModuleList()
-        {
-            return _availableModules;
+            AvailableModules = LoadExternalAssemblies(GetAllModulePaths());
         }
 
         private static string[] GetAllModulePaths()
         {
             List<string> modulePaths = new List<string>();
-            
-            string customLibsAppData = Path.Combine(Utils.PersistentDataDirectory, "CustomLibs");
             string customLibsExe = "CustomLibs";
 
-            // Alternative data path to look for modules that exist beside the EXE (for portability use for eg). VRCFT will not create this subdirectory, the subfolder must be explicitly included with the EXE. Comes first.
             if (Directory.Exists(customLibsExe))
                 modulePaths.AddRange(Directory.GetFiles(customLibsExe, "*.dll"));
 
-            // 'Main' data path to look for modules that are properly installed into the CustomLibs in the appdata directory. Comes second to portable folder.
-            if (!Directory.Exists(customLibsAppData))
-                Directory.CreateDirectory(customLibsAppData);
+            if (!Directory.Exists(Utils.CustomLibsDirectory))
+                Directory.CreateDirectory(Utils.CustomLibsDirectory);
 
-            modulePaths.AddRange(Directory.GetFiles(customLibsAppData, "*.dll"));
+            modulePaths.AddRange(Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll"));
 
             return modulePaths.ToArray();
         }
@@ -153,14 +142,41 @@ namespace VRCFaceTracking
             return null;
         }
 
-        public static List<Assembly> LoadExternalAssemblies(string[] path)
+        public static List<Assembly> LoadExternalAssemblies(string[] path, bool useAttributes = true)
         {
             var returnList = new List<Assembly>();
-
-            // Load dotnet dlls from the VRCFTLibs folder, and CustomLibs if it happens to be beside the EXE (for portability).
             foreach (var dll in path)
             {
-                returnList.Add(Assembly.LoadFrom(dll));
+                try
+                {
+                    Assembly loaded = Assembly.LoadFrom(dll);
+                    foreach(Type type in loaded.GetExportedTypes())
+                        if (type.BaseType == typeof(ExtTrackingModule))
+                        {
+                            Logger.Msg(type.ToString() + " implements ExtTrackingModule.");
+                            returnList.Add(loaded);
+                            continue;
+                        }
+                }
+                catch (FileNotFoundException)
+                {
+                    Logger.Warning(dll + " failed to find file. Skipping.");
+                }
+                catch (ArgumentNullException)
+                {
+                    Logger.Warning(dll + " Assembly mismatch. Skipping.");
+                }
+            }
+            if (useAttributes) 
+            {
+                try
+                {
+                    ModuleAttributeHandler.HandleModuleAttributes(ref returnList);
+                }
+                catch(Exception e)
+                {
+                    Logger.Error(e.Message);
+                }
             }
 
             return returnList;
@@ -172,7 +188,6 @@ namespace VRCFaceTracking
                 return;
             
             var thread = new Thread(module.GetUpdateThreadFunc().Invoke);
-            //thread.IsBackground = true;
             UsefulThreads.Add(module, thread);
             thread.Start();
         }
@@ -181,8 +196,7 @@ namespace VRCFaceTracking
         {
             if (module.Supported.SupportsEye || module.Supported.SupportsExpressions)
             {
-                bool eyeSuccess = false;
-                bool expressionSuccess = false;
+                bool eyeSuccess = false, expressionSuccess = false;
                 try
                 {
                     (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
@@ -221,10 +235,11 @@ namespace VRCFaceTracking
 
             foreach (Assembly module in moduleType)
             {
-                ExtTrackingModule loadedModule;
+                if (_loadedEyeModule != null && _loadedExpressionModule != null)
+                    break;
 
-                loadedModule = LoadExternalModule(module);
                 Logger.Msg("Initializing module: " + module.ToString());
+                ExtTrackingModule loadedModule = LoadExternalModule(module);
                 AttemptModuleInitialize(loadedModule);
             }
 

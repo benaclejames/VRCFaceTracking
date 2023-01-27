@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
-using VRCFaceTracking.Params.Lip;
 
 namespace ALVRTrackingInterface
 {
@@ -289,8 +288,8 @@ namespace ALVRTrackingInterface
             float eyeClosedR = Math.Min(1, expressions[(int)FBExpression.Eyes_Closed_R] + expressions[(int)FBExpression.Eyes_Look_Down_R] * 0.5f);
 
             // Add Lid tightener to eye lid close to help get value closed
-            // eyeClosedL = Math.Min(1, eyeClosedL + expressions[(int)FBExpression.Lid_Tightener_L] * 0.5f);
-            // eyeClosedR = Math.Min(1, eyeClosedR + expressions[(int)FBExpression.Lid_Tightener_R] * 0.5f);
+            eyeClosedL = Math.Min(1, eyeClosedL + expressions[(int)FBExpression.Lid_Tightener_L] * 0.5f);
+            eyeClosedR = Math.Min(1, eyeClosedR + expressions[(int)FBExpression.Lid_Tightener_R] * 0.5f);
 
             // Convert from Eye Closed to Eye Openness and limit from going negative. Set the max higher than normal to offset the eye lid to help keep eye lid open.
             eye.Left.Openness = Math.Min(1, Math.Max(0, 1.1f - eyeClosedL * TrackingSensitivity.EyeLid));
@@ -498,8 +497,8 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.LipSuckUpperLeft].Weight = expressions[(int)FBExpression.Lip_Suck_LT] * TrackingSensitivity.LipSuckTop;
             unifiedExpressions[(int)UnifiedExpressions.MouthTightenerLeft].Weight = expressions[(int)FBExpression.Lip_Tightener_L] * TrackingSensitivity.MouthTightener;
             unifiedExpressions[(int)UnifiedExpressions.MouthTightenerRight].Weight = expressions[(int)FBExpression.Lip_Tightener_R] * TrackingSensitivity.MouthTightener;            
-            unifiedExpressions[(int)UnifiedExpressions.NoseWrinkleLeft].Weight = expressions[(int)FBExpression.Nose_Wrinkler_L] * TrackingSensitivity.NoseSneer;
-            unifiedExpressions[(int)UnifiedExpressions.NoseWrinkleRight].Weight = expressions[(int)FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer;
+            unifiedExpressions[(int)UnifiedExpressions.NoseSneerLeft].Weight = expressions[(int)FBExpression.Nose_Wrinkler_L] * TrackingSensitivity.NoseSneer;
+            unifiedExpressions[(int)UnifiedExpressions.NoseSneerRight].Weight = expressions[(int)FBExpression.Nose_Wrinkler_R] * TrackingSensitivity.NoseSneer;
 
             //UnifiedTrackingData.LatestLipData.LatestShapes[(int)UnifiedExpression.MouthClosed] = Math.Min(1, (expressions[(int)FBExpression.Lips_Toward]) * TrackingSensitivity.MouthTowards);
 
