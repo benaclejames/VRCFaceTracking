@@ -59,17 +59,17 @@ namespace VRCFaceTracking.Params.Eye
 
             new EParam(exp =>
                 exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f -
-                ((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .25)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight)),
+                ((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight)),
                 "LeftEyeLidExpandedSqueeze", 0.5f, true),
             new EParam(exp =>
                 exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f -
-                ((float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .25)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)),
+                ((float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)),
                 "RightEyeLidExpandedSqueeze", 0.5f, true),
             new EParam(exp =>
                 (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) + 
                 (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                (((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .25)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) + 
-                (float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .25)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)) / 2.0f), 
+                (((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) + 
+                (float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)) / 2.0f), 
                 "EyeLidExpandedSqueeze", 0.5f, true),
 
             #endregion
@@ -147,6 +147,68 @@ namespace VRCFaceTracking.Params.Eye
                 ? (exp.Eye.Left.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) > 0
                 : (exp.Eye.Right.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) > 0
                 , "EyesSqueezeToggle"),
+
+            #endregion
+
+            #region Quest Pro Legacy
+
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight 
+                > exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight 
+                ? exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight 
+                : exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight, 
+                "BrowsInnerUp"),
+
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight, "BrowInnerUpLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight, "BrowInnerUpRight"),
+
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight 
+                > exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight 
+                ? exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight
+                : exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight, 
+                "BrowsOuterUp"),
+
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight, "BrowOuterUpLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight, "BrowOuterUpRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f
+                > (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f
+                ? (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f
+                : (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f, 
+                "BrowsDown"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f, "BrowDownLeft"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f, "BrowDownRight"),
+
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserLower].Weight, "MouthRaiserLower"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserUpper].Weight, "MouthRaiserUpper"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f, "EyesSquint"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight, "EyeSquintLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight, "EyeSquintRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.CheekSquintLeft].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSquintRight].Weight) / 2.0f, "CheeksSquint"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekSquintLeft].Weight, "CheekSquintLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekSquintRight].Weight, "CheekSquintRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight) / 2.0f, "MouthDimple"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight, "MouthDimpleLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight, "MouthDimpleRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthPressLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthPressRight].Weight) / 2.0f, "MouthPress"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthPressLeft].Weight, "MouthPressLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthPressRight].Weight, "MouthPressRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight) / 2.0f, "MouthStretch"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight, "MouthStretchLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight, "MouthStretchRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight) / 2.0f, "MouthTightener"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight, "MouthTightenerLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight, "MouthTightenerRight"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight) / 2.0f, "NoseSneer"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight, "NoseSneerLeft"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight, "NoseSneerRight"),
 
             #endregion
         };

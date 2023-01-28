@@ -294,8 +294,8 @@ namespace ALVRTrackingInterface
             eyeClosedR = Math.Min(1, eyeClosedR + expressions[(int)FBExpression.Lid_Tightener_R] * 0.5f);
 
             // Convert from Eye Closed to Eye Openness and limit from going negative. Set the max higher than normal to offset the eye lid to help keep eye lid open.
-            eye.Left.Openness = Math.Min(1, Math.Max(0, 1.1f - eyeClosedL * TrackingSensitivity.EyeLid));
-            eye.Right.Openness = Math.Min(1, Math.Max(0, 1.1f - eyeClosedR * TrackingSensitivity.EyeLid));
+            eye.Left.Openness = Math.Min(1, Math.Max(0, 1.0f - eyeClosedL * TrackingSensitivity.EyeLid));
+            eye.Right.Openness = Math.Min(1, Math.Max(0, 1.0f - eyeClosedR * TrackingSensitivity.EyeLid));
 
             // As eye opens there is an issue flickering between eye wide and eye not fully open with the combined eye lid parameters. Need to reduce the eye widen value until openess is closer to value of 1. When not fully open will do constant value to reduce the eye widen.
             float eyeWidenL = Math.Max(0, expressions[(int)FBExpression.Upper_Lid_Raiser_L] * TrackingSensitivity.EyeWiden - 3.0f * (1 - eye.Left.Openness));

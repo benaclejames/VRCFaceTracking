@@ -13,6 +13,7 @@ namespace VRCFaceTracking.Types
     public class UnifiedConfig
     {
         private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
+        private static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true };
 
         public List<string> RequestedModulePaths;
         public UnifiedTrackingData Data;
@@ -24,7 +25,7 @@ namespace VRCFaceTracking.Types
             try
             {
                 string jsonString = File.ReadAllText(unifiedConfigPath);
-                config = JsonSerializer.Deserialize<UnifiedConfig>(jsonString, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
+                config = JsonSerializer.Deserialize<UnifiedConfig>(jsonString, jsonSerializerOptions);
                 if (config != null)
                 {
                     if (config.RequestedModulePaths != null && config.RequestedModulePaths.Count > 0)
@@ -32,10 +33,7 @@ namespace VRCFaceTracking.Types
                         Logger.Msg("Saved module load order initialized.");
                         UnifiedLibManager.RequestedModules = UnifiedLibManager.LoadExternalAssemblies(config.RequestedModulePaths.ToArray());
                     }
-                    else
-                    {
-                        Logger.Msg("Load order not found; initializing default order scheme.");
-                    }
+                    else Logger.Msg("Load order not found; initializing default order scheme.");
 
                     if (config.Mutator != null)
                     {
@@ -43,17 +41,12 @@ namespace VRCFaceTracking.Types
                         UnifiedTracking.Mutator = config.Mutator;
                     }
                     else Logger.Msg("Mutators not found; initializing default mutator.");
-
-                    if (config.Data != null)
-                    {
-                        Logger.Msg("Saved parameter data loaded.");
-                        UnifiedTracking.Data = config.Data;
-                    }
                 }
             }
             catch (FileNotFoundException)
             {
-                Logger.Warning("Configuration file not found, will be created on proper exit of application.");
+                Logger.Warning("Configuration file not found; creating placeholder 'Config.json' file.");
+                Save();
             }
             catch (JsonException)
             {
@@ -66,19 +59,20 @@ namespace VRCFaceTracking.Types
         {
             using (Stream stream = File.Open(unifiedConfigPath, FileMode.Create))
             {
-                UnifiedConfig tempConfig = new UnifiedConfig();
+                UnifiedConfig tempConfig = new UnifiedConfig
+                {
+                    // UnifiedTrackingData
+                    Data = UnifiedTracking.Data,
 
-                // UnifiedTrackingData
-                tempConfig.Data = UnifiedTracking.Data;
+                    // UnifiedTrackingMutator
+                    Mutator = UnifiedTracking.Mutator,
 
-                // UnifiedTrackingMutator
-                tempConfig.Mutator = UnifiedTracking.Mutator;
-
-                // Assembly load order.
-                tempConfig.RequestedModulePaths = new List<string>();
+                    // Assembly load order.
+                    RequestedModulePaths = new List<string>()
+                };
                 UnifiedLibManager.RequestedModules.ForEach(a => tempConfig.RequestedModulePaths.Add(a.Location));
 
-                JsonSerializer.Serialize(stream, tempConfig, new JsonSerializerOptions { WriteIndented = true, IncludeFields = true });
+                JsonSerializer.Serialize(stream, tempConfig, jsonSerializerOptions);
                 stream.Dispose();
             }
         }

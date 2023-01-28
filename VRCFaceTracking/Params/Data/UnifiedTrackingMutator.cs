@@ -1,5 +1,6 @@
 using System;
 using System.Drawing.Drawing2D;
+using System.Text.Json.Serialization;
 using System.Windows.Markup;
 using VRCFaceTracking.Params;
 
@@ -25,9 +26,9 @@ namespace VRCFaceTracking
         }
 
         private static UnifiedTrackingData trackingDataBuffer = new UnifiedTrackingData();
-        public static MutationData mutationData = new MutationData();
+        public MutationData mutationData = new MutationData();
 
-        public CalibratorState CalibratorMode = CalibratorState.Inactive;
+        [JsonIgnore] public CalibratorState CalibratorMode = CalibratorState.Inactive;
         public float CalibrationWeight;
 
         public bool SmoothingMode = false;
@@ -46,12 +47,15 @@ namespace VRCFaceTracking
 
         private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
         {
+            if (CalibratorMode == CalibratorState.Inactive) 
+                return;
+
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
             {
                 if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult > 1.0f) // Calibrator
                         MutationData.ShapeMutations[i].CalibrationMult = SimpleLerp(1.0f / inputData.Shapes[i].Weight, MutationData.ShapeMutations[i].CalibrationMult, calibrationWeight);
 
-                inputData.Shapes[i].Weight = Math.Min(1, (inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult));
+                inputData.Shapes[i].Weight = Math.Min(1, inputData.Shapes[i].Weight * MutationData.ShapeMutations[i].CalibrationMult);
             }
         }
 
@@ -61,24 +65,23 @@ namespace VRCFaceTracking
         private void ApplySmoothing(ref UnifiedTrackingData input)
         {
             // Example of applying smoothing to the data within the mutator:
-            if (SmoothingMode)
-            {
-                for (int i = 0; i < input.Shapes.Length; i++)
-                    input.Shapes[i].Weight =
-                        SimpleLerp(
-                            input.Shapes[i].Weight,
-                            trackingDataBuffer.Shapes[i].Weight,
-                            MutationData.ShapeMutations[i].SmoothnessMult
-                        );
+            if (!SmoothingMode) return;
 
-                input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, trackingDataBuffer.Eye.Left.Openness, MutationData.OpennessMutations.SmoothnessMult);
-                input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
-                input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, MutationData.GazeMutations.SmoothnessMult);
+            for (int i = 0; i < input.Shapes.Length; i++)
+                input.Shapes[i].Weight =
+                    SimpleLerp(
+                        input.Shapes[i].Weight,
+                        trackingDataBuffer.Shapes[i].Weight,
+                        MutationData.ShapeMutations[i].SmoothnessMult
+                    );
 
-                input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, MutationData.OpennessMutations.SmoothnessMult);
-                input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
-                input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, MutationData.GazeMutations.SmoothnessMult);
-            }
+            input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, trackingDataBuffer.Eye.Left.Openness, MutationData.OpennessMutations.SmoothnessMult);
+            input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
+            input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, MutationData.GazeMutations.SmoothnessMult);
+
+            input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, MutationData.OpennessMutations.SmoothnessMult);
+            input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, MutationData.PupilMutations.SmoothnessMult);
+            input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, MutationData.GazeMutations.SmoothnessMult);
         }
 
         /// <summary>
