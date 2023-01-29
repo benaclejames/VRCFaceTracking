@@ -39,7 +39,6 @@ namespace VRCFaceTracking
             }).ToList();
 
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static IEnumerable<OSCParams.BaseParam> _relevantParams_v2;
         private static int _relevantParamsCount = 416;
 
         private static string _ip = "127.0.0.1";
@@ -95,24 +94,23 @@ namespace VRCFaceTracking
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            _relevantParams = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-            _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            var _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            var _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase())
+                _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
                 _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
 
-                // Reset calibration on parameter data.
-                //UnifiedTracking.Mutator.SetCalibration();
+                _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
 
-                _relevantParamsCount = _relevantParams.Count() + _relevantParams_v2.Count();
-                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + " parameters loaded.");
+                Logger.Msg("Config file parsed successfully! " + _relevantParams.Count() + " parameters loaded.");
                 
-                if (_relevantParams.Count() > 0)
-                    Logger.Warning(_relevantParams.Count() + " legacy parameters loaded. These are undocumented and outdated parameters.");
+                if (_relevantParams_v1.Count() > 0)
+                    Logger.Warning(_relevantParams_v1.Count() + " legacy parameters loaded. These are undocumented and outdated parameters.");
             };
 
             // Begin main OSC update loop
