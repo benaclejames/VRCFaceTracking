@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
+using static DefaultNamespace.FBData;
 
 namespace ALVRTrackingInterface
 {
@@ -172,9 +173,8 @@ namespace ALVRTrackingInterface
                 yaw_R = (180.0 / Math.PI) * yaw;
 
                 if (eyeActive)
-                {
-                    UpdateEyeData(ref UnifiedTracking.Data.Eye, ref expressions);
-                    UpdateEyeExpressions(ref UnifiedTracking.Data.Shapes, ref expressions);
+                {                   
+                    UpdateEyeExpressions(ref UnifiedTracking.Data.Shapes, ref UnifiedTracking.Data.Eye, ref expressions);
                 }
                 if (lipActive)
                     UpdateMouthExpressions(ref UnifiedTracking.Data.Shapes, ref expressions);
@@ -186,14 +186,16 @@ namespace ALVRTrackingInterface
             }
         }
 
-
-        // Preprocess our expressions per the Meta Documentation
-        private void UpdateEyeData(ref UnifiedEyeData eye, ref float[] expressions)
+        private void UpdateEyeExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref UnifiedEyeData eye, ref float[] expressions)
         {
             #region Eye Data parsing
 
-            eye.Left.Openness = 1.0f - expressions[(int)FBExpression.Eyes_Closed_L];
-            eye.Right.Openness = 1.0f - expressions[(int)FBExpression.Eyes_Closed_R];
+            float SquintWeight = 0.25f;
+            float WidenWeight = 0.8f;
+            float EyeLidWeight = 3.0f;
+
+            float OpennessLeft = Math.Max(0, 1.0f - expressions[(int)FBExpression.Eyes_Closed_L] + (float)Math.Pow(1.0f - expressions[(int)FBExpression.Eyes_Closed_L], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Upper_Lid_Raiser_L], 1.0 / WidenWeight) - 0.5f * (float)Math.Pow(expressions[(int)FBExpression.Eyes_Closed_L], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Lid_Tightener_L], 1.0f / SquintWeight) - 0.5f * expressions[(int)FBExpression.Eyes_Look_Down_L]);
+            float OpennessRight = Math.Max(0, 1.0f - expressions[(int)FBExpression.Eyes_Closed_R] + (float)Math.Pow(1.0f - expressions[(int)FBExpression.Eyes_Closed_R], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Upper_Lid_Raiser_R], 1.0 / WidenWeight) - 0.5f * (float)Math.Pow(expressions[(int)FBExpression.Eyes_Closed_R], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Lid_Tightener_R], 1.0f / SquintWeight) - 0.5f * expressions[(int)FBExpression.Eyes_Look_Down_R]);
 
             #endregion
 
@@ -261,7 +263,7 @@ namespace ALVRTrackingInterface
                 LookRight: expressions[(int)FBExpression.Eyes_Look_Right_L],
                 LookUp: expressions[(int)FBExpression.Eyes_Look_Up_L],
                 LookDown: expressions[(int)FBExpression.Eyes_Look_Down_L],
-                Openness: Math.Min(1, eye.Left.Openness)
+                Openness: Math.Min(1, OpennessLeft)
             );
 
             eye.Right = MakeEye
@@ -270,25 +272,22 @@ namespace ALVRTrackingInterface
                 LookRight: expressions[(int)FBExpression.Eyes_Look_Right_R],
                 LookUp: expressions[(int)FBExpression.Eyes_Look_Up_R],
                 LookDown: expressions[(int)FBExpression.Eyes_Look_Down_R],
-                Openness: Math.Min(1, eye.Right.Openness)
+                Openness: Math.Min(1, OpennessRight)
             );
 
             // Eye dilation code, automated process maybe?
-            eye.Left.PupilDiameter_MM  = 0.0035f;
+            eye.Left.PupilDiameter_MM = 0.0035f;
             eye.Right.PupilDiameter_MM = 0.0035f;
 
             #endregion
-        }
 
-        private void UpdateEyeExpressions(ref UnifiedExpressionShape[] unifiedExpressions, ref float[] expressions)
-        {
             #region Eye Expressions Set
 
-            unifiedExpressions[(int)UnifiedExpressions.EyeWideLeft].Weight = expressions[(int)FBExpression.Upper_Lid_Raiser_L] ;
-            unifiedExpressions[(int)UnifiedExpressions.EyeWideRight].Weight = expressions[(int)FBExpression.Upper_Lid_Raiser_R] ;
+            unifiedExpressions[(int)UnifiedExpressions.EyeWideLeft].Weight = (float)Math.Pow(1.0f - expressions[(int)FBExpression.Eyes_Closed_L], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Upper_Lid_Raiser_L], 1.0 / WidenWeight);
+            unifiedExpressions[(int)UnifiedExpressions.EyeWideRight].Weight = (float)Math.Pow(1.0f - expressions[(int)FBExpression.Eyes_Closed_R], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Upper_Lid_Raiser_R], 1.0 / WidenWeight);
 
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft].Weight = expressions[(int)FBExpression.Lid_Tightener_L];
-            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].Weight = expressions[(int)FBExpression.Lid_Tightener_R];
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintLeft].Weight = (float)Math.Pow(expressions[(int)FBExpression.Eyes_Closed_L], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Lid_Tightener_L], 1.0f / SquintWeight);
+            unifiedExpressions[(int)UnifiedExpressions.EyeSquintRight].Weight = (float)Math.Pow(expressions[(int)FBExpression.Eyes_Closed_R], 1.0f / EyeLidWeight) * (float)Math.Pow(expressions[(int)FBExpression.Lid_Tightener_R], 1.0f / SquintWeight);
 
             #endregion
 
