@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VRCFaceTracking.OSC
 {
@@ -37,8 +38,10 @@ namespace VRCFaceTracking.OSC
 
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
-                var compatibleParam =
-                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.Type == _paramType);
+                var compatibleParam = newParams.FirstOrDefault(param => 
+                    Regex.IsMatch(param.name, @"(?<!(v\d/))(" + _paramName + @")$")
+                    && param.input.Type == _paramType);
+
                 if (compatibleParam != null)
                 {
                     Relevant = true;
