@@ -55,6 +55,8 @@ namespace VRCFaceTracking.Params
             this.Right.Gaze = data.Right.Gaze;
             this.Right.Openness = data.Right.Openness;
             this.Right.PupilDiameter_MM = data.Right.PupilDiameter_MM;
+            this._maxDilation = data._maxDilation;
+            this._minDilation = data._minDilation;
         }
     }
 
