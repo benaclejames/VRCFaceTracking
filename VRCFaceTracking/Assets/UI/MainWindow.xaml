@@ -113,16 +113,17 @@
                         </StackPanel>
                     </ScrollViewer>
                     <Button x:Name="TestCalibration" Content="Calibrate Expressions" HorizontalAlignment="Left" Height="36" Margin="20,226,0,0" VerticalAlignment="Top" Width="140" Click="CalibrationClick" Grid.RowSpan="2"/>
-                    <CheckBox x:Name="FineTuneCalibration" Content="Calibrator Fine Tuning" HorizontalAlignment="Left" Margin="176,144,0,0" VerticalAlignment="Top" Foreground="White" Checked="FineTuneCalibration_Checked" Unchecked="FineTuneCalibration_Unchecked"/>
+                    <CheckBox x:Name="UseCalibration" Content="Calibrator" HorizontalAlignment="Left" Margin="176,144,0,0" VerticalAlignment="Top" Foreground="White" Checked="UseCalibration_Checked" Unchecked="UseCalibration_Unchecked"/>
                     <CheckBox x:Name="EnableSmoothing" Content="Smooth Expressions" HorizontalAlignment="Left" Margin="176,162,0,0" VerticalAlignment="Top" Foreground="White" Checked="EnableSmoothing_Checked" Unchecked="EnableSmoothing_Unchecked"/>
                     <Slider 
+                        Name="SmoothSlider"
                         ValueChanged="Smooth_Slider_ValueChanged"
                         HorizontalAlignment="Left" Margin="182,182,0,0" 
                         VerticalAlignment="Top"
                         Width="120" 
                         Maximum="1" 
                         IsEnabled="{Binding IsEnabled.TrueString, ElementName=EnableSmoothing}" 
-                        Value="0.25"
+                        Value="0.5"
                     />
 
                 </Grid>

@@ -28,7 +28,7 @@ namespace VRCFaceTracking
         private UnifiedTrackingData trackingDataBuffer = new UnifiedTrackingData();
         public MutationData mutationData = new MutationData();
 
-        [JsonIgnore] public CalibratorState CalibratorMode = CalibratorState.Inactive;
+        public CalibratorState CalibratorMode = CalibratorState.Inactive;
         public float CalibrationWeight;
 
         public bool SmoothingMode = false;

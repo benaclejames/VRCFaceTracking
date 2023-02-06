@@ -192,6 +192,8 @@ namespace VRCFaceTracking.Assets.UI
             // List box containing all selectable modules that implement ExtTrackingModule.
             UnifiedLibManager.ReloadModules();
             moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
+            UseCalibration.IsChecked = UnifiedTracking.Mutator.CalibratorMode == UnifiedTrackingMutator.CalibratorState.Inactive ? false : true;
+            EnableSmoothing.IsChecked = UnifiedTracking.Mutator.SmoothingMode ? true : false;
         }
 
         private void TabController_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -207,7 +209,7 @@ namespace VRCFaceTracking.Assets.UI
 
         private void CalibrationClick(object sender, RoutedEventArgs e)
         {
-            bool fineTune = (bool)FineTuneCalibration.IsChecked;
+            UseCalibration.IsChecked = true;
 
             Thread _thread = new Thread(() =>
             {
@@ -218,18 +220,12 @@ namespace VRCFaceTracking.Assets.UI
                 UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
                 UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
 
-                Logger.Msg("Calibrating normalization for 30s.");
+                Logger.Msg("Calibrating deep normalization for 30s.");
                 Thread.Sleep(30000);
 
-                if (fineTune)
-                {
-                    UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
-                    Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
-                }
-
-                Logger.Msg("Calibration completed successfully! Values will be saved on exit.");
-                UnifiedTracking.Mutator.CalibrationWeight = 0.0f;
-                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
+                UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
+                Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
+                
             });
             _thread.Start();
         }
@@ -244,18 +240,17 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTracking.Mutator.SmoothingMode = false;
         }
 
-        private void FineTuneCalibration_Checked(object sender, RoutedEventArgs e)
+        private void UseCalibration_Checked(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Fine-tuning normalization.");
+            Logger.Msg("Enabled fine-tune calibration and using existing calibrated values.");
             UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
             UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
         }
 
-        private void FineTuneCalibration_Unchecked(object sender, RoutedEventArgs e)
+        private void UseCalibration_Unchecked(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Fixed normalization.");
-            UnifiedTracking.Mutator.CalibrationWeight = 0.0f;
-            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrated;
+            Logger.Msg("Disabled calibration.");
+            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
         }
 
         private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
