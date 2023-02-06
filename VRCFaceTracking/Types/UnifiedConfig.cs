@@ -15,8 +15,8 @@ namespace VRCFaceTracking.Types
         private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
         private static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true };
 
-        public List<string> RequestedModulePaths;
-        public UnifiedTrackingData Data;
+        public List<string> RequestedModulePaths = new List<string>();
+        public UnifiedTrackingData Data = new UnifiedTrackingData();
         public UnifiedTrackingMutator Mutator;
 
         public void ReadConfiguration()
@@ -59,17 +59,17 @@ namespace VRCFaceTracking.Types
         {
             using (Stream stream = File.Open(unifiedConfigPath, FileMode.Create))
             {
-                UnifiedConfig tempConfig = new UnifiedConfig
-                {
-                    // UnifiedTrackingData
-                    Data = UnifiedTracking.Data,
+                UnifiedConfig tempConfig = new UnifiedConfig();
 
-                    // UnifiedTrackingMutator
-                    Mutator = UnifiedTracking.Mutator,
+                // UnifiedTrackingData
+                tempConfig.Data = UnifiedTracking.Data;
 
-                    // Assembly load order.
-                    RequestedModulePaths = new List<string>()
-                };
+                // UnifiedTrackingMutator
+                tempConfig.Mutator = UnifiedTracking.Mutator;
+
+                // Assembly load order.
+                tempConfig.RequestedModulePaths = new List<string>();
+
                 UnifiedLibManager.RequestedModules.ForEach(a => tempConfig.RequestedModulePaths.Add(a.Location));
 
                 JsonSerializer.Serialize(stream, tempConfig, jsonSerializerOptions);
