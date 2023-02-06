@@ -68,7 +68,7 @@ namespace VRCFaceTracking.Params
         /// <summary>
         /// Value that contains the specified Unified Expression raw value.
         /// </summary>
-        [JsonIgnore] public float Weight;
+        public float Weight;
     }
 
     /// <summary>
