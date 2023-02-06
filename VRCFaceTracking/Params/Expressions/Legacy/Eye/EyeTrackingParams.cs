@@ -57,17 +57,16 @@ namespace VRCFaceTracking.Params.Eye
 
             new EParam(exp =>
                 exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f -
-                ((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight)),
+                Squeeze(exp, 0),
                 "LeftEyeLidExpandedSqueeze", 0.5f, true),
             new EParam(exp =>
                 exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f -
-                ((float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)),
+                Squeeze(exp, 1),
                 "RightEyeLidExpandedSqueeze", 0.5f, true),
             new EParam(exp =>
                 (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) + 
                 (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                (((float)((1.0f - Math.Pow(exp.Eye.Left.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) + 
-                (float)((1.0f - Math.Pow(exp.Eye.Right.Openness, .36)) * exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight)) / 2.0f), 
+                Squeeze(exp, 2), 
                 "EyeLidExpandedSqueeze", 0.5f, true),
 
             #endregion
@@ -102,29 +101,34 @@ namespace VRCFaceTracking.Params.Eye
             // Still need to reforumulate these parameters with the compensation.
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight; 
-                if ((exp.Eye.Left.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) > 0)
-                    return (exp.Eye.Left.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight);
-                return exp.Eye.Left.Openness;
+                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0);
+                if (eyeLid > 1)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight;
+                if (eyeLid >= 0)
+                    return exp.Eye.Left.Openness;
+                return Squeeze(exp, 0);
             }, "LeftEyeLidExpandedSqueeze"),
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight > 0)
+                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1);
+                if (eyeLid > 1)
                     return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight; 
-                if ((- exp.Eye.Right.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) > 0)
-                    return (- exp.Eye.Right.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight);
-                return exp.Eye.Right.Openness;
+                if (eyeLid >= 0)
+                    return exp.Eye.Right.Openness;
+                return Squeeze(exp, 1);
             }, "RightEyeLidExpandedSqueeze"),
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight / 2.0f > 0)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight / 2.0f; 
-                if ((- exp.Eye.Right.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) + (- exp.Eye.Left.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) / 2.0f > 0)
-                    return (- exp.Eye.Right.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) + (- exp.Eye.Left.Openness + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) / 2.0f;
-                return exp.Eye.Combined().Openness;
+                var eyeLid = (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
+                    (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
+                    Squeeze(exp, 2);
+                if (eyeLid > 1)
+                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f;
+                if (eyeLid >= 0)
+                    return exp.Eye.Combined().Openness;
+                return Squeeze(exp, 1);
             }, "CombinedEyeLidExpandedSqueeze"),
             
             #endregion
@@ -133,19 +137,21 @@ namespace VRCFaceTracking.Params.Eye
 
             // These parameters are used to distinguish when EyeLidExpanded / EyeLidExpandedSqueeze
             // is returning a value as a Widen or Squeeze. Intended for the Bool or Binary param variant.
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight > 0, "LeftEyeWidenToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight > 0, "RightEyeWidenToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight > exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight
-                ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight > 0
-                : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight > 0
-                , "EyesWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0) > 1, "LeftEyeWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) > 1, "RightEyeWidenToggle"),
+            new BoolParameter(exp =>
+                (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) + 
+                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0)) / 2.0f
+                > 1, 
+                "EyesWidenToggle"),
 
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight > 0, "RightEyeSqueezeToggle"),
-            new BoolParameter(exp => (exp.Eye.Left.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) > (exp.Eye.Right.Openness - exp.Shapes[(int) UnifiedExpressions.EyeSquintRight].Weight)
-                ? (exp.Eye.Left.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) > 0
-                : (exp.Eye.Right.Openness - exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) > 0
-                , "EyesSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0) < 1, "LeftEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) < 1, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp =>
+                (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) +
+                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0)) / 2.0f
+                < 1, 
+                "EyesSqueezeToggle"),
 
             #endregion
 
@@ -217,5 +223,12 @@ namespace VRCFaceTracking.Params.Eye
         // Brain Hurty
         private static float NormalizeFloat(float minInput, float maxInput, float minOutput, float maxOutput,
             float value) => (maxOutput - minOutput) / (maxInput - minInput) * (value - maxInput) + maxOutput;
+
+        // eyeIndex: 0 == Left, 1 == Right, 2 == avg Both
+        private static float Squeeze(UnifiedTrackingData data, int eyeIndex) =>
+            eyeIndex == 0 ? (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .36)) * data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
+            : eyeIndex == 1 ? (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .36)) * data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
+            : eyeIndex == 2 ? (float)(1.0f - Math.Pow(data.Eye.Combined().Openness, .36)) * (data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f 
+            : 0.0f;
     }
 }

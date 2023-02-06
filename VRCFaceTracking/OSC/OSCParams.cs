@@ -39,7 +39,7 @@ namespace VRCFaceTracking.OSC
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
                 var compatibleParam = newParams.FirstOrDefault(param => 
-                    Regex.IsMatch(param.name, @"(?<!(v\d/))(" + _paramName + @")$")
+                    Regex.IsMatch(param.name, @"(?<!(v\d+/))(" + _paramName + @")$")
                     && param.input.Type == _paramType);
 
                 if (compatibleParam != null)
