@@ -70,8 +70,36 @@ namespace VRCFaceTracking.OSC
                 return;
             }
             var newMsg = new OscMessage(buffer);
-            if (newMsg.Address == "/avatar/change")
-                ConfigParser.ParseNewAvatar((string) newMsg.Value);
+            switch (newMsg.Address)
+            {
+                case "/avatar/change":
+                    ConfigParser.ParseNewAvatar((string)newMsg.Value);
+                    break;
+                case "/avatar/parameters/EyeTrackingActive":
+                    if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)
+                    {
+                        if (!(bool)newMsg.Value)
+                            UnifiedLibManager.EyeStatus = ModuleState.Idle;
+                        else UnifiedLibManager.EyeStatus = ModuleState.Active;
+                    }
+                    break;
+                case "/avatar/parameters/LipTrackingActive":
+                    if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
+                    {
+                        if (!(bool)newMsg.Value)
+                            UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
+                        else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
+                    }
+                    break;
+                case "/avatar/parameters/ExpressionTrackingActive":
+                    if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
+                    {
+                        if (!(bool)newMsg.Value)
+                            UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
+                        else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
+                    }
+                    break;
+            }
         }
 
         public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);

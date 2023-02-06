@@ -198,12 +198,8 @@ namespace VRCFaceTracking.Params
 
             #endregion
 
-            #region Status
-
-            new BoolParameter(exp => UnifiedLibManager.EyeStatus.Equals(ModuleState.Active), "EyeTrackingActive"),
-            new BoolParameter(exp => UnifiedLibManager.ExpressionStatus.Equals(ModuleState.Active), "LipTrackingActive"),
-
-            #endregion
+            new ConditionalBoolParameter(exp => (UnifiedLibManager.EyeStatus == ModuleState.Active, UnifiedLibManager.EyeStatus != ModuleState.Uninitialized), "EyeTrackingActive"),
+            new ConditionalBoolParameter(exp => (UnifiedLibManager.ExpressionStatus == ModuleState.Active, UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized), "LipTrackingActive")
 
         };
 

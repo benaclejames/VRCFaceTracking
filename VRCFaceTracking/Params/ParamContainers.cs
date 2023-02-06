@@ -38,6 +38,25 @@ namespace VRCFaceTracking.Params
         }
     }
 
+    public class ConditionalBoolParameter : OSCParams.BoolBaseParam, IParameter
+    {
+        public ConditionalBoolParameter(Func<UnifiedTrackingData, (bool?, bool?)> getValueFunc, string paramName) : base(paramName) =>
+            UnifiedTracking.OnUnifiedDataUpdated += exp =>
+            {
+                if (getValueFunc.Invoke(exp).Item2.HasValue && getValueFunc.Invoke(exp).Item2.Value)
+                {
+                    var value = getValueFunc.Invoke(exp).Item1;
+                    if (value.HasValue)
+                        ParamValue = value.Value;
+                }
+            };
+
+        public OSCParams.BaseParam[] GetBase()
+        {
+            return new OSCParams.BaseParam[] { this };
+        }
+    }
+
     public class BinaryParameter : OSCParams.BinaryBaseParameter, IParameter
     {
         public BinaryParameter(Func<UnifiedTrackingData, float?> getValueFunc,

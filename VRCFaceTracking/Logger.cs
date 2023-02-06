@@ -11,31 +11,60 @@ namespace VRCFaceTracking
 
         public static void Msg(string msgStr)
         {
-            var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + msgStr;
-            
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "White"));
-        
-            Console.WriteLine(formattedStr);
+            var timeStamp = "[" + DateTime.Now.ToString("HH:mm:ss") + "] ";
+            var formattedStr = timeStamp + msgStr;
+
+            try
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + msgStr, "White"));
+                Console.WriteLine(formattedStr + msgStr);
+            }
+            catch (Exception e)
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + "Message intercepted while writing. " + e, "White"));
+                Console.WriteLine(formattedStr);
+            }
         }
 
         public static void Warning(string warningStr)
         {
-            var formattedStr = "["+DateTime.Now.ToString("HH:mm:ss") + "] [WARNING] " + warningStr;
-            
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "Yellow"));
+            var formattedStr = "["+DateTime.Now.ToString("HH:mm:ss") + "] [WARNING] ";
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(formattedStr);
-            Console.ResetColor();
+            try
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + warningStr, "Yellow"));
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(formattedStr);
+                Console.ResetColor();
+            }
+            catch (Exception e)
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + "Message intercepted while writing. " + e, "Yellow"));
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(formattedStr);
+                Console.ResetColor();
+            }            
         }
         
         public static void Error(string errorStr)
         {
-            var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] [ERROR] " + errorStr;
-            
-            ConsoleOutput.Add(new Tuple<string, string>(formattedStr,"Red"));
+            var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] [ERROR] ";
+
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(formattedStr);
+
+            try
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + errorStr, "Red"));
+                
+                Console.WriteLine(formattedStr);
+                
+            }
+            catch (Exception e)
+            {
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + "Message intercepted while writing. " + e, "Red"));
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+
             Console.ResetColor();
         }
     }
