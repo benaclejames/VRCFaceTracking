@@ -15,8 +15,8 @@ namespace VRCFaceTracking.Params
             #region Eye Gaze
             
             new EParam(exp => exp.Eye.Combined().Gaze, "v2/Eyes"),
-            new EParam(exp => exp.Eye.Left.Gaze, "v2/LeftEye"),
-            new EParam(exp => exp.Eye.Right.Gaze, "v2/RightEye"),
+            new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
+            new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
             
             #endregion
 
