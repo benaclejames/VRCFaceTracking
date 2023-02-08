@@ -226,9 +226,9 @@ namespace VRCFaceTracking.Params.Eye
 
         // eyeIndex: 0 == Left, 1 == Right, 2 == avg Both
         private static float Squeeze(UnifiedTrackingData data, int eyeIndex) =>
-            eyeIndex == 0 ? (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .36)) * data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
-            : eyeIndex == 1 ? (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .36)) * data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
-            : eyeIndex == 2 ? (float)(1.0f - Math.Pow(data.Eye.Combined().Openness, .36)) * (data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f 
+            eyeIndex == 0 ? (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
+            : eyeIndex == 1 ? (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
+            : eyeIndex == 2 ? (float)(1.0f - Math.Pow(data.Eye.Combined().Openness, .15)) * (data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f 
             : 0.0f;
     }
 }

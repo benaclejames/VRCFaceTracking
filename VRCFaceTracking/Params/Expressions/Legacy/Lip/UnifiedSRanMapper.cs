@@ -5,6 +5,9 @@ namespace VRCFaceTracking.Params.Lip
 {
     internal static class UnifiedSRanMapper
     {
+        // This map will transform the robust tracking data from Unified and transform it to track as closely to the SRanipal standard tracking (as of SRanipal 1.3.6.x) as possible.
+        // Some shapes are used to gate other shapes from tracking, some shapes are directly mappable, and some shapes are a combination of many Unified shapes.
+        // If an interface properly interfaces to Unified's tracking standard then this SRanipal emulator will work well.
         private static Dictionary<SRanipal_LipShape_v2, Func<UnifiedTrackingData, float>> ShapeMap = new Dictionary<SRanipal_LipShape_v2, Func<UnifiedTrackingData, float>>
         {
             { SRanipal_LipShape_v2.JawRight, exp => exp.Shapes[(int)UnifiedExpressions.JawRight].Weight },
@@ -13,7 +16,7 @@ namespace VRCFaceTracking.Params.Lip
             { SRanipal_LipShape_v2.JawOpen, exp => Math.Min(1, Math.Max(0, exp.Shapes[(int)UnifiedExpressions.JawOpen].Weight - exp.Shapes[(int)UnifiedExpressions.MouthClosed].Weight)) },
             { SRanipal_LipShape_v2.MouthApeShape, exp => exp.Shapes[(int)UnifiedExpressions.MouthClosed].Weight},
 
-            { SRanipal_LipShape_v2.MouthUpperRight, exp => exp.Shapes[(int)UnifiedExpressions.MouthUpperRight].Weight},
+            { SRanipal_LipShape_v2.MouthUpperRight, exp => exp.Shapes[(int)UnifiedExpressions.MouthUpperRight].Weight },
             { SRanipal_LipShape_v2.MouthUpperLeft, exp => exp.Shapes[(int)UnifiedExpressions.MouthUpperLeft].Weight },
             { SRanipal_LipShape_v2.MouthLowerRight, exp => exp.Shapes[(int)UnifiedExpressions.MouthLowerRight].Weight },
             { SRanipal_LipShape_v2.MouthLowerLeft, exp => exp.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight },
@@ -23,27 +26,57 @@ namespace VRCFaceTracking.Params.Lip
 
             { SRanipal_LipShape_v2.MouthPout, exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight) / 2.0f },
 
-            { SRanipal_LipShape_v2.MouthSmileRight, exp => (float)Math.Min(1, Math.Pow(exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight, 1.5f) + Math.Pow(exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight, 1.5f) / 2.0f)},
-            { SRanipal_LipShape_v2.MouthSmileLeft, exp => (float)Math.Min(1, Math.Pow(exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight, 1.5f) + Math.Pow(exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight, 1.5f) / 2.0f)},
-            { SRanipal_LipShape_v2.MouthSadRight, exp => Math.Min(1, ((exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f) * (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight)) },
-            { SRanipal_LipShape_v2.MouthSadLeft, exp => Math.Min(1, ((exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f) * (exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight)) },
+            { SRanipal_LipShape_v2.MouthSmileRight, exp =>
+                exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight > exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight ?
+                    exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight :
+                    exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight },
+            { SRanipal_LipShape_v2.MouthSmileLeft, exp =>
+                exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight > exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight ?
+                    exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight :
+                    exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight },
+            { SRanipal_LipShape_v2.MouthSadRight, exp =>
+                Math.Max(0, (((exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f >
+                (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight) ?
+                    (exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f :
+                    (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight)) -
+                (GetTransformedShape(SRanipal_LipShape_v2.MouthSmileRight, exp))))},
+            { SRanipal_LipShape_v2.MouthSadLeft, exp =>
+                Math.Max(0, (((exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f >
+                (exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight) ?
+                    (exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f :
+                    (exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight)) -
+                (GetTransformedShape(SRanipal_LipShape_v2.MouthSmileLeft, exp))))},
 
             { SRanipal_LipShape_v2.CheekPuffLeft, exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight },
             { SRanipal_LipShape_v2.CheekPuffRight, exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight },
             { SRanipal_LipShape_v2.CheekSuck, exp => (exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight) / 2.0f },
 
-            { SRanipal_LipShape_v2.MouthUpperUpRight, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight) },
-            { SRanipal_LipShape_v2.MouthUpperUpLeft, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight) },
-            { SRanipal_LipShape_v2.MouthLowerDownRight, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight) },
-            { SRanipal_LipShape_v2.MouthLowerDownLeft, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight) },
+            { SRanipal_LipShape_v2.MouthUpperUpRight, exp =>
+                Math.Max(0, 
+                    exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight * (1f-exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight) +
+                    (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight)},
+            { SRanipal_LipShape_v2.MouthUpperUpLeft, exp =>
+                Math.Max(0, 
+                    exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight * (1f-exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight) +
+                    (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight)},
+            { SRanipal_LipShape_v2.MouthLowerDownRight, exp =>
+                Math.Max(0,
+                    exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight +
+                    (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight)},
+            { SRanipal_LipShape_v2.MouthLowerDownLeft, exp =>
+                Math.Max(0,
+                    exp.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight +
+                    (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight)},
 
-            { SRanipal_LipShape_v2.MouthUpperInside, exp => Math.Max(0, (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight) / 2.0f ) },
-            { SRanipal_LipShape_v2.MouthLowerInside, exp => Math.Max(0, (exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight) / 2.0f ) },
+            { SRanipal_LipShape_v2.MouthUpperInside, exp =>
+                (float)Math.Max(0, (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight) / 2.0f)},
+            { SRanipal_LipShape_v2.MouthLowerInside, exp =>
+                (float)Math.Max(0, (exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight) / 2.0f)},
 
             { SRanipal_LipShape_v2.MouthLowerOverlay, exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserLower].Weight },
 
-            { SRanipal_LipShape_v2.TongueLongStep1, exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight * 2.0f)},
-            { SRanipal_LipShape_v2.TongueLongStep2, exp => Math.Min(1, Math.Max(0, (exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight * 2.0f) - 1.0f))},
+            { SRanipal_LipShape_v2.TongueLongStep1, exp => Math.Min(0.5f, exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight)},
+            { SRanipal_LipShape_v2.TongueLongStep2, exp => Math.Min(1, Math.Max(0.5f, exp.Shapes[(int)UnifiedExpressions.TongueOut].Weight)) },
 
             { SRanipal_LipShape_v2.TongueDown, exp => exp.Shapes[(int)UnifiedExpressions.TongueDown].Weight},
             { SRanipal_LipShape_v2.TongueUp, exp => exp.Shapes[(int)UnifiedExpressions.TongueUp].Weight},
