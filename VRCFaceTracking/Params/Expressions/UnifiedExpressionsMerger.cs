@@ -63,6 +63,15 @@ namespace VRCFaceTracking.Params
 
             #region Eyebrows Compacted
 
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight) / 2.0f,
+                "v2/BrowsInnerUp"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f,
+                "v2/BrowDownLeft"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f,
+                "v2/BrowDownRight"),
+
             new EParam(exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
                 Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight),
                 "v2/BrowYRight"),
