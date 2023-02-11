@@ -84,13 +84,6 @@ namespace VRCFaceTracking.OSC
                     }
                     break;
                 case "/avatar/parameters/LipTrackingActive":
-                    if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
-                    {
-                        if (!(bool)newMsg.Value)
-                            UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
-                        else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
-                    }
-                    break;
                 case "/avatar/parameters/ExpressionTrackingActive":
                     if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
                     {
