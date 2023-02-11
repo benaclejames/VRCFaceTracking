@@ -38,8 +38,10 @@ namespace VRCFaceTracking.OSC
 
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
+                Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
+
                 var compatibleParam = newParams.FirstOrDefault(param =>
-                    Regex.IsMatch(param.name, @"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$", RegexOptions.Compiled)
+                    regex.IsMatch(param.name)
                     && param.input.Type == _paramType);
 
                 if (compatibleParam != null)
@@ -140,15 +142,15 @@ namespace VRCFaceTracking.OSC
                 _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
+                Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
+
                 var boolParams = newParams.Where(p => 
-                p.input.Type == typeof(bool) && Regex.IsMatch(p.name, @"(?<!(v\d+))(/" + _paramName + @"\d+)$|^(" + _paramName + @"\d+)$"));
+                    p.input.Type == typeof(bool) && regex.IsMatch(p.name));
 
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)
                 {
-                    var binaryMatch = Regex.Match(param.name, @"\d+$", RegexOptions.RightToLeft | RegexOptions.Compiled );
-                    // If match success: Cut the parameter name to get the index
-                    if (!binaryMatch.Success || !int.TryParse(binaryMatch.Value, out var index)) continue;
+                    if (!int.TryParse(String.Concat(param.name.ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
