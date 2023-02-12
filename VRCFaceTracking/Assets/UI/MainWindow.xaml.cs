@@ -215,7 +215,7 @@ namespace VRCFaceTracking.Assets.UI
             {
                 Logger.Msg("Initialized calibration.");
 
-                UnifiedTracking.Mutator.SetCalibration(999.99f);
+                UnifiedTracking.Mutator.SetCalibration();
 
                 UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
                 UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;

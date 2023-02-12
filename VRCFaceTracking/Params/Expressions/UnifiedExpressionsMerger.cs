@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace VRCFaceTracking.Params
 {
@@ -35,7 +36,18 @@ namespace VRCFaceTracking.Params
                 ? exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight
                 : exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight,
                 "v2/EyesWiden"),
-            
+
+            #endregion
+
+            #region Eyelids Combined
+
+            new EParam(exp => exp.Eye.Left.Openness * .8f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f, "v2/EyeLidLeft"),
+            new EParam(exp => exp.Eye.Right.Openness * .8f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f, "v2/EyeLidRight"),
+            new EParam(exp =>
+                ((exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f) * .8f +
+                ((exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f) * .2f,
+                "v2/EyeLids"),
+           
             #endregion
 
             #region Eyes Squint (Combined)
@@ -48,73 +60,42 @@ namespace VRCFaceTracking.Params
             
             #endregion
 
-            #region Eye Expressions
-
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight - exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight, "v2/LeftEyeExpression"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight - exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight, "v2/RightEyeExpression"),
-
-            new EParam(exp =>
-                (exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight) / 2.0f -
-                (exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f,
-                "v2/EyesExpression"),
-
-            
-            #endregion
-
             #region Eyebrows Compacted
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight) / 2.0f,
+            new EParam(exp => 
+                GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight) + GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft),
+                "v2/BrowsDown"),
+
+            new EParam(exp => 
+                (exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight) / 2.0f,
                 "v2/BrowsInnerUp"),
+            new EParam(exp => 
+                (exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) / 2.0f,
+                "v2/BrowsOuterUp"),
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f,
-                "v2/BrowDownLeft"),
-
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f,
-                "v2/BrowDownRight"),
-
-            new EParam(exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight),
-                "v2/BrowYRight"),
-
-            new EParam(exp => Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight) -
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight),
-                "v2/BrowYLeft"),
-
-            new EParam(exp =>
-                (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight)) +
-                (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight) -
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight)) / 2.0f,
-                "v2/BrowsY"),
-
-            // Kinda complicated, basically reports the 'angle' of the brow normalized from -1.0 - 1.0, with -1.0 being angry and 1 being worried. Can be used in tandem with the
-            // BrowY parameters to regain brow positioning but can be used by itself to control a simplified expression of the brows.
-            new EParam(exp =>
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight, 2.0f) -
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight, 2.0f),
+            // -1 = 'Angry', +1 = 'Worried'
+            new EParam(exp => 
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
+                GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight),
                 "v2/BrowExpressionRight"),
 
-            new EParam(exp =>
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight, 2.0f) -
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight, 2.0f),
+            new EParam(exp => 
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight) -
+                GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft),
                 "v2/BrowExpressionLeft"),
 
             new EParam(exp =>
-                ((float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight, 2.0f) -
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight, 2.0f)) +
-                ((float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight, 2.0f) -
-                (float)Math.Pow(exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight - exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight, 2.0f)) / 2.0f,
-                "v2/BrowsExpression"),
+                (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight)) +
+                (GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight) - GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft)) / 2.0f,
+                "v2/BrowExpression"),
 
             #endregion
 
             #region Jaw Combined
 
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.JawRight].Weight - exp.Shapes[(int)UnifiedExpressions.JawLeft].Weight, "v2/JawX"),
-
-            #endregion
-
-            #region Mouth Closed Combined
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.JawForward].Weight - exp.Shapes[(int)UnifiedExpressions.JawBackward].Weight, "v2/JawZ"),
 
             #endregion
 
@@ -125,9 +106,9 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight, "v2/CheekLeftPuffSuck"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight, "v2/CheekRightPuffSuck"),
 
-            new EParam(exp => 
-                (exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight + exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight) / 2.0f - 
-                (exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight) / 2.0f, 
+            new EParam(exp =>
+                (exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight + exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight) / 2.0f -
+                (exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight) / 2.0f,
                 "v2/CheekPuffSuck"),
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight) / 2.0f, "v2/CheekSuck"),
@@ -139,9 +120,9 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthUpperRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthUpperLeft].Weight, "v2/MouthUpperX"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthLowerRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight, "v2/MouthLowerX"),
 
-            new EParam(exp => 
+            new EParam(exp =>
                 (exp.Shapes[(int)UnifiedExpressions.MouthUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthLowerRight].Weight) / 2.0f -
-                (exp.Shapes[(int)UnifiedExpressions.MouthUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight) / 2.0f, 
+                (exp.Shapes[(int)UnifiedExpressions.MouthUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight) / 2.0f,
                 "v2/MouthX"),
 
             #endregion
@@ -150,18 +131,23 @@ namespace VRCFaceTracking.Params
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight) / 2.0f, "v2/LipSuckUpper"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight) / 2.0f, "v2/LipSuckLower"),
-
+            new EParam(exp => ((exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight) / 2.0f) +
+                ((exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight) / 2.0f), "v2/LipSuck"),
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight) / 2.0f, "v2/LipFunnelUpper"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight) / 2.0f, "v2/LipFunnelLower"),
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight) / 2.0f, "v2/LipPucker"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight) / 2.0f, "v2/LipPuckerRight"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 2.0f, "v2/LipPuckerLeft"),
+            new EParam(exp => 
+                (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight +
+                exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 4.0f, "v2/LipPucker"),
 
             #endregion
 
             #region Mouth Combined
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight) / 2.0f, "v2/MouthUpperUp"),
+            new EParam(exp => (GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft)) / 2.0f, "v2/MouthUpperUp"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight) / 2.0f, "v2/MouthLowerDown"),
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight) / 2.0f, "v2/MouthStretch"),
@@ -171,29 +157,43 @@ namespace VRCFaceTracking.Params
 
             #endregion
 
-            #region Smile Combined
-
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight, "v2/SmileFrownRight"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight - exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight, "v2/SmileFrownLeft"),
+            #region Lip Corners Combined
 
             new EParam(exp =>
-                (exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight) / 2.0f -
-                (exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f,
+                exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight - exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight, 
+                "v2/MouthCornerYLeft"),
+            new EParam(exp =>
+                exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight, 
+                "v2/MouthCornerYRight"),
+            new EParam(exp =>
+                exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight * .5f -
+                exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight, "v2/MouthCornersY"),
+
+            new EParam(exp =>
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileRight) - 
+                exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight, "v2/SmileFrownRight"),
+            new EParam(exp =>
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileLeft) - 
+                exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight, "v2/SmileFrownLeft"),
+
+            new EParam(exp =>
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileRight) * .5f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileLeft) * .5f -
+                exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight * .5f,
                 "v2/SmileFrown"),
 
-            // Smile 'Sad' contains both the stretcher and frown shapes to represent sad (similar in functionality to SRanipal Sad, just with explicit acknowledgment of more tracking fidelity).
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight -
-                Math.Min(1.0f, exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight),
+            // Smile 'Sad' contains both the stretcher and frown shapes to represent sad (similar in functionality to SRanipal Sad, just with explicit acknowledgment of lessened tracking fidelity).
+            new EParam(exp => 
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileRight) - GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadRight),
                 "v2/SmileSadRight"),
 
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight -
-                Math.Min(1.0f, exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight),
+            new EParam(exp => 
+            GetSimpleShape(exp,
+                UnifiedSimpleExpressions.MouthSmileLeft) - GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadLeft),
                 "v2/SmileSadLeft"),
 
             new EParam(exp =>
-                (exp.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight) / 2.0f -
-                (Math.Min(1.0f, exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight) +
-                Math.Min(1.0f, exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight)) / 2.0f,
+                (GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileLeft) + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileRight)) / 2.0f -
+                (GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadLeft) + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadRight)) / 2.0f,
                 "v2/SmileSad"),
 
             #endregion 
@@ -202,7 +202,7 @@ namespace VRCFaceTracking.Params
 
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.TongueRight].Weight - exp.Shapes[(int)UnifiedExpressions.TongueLeft].Weight, "v2/TongueX"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.TongueUp].Weight - exp.Shapes[(int)UnifiedExpressions.TongueDown].Weight, "v2/TongueY"),
-            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.TongueCurl].Weight - exp.Shapes[(int)UnifiedExpressions.TongueBend].Weight, "v2/TongueArch"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.TongueCurlUp].Weight - exp.Shapes[(int)UnifiedExpressions.TongueBendDown].Weight, "v2/TongueArchY"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.TongueFlat].Weight - exp.Shapes[(int)UnifiedExpressions.TongueSquish].Weight, "v2/TongueShape"),
 
             #endregion
@@ -213,11 +213,17 @@ namespace VRCFaceTracking.Params
         };
 
         public static readonly IParameter[] ExpressionParameters =
-            GetAllBaseExpressions().Union(UnifiedCombinedShapes).ToArray();
+            GetAllBaseExpressions().Union(GetAllBaseSimpleExpressions()).Union(UnifiedCombinedShapes).ToArray();
 
         private static IEnumerable<EParam> GetAllBaseExpressions() =>
             ((UnifiedExpressions[])Enum.GetValues(typeof(UnifiedExpressions))).ToList().Select(shape =>
                new EParam(exp => exp.Shapes[(int)shape].Weight,
                    "v2/" + shape.ToString(), 0.0f));
+        private static IEnumerable<EParam> GetAllBaseSimpleExpressions() =>
+            ((UnifiedSimpleExpressions[])Enum.GetValues(typeof(UnifiedSimpleExpressions))).ToList().Select(simple =>
+               new EParam(exp => GetSimpleShape(exp, simple),
+                   "v2/" + simple.ToString(), 0.0f));
+
+        private static float GetSimpleShape(UnifiedTrackingData data, UnifiedSimpleExpressions expression) => UnifiedSimplifier.ExpressionMap[expression].Invoke(data);
     }
 }

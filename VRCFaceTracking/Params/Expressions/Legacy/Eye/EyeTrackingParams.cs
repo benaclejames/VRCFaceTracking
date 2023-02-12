@@ -75,14 +75,14 @@ namespace VRCFaceTracking.Params.Eye
             
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight > 0)
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f > .8f)
                     return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight;
                 return exp.Eye.Left.Openness;
             }, "LeftEyeLidExpanded"),
 
             new BinaryParameter(exp =>
             {
-                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight > 0)
+                if (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f > .8f)
                     return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight;
                 return exp.Eye.Right.Openness;
             }, "RightEyeLidExpanded"),
@@ -102,7 +102,7 @@ namespace VRCFaceTracking.Params.Eye
             new BinaryParameter(exp =>
             {
                 var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0);
-                if (eyeLid > 1)
+                if (eyeLid > .8f)
                     return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight;
                 if (eyeLid >= 0)
                     return exp.Eye.Left.Openness;
@@ -112,7 +112,7 @@ namespace VRCFaceTracking.Params.Eye
             new BinaryParameter(exp =>
             {
                 var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1);
-                if (eyeLid > 1)
+                if (eyeLid > .8f)
                     return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight; 
                 if (eyeLid >= 0)
                     return exp.Eye.Right.Openness;
@@ -124,7 +124,7 @@ namespace VRCFaceTracking.Params.Eye
                 var eyeLid = (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
                     (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
                     Squeeze(exp, 2);
-                if (eyeLid > 1)
+                if (eyeLid > .8f)
                     return (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f;
                 if (eyeLid >= 0)
                     return exp.Eye.Combined().Openness;
@@ -137,20 +137,20 @@ namespace VRCFaceTracking.Params.Eye
 
             // These parameters are used to distinguish when EyeLidExpanded / EyeLidExpandedSqueeze
             // is returning a value as a Widen or Squeeze. Intended for the Bool or Binary param variant.
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0) > 1, "LeftEyeWidenToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) > 1, "RightEyeWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f > .8f, "LeftEyeWidenToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f > .8f, "RightEyeWidenToggle"),
             new BoolParameter(exp =>
-                (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) + 
-                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0)) / 2.0f
-                > 1, 
+                (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f + 
+                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) / 2.0f
+                > .8f, 
                 "EyesWidenToggle"),
 
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0) < 1, "LeftEyeSqueezeToggle"),
-            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) < 1, "RightEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0) < 0, "LeftEyeSqueezeToggle"),
+            new BoolParameter(exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) < 0, "RightEyeSqueezeToggle"),
             new BoolParameter(exp =>
                 (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1) +
                 exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0)) / 2.0f
-                < 1, 
+                < 0, 
                 "EyesSqueezeToggle"),
 
             #endregion
@@ -177,14 +177,14 @@ namespace VRCFaceTracking.Params.Eye
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight, "BrowOuterUpLeft"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight, "BrowOuterUpRight"),
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f
-                > (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f
-                ? (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f
-                : (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f, 
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowPinchLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight) / 2.0f
+                > (exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight) / 2.0f
+                ? (exp.Shapes[(int)UnifiedExpressions.BrowPinchLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight) / 2.0f
+                : (exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight) / 2.0f, 
                 "BrowsDown"),
 
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownLeft].Weight) / 2.0f, "BrowDownLeft"),
-            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowInnerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterDownRight].Weight) / 2.0f, "BrowDownRight"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowPinchLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight) / 2.0f, "BrowDownLeft"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight) / 2.0f, "BrowDownRight"),
 
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserLower].Weight, "MouthRaiserLower"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthRaiserUpper].Weight, "MouthRaiserUpper"),

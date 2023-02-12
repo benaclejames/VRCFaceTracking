@@ -266,11 +266,11 @@ namespace SRanipalExtTrackingInterface
             data[(int)UnifiedExpressions.BrowInnerUpRight].Weight = external.right.eye_wide;
             data[(int)UnifiedExpressions.BrowOuterUpRight].Weight = external.right.eye_wide;
 
-            data[(int)UnifiedExpressions.BrowInnerDownLeft].Weight = external.left.eye_squeeze;
-            data[(int)UnifiedExpressions.BrowOuterDownLeft].Weight = external.left.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowPinchLeft].Weight = external.left.eye_squeeze;
+            data[(int)UnifiedExpressions.BrowLowererLeft].Weight = external.left.eye_squeeze * browOuterOffset;
 
-            data[(int)UnifiedExpressions.BrowInnerDownRight].Weight = external.right.eye_squeeze;
-            data[(int)UnifiedExpressions.BrowOuterDownRight].Weight = external.right.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowPinchRight].Weight = external.right.eye_squeeze;
+            data[(int)UnifiedExpressions.BrowLowererRight].Weight = external.right.eye_squeeze * browOuterOffset;
         }
 
         private Error UpdateMouth()
@@ -304,13 +304,17 @@ namespace SRanipalExtTrackingInterface
                 #region Direct Mouth and Lip
 
                 // These shapes have overturns subtracting from them, as we are expecting the new standard to have Upper Up / Lower Down baked into the funneller shapes below these.
-                data.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
-                data.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
                 data.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerDownLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthLowerOverturn];
                 data.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerDownRight] - external.blend_shape_weight[(int)LipShape_v2.MouthLowerOverturn];
 
-                data.Shapes[(int)UnifiedExpressions.LipPuckerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
-                data.Shapes[(int)UnifiedExpressions.LipPuckerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
+                data.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
+                data.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
+                data.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
+                data.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthPout];
 
                 data.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
                 data.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
@@ -327,8 +331,10 @@ namespace SRanipalExtTrackingInterface
                 data.Shapes[(int)UnifiedExpressions.MouthLowerLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerLeft];
                 data.Shapes[(int)UnifiedExpressions.MouthLowerRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerRight];
 
-                data.Shapes[(int)UnifiedExpressions.MouthSmileLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileLeft];
-                data.Shapes[(int)UnifiedExpressions.MouthSmileRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileRight];
+                data.Shapes[(int)UnifiedExpressions.MouthCornerPullLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileLeft];
+                data.Shapes[(int)UnifiedExpressions.MouthCornerPullRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileRight];
+                data.Shapes[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileLeft];
+                data.Shapes[(int)UnifiedExpressions.MouthCornerSlantRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSmileRight];
                 data.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSadLeft];
                 data.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthSadRight];
 

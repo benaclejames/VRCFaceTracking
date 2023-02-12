@@ -26,8 +26,6 @@ namespace ALVRTrackingInterface
         private byte[] rawExpressions = new byte[expressionsSize * 4 + (8 * 2 * 4)];
         private float[] expressions = new float[expressionsSize + (8 * 2)];
 
-        private double pitch_L, yaw_L, pitch_R, yaw_R; // eye rotations
-
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
@@ -149,28 +147,6 @@ namespace ALVRTrackingInterface
                 // We then need to convert this byte array to a float array. Thankfully, this can all be done in a single line of code.
                 Buffer.BlockCopy(rawExpressions, 0, expressions, 0, expressionsSize * 4 + (8 * 2 * 4));
 
-                double q_x = expressions[64];
-                double q_y = expressions[65];
-                double q_z = expressions[66];
-                double q_w = expressions[67];
-
-                double yaw = Math.Atan2(2.0 * (q_y * q_z + q_w * q_x), q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z);
-                double pitch = Math.Asin(-2.0 * (q_x * q_z - q_w * q_y));
-
-                pitch_L = (180.0 / Math.PI) * pitch; // from radians
-                yaw_L = (180.0 / Math.PI) * yaw;
-
-                q_x = expressions[72];
-                q_y = expressions[73];
-                q_z = expressions[74];
-                q_w = expressions[75];
-
-                yaw = Math.Atan2(2.0 * (q_y * q_z + q_w * q_x), q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z);
-                pitch = Math.Asin(-2.0 * (q_x * q_z - q_w * q_y));
-
-                pitch_R = (180.0 / Math.PI) * pitch; // from radians
-                yaw_R = (180.0 / Math.PI) * yaw;
-
                 if (eyeActive)
                 {
                     UpdateEyeData(ref UnifiedTracking.Data.Eye, ref expressions);
@@ -205,6 +181,28 @@ namespace ALVRTrackingInterface
             // pitch = 47(left)-- > -47(right)
             // yaw = -55(down)-- > 43(up)
             // Eye look angle (degrees) limits calibrated to SRanipal eye tracking
+
+            double q_x = expressions[64];
+            double q_y = expressions[65];
+            double q_z = expressions[66];
+            double q_w = expressions[67];
+
+            double yaw = Math.Atan2(2.0 * (q_y * q_z + q_w * q_x), q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z);
+            double pitch = Math.Asin(-2.0 * (q_x * q_z - q_w * q_y));
+
+            var pitch_L = (180.0 / Math.PI) * pitch; // from radians
+            var yaw_L = (180.0 / Math.PI) * yaw;
+
+            q_x = expressions[72];
+            q_y = expressions[73];
+            q_z = expressions[74];
+            q_w = expressions[75];
+
+            yaw = Math.Atan2(2.0 * (q_y * q_z + q_w * q_x), q_w * q_w - q_x * q_x - q_y * q_y + q_z * q_z);
+            pitch = Math.Asin(-2.0 * (q_x * q_z - q_w * q_y));
+
+            var pitch_R = (180.0 / Math.PI) * pitch; // from radians
+            var yaw_R = (180.0 / Math.PI) * yaw;
 
             float eyeLookUpLimit = 43;
             float eyeLookDownLimit = 55;
@@ -300,10 +298,10 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_L];
             unifiedExpressions[(int)UnifiedExpressions.BrowOuterUpRight].Weight = expressions[(int)FBExpression.Outer_Brow_Raiser_R];
 
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L];
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L];
-            unifiedExpressions[(int)UnifiedExpressions.BrowOuterDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R];
-            unifiedExpressions[(int)UnifiedExpressions.BrowInnerDownRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R];
+            unifiedExpressions[(int)UnifiedExpressions.BrowLowererLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L];
+            unifiedExpressions[(int)UnifiedExpressions.BrowPinchLeft].Weight = expressions[(int)FBExpression.Brow_Lowerer_L];
+            unifiedExpressions[(int)UnifiedExpressions.BrowLowererRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R];
+            unifiedExpressions[(int)UnifiedExpressions.BrowPinchRight].Weight = expressions[(int)FBExpression.Brow_Lowerer_R];
 
             #endregion
         }
@@ -326,15 +324,19 @@ namespace ALVRTrackingInterface
             unifiedExpressions[(int)UnifiedExpressions.MouthUpperRight].Weight = expressions[(int)FBExpression.Mouth_Right];
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerRight].Weight = expressions[(int)FBExpression.Mouth_Right];
 
-            unifiedExpressions[(int)UnifiedExpressions.MouthSmileLeft].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_L];
-            unifiedExpressions[(int)UnifiedExpressions.MouthSmileRight].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_R];
+            unifiedExpressions[(int)UnifiedExpressions.MouthCornerPullLeft].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_L];
+            unifiedExpressions[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_L];
+            unifiedExpressions[(int)UnifiedExpressions.MouthCornerPullRight].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_R];
+            unifiedExpressions[(int)UnifiedExpressions.MouthCornerSlantRight].Weight = expressions[(int)FBExpression.Lip_Corner_Puller_R];
             unifiedExpressions[(int)UnifiedExpressions.MouthFrownLeft].Weight = expressions[(int)FBExpression.Lip_Corner_Depressor_L];
             unifiedExpressions[(int)UnifiedExpressions.MouthFrownRight].Weight = expressions[(int)FBExpression.Lip_Corner_Depressor_R];
 
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownLeft].Weight = expressions[(int)FBExpression.Lower_Lip_Depressor_L];
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownRight].Weight = expressions[(int)FBExpression.Lower_Lip_Depressor_R];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperUpRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R];
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L];
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L];
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R];
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R];
 
             unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper].Weight = expressions[(int)FBExpression.Chin_Raiser_T];
             unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower].Weight = expressions[(int)FBExpression.Chin_Raiser_B];
@@ -353,12 +355,16 @@ namespace ALVRTrackingInterface
             #endregion
 
             #region Lip Expression Set   
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerRight].Weight = expressions[(int)FBExpression.Lip_Pucker_R];
-            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLeft].Weight = expressions[(int)FBExpression.Lip_Pucker_L];
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerUpperRight].Weight = expressions[(int)FBExpression.Lip_Pucker_R];
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLowerRight].Weight = expressions[(int)FBExpression.Lip_Pucker_R];
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight = expressions[(int)FBExpression.Lip_Pucker_L];
+            unifiedExpressions[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight = expressions[(int)FBExpression.Lip_Pucker_L];
+
             unifiedExpressions[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight = expressions[(int)FBExpression.Lip_Funneler_LT];
             unifiedExpressions[(int)UnifiedExpressions.LipFunnelUpperRight].Weight = expressions[(int)FBExpression.Lip_Funneler_RT];
             unifiedExpressions[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight = expressions[(int)FBExpression.Lip_Funneler_LB];
             unifiedExpressions[(int)UnifiedExpressions.LipFunnelLowerRight].Weight = expressions[(int)FBExpression.Lip_Funneler_RB];
+
             unifiedExpressions[(int)UnifiedExpressions.LipSuckUpperLeft].Weight = expressions[(int)FBExpression.Lip_Suck_LT];
             unifiedExpressions[(int)UnifiedExpressions.LipSuckUpperRight].Weight = expressions[(int)FBExpression.Lip_Suck_RT];
             unifiedExpressions[(int)UnifiedExpressions.LipSuckLowerLeft].Weight = expressions[(int)FBExpression.Lip_Suck_LB];

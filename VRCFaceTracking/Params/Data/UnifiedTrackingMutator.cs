@@ -13,7 +13,8 @@ namespace VRCFaceTracking
     {
         public struct Mutation
         {
-            public float CalibrationMult; // The amount to multiply this parameter to normalize between 0-1.
+            public float Ceil; // The maximum that the parameter reaches.
+            public float Floor; // the minimum that the parameter reaches.
             //public float SigmoidMult; // How much should this parameter be affected by the sigmoid function. This makes the parameter act more like a toggle.
             //public float LogitMult; // How much should this parameter be affected by the logit (inverse of sigmoid) function. This makes the parameter act more within the normalized range.
             public float SmoothnessMult; // How much should this parameter be affected by the smoothing function.
@@ -52,10 +53,14 @@ namespace VRCFaceTracking
 
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
             {
-                if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight * mutationData.ShapeMutations[i].CalibrationMult > 1.0f) // Calibrator
-                    mutationData.ShapeMutations[i].CalibrationMult = SimpleLerp(1.0f / inputData.Shapes[i].Weight, mutationData.ShapeMutations[i].CalibrationMult, calibrationWeight);
+                if (inputData.Shapes[i].Weight <= 0.0f)
+                    continue;
+                if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight > mutationData.ShapeMutations[i].Ceil) // Calibrator
+                    mutationData.ShapeMutations[i].Ceil = SimpleLerp(inputData.Shapes[i].Weight, mutationData.ShapeMutations[i].Ceil, calibrationWeight);
+                if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight < mutationData.ShapeMutations[i].Floor)
+                    mutationData.ShapeMutations[i].Floor = SimpleLerp(inputData.Shapes[i].Weight, mutationData.ShapeMutations[i].Floor, calibrationWeight);
 
-                inputData.Shapes[i].Weight = Math.Min(1, inputData.Shapes[i].Weight * mutationData.ShapeMutations[i].CalibrationMult);
+                inputData.Shapes[i].Weight = (inputData.Shapes[i].Weight - mutationData.ShapeMutations[i].Floor) / (mutationData.ShapeMutations[i].Ceil - mutationData.ShapeMutations[i].Floor);
             }
         }
 
@@ -103,15 +108,21 @@ namespace VRCFaceTracking
             return inputBuffer;
         } 
 
-        public void SetCalibration(float setValue = 0.0f)
+        public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
         {
             // Currently eye data does not get parsed by calibration.
-            mutationData.PupilMutations.CalibrationMult = setValue;
-            mutationData.GazeMutations.CalibrationMult = setValue;
-            mutationData.OpennessMutations.CalibrationMult = setValue;
+            mutationData.PupilMutations.Ceil = ceiling;
+            mutationData.GazeMutations.Ceil = ceiling;
+            mutationData.OpennessMutations.Ceil = ceiling;
+            mutationData.PupilMutations.Floor = floor;
+            mutationData.GazeMutations.Floor = floor;
+            mutationData.OpennessMutations.Floor = floor;
 
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
-                mutationData.ShapeMutations[i].CalibrationMult = setValue;
+            {
+                mutationData.ShapeMutations[i].Ceil = ceiling;
+                mutationData.ShapeMutations[i].Floor = floor;
+            }
         }
 
         public void SetSmoothness(float setValue = 0.0f)

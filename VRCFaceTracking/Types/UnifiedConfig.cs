@@ -13,7 +13,7 @@ namespace VRCFaceTracking.Types
     public class UnifiedConfig
     {
         private static string unifiedConfigPath = Utils.PersistentDataDirectory + "\\Config.json";
-        private static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true };
+        private static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions() { WriteIndented = true, IncludeFields = true, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
 
         public List<string> RequestedModulePaths = new List<string>();
         public UnifiedTrackingData Data = new UnifiedTrackingData();
