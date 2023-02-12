@@ -168,11 +168,11 @@ namespace ALVRTrackingInterface
         {
             #region Eye Data parsing
 
-            eye.Left.Openness = 1.0f - (float)Math.Min(1, expressions[(int)FBExpression.Eyes_Closed_L] +
-                (Math.Pow(expressions[(int)FBExpression.Eyes_Closed_L], .33) * Math.Pow(expressions[(int)FBExpression.Lid_Tightener_L], 1.25)));
+            eye.Left.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Eyes_Closed_L] + // Use eye closed full range
+                expressions[(int)FBExpression.Eyes_Closed_L] * (2f * expressions[(int)FBExpression.Lid_Tightener_L] / Math.Pow(2f, 2f * expressions[(int)FBExpression.Lid_Tightener_L])))); // Add lid tighener as the eye closes to help winking.
 
-            eye.Right.Openness = 1.0f - (float)Math.Min(1, expressions[(int)FBExpression.Eyes_Closed_R] +
-                (Math.Pow(expressions[(int)FBExpression.Eyes_Closed_R], .33) * Math.Pow(expressions[(int)FBExpression.Lid_Tightener_R], 1.25)));
+            eye.Right.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, expressions[(int)FBExpression.Eyes_Closed_R] + // Use eye closed full range
+                expressions[(int)FBExpression.Eyes_Closed_R] * (2f * expressions[(int)FBExpression.Lid_Tightener_R] / Math.Pow(2f, 2f * expressions[(int)FBExpression.Lid_Tightener_R])))); // Add lid tighener as the eye closes to help winking.
 
             #endregion
 
@@ -333,10 +333,10 @@ namespace ALVRTrackingInterface
 
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownLeft].Weight = expressions[(int)FBExpression.Lower_Lip_Depressor_L];
             unifiedExpressions[(int)UnifiedExpressions.MouthLowerDownRight].Weight = expressions[(int)FBExpression.Lower_Lip_Depressor_R];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenLeft].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_L];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R];
-            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenRight].Weight = expressions[(int)FBExpression.Upper_Lip_Raiser_R];
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = Math.Max(0.0f, expressions[(int)FBExpression.Upper_Lip_Raiser_L] - expressions[(int)FBExpression.Nose_Wrinkler_L]); // Workaround for wierd tracking quirk.
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenLeft].Weight = Math.Max(0.0f, expressions[(int)FBExpression.Upper_Lip_Raiser_L] - expressions[(int)FBExpression.Nose_Wrinkler_L]); // Workaround for wierd tracking quirk.
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = Math.Max(0.0f, expressions[(int)FBExpression.Upper_Lip_Raiser_R] - expressions[(int)FBExpression.Nose_Wrinkler_L]); // Workaround for wierd tracking quirk.
+            unifiedExpressions[(int)UnifiedExpressions.MouthUpperDeepenRight].Weight = Math.Max(0.0f, expressions[(int)FBExpression.Upper_Lip_Raiser_R] - expressions[(int)FBExpression.Nose_Wrinkler_L]); // Workaround for wierd tracking quirk.
 
             unifiedExpressions[(int)UnifiedExpressions.MouthRaiserUpper].Weight = expressions[(int)FBExpression.Chin_Raiser_T];
             unifiedExpressions[(int)UnifiedExpressions.MouthRaiserLower].Weight = expressions[(int)FBExpression.Chin_Raiser_B];

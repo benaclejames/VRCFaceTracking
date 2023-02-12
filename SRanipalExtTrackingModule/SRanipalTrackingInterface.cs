@@ -27,7 +27,7 @@ namespace SRanipalExtTrackingInterface
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
             // Look for SRanipal assemblies here.
-            Directory.SetCurrentDirectory(Utils.PersistentDataDirectory + "/CustomLibs/ModuleLibs");
+            Directory.SetCurrentDirectory(Utils.CustomLibsDirectory + "\\ModuleLibs");
 
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
 
@@ -257,9 +257,6 @@ namespace SRanipalExtTrackingInterface
             data[(int)UnifiedExpressions.EyeSquintRight].Weight = external.right.eye_squeeze;
 
             // Emulator expressions for Unified Expressions. These are essentially already baked into Legacy eye expressions (SRanipal)
-
-            float browOuterOffset = 0.66f;
-
             data[(int)UnifiedExpressions.BrowInnerUpLeft].Weight = external.left.eye_wide;
             data[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = external.left.eye_wide;
 
@@ -267,10 +264,10 @@ namespace SRanipalExtTrackingInterface
             data[(int)UnifiedExpressions.BrowOuterUpRight].Weight = external.right.eye_wide;
 
             data[(int)UnifiedExpressions.BrowPinchLeft].Weight = external.left.eye_squeeze;
-            data[(int)UnifiedExpressions.BrowLowererLeft].Weight = external.left.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowLowererLeft].Weight = external.left.eye_squeeze;
 
             data[(int)UnifiedExpressions.BrowPinchRight].Weight = external.right.eye_squeeze;
-            data[(int)UnifiedExpressions.BrowLowererRight].Weight = external.right.eye_squeeze * browOuterOffset;
+            data[(int)UnifiedExpressions.BrowLowererRight].Weight = external.right.eye_squeeze;
         }
 
         private Error UpdateMouth()
@@ -304,10 +301,11 @@ namespace SRanipalExtTrackingInterface
                 #region Direct Mouth and Lip
 
                 // These shapes have overturns subtracting from them, as we are expecting the new standard to have Upper Up / Lower Down baked into the funneller shapes below these.
-                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
                 data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperDeepenRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
                 data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
-                data.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpRight] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+                data.Shapes[(int)UnifiedExpressions.MouthUpperDeepenLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthUpperUpLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthUpperOverturn];
+
                 data.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerDownLeft] - external.blend_shape_weight[(int)LipShape_v2.MouthLowerOverturn];
                 data.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight = external.blend_shape_weight[(int)LipShape_v2.MouthLowerDownRight] - external.blend_shape_weight[(int)LipShape_v2.MouthLowerOverturn];
 
