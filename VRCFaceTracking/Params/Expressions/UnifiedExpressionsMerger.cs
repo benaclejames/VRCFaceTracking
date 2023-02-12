@@ -127,6 +127,17 @@ namespace VRCFaceTracking.Params
 
             #endregion
 
+            #region Mouth Open
+
+            new EParam(exp => GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) * .5f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft) * .5f, "v2/MouthUpperUp"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight * .5f + exp.Shapes[(int) UnifiedExpressions.MouthLowerDownLeft].Weight * .5f, "v2/MouthLowerDown"),
+            new EParam(exp => 
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) * .25f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft) * .25f +
+                exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight * .25f + exp.Shapes[(int) UnifiedExpressions.MouthLowerDownLeft].Weight * .25f,
+                "v2/MouthOpen"),
+
+            #endregion
+
             #region Lip Combined
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight) / 2.0f, "v2/LipSuckUpper"),
