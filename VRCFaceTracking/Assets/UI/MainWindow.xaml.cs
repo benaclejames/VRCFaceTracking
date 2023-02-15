@@ -114,7 +114,7 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (!IsEyePageVisible || UnifiedTracking.EyeImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTracking.EyeImageData.ImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
