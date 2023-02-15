@@ -16,8 +16,8 @@ namespace VRCFaceTracking
 
             try
             {
-                ConsoleOutput.Add(new Tuple<string, string>(formattedStr + msgStr, "White"));
-                Console.WriteLine(formattedStr + msgStr);
+                ConsoleOutput.Add(new Tuple<string, string>(formattedStr, "White"));
+                Console.WriteLine(formattedStr);
             }
             catch (Exception e)
             {

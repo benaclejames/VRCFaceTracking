@@ -56,8 +56,9 @@ namespace VRCFaceTracking
         private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
         private static readonly Dictionary<ExtTrackingModule, Thread> UsefulThreads =
             new Dictionary<ExtTrackingModule, Thread>();
+        private static bool _enableEye = true, _enableExpression = true;
         #endregion
-        
+
         private static Thread _initializeWorker;
 
         private static void CreateModuleInitializer(List<Assembly> modules)
@@ -76,7 +77,7 @@ namespace VRCFaceTracking
                 else Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
 
             });
-            Logger.Msg("Starting initialization thread");
+            Logger.Msg("Starting initialization for " + (_enableEye ? "eye" : "") + (_enableEye && _enableExpression ? " and " : "") + (_enableExpression ? "expression" : "") + " tracking");
             _initializeWorker.Start();
         }
 
@@ -85,6 +86,12 @@ namespace VRCFaceTracking
             if (RequestedModules != null && RequestedModules.Count > 0)
                 CreateModuleInitializer(RequestedModules);
             else CreateModuleInitializer(AvailableModules);
+        }
+
+        public static void SetTrackingEnabled(bool enableEye, bool enableExpression)
+        {
+            _enableEye = enableEye;
+            _enableExpression = enableExpression;
         }
 
         public static void ReloadModules()
@@ -216,7 +223,7 @@ namespace VRCFaceTracking
                 bool eyeSuccess = false, expressionSuccess = false;
                 try
                 {
-                    (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
+                    (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null && _enableEye, _loadedExpressionModule == null && _enableExpression);
                 }
                 catch (MissingMethodException)
                 {
