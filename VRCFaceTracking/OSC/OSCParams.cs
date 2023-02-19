@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VRCFaceTracking.OSC
 {
@@ -15,16 +16,28 @@ namespace VRCFaceTracking.OSC
                 get => _paramValue;
                 set
                 {
-                    if (!Relevant || _paramValue.SequenceEqual(value)) return;
+                    if (_paramValue.SequenceEqual(value)) return;
                     
                     _paramValue = value;
                     NeedsSend = true;
                 }
             }
 
+            public char OscType
+            {
+                get => _oscType;
+                set
+                {
+                    if (_oscType == value) return;
+                    
+                    _oscType = value;
+                    NeedsSend = true;
+                }
+            }
+
             private byte[] _paramValue = new byte[4];
             private readonly Type _paramType;
-            public char OscType;
+            private char _oscType;
             public bool Relevant, NeedsSend = true;
             public ConfigParser.InputOutputDef OutputInfo;
 
@@ -77,11 +90,8 @@ namespace VRCFaceTracking.OSC
 
             public new bool ParamValue
             {
-                set
-                {
-                    OscType = value ? 'T' : 'F';
-                    NeedsSend = true;
-                }
+                get => OscType == 'T';
+                set => OscType = value ? 'T' : 'F';
             }
         }
 
