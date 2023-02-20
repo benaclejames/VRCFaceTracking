@@ -13,6 +13,7 @@ namespace VRCFaceTracking
     {
         public struct Mutation
         {
+            public string Name;
             public float Ceil; // The maximum that the parameter reaches.
             public float Floor; // the minimum that the parameter reaches.
             //public float SigmoidMult; // How much should this parameter be affected by the sigmoid function. This makes the parameter act more like a toggle.
@@ -114,12 +115,18 @@ namespace VRCFaceTracking
             mutationData.PupilMutations.Ceil = ceiling;
             mutationData.GazeMutations.Ceil = ceiling;
             mutationData.OpennessMutations.Ceil = ceiling;
+            
             mutationData.PupilMutations.Floor = floor;
             mutationData.GazeMutations.Floor = floor;
             mutationData.OpennessMutations.Floor = floor;
 
+            mutationData.PupilMutations.Name = "Pupil";
+            mutationData.GazeMutations.Name = "Gaze";
+            mutationData.OpennessMutations.Name = "Openness";
+
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
             {
+                mutationData.ShapeMutations[i].Name = ((UnifiedExpressions)i).ToString();
                 mutationData.ShapeMutations[i].Ceil = ceiling;
                 mutationData.ShapeMutations[i].Floor = floor;
             }
