@@ -5,6 +5,7 @@ using VRCFaceTracking.Params.Lip;
 
 namespace VRCFaceTracking.Params.LipMerging
 {
+    [Obsolete("SRanipal Lip Shapes are being phased out. Please switch to Unified Expressions.")]
     public static class LipShapeMerger
     {
         private static readonly Dictionary<string, ICombinedShape> MergedShapes =

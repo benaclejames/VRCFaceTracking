@@ -113,9 +113,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="Assets\Images\VRCFT.ico" />
-    <None Include="FodyWeavers.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
