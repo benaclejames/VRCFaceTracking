@@ -11,6 +11,37 @@
             
             #endregion
             
+            #region Convergence
+
+            new EParam(v2 => v2.ConvergencePlaneDistance20M, "ConvergencePlaneDistance20M"),
+            new EParam(v2 => v2.ConvergencePlaneDistance10M, "ConvergencePlaneDistance10M"),
+            new EParam(v2 => v2.ConvergencePlaneDistance5M, "ConvergencePlaneDistance5M"),
+            new EParam(v2 => v2.ConvergencePlaneDistance2M, "ConvergencePlaneDistance2M"),
+            new EParam(v2 => v2.ConvergencePlaneDistance1M, "ConvergencePlaneDistance1M"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 0.1f, "ConvergencePlaneDistanceUnder10CM"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 0.2f, "ConvergencePlaneDistanceUnder20CM"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 0.5f, "ConvergencePlaneDistanceUnder50CM"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 1f, "ConvergencePlaneDistanceUnder1M"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 2f, "ConvergencePlaneDistanceUnder2M"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 5f, "ConvergencePlaneDistanceUnder5M"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 10f, "ConvergencePlaneDistanceUnder10M"),
+            new BoolParameter(v2 => v2.ConvergencePlaneDistanceRawM < 20f, "ConvergencePlaneDistanceUnder20M"),
+            new EParam(v2 => v2.ConvergencePointDistance20M, "ConvergencePointDistance20M"),
+            new EParam(v2 => v2.ConvergencePointDistance10M, "ConvergencePointDistance10M"),
+            new EParam(v2 => v2.ConvergencePointDistance5M, "ConvergencePointDistance5M"),
+            new EParam(v2 => v2.ConvergencePointDistance2M, "ConvergencePointDistance2M"),
+            new EParam(v2 => v2.ConvergencePointDistance1M, "ConvergencePointDistance1M"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 0.1f, "ConvergencePointDistanceUnder10CM"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 0.2f, "ConvergencePointDistanceUnder20CM"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 0.5f, "ConvergencePointDistanceUnder50CM"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 1f, "ConvergencePointDistanceUnder1M"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 2f, "ConvergencePointDistanceUnder2M"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 5f, "ConvergencePointDistanceUnder5M"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 10f, "ConvergencePointDistanceUnder10M"),
+            new BoolParameter(v2 => v2.ConvergencePointDistanceRawM < 20f, "ConvergencePointDistanceUnder20M"),
+            
+            #endregion
+            
             #region Widen
 
             new EParam(v2 => v2.Left.Widen > v2.Right.Widen ? v2.Left.Widen : v2.Right.Widen, "EyesWiden"),
