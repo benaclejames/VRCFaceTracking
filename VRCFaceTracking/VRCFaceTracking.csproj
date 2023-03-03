@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="ConfigParser.cs" />
     <Compile Include="Library\AttributeHandler.cs" />
+    <Compile Include="OSC\OSCUtils.cs" />
     <Compile Include="Params\Expressions\UnifiedSimpleExpressions.cs" />
     <Compile Include="SDK\Attributes.cs" />
     <Compile Include="Types\ImageData.cs" />
