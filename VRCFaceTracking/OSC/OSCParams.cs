@@ -33,7 +33,7 @@ namespace VRCFaceTracking.OSC
             {
                 _paramName = name;
                 _paramType = type;
-                OscType = Utils.TypeConversions[type].oscType;
+                OscType = OscUtils.TypeConversions[type].oscType;
             }
 
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)

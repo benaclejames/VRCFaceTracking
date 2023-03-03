@@ -1,9 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VRCFaceTracking.OSC
 {
-    public static class OSCUtils
+    public static class OscUtils
     {
+        public static readonly Dictionary<Type, (char oscType, string configType)> TypeConversions =
+            new Dictionary<Type, (char oscType, string configType)>
+            {
+                {typeof(bool), ('F', "Bool")},
+                {typeof(float), ('f', "Float")},
+                {typeof(int), ('i', "Int")},
+            };
+        
         public static byte[] EnsureCompliance(this byte[] inputArr)
         {
             var nullTerm = new byte[inputArr.Length + 1];
