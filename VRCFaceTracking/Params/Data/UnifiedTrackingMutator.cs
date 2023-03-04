@@ -1,6 +1,7 @@
 using System;
 using System.Drawing.Drawing2D;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Windows.Markup;
 using VRCFaceTracking.Params;
 
@@ -107,7 +108,28 @@ namespace VRCFaceTracking
 
             trackingDataBuffer.CopyPropertiesOf(inputBuffer);
             return inputBuffer;
-        } 
+        }
+
+        public static void InitializeCalibration()
+        {
+            Thread _thread = new Thread(() =>
+            {
+                Logger.Msg("Initialized calibration.");
+
+                UnifiedTracking.Mutator.SetCalibration();
+
+                UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
+                UnifiedTracking.Mutator.CalibratorMode = CalibratorState.Calibrating;
+
+                Logger.Msg("Calibrating deep normalization for 30s.");
+                Thread.Sleep(30000);
+
+                UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
+                Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
+
+            });
+            _thread.Start();
+        }
 
         public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
         {

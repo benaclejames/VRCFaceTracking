@@ -208,24 +208,7 @@ namespace VRCFaceTracking.Assets.UI
         private void CalibrationClick(object sender, RoutedEventArgs e)
         {
             UseCalibration.IsChecked = true;
-
-            Thread _thread = new Thread(() =>
-            {
-                Logger.Msg("Initialized calibration.");
-
-                UnifiedTracking.Mutator.SetCalibration();
-
-                UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
-                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
-
-                Logger.Msg("Calibrating deep normalization for 30s.");
-                Thread.Sleep(30000);
-
-                UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
-                Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
-                
-            });
-            _thread.Start();
+            UnifiedTrackingMutator.InitializeCalibration();
         }
 
         private void EnableSmoothing_Checked(object sender, RoutedEventArgs e)
