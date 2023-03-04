@@ -116,34 +116,26 @@ namespace VRCFaceTracking.OSC
                     Value = Encoding.ASCII.GetString(stringBytes.ToArray());
                     break;
                 case 98: // OSC Type tag: 'b' ; OSC-blob
-                    Logger.Error("Unimplemented OSC-blob Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
 
                 #endregion
 
                 #region Non Standard OSC-Type/s
 
                 case 104: // OSC Type tag: 'h' ; 64 Bit Big-Endian
-                    Logger.Error("Unimplemented OSC-blob Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 116: // OSC Type tag: 't' ; OSC-timetag
-                    Logger.Error("Unimplemented OSC-timetag Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 100: // OSC Type tag: 'd' ; 64 Bit Big-Endian
-                    Logger.Error("Unimplemented Double Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 83: // OSC Type tag: 'S' ; Type represented in OSC-string
-                    Logger.Error("Unimplemented 'Type' OSC-string Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 99: // OSC Type tag: 'c' ; 32 bit ASCII
-                    Logger.Error("Unimplemented ASCII Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 114: // OSC Type tag: 'r' ; 32 bit RGBA color
-                    Logger.Error("Unimplemented RGBA color Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 109: // OSC Type tag: 'm' ; 4 bit MIDI. Each byte as: port id, status, data1, data2
-                    Logger.Error("Unimplemented MIDI Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 70: // OSC Type tag: 'T' ; Represents true, No extra data
                     Value = false;
                     break;
@@ -157,16 +149,14 @@ namespace VRCFaceTracking.OSC
                     Value = 1.0f;
                     break;
                 case 91: // OSC Type tag: '[' ; Represents start of an array.
-                    Logger.Error("Unimplemented Array Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
                 case 93: // OSC Type tag: ']' ; Represents end of an array.
-                    Logger.Error("Unimplemented Array Type detected: " + type + " for name " + Address);
-                    break;
+                    goto default;
 
                 #endregion
 
                 default:
-                    Logger.Error("OSC Type outside of OSC Type spec: " + type + " for name " + Address);
+                    Logger.Error("OSC Type unimplemented: " + type + " for name " + Address);
                     break;
             }
         }
