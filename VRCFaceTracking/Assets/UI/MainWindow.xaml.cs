@@ -200,10 +200,8 @@ namespace VRCFaceTracking.Assets.UI
             IsLipPageVisible = TabController.SelectedIndex == 2;
         }
 
-        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
             UnifiedLibManager.RequestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Assembly>().ToList());
-        }
 
         private void CalibrationClick(object sender, RoutedEventArgs e)
         {
@@ -211,15 +209,9 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTrackingMutator.InitializeCalibration();
         }
 
-        private void EnableSmoothing_Checked(object sender, RoutedEventArgs e)
-        {                   
-            UnifiedTracking.Mutator.SmoothingMode = true;
-        }
+        private void EnableSmoothing_Checked(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = true;
 
-        private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e)
-        {
-            UnifiedTracking.Mutator.SmoothingMode = false;
-        }
+        private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = false;
 
         private void UseCalibration_Checked(object sender, RoutedEventArgs e)
         {
@@ -234,9 +226,6 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
         }
 
-        private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
-        }
+        private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
     }
 }
