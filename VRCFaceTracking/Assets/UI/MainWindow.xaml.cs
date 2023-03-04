@@ -189,8 +189,6 @@ namespace VRCFaceTracking.Assets.UI
 
         private void MainWindow_Loaded(object sender, EventArgs eventArgs)
         {
-            // List box containing all selectable modules that implement ExtTrackingModule.
-            UnifiedLibManager.ReloadModules();
             moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
             UseCalibration.IsChecked = UnifiedTracking.Mutator.CalibratorMode == UnifiedTrackingMutator.CalibratorState.Inactive ? false : true;
             EnableSmoothing.IsChecked = UnifiedTracking.Mutator.SmoothingMode ? true : false;
