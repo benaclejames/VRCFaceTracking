@@ -165,29 +165,9 @@ namespace VRCFaceTracking
                             continue;
                         }
                 }
-                catch (FileNotFoundException)
-                {
-                    Logger.Warning(dll + " failed to find file. Skipping.");
-                    continue;
-                }
-                catch (ArgumentNullException)
-                {
-                    Logger.Warning(dll + " Assembly mismatch. Skipping.");
-                    continue;
-                }
-                catch (BadImageFormatException)
-                {
-                    Logger.Warning(dll + " Assembly image not of expected format. Skipping.");
-                    continue;
-                }
-                catch (FileLoadException)
-                {
-                    Logger.Warning(dll + " Assembly could not be loaded. Skipping.");
-                    continue;
-                }
                 catch (Exception e)
                 {
-                    Logger.Warning(e.Message + " Assembly not able to be loaded. Skipping. ");
+                    Logger.Warning(e.Message + " Assembly not able to be loaded. Skipping.");
                     continue;
                 }
             }
