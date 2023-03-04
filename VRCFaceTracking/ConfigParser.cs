@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking
 {
@@ -15,7 +16,7 @@ namespace VRCFaceTracking
             public string type { get; set; }
 
             [JsonIgnore]
-            public Type Type => Utils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
+            public Type Type => OscUtils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
         }
 
         public class Parameter
