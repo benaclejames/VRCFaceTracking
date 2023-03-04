@@ -209,21 +209,20 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTrackingMutator.InitializeCalibration();
         }
 
-        private void EnableSmoothing_Checked(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = true;
-
-        private void EnableSmoothing_Unchecked(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = false;
-
-        private void UseCalibration_Checked(object sender, RoutedEventArgs e)
+        private void EnableSmoothing_CheckChanged(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = (bool)UseCalibration.IsChecked;
+        private void UseCalibration_CheckChanged(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Enabled fine-tune calibration and using existing calibrated values.");
-            UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
-            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
-        }
-
-        private void UseCalibration_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Logger.Msg("Disabled calibration.");
-            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
+            if (UseCalibration.IsChecked == true)
+            {
+                Logger.Msg("Enabled fine-tune calibration and using existing calibrated values.");
+                UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
+                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+            }
+            else
+            {
+                Logger.Msg("Disabled calibration.");
+                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
+            }
         }
 
         private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
