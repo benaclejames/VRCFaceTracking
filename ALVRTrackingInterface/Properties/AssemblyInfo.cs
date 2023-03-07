@@ -17,7 +17,7 @@ using VRCFaceTracking;
 
 // VRCFaceTracking load order attributes
 [assembly: VRCFTModuleEnsureLoadPrior("9a1969a3-9cb4-40c6-9aa8-9162b00c2050")]
-[assembly: VRCFTModuleType(VRCFTModuleType.Both)]
+//[assembly: VRCFTModuleType(VRCFTModuleType.Both)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

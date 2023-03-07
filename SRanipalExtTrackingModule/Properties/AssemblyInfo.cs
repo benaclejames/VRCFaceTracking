@@ -16,7 +16,7 @@ using VRCFaceTracking;
 [assembly: AssemblyCulture("")]
 
 // VRCFaceTracking Loading Information
-[assembly: VRCFTModuleType(VRCFTModuleType.Both)]
+//[assembly: VRCFTModuleType(VRCFTModuleType.Both)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
