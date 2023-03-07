@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace VRCFaceTracking
 {
+    /*
     public enum VRCFTModuleType
     {
         Eye,
@@ -29,6 +30,7 @@ namespace VRCFaceTracking
             ModuleType = moduleType;
         }
     }
+    */
 
     /// <summary>
     /// Specifies loading this module prior to the specified module GUID.
