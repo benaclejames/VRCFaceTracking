@@ -40,7 +40,7 @@ namespace ALVRTrackingInterface
             if (!File.Exists(configPath))
             {
                 Logger.Msg("Failed to find config JSON! A questProIP.txt file has been generated, please configure your Quest Pro's IP address into this text file.");
-                File.WriteAllText("192.168.254.254", configPath);
+                File.WriteAllText(configPath, "192.168.254.254");
                 return (false, false);
             }
 
@@ -395,7 +395,18 @@ namespace ALVRTrackingInterface
 
         public override void Teardown()
         {
+            Logger.Msg("Tearing down ALVR client server...");
+            try
+            {
+                stream.Close();
+            }
+            catch (SocketException e)
+            {
+                Logger.Error(e.Message);
+                Thread.Sleep(1000);
+            }
 
+            Logger.Msg("ALVR module successfully disposed resources!");
         }
     }
 }
