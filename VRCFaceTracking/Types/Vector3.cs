@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace VRCFaceTracking.Params
 {
@@ -23,5 +24,22 @@ namespace VRCFaceTracking.Params
             
             return this;
         }
+        public static Vector3 operator *(Vector3 a, float d)
+        => new Vector3(a.x * d, a.y * d, a.z * d);
+
+        public static Vector3 operator /(Vector3 a, float d)
+        => new Vector3(a.x / d, a.y / d, a.z / d);
+
+        public static Vector3 operator +(Vector3 a, Vector3 b)
+        => new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+
+        public static Vector3 operator -(Vector3 a, Vector3 b)
+        => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+
+        // Tobii normalized eye value is r = 1. Used by UnifiedEyeData gaze data.
+        public Vector2 PolarTo2DCartesian(float r = 1)
+        => new Vector2(r * (float)Math.Cos(x), r * (float)Math.Sin(y));
+
+        public static Vector3 zero => new Vector3(0, 0, 0);
     }
 }

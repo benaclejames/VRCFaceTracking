@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Windows.Navigation;
 
 namespace VRCFaceTracking.Params
 {
@@ -27,7 +29,14 @@ namespace VRCFaceTracking.Params
         public static Vector2 operator +(Vector2 a, Vector2 b)
         => new Vector2(a.x + b.x, a.y + b.y);
 
+        public static Vector2 operator -(Vector2 a, Vector2 b)
+        => new Vector2(a.x - b.x, a.y - b.y);
+
         public static Vector2 zero => new Vector2(0, 0);
+
+        // Tobii normalized eye value is r = 1. Used by UnifiedEyeData gaze data.
+        public Vector2 PolarTo2DCartesian(float r = 1) 
+        => new Vector2(r * (float)Math.Cos(x), r * (float)Math.Sin(y));
 
         public Vector2 FlipXCoordinates()
         {
