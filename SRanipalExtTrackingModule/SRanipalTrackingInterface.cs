@@ -90,11 +90,6 @@ namespace SRanipalExtTrackingInterface
                                                        UnifiedTracking.LipImageData.ImageSize.x);
             }
 
-            UnifiedTrackingMutator.OnCalibrationInitialize = () =>
-            {
-                Logger.Msg("SRanipal test calibrate init!!!!");
-            };
-
             return (eyeEnabled, lipEnabled);
         }
 
