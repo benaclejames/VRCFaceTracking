@@ -110,7 +110,7 @@ namespace VRCFaceTracking
             return inputBuffer;
         }
 
-        public static void InitializeCalibration()
+        public void InitializeCalibration()
         {
             Thread _thread = new Thread(() =>
             {
