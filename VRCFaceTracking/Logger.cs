@@ -29,33 +29,30 @@ namespace VRCFaceTracking
         public static void Warning(string warningStr)
         {
             var formattedStr = "["+DateTime.Now.ToString("HH:mm:ss") + "] [WARNING] ";
+            Console.ForegroundColor = ConsoleColor.Yellow;
 
             try
             {
                 ConsoleOutput.Add(new Tuple<string, string>(formattedStr + warningStr, "Yellow"));
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(formattedStr);
-                Console.ResetColor();
             }
             catch (Exception e)
             {
                 ConsoleOutput.Add(new Tuple<string, string>(formattedStr + "Message intercepted while writing. " + e, "Yellow"));
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(formattedStr);
-                Console.ResetColor();
-            }            
+            }
+
+            Console.ResetColor();
         }
         
         public static void Error(string errorStr)
         {
             var formattedStr = "[" + DateTime.Now.ToString("HH:mm:ss") + "] [ERROR] ";
-
             Console.ForegroundColor = ConsoleColor.Red;
 
             try
             {
                 ConsoleOutput.Add(new Tuple<string, string>(formattedStr + errorStr, "Red"));
-                
                 Console.WriteLine(formattedStr);
                 
             }
