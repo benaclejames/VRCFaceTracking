@@ -37,8 +37,8 @@ namespace VRCFaceTracking.Params
         => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 
         // Tobii normalized eye value is r = 1. Used by UnifiedEyeData gaze data.
-        public Vector2 PolarTo2DCartesian(float r = 1)
-        => new Vector2(r * (float)Math.Cos(x), r * (float)Math.Sin(y));
+        public Vector3 PolarTo2DCartesian(float r = 1)
+        => new Vector3(r * (float)Math.Cos(x), r * (float)Math.Sin(y), z);
 
         public static Vector3 zero => new Vector3(0, 0, 0);
     }

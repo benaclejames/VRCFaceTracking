@@ -230,11 +230,24 @@ namespace SRanipalExtTrackingInterface
             return updateResult;
         }
 
-        private static Vector3 GetConvergenceAngleOffsetNormalized(VerboseData external)
+        private static Vector3 GetConvergenceAngleOffset(VerboseData external)
         {
-            float ipd = 66.5f;
+            var leftComp = Math.PI / 2 + Math.Asin(external.left.gaze_direction_normalized.FlipXCoordinates().x);
+            var rightComp = Math.PI / 2 - Math.Asin(external.right.gaze_direction_normalized.FlipXCoordinates().x);
+
+            var dynIPD_mm = external.left.gaze_origin_mm.x - external.right.gaze_origin_mm.x;
+
+            if (leftComp + rightComp >= Math.PI)
+                return new Vector3(1f,0,0);
+
+            var rightSide_mm = Math.Sin(rightComp) * dynIPD_mm / Math.Sin(Math.PI - leftComp - rightComp);
+            var leftSide_mm = Math.Sin(leftComp) * dynIPD_mm / Math.Sin(Math.PI - rightComp - leftComp);
+
+            var convergenceDistance_mm = (leftSide_mm/2f) + (rightSide_mm/2f);
+
+
             if (external.combined.eye_data.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
-                return new Vector3((float)Math.Tan((ipd/2)/external.combined.convergence_distance_mm), 0, 0);
+                return new Vector3((float)Math.Atan((dynIPD_mm / 2f) / convergenceDistance_mm), 0, 0);
             return Vector3.zero;
         }
 
@@ -249,7 +262,7 @@ namespace SRanipalExtTrackingInterface
                 data.Left.PupilDiameter_MM = external.left.pupil_diameter_mm;
             if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
                 data.Right.PupilDiameter_MM = external.right.pupil_diameter_mm;
-
+            
             if (SRanipal_Eye_API.IsViveProEye())
             {
                 if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
@@ -258,12 +271,14 @@ namespace SRanipalExtTrackingInterface
                     data.Right.Gaze = external.right.gaze_direction_normalized.FlipXCoordinates();
                 return;
             }
-
-            // Fix for Focus 3 / Droolon F1 eye tracking
-            if (external.combined.eye_data.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
+            
+            // Fix for Focus 3 / Droolon F1 gaze tracking. For some reason convergence data isn't available from combined set so we will calculate it from the two gaze vectors.
+            if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY) && external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
             {
-                data.Left.Gaze = external.combined.eye_data.gaze_direction_normalized.FlipXCoordinates() + GetConvergenceAngleOffsetNormalized(external).PolarTo2DCartesian();
-                data.Right.Gaze = external.combined.eye_data.gaze_direction_normalized.FlipXCoordinates() - GetConvergenceAngleOffsetNormalized(external).PolarTo2DCartesian();
+                Vector3 gaze_direction_normalized = (external.left.gaze_direction_normalized.FlipXCoordinates()/2f) + (external.right.gaze_direction_normalized.FlipXCoordinates()/2f);
+                Vector3 convergenceOffset = GetConvergenceAngleOffset(external);
+                data.Left.Gaze = gaze_direction_normalized + convergenceOffset;
+                data.Right.Gaze = gaze_direction_normalized - convergenceOffset;
             }
         }
 
