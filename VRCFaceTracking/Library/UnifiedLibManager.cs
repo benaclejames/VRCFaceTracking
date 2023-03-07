@@ -102,10 +102,13 @@ namespace VRCFaceTracking
         private static string[] GetAllModulePaths()
         {
             List<string> modulePaths = new List<string>();
+
+            /*
             string customLibsExe = "CustomLibs";
 
             if (Directory.Exists(customLibsExe))
                 modulePaths.AddRange(Directory.GetFiles(customLibsExe, "*.dll"));
+            */
 
             if (!Directory.Exists(Utils.CustomLibsDirectory))
                 Directory.CreateDirectory(Utils.CustomLibsDirectory);
