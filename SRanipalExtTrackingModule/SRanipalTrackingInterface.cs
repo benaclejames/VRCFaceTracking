@@ -26,7 +26,7 @@ namespace SRanipalExtTrackingInterface
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
-            // Look for SRanipal assemblies here.
+            // Look for SRanipal assemblies here. Placeholder for unmanaged assemblies not being embedded in the dll.
             Directory.SetCurrentDirectory(Utils.CustomLibsDirectory + "\\ModuleLibs");
 
             Error eyeError = Error.UNDEFINED, lipError = Error.UNDEFINED;
@@ -89,6 +89,11 @@ namespace SRanipalExtTrackingInterface
                 lipData.image = Marshal.AllocCoTaskMem(UnifiedTracking.LipImageData.ImageSize.x *
                                                        UnifiedTracking.LipImageData.ImageSize.x);
             }
+
+            UnifiedTrackingMutator.OnCalibrationInitialize = () =>
+            {
+                Logger.Msg("SRanipal test calibrate init!!!!");
+            };
 
             return (eyeEnabled, lipEnabled);
         }
@@ -230,13 +235,16 @@ namespace SRanipalExtTrackingInterface
             return updateResult;
         }
 
+        private static Vector3 GetConvergenceAngleOffsetNormalized(VerboseData external)
+        {
+            float ipd = 66.5f;
+            if (external.combined.eye_data.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
+                return new Vector3((float)Math.Tan((ipd/2)/external.combined.convergence_distance_mm), 0, 0);
+            return Vector3.zero;
+        }
+
         private void UpdateEyeParameters(ref UnifiedEyeData data, VerboseData external)
         {
-            if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
-                data.Left.Gaze = external.left.gaze_direction_normalized.FlipXCoordinates();
-            if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
-                data.Right.Gaze = external.right.gaze_direction_normalized.FlipXCoordinates();
-
             if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_EYE_OPENNESS_VALIDITY))
                 data.Left.Openness = external.left.eye_openness;
             if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_EYE_OPENNESS_VALIDITY))
@@ -246,6 +254,22 @@ namespace SRanipalExtTrackingInterface
                 data.Left.PupilDiameter_MM = external.left.pupil_diameter_mm;
             if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
                 data.Right.PupilDiameter_MM = external.right.pupil_diameter_mm;
+
+            if (SRanipal_Eye_API.IsViveProEye())
+            {
+                if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
+                    data.Left.Gaze = external.left.gaze_direction_normalized.FlipXCoordinates();
+                if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
+                    data.Right.Gaze = external.right.gaze_direction_normalized.FlipXCoordinates();
+                return;
+            }
+
+            // Fix for Focus 3 / Droolon F1 eye tracking
+            if (external.combined.eye_data.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
+            {
+                data.Left.Gaze = external.combined.eye_data.gaze_direction_normalized.FlipXCoordinates() + GetConvergenceAngleOffsetNormalized(external).PolarTo2DCartesian();
+                data.Right.Gaze = external.combined.eye_data.gaze_direction_normalized.FlipXCoordinates() - GetConvergenceAngleOffsetNormalized(external).PolarTo2DCartesian();
+            }
         }
 
         private void UpdateEyeExpressions(ref UnifiedExpressionShape[] data, EyeExpression external)
