@@ -39,7 +39,6 @@ namespace VRCFT_Module_Example
         // Example of data coming from the outside tracking interface.
         ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
-        bool external_tracking_state;
 
         // Lets Unified Library Manager know what type of data to expect.
         public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
@@ -64,8 +63,7 @@ namespace VRCFT_Module_Example
             {
                 while (true)
                 {
-                    if (external_tracking_state)
-                        Update();
+                    Update();
 
                     // Have the update function work in-tandem with your tracking's update
                     Thread.Sleep(10);

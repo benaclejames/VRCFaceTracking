@@ -100,7 +100,7 @@
     <Compile Include="Params\Data\UnifiedTrackingMutator.cs" />
     <Compile Include="Params\Expressions\Legacy\Lip\UnifiedSRanMapper.cs" />
     <Compile Include="Params\Expressions\UnifiedExpressions.cs" />
-    <Compile Include="Types\UnifiedConfig.cs" />
+    <Compile Include="UnifiedConfig.cs" />
     <Compile Include="Types\Vector2.cs" />
     <Compile Include="Types\Vector3.cs" />
     <Compile Include="Types\XYParam.cs" />
