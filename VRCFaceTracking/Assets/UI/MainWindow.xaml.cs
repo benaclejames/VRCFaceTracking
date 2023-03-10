@@ -191,7 +191,7 @@ namespace VRCFaceTracking.Assets.UI
         {
             moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
             UseCalibration.IsChecked = UnifiedTracking.Mutator.CalibratorMode == UnifiedTrackingMutator.CalibratorState.Inactive ? false : true;
-            EnableSmoothing.IsChecked = UnifiedTracking.Mutator.SmoothingMode ? true : false;
+            //EnableSmoothing.IsChecked = UnifiedTracking.Mutator.SmoothingMode ? true : false;
         }
 
         private void TabController_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -209,7 +209,6 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTracking.Mutator.InitializeCalibration();
         }
 
-        private void EnableSmoothing_CheckChanged(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = (bool)UseCalibration.IsChecked;
         private void UseCalibration_CheckChanged(object sender, RoutedEventArgs e)
         {
             if (UseCalibration.IsChecked == true)
@@ -224,6 +223,8 @@ namespace VRCFaceTracking.Assets.UI
             UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
         }
 
-        private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
+        //private void EnableSmoothing_CheckChanged(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = (bool)UseCalibration.IsChecked;
+
+        //private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
     }
 }
