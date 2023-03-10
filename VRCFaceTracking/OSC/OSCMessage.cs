@@ -73,6 +73,7 @@ namespace VRCFaceTracking.OSC
             }
 
             Address = Encoding.ASCII.GetString(addressBytes.ToArray());
+
             // Increase iter until we find the type identifier
             for (; iter < bytes.Length; iter++)
             {
@@ -83,24 +84,27 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
-            byte type = bytes[iter];
+
+        byte type = bytes[iter];
             iter += 2; // Next multiple of 4
 
             switch (type)
             {
-                case 105:
+                #region Standard OSC-Type/s
+
+                case 105: // OSC Type tag: 'i' ; int32
                     var intBytes = new byte[4];
                     Array.Copy(bytes, iter, intBytes, 0, 4);
                     Array.Reverse(intBytes);
                     Value = BitConverter.ToInt32(intBytes, 0);
                     break;
-                case 102:
+                case 102: // OSC Type tag: 'f' ; float32
                     var floatBytes = new byte[4];
                     Array.Copy(bytes, iter, floatBytes, 0, 4);
                     Array.Reverse(floatBytes);
                     Value = BitConverter.ToSingle(floatBytes, 0);
                     break;
-                case 115:
+                case 115: // OSC Type tag: 's' ; OSC-string
                     var stringBytes = new List<byte>();
                     for (iter++; iter < bytes.Length; iter++)
                     {
@@ -109,17 +113,51 @@ namespace VRCFaceTracking.OSC
 
                         stringBytes.Add(bytes[iter]);
                     }
-
                     Value = Encoding.ASCII.GetString(stringBytes.ToArray());
                     break;
-                case 70:
+                case 98: // OSC Type tag: 'b' ; OSC-blob
+                    goto default;
+
+                #endregion
+
+                #region Non Standard OSC-Type/s
+
+                case 104: // OSC Type tag: 'h' ; 64 Bit Big-Endian
+                    goto default;
+                case 116: // OSC Type tag: 't' ; OSC-timetag
+                    goto default;
+                case 100: // OSC Type tag: 'd' ; 64 Bit Big-Endian
+                    goto default;
+                case 83: // OSC Type tag: 'S' ; Type represented in OSC-string
+                    goto default;
+                case 99: // OSC Type tag: 'c' ; 32 bit ASCII
+                    goto default;
+                case 114: // OSC Type tag: 'r' ; 32 bit RGBA color
+                    goto default;
+                case 109: // OSC Type tag: 'm' ; 4 bit MIDI. Each byte as: port id, status, data1, data2
+                    goto default;
+                case 70: // OSC Type tag: 'T' ; Represents true, No extra data
                     Value = false;
                     break;
-                case 84:
+                case 84: // OSC Type tag: 'F' ; Represents false, No extra data
                     Value = true;
                     break;
+                case 78: // OSC Type tag: 'N' ; Represents NIL (zero), No extra data
+                    Value = 0;
+                    break;
+                case 73: // OSC Type tag: 'I' ; Represents Infinitum (endlessly infinite), No extra data. Capping to 1.
+                    Value = 1.0f;
+                    break;
+                case 91: // OSC Type tag: '[' ; Represents start of an array.
+                    goto default;
+                case 93: // OSC Type tag: ']' ; Represents end of an array.
+                    goto default;
+
+                #endregion
+
                 default:
-                    throw new Exception("Unknown type identifier: " + type + " for name " + Address);
+                    Logger.Error("OSC Type unimplemented: " + type + " for name " + Address);
+                    break;
             }
         }
     }

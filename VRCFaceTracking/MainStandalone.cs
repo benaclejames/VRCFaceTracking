@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.OSC;
+using VRCFaceTracking.Types;
 
 [assembly: AssemblyTitle("VRCFaceTracking")]
 [assembly: AssemblyDescription("Application to enable Face Tracking from within VRChat using OSC")]
@@ -28,6 +29,7 @@ namespace VRCFaceTracking
     public static class MainStandalone
     {
         public static OscMain OscMain;
+        public static UnifiedConfig unifiedConfig = new UnifiedConfig();
 
         private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
@@ -39,13 +41,12 @@ namespace VRCFaceTracking
         private static IEnumerable<OSCParams.BaseParam> _relevantParams;
         private static int _relevantParamsCount = 416;
 
-        private static string _ip = "127.0.0.1";
-        private static int _inPort = 9001, _outPort = 9000;
-
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
         public static void Teardown()
         {
+            unifiedConfig.Save();
+
             // Kill our threads
             MasterCancellationTokenSource.Cancel();
             
@@ -62,10 +63,7 @@ namespace VRCFaceTracking
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
-            (_outPort, _ip, _inPort) = ArgsHandler.HandleArgs();
-            
-            // Load dependencies
-            DependencyManager.Load();
+            (int outPort, string ip, int inPort, bool enableEye, bool enableExpression) = ArgsHandler.HandleArgs();
 
             // Ensure OSC is enabled
             if (VRChat.ForceEnableOsc())  // If osc was previously not enabled
@@ -77,28 +75,43 @@ namespace VRCFaceTracking
                         "However, VRChat was running while this change was made.\n" + 
                         "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
             }
-            
+
+            // Load all available modules.
+            UnifiedLibManager.ReloadModules();
+
+            // Try to load config and propogate data into Unified if they exist.
+            unifiedConfig.ReadConfiguration();
+
             // Initialize Tracking Runtimes
+            UnifiedLibManager.SetTrackingEnabled(enableEye, enableExpression);
             UnifiedLibManager.Initialize();
 
             // Initialize Locals
             OscMain = new OscMain();
-            var bindResults = OscMain.Bind(_ip, _outPort, _inPort);
+            var bindResults = OscMain.Bind(ip, outPort, inPort);
             if (!bindResults.receiverSuccess)
                 Logger.Error("Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
             
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            var _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            var _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
+            _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
 
             ConfigParser.OnConfigLoaded += () =>
             {
-                _relevantParams = UnifiedTrackingData.AllParameters.SelectMany(p => p.GetBase())
+                _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase())
                     .Where(param => param.Relevant);
-                UnifiedTrackingData.LatestEyeData.ResetThresholds();
-                _relevantParamsCount = _relevantParams.Count();
-                Logger.Msg("Config file parsed successfully! " + _relevantParamsCount + " parameters loaded");
+                _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
+                    .Where(param => param.Relevant);
+
+                _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
+
+                Logger.Msg("Config file parsed successfully! " + _relevantParams.Count() + " parameters loaded.");
+                
+                if (_relevantParams_v1.Count() > 0)
+                    Logger.Warning(_relevantParams_v1.Count() + " legacy parameters loaded. These are undocumented and outdated parameters.");
             };
 
             // Begin main OSC update loop
@@ -110,8 +123,7 @@ namespace VRCFaceTracking
                 if (_relevantParamsCount <= 0)
                     continue;
 
-                UnifiedTrackingData.OnUnifiedDataUpdated.Invoke(UnifiedTrackingData.LatestEyeData,
-                    UnifiedTrackingData.LatestLipData);
+                UnifiedTracking.UpdateData();
 
                 var messages = ConstructMessages(_relevantParams);
                 while (messages.Count > 0)

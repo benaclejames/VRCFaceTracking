@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:VRCFaceTracking"
         mc:Ignorable="d"
-        Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize" StateChanged="MainWindow_OnSizeChanged">
+        Title="VRCFaceTracking" Height="607" Width="1004" Background="#3b3b3b" ResizeMode="CanMinimize" StateChanged="MainWindow_OnSizeChanged" Loaded="MainWindow_Loaded">
 
     <Window.Resources>
 
@@ -78,7 +78,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
     </Window.Resources>
 
     <Grid Margin="0,0,-0.4,0">
@@ -96,10 +96,11 @@
                     <Image x:Name="VRCFTLogoTop" HorizontalAlignment="Left" Height="120" Margin="20,15,0,0" VerticalAlignment="Top" Width="120" Source="../Images/LogoIndicators/Uninitialized/Top.png"/>
                     <Image x:Name="VRCFTLogoBottom" HorizontalAlignment="Left" Height="120" Margin="20,72,0,0" VerticalAlignment="Top" Width="120" Source="../Images/LogoIndicators/Uninitialized/Bottom.png"/>
                     <TextBlock x:Name="WTVRCFT" HorizontalAlignment="Left" Margin="145,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="115" Width="185" Foreground="#FFE8E8E8" FontWeight="Bold" FontSize="20" Grid.ColumnSpan="2"><Run Text="Welcome to"/><LineBreak/><Run Text="VRCFaceTracking!"/></TextBlock>
-                    <ListBox x:Name="AvatarInfo" Background="#00000000" Height="254" Margin="20,20,18,0" VerticalAlignment="Top" SelectionChanged="AvatarInfoUpdate" Grid.RowSpan="2" Grid.Column="1"/>
-                    <Button x:Name="PauseEyesButton" Content="Toggle Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="20,144,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes" BorderThickness="1,1,1,1" />                   
+                    <ListBox Name="moduleListBox" SelectionChanged="ListBox_SelectionChanged" Margin="186,18,20,45" Grid.Column="1" SelectionMode="Multiple"/>
+                    <Button x:Name="PauseEyesButton" Content="Toggle Eye Tracking" HorizontalAlignment="Left" Height="36" Margin="20,144,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickEyes" BorderThickness="1,1,1,1" />
                     <Button x:Name="PauseMouthButton" Content="Toggle Lip Tracking" HorizontalAlignment="Left" Height="36" Margin="20,185,0,0" VerticalAlignment="Top" Width="140" Click="PauseClickMouth" Grid.RowSpan="2"/>
-                    <Button x:Name="ReinitializeButton" Content="Reinitialize" HorizontalAlignment="Left" Margin="20,227,0,261" Width="140" Click="ReinitializeClick" Grid.RowSpan="2"/>
+                    <Button x:Name="ReinitializeButton" Content="Reinitialize" HorizontalAlignment="Left" Margin="186,213,0,289" Width="140" Click="ReinitializeClick" Grid.Column="1" Grid.RowSpan="2"/>
+                    <Button x:Name="ReloadButton" Content="Reload Modules" HorizontalAlignment="Left" Margin="331,213,0,289" Width="140" Click="ReloadModulesClick" Grid.Column="1" Grid.RowSpan="2"/>
                     <ScrollViewer x:Name="Scroller" Margin="20,49,20,0" HorizontalScrollBarVisibility="Auto" Grid.Row="1" Grid.ColumnSpan="2" Height="240" VerticalAlignment="Top">
                         <StackPanel Width="945" Visibility="Visible">
                             <ItemsControl ItemsSource="{Binding Source={x:Static local:Logger.ConsoleOutput}}" Width="940">
@@ -111,6 +112,23 @@
                             </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
+                    <Button x:Name="TestCalibration" Content="Calibrate Expressions" HorizontalAlignment="Left" Height="36" Margin="20,226,0,0" VerticalAlignment="Top" Width="140" Click="CalibrationClick" Grid.RowSpan="2"/>
+                    <CheckBox x:Name="UseCalibration" Content="Calibrator" HorizontalAlignment="Left" Margin="176,144,0,0" VerticalAlignment="Top" Foreground="White" Checked="UseCalibration_CheckChanged" Unchecked="UseCalibration_CheckChanged"/>
+                    <!--
+                    <CheckBox x:Name="EnableSmoothing" Content="Smooth Expressions" HorizontalAlignment="Left" Margin="176,162,0,0" VerticalAlignment="Top" Foreground="White" Checked="EnableSmoothing_CheckChanged" Unchecked="EnableSmoothing_CheckChanged"/>
+                    -->
+                    <!--
+                    <Slider 
+                        Name="SmoothSlider"
+                        ValueChanged="Smooth_Slider_ValueChanged"
+                        HorizontalAlignment="Left" Margin="182,182,0,0" 
+                        VerticalAlignment="Top"
+                        Width="120" 
+                        Maximum="1" 
+                        IsEnabled="{Binding IsEnabled.TrueString, ElementName=EnableSmoothing}" 
+                        Value="0.5"
+                    />
+                    -->
                 </Grid>
 
             </TabItem>
@@ -121,6 +139,5 @@
                 <Image x:Name="LipImage" Height="478" Margin="22,0,22,0" Source="../Images/ColorBars.png"/>
             </TabItem>
         </TabControl>
-
     </Grid>
 </Window>

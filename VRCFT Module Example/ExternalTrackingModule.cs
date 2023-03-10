@@ -2,52 +2,58 @@
 using System.Threading;
 using VRCFaceTracking;
 using VRCFaceTracking.Params;
+using VRCFT_Module_Example.Structures;
 
 namespace VRCFT_Module_Example
-{
-    // Example "single-eye" data response.
-    public struct ExampleExternalTrackingDataEye
-    {
-        public float eye_lid_openness;
-        public float eye_x;
-        public float eye_y;
-    }
-    
-    // Example "full-data" response from the external tracking system.
-    public struct ExampleExternalTrackingDataStruct
-    {
-        public ExampleExternalTrackingDataEye left_eye;
-        public ExampleExternalTrackingDataEye right_eye;
-    }   
-    
-    
+{ 
     // This class contains the overrides for any VRCFT Tracking Data struct functions
     public static class TrackingData
     {
-        // This function parses the external module's single-eye data into a VRCFT-Parseable format
-        public static void Update(ref Eye data, ExampleExternalTrackingDataEye external)
+
+        // This function parses the external module's full-data data into UnifiedExpressions' eye structure.
+        public static void UpdateEye(ref UnifiedEyeData data, ExampleExternalTrackingDataStruct external)
         {
-            data.Look = new Vector2(external.eye_x, external.eye_y);
-            data.Openness = external.eye_lid_openness;
+            if (external.left_eye.eye_validity) 
+            {
+                data.Left.Openness = external.left_eye.eye_lid_openness;
+                data.Left.Gaze = new Vector2(external.left_eye.eye_x, external.left_eye.eye_y);
+            }
+
+            if (external.right_eye.eye_validity)
+            {
+                data.Right.Openness = external.right_eye.eye_lid_openness;
+                data.Right.Gaze = new Vector2(external.right_eye.eye_x, external.right_eye.eye_y);
+            }
         }
 
-        // This function parses the external module's full-data data into multiple VRCFT-Parseable single-eye structs
-        public static void Update(ref EyeTrackingData data, ExampleExternalTrackingDataStruct external)
+        // This function parses the external module's full-data data into the UnifiedExpressions' Shapes
+        public static void UpdateExpressions(ref UnifiedTrackingData data, ExampleExternalTrackingDataExpressions external)
         {
-            Update(ref data.Right, external.left_eye);
-            Update(ref data.Left, external.right_eye);
+            data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = external.jaw_open;
+            data.Shapes[(int)UnifiedExpressions.TongueOut].Weight = external.tongue_out;
         }
     }
     
     public class ExternalExtTrackingModule : ExtTrackingModule
     {
-        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
-        public override (bool SupportsEye, bool SupportsLip) Supported => (true, true);
+        // Example of data coming from the outside tracking interface.
+        ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
+        ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
 
-        public override (bool eyeSuccess, bool lipSuccess) Initialize(bool eye, bool lip)
+        // Lets Unified Library Manager know what type of data to expect.
+        public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
+
+        // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
+        public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
-            Console.WriteLine("Initializing inside external module");
-            return (true, false);
+            Logger.Msg("Initializing inside external module");
+
+            // Use the incoming parameters to determine if the tracking interface can initialize into any available module slots.
+            // Then let the library manager know if your tracking interface has initialized properly
+
+            var moduleState = (eyeAvailable, expressionAvailable);
+
+            return moduleState;
         }
 
         // This will be run in the tracking thread. This is exposed so you can control when and if the tracking data is updated down to the lowest level.
@@ -58,6 +64,8 @@ namespace VRCFT_Module_Example
                 while (true)
                 {
                     Update();
+
+                    // Have the update function work in-tandem with your tracking's update
                     Thread.Sleep(10);
                 }
             };
@@ -66,18 +74,23 @@ namespace VRCFT_Module_Example
         // The update function needs to be defined separately in case the user is running with the --vrcft-nothread launch parameter
         public void Update()
         {
-            Console.WriteLine("Updating inside external module.");
-            
+            Logger.Msg("Updating inside external module.");
+
             if (Status.EyeState == ModuleState.Active)
-                Console.WriteLine("Eye data is being utilized.");
-            if (Status.LipState == ModuleState.Active)
-                Console.WriteLine("Lip data is being utilized.");
+            {
+                Logger.Msg("Eye data is being utilized.");
+                TrackingData.UpdateEye(ref UnifiedTracking.Data.Eye, external_eye);
+            }
+            if (Status.ExpressionState == ModuleState.Active)
+            {
+                Logger.Msg("Expression data is being utilized.");
+                TrackingData.UpdateExpressions(ref UnifiedTracking.Data, external_expressions);
+            }
         }
 
-        // A chance to de-initialize everything. This runs synchronously inside main game thread. Do not touch any Unity objects here.
         public override void Teardown()
         {
-            Console.WriteLine("Teardown");
+            Logger.Msg("Teardown");
         }
     }
 }

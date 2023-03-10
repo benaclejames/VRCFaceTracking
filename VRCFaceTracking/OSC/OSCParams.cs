@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace VRCFaceTracking.OSC
 {
@@ -32,13 +33,17 @@ namespace VRCFaceTracking.OSC
             {
                 _paramName = name;
                 _paramType = type;
-                OscType = Utils.TypeConversions[type].oscType;
+                OscType = OscUtils.TypeConversions[type].oscType;
             }
 
             public virtual void ResetParam(ConfigParser.Parameter[] newParams)
             {
-                var compatibleParam =
-                    newParams.FirstOrDefault(param => param.name == _paramName && param.input.Type == _paramType);
+                Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
+
+                var compatibleParam = newParams.FirstOrDefault(param =>
+                    regex.IsMatch(param.name)
+                    && param.input.Type == _paramType);
+
                 if (compatibleParam != null)
                 {
                     Relevant = true;
@@ -137,13 +142,15 @@ namespace VRCFaceTracking.OSC
                 _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
-                var boolParams = newParams.Where(p => p.input.Type == typeof(bool) && p.name.StartsWith(_paramName));
+                Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
+
+                var boolParams = newParams.Where(p => 
+                    p.input.Type == typeof(bool) && regex.IsMatch(p.name));
 
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)
                 {
-                    // Cut the parameter name to get the index
-                    if (!int.TryParse(param.name.Substring(_paramName.Length), out var index)) continue;
+                    if (!int.TryParse(String.Concat(param.name.ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
