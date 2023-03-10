@@ -26,7 +26,7 @@ namespace ALVRTrackingInterface
         private byte[] rawExpressions = new byte[expressionsSize * 4 + (8 * 2 * 4)];
         private float[] expressions = new float[expressionsSize + (8 * 2)];
 
-        public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
+        public override (bool SupportsEye, bool SupportsExpression) Supported => (true, true);
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {

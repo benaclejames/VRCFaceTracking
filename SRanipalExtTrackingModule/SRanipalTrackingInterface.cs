@@ -22,7 +22,7 @@ namespace SRanipalExtTrackingInterface
 
         private static CancellationTokenSource _cancellationToken;
         
-        public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
+        public override (bool SupportsEye, bool SupportsExpression) Supported => (true, true);
 
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
         {
@@ -238,7 +238,7 @@ namespace SRanipalExtTrackingInterface
             var dynIPD_mm = external.left.gaze_origin_mm.x - external.right.gaze_origin_mm.x;
 
             if (leftComp + rightComp >= Math.PI)
-                return new Vector3(1f,0,0);
+                return new Vector3(0,0,0);
 
             var rightSide_mm = Math.Sin(rightComp) * dynIPD_mm / Math.Sin(Math.PI - leftComp - rightComp);
             var leftSide_mm = Math.Sin(leftComp) * dynIPD_mm / Math.Sin(Math.PI - rightComp - leftComp);
@@ -276,9 +276,9 @@ namespace SRanipalExtTrackingInterface
             if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY) && external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
             {
                 Vector3 gaze_direction_normalized = (external.left.gaze_direction_normalized.FlipXCoordinates()/2f) + (external.right.gaze_direction_normalized.FlipXCoordinates()/2f);
-                Vector3 convergenceOffset = GetConvergenceAngleOffset(external);
-                data.Left.Gaze = gaze_direction_normalized + convergenceOffset;
-                data.Right.Gaze = gaze_direction_normalized - convergenceOffset;
+                //Vector3 convergenceOffset = GetConvergenceAngleOffset(external);
+                data.Left.Gaze = gaze_direction_normalized;
+                data.Right.Gaze = gaze_direction_normalized;
             }
         }
 

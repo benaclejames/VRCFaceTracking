@@ -201,7 +201,7 @@ namespace VRCFaceTracking
 
         private static void AttemptModuleInitialize(ExtTrackingModule module)
         {
-            if (module.Supported.SupportsEye || module.Supported.SupportsExpressions)
+            if (module.Supported.SupportsEye || module.Supported.SupportsExpression)
             {
                 bool eyeSuccess = false, expressionSuccess = false;
                 try

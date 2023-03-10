@@ -34,14 +34,14 @@ namespace VRCFT_Module_Example
         }
     }
     
-    public class ExternalExtTrackingModule : ExtTrackingModule
+    public class ExampleExtTrackingModule : ExtTrackingModule
     {
         // Example of data coming from the outside tracking interface.
         ExampleExternalTrackingDataStruct external_eye = new ExampleExternalTrackingDataStruct();
         ExampleExternalTrackingDataExpressions external_expressions = new ExampleExternalTrackingDataExpressions();
 
         // Lets Unified Library Manager know what type of data to expect.
-        public override (bool SupportsEye, bool SupportsExpressions) Supported => (true, true);
+        public override (bool SupportsEye, bool SupportsExpression) Supported => (true, true);
 
         // Synchronous module initialization. Take as much time as you need to initialize any external modules. This runs in the init-thread
         public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
