@@ -273,8 +273,12 @@ namespace ALVRTrackingInterface
             );
 
             // Eye dilation code, automated process maybe?
-            eye.Left.PupilDiameter_MM  = 0.0035f;
-            eye.Right.PupilDiameter_MM = 0.0035f;
+            eye.Left.PupilDiameter_MM  = 5f;
+            eye.Right.PupilDiameter_MM = 5f;
+
+            // Force the normalization values of Dilation to fit avg. pupil values.
+            eye._minDilation = 0;
+            eye._maxDilation = 10;
 
             #endregion
         }
