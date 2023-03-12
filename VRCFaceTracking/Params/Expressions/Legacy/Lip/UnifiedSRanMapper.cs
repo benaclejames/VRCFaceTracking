@@ -55,11 +55,11 @@ namespace VRCFaceTracking.Params.Lip
 
             { SRanipal_LipShape_v2.MouthUpperUpRight, exp =>
                 (float)Math.Max(0,
-                    GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) +
+                    exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight +
                     (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight)},
             { SRanipal_LipShape_v2.MouthUpperUpLeft, exp =>
                 (float)Math.Max(0,
-                    GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) +
+                    exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight +
                     (1f - exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight) * exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight)},
             { SRanipal_LipShape_v2.MouthLowerDownRight, exp =>
                 Math.Max(0,

@@ -21,8 +21,6 @@ namespace VRCFaceTracking.Params
         MouthSmileLeft, // Moves the left corner of the lip into a smile expression.
         MouthSadRight, // Moves the right corner of the lip into a sad expression.
         MouthSadLeft, // Moves the left corner of the lip into a sad expression.
-        MouthUpperUpRight, // Raises the entire upper right of the lips.
-        MouthUpperUpLeft, // Raises the entire upper left of the lips.
     }
 
     public static class UnifiedSimplifier
@@ -48,11 +46,6 @@ namespace VRCFaceTracking.Params
             { UnifiedSimpleExpressions.MouthSadLeft, exp =>
                 exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight > exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight ?
                 exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight : exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight },
-
-            { UnifiedSimpleExpressions.MouthUpperUpRight, exp =>
-                exp.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthUpperDeepenRight].Weight * .5f },
-            { UnifiedSimpleExpressions.MouthUpperUpLeft, exp =>
-                exp.Shapes[(int)UnifiedExpressions.MouthUpperInnerUpLeft].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthUpperDeepenLeft].Weight * .5f },
         };
     }
 }

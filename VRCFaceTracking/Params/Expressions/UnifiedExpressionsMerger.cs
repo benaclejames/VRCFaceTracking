@@ -129,10 +129,10 @@ namespace VRCFaceTracking.Params
 
             #region Mouth Open
 
-            new EParam(exp => GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) * .5f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft) * .5f, "v2/MouthUpperUp"),
+            new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight * .5f, "v2/MouthUpperUp"),
             new EParam(exp => exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight * .5f + exp.Shapes[(int) UnifiedExpressions.MouthLowerDownLeft].Weight * .5f, "v2/MouthLowerDown"),
-            new EParam(exp => 
-                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) * .25f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft) * .25f +
+            new EParam(exp =>
+                exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight * .25f + exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight * .25f +
                 exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight * .25f + exp.Shapes[(int) UnifiedExpressions.MouthLowerDownLeft].Weight * .25f,
                 "v2/MouthOpen"),
 
@@ -158,7 +158,7 @@ namespace VRCFaceTracking.Params
 
             #region Mouth Combined
 
-            new EParam(exp => (GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpRight) + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthUpperUpLeft)) / 2.0f, "v2/MouthUpperUp"),
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight) / 2.0f, "v2/MouthUpperUp"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight) / 2.0f, "v2/MouthLowerDown"),
 
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight) / 2.0f, "v2/MouthStretch"),

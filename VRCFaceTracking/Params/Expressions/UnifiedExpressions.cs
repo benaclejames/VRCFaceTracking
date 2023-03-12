@@ -108,8 +108,8 @@
         LipPuckerLowerLeft, // Lower left part of the lip pinches inward and pushes outward. Basis on complex action of the orbicularis-oris orbital muscle around the lips.
 
         // 'Upper lip raiser' group
-        MouthUpperInnerUpRight, // Upper inner right part of the lip is pulled upward. Basis on the levator labii superioris muscle.
-        MouthUpperInnerUpLeft, // Upper inner left part of the lip is pulled upward. Basis on the levator labii superioris muscle.
+        MouthUpperUpRight, // Upper right part of the lip is pulled upward. Basis on the levator labii superioris muscle.
+        MouthUpperUpLeft, // Upper left part of the lip is pulled upward. Basis on the levator labii superioris muscle.
         MouthUpperDeepenRight, // Upper outer right part of the lip is pulled upward, backward, and rightward. Basis on the zygomaticus minor muscle.
         MouthUpperDeepenLeft, // Upper outer left part of the lip is pulled upward, backward, and rightward. Basis on the zygomaticus minor muscle.
         NoseSneerRight, // The right side face pulls upward into a sneer and raises the inner part of the lips at extreme ranges. Based on levator labii superioris alaeque nasi muscle.
