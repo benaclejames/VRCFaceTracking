@@ -159,7 +159,7 @@ namespace VRCFaceTracking.OSC
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)
                 {
-                    if (!int.TryParse(String.Concat(param.name.ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
+                    if (!int.TryParse(String.Concat(param.name.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
