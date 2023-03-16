@@ -8,28 +8,43 @@ namespace VRCFaceTracking.OSC
     {
         public readonly byte[] Data;
 
-        public OscBundle(IEnumerable<OscMessage> messages)
+        public OscBundle(OscMessage<object>[] messages)
         {
-            int size = messages.Sum(param => param.Data.Length + 4);
-            Data = new byte[16+size]; // Include #bundle header and null terminator
+            int messageCount = messages.Length;
+            byte[][] messageData = new byte[][messageCount];
+            // Fill the second array with the message data from each message
+            int i = 0;
+            int combinedSize = 0;
+            foreach (var message in messages)
+            { 
+                byte[] oscData = message.Serialize();
+                messageData[i] = oscData;
+                combinedSize += oscData.Length;
+                i++;
+            }
+            
+            Data = new byte[16+combinedSize]; // Include #bundle header and null terminator
             Array.Copy(new byte[] {35, 98, 117, 110, 100, 108, 101, 0}, Data, 8);
+            
             // Get the NTP time with picoseconds
             Int64 time = (Int64) (DateTime.UtcNow - new DateTime(1900, 1, 1)).TotalMilliseconds * 1000;
             var timeBytes = BitConverter.GetBytes(time);
-            Array.Reverse(timeBytes);
+            if (BitConverter.IsLittleEndian) 
+                Array.Reverse(timeBytes);
             Array.Copy(timeBytes, 0, Data, 8, 8);
 
             // Now add bundle data
             int ix = 16;
-            foreach (var message in messages)
+            foreach (var message in messageData)
             {
-                var length = BitConverter.GetBytes(message.Data.Length);
-                Array.Reverse(length);
+                var length = BitConverter.GetBytes(message.Length);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(length);
                 Array.Copy(length, 0, Data, ix, 4);
                 ix += 4;
 
-                Array.Copy(message.Data, 0, Data, ix, message.Data.Length);
-                ix += message.Data.Length;
+                Array.Copy(message, 0, Data, ix, message.Length);
+                ix += message.Length;
             }
         }
     }

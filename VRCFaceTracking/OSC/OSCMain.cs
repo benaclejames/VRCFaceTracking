@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace VRCFaceTracking.OSC
@@ -50,7 +48,7 @@ namespace VRCFaceTracking.OSC
                 // Ignore as this is most likely a timeout exception
                 return;
             }
-            var newMsg = new OscMessage(buffer);
+            var newMsg = new OscMessage<object>(buffer);
             switch (newMsg.Address)
             {
                 case "/avatar/change":

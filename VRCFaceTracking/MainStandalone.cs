@@ -31,7 +31,7 @@ namespace VRCFaceTracking
         public static OscMain OscMain;
         public static UnifiedConfig unifiedConfig = new UnifiedConfig();
 
-        private static List<OscMessage> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
+        private static List<byte[]> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
             parameters.Where(p => p.NeedsSend).Select(param =>
             {
                 param.NeedsSend = false;

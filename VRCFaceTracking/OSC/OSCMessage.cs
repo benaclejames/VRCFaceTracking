@@ -1,67 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace VRCFaceTracking.OSC
 {
-    public class OscMessage
+    public class OscMessage<T>
     {
-        public readonly byte[] Data;
         public readonly string Address;
-        public readonly object Value;
+        private readonly byte[] _addressBytes;
+        
+        private readonly byte[] _valueIdentBytes = {44, 0, 0, 0};
+
+        public char TypeIdentifier
+        {
+            get => (char)_valueIdentBytes[1];
+            set => _valueIdentBytes[1] = (byte)value;
+        }
+        
+        public T Value;
+        private byte[] _data;
+
+        public byte[] SerializationCache;
 
         private OscMessage(string name, char typeIdentifier)
         {
+            // Set constant address
             Address = name;
+            _addressBytes = Encoding.ASCII.GetBytes(name).EnsureCompliance();
+
+            TypeIdentifier = typeIdentifier;
+        }
+        
+        public OscMessage(string name, Type type) : this(name, OscUtils.TypeConversions[type].oscType) {}
+
+        public void SetValue(T newValue)
+        {
+            Value = newValue;
             
-            var nameBytes = Encoding.ASCII.GetBytes(name);
-            nameBytes = nameBytes.EnsureCompliance();
-
-            var valueIdentBytes = Encoding.ASCII.GetBytes("," + typeIdentifier);
-            valueIdentBytes = valueIdentBytes.EnsureCompliance();
-
-            Data = new byte[nameBytes.Length + valueIdentBytes.Length];
-            Array.Copy(nameBytes, Data, nameBytes.Length);
-            Array.Copy(valueIdentBytes, 0, Data, nameBytes.Length, valueIdentBytes.Length);
+            if (typeof(T) == typeof(int))
+                SetInt((int)(object)newValue);
+            
+            if (typeof(T) == typeof(float) || typeof(T) == typeof(double))
+                SetFloat((double)(object)newValue);
+            
+            if (typeof(T) == typeof(bool))
+                SetBool((bool)(object)newValue);
         }
 
-        public OscMessage(string name, int value) : this(name, 'i')
+        private void SetInt(int newValue)
         {
-            var valueArr = BitConverter.GetBytes(value);
-            Array.Reverse(valueArr);
-
-            var newFullArr = new byte[Data.Length+valueArr.Length];
-            Array.Copy(Data, newFullArr, Data.Length);
-            Array.Copy(valueArr, 0, newFullArr, Data.Length, valueArr.Length);
-            Data = newFullArr;
+            _data = BitConverter.GetBytes(newValue);
+            
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(_data);
         }
         
-        public OscMessage(string name, double value) : this(name, 'f')
+        private void SetFloat(double newValue)
         {
-            var valueArr = BitConverter.GetBytes((float)value);
-            Array.Reverse(valueArr);
-
-            var newFullArr = new byte[Data.Length+valueArr.Length];
-            Array.Copy(Data, newFullArr, Data.Length);
-            Array.Copy(valueArr, 0, newFullArr, Data.Length, valueArr.Length);
-            Data = newFullArr;
+            _data = BitConverter.GetBytes(newValue);
+            
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(_data);
         }
         
-        public OscMessage(string name, bool value) : this(name, value ? 'T' : 'F') {}
+        private void SetBool(bool newValue) => TypeIdentifier = newValue ? 'T' : 'F';
 
-        public OscMessage(string name, char type, byte[] valueBytes) : this(name, type)
+        public byte[] Serialize()
         {
-            if (valueBytes == null) return;
-            var newFullArr = new byte[Data.Length+valueBytes.Length];
-            Array.Copy(Data, newFullArr, Data.Length);
-            Array.Copy(valueBytes, 0, newFullArr, Data.Length, valueBytes.Length);
-            Data = newFullArr;
+            SerializationCache = new byte[_addressBytes.Length + _valueIdentBytes.Length + _data.Length];
+            Array.Copy(_addressBytes, SerializationCache, _addressBytes.Length);
+            Array.Copy(_valueIdentBytes, 0, SerializationCache, _addressBytes.Length, _valueIdentBytes.Length);
+            Array.Copy(_data, 0, SerializationCache, _addressBytes.Length + _valueIdentBytes.Length, _data.Length);
+            return SerializationCache;
         }
 
         public OscMessage(byte[] bytes)
         {
-            int iter = 0;
+            var iter = 0;
 
             var addressBytes = new List<byte>();
             for (; iter < bytes.Length; iter++)
@@ -77,32 +92,27 @@ namespace VRCFaceTracking.OSC
             // Increase iter until we find the type identifier
             for (; iter < bytes.Length; iter++)
             {
-                if (bytes[iter] == ',')
-                {
-                    iter++;
-                    break;
-                }
+                if (bytes[iter] != ',') continue;
+                
+                iter++;
+                break;
             }
 
-
-        byte type = bytes[iter];
             iter += 2; // Next multiple of 4
 
-            switch (type)
+            switch (bytes[iter])
             {
-                #region Standard OSC-Type/s
-
                 case 105: // OSC Type tag: 'i' ; int32
                     var intBytes = new byte[4];
                     Array.Copy(bytes, iter, intBytes, 0, 4);
                     Array.Reverse(intBytes);
-                    Value = BitConverter.ToInt32(intBytes, 0);
+                    Value = (T)(object)BitConverter.ToInt32(intBytes, 0);
                     break;
                 case 102: // OSC Type tag: 'f' ; float32
                     var floatBytes = new byte[4];
                     Array.Copy(bytes, iter, floatBytes, 0, 4);
                     Array.Reverse(floatBytes);
-                    Value = BitConverter.ToSingle(floatBytes, 0);
+                    Value = (T)(object)BitConverter.ToSingle(floatBytes, 0);
                     break;
                 case 115: // OSC Type tag: 's' ; OSC-string
                     var stringBytes = new List<byte>();
@@ -113,50 +123,28 @@ namespace VRCFaceTracking.OSC
 
                         stringBytes.Add(bytes[iter]);
                     }
-                    Value = Encoding.ASCII.GetString(stringBytes.ToArray());
+
+                    Value = (T)(object)Encoding.ASCII.GetString(stringBytes.ToArray());
                     break;
-                case 98: // OSC Type tag: 'b' ; OSC-blob
-                    goto default;
 
-                #endregion
-
-                #region Non Standard OSC-Type/s
-
-                case 104: // OSC Type tag: 'h' ; 64 Bit Big-Endian
-                    goto default;
-                case 116: // OSC Type tag: 't' ; OSC-timetag
-                    goto default;
-                case 100: // OSC Type tag: 'd' ; 64 Bit Big-Endian
-                    goto default;
-                case 83: // OSC Type tag: 'S' ; Type represented in OSC-string
-                    goto default;
-                case 99: // OSC Type tag: 'c' ; 32 bit ASCII
-                    goto default;
-                case 114: // OSC Type tag: 'r' ; 32 bit RGBA color
-                    goto default;
-                case 109: // OSC Type tag: 'm' ; 4 bit MIDI. Each byte as: port id, status, data1, data2
-                    goto default;
                 case 70: // OSC Type tag: 'T' ; Represents true, No extra data
-                    Value = false;
+                    Value = (T)(object)false;
                     break;
                 case 84: // OSC Type tag: 'F' ; Represents false, No extra data
-                    Value = true;
+                    Value = (T)(object)true;
                     break;
                 case 78: // OSC Type tag: 'N' ; Represents NIL (zero), No extra data
-                    Value = 0;
+                    Value = (T)(object)0;
                     break;
                 case 73: // OSC Type tag: 'I' ; Represents Infinitum (endlessly infinite), No extra data. Capping to 1.
-                    Value = 1.0f;
+                    Value = (T)(object)int.MaxValue;
                     break;
                 case 91: // OSC Type tag: '[' ; Represents start of an array.
                     goto default;
                 case 93: // OSC Type tag: ']' ; Represents end of an array.
                     goto default;
 
-                #endregion
-
                 default:
-                    Logger.Error("OSC Type unimplemented: " + type + " for name " + Address);
                     break;
             }
         }
