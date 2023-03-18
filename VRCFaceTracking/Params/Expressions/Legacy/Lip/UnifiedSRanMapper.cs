@@ -29,13 +29,11 @@ namespace VRCFaceTracking.Params.Lip
                 exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight) / 4.0f },
 
             { SRanipal_LipShape_v2.MouthSmileRight, exp =>
-                (exp.Shapes[(int)UnifiedExpressions.MouthCornerPullRight].Weight * .8f + exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantRight].Weight * .2f) > exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight ?
-                    (exp.Shapes[(int)UnifiedExpressions.MouthCornerPullRight].Weight * .8f + exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantRight].Weight * .2f) :
-                    exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight },
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadRight) > exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight ?
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadRight) : exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight },
             { SRanipal_LipShape_v2.MouthSmileLeft, exp =>
-                (exp.Shapes[(int)UnifiedExpressions.MouthCornerPullLeft].Weight * .8f + exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight * .2f) > exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight ?
-                    (exp.Shapes[(int)UnifiedExpressions.MouthCornerPullLeft].Weight * .8f + exp.Shapes[(int)UnifiedExpressions.MouthCornerSlantLeft].Weight * .2f) :
-                    exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight },
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadLeft) > exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight ?
+                GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSadLeft) : exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight },
             { SRanipal_LipShape_v2.MouthSadRight, exp =>
                 Math.Max(0, (((exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight) / 2.0f >
                 (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight) ?

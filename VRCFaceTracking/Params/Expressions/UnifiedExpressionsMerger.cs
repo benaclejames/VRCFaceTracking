@@ -21,6 +21,16 @@ namespace VRCFaceTracking.Params
             
             #endregion
 
+            #region Eye Pupils
+            
+            new EParam(exp => exp.Eye.Combined().PupilDiameter_MM, "v2/PupilDilation"),
+
+            new EParam(exp => exp.Eye.Left.PupilDiameter_MM * 0.1f, "v2/PupilDiameterLeft"),
+            new EParam(exp => exp.Eye.Right.PupilDiameter_MM * 0.1f, "v2/PupilDiameterRight"),
+            new EParam(exp => (exp.Eye.Left.PupilDiameter_MM * 0.1f + exp.Eye.Left.PupilDiameter_MM * 0.1f) / 2.0f, "v2/PupilDiameter"),
+            
+            #endregion
+
             #region Eye Openness
             
             new EParam(exp => exp.Eye.Left.Openness, "v2/EyeOpenLeft"),
@@ -165,6 +175,8 @@ namespace VRCFaceTracking.Params
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight) / 2.0f, "v2/MouthTightener"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthPressRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthPressLeft].Weight) / 2.0f, "v2/MouthPress"),
             new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight) / 2.0f, "v2/MouthDimple"),
+
+            new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight + exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight) / 2.0f, "v2/NoseSneer"),
 
             #endregion
 
