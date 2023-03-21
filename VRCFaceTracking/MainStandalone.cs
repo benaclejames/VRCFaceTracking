@@ -94,7 +94,6 @@ namespace VRCFaceTracking
 
             // Begin main OSC update loop
             Utils.TimeBeginPeriod(1);
-            byte[] buffer = new byte[4096];
             while (!MasterCancellationTokenSource.IsCancellationRequested)
             {
                 Thread.Sleep(10);
@@ -111,6 +110,7 @@ namespace VRCFaceTracking
                 int messageIndex = 0;
                 while (messageIndex < relevantMessages.Length)
                 {
+                    byte[] buffer = new byte[4096];
                     var length = RustLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
                         ref messageIndex);
                     if (length > 4096)
