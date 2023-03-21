@@ -4,8 +4,8 @@ namespace VRCFaceTracking.Params
 {
     public interface IParameter
     {
-        void ResetParam(ConfigParser.Parameter[] newParams);
-        
-        OSCParams.BaseParam[] GetBase();
+        int ResetParam(ConfigParser.Parameter[] newParams);
+
+        //OSCParams.ParameterState[] GetSelfAndChildren();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace VRCFaceTracking.OSC
@@ -48,7 +49,7 @@ namespace VRCFaceTracking.OSC
                 // Ignore as this is most likely a timeout exception
                 return;
             }
-            var newMsg = new OscMessage<object>(buffer);
+            var newMsg = new OscMessage(buffer);
             switch (newMsg.Address)
             {
                 case "/avatar/change":
@@ -74,6 +75,6 @@ namespace VRCFaceTracking.OSC
             }
         }
 
-        public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);
+        public void Send(byte[] data, int length) => SenderClient.Send(data, length, SocketFlags.None);
     }
 }

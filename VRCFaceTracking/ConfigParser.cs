@@ -33,7 +33,7 @@ namespace VRCFaceTracking
             public List<Parameter> parameters { get; set; }
         }
 
-        public static Action OnConfigLoaded = () => { };
+        public static Action<int> OnConfigLoaded = (int count) => { };
 
         public static void ParseNewAvatar(string newId)
         {
@@ -62,10 +62,11 @@ namespace VRCFaceTracking
             Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
+            int count = 0;
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(parameters);
+                count += parameter.ResetParam(parameters);
 
-            OnConfigLoaded();
+            OnConfigLoaded(count);
         }
     }
 }

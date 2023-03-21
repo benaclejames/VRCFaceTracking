@@ -6,6 +6,7 @@ using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Documents;
 using VRCFaceTracking.Assets.UI;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
@@ -31,16 +32,6 @@ namespace VRCFaceTracking
         public static OscMain OscMain;
         public static UnifiedConfig unifiedConfig = new UnifiedConfig();
 
-        private static List<byte[]> ConstructMessages(IEnumerable<OSCParams.BaseParam> parameters) =>
-            parameters.Where(p => p.NeedsSend).Select(param =>
-            {
-                param.NeedsSend = false;
-                return new OscMessage(param.OutputInfo.address, param.OscType, param.ParamValue);
-            }).ToList();
-
-        private static IEnumerable<OSCParams.BaseParam> _relevantParams;
-        private static int _relevantParamsCount = 416;
-
         public static readonly CancellationTokenSource MasterCancellationTokenSource = new CancellationTokenSource();
 
         public static void Teardown()
@@ -60,6 +51,7 @@ namespace VRCFaceTracking
         
         public static void Initialize()
         {
+            var test2 = BitConverter.GetBytes(69.42);
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
@@ -95,50 +87,38 @@ namespace VRCFaceTracking
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            var _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-            var _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase()).Where(param => param.Relevant);
-            _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
-
-            ConfigParser.OnConfigLoaded += () =>
+            ConfigParser.OnConfigLoaded += (count) =>
             {
-                _relevantParams_v1 = UnifiedTracking.AllParameters_v1.SelectMany(p => p.GetBase())
-                    .Where(param => param.Relevant);
-                _relevantParams_v2 = UnifiedTracking.AllParameters_v2.SelectMany(p => p.GetBase())
-                    .Where(param => param.Relevant);
-
-                _relevantParams = _relevantParams_v1.Concat(_relevantParams_v2);
-
-                Logger.Msg("Config file parsed successfully! " + _relevantParams.Count() + " parameters loaded.");
-                
-                if (_relevantParams_v1.Count() > 0)
-                    Logger.Warning(_relevantParams_v1.Count() + " legacy parameters loaded. These are undocumented and outdated parameters.");
+                    Logger.Warning(count + " legacy parameters loaded. These are undocumented and outdated parameters.");
             };
 
             // Begin main OSC update loop
             Utils.TimeBeginPeriod(1);
+            byte[] buffer = new byte[4096];
             while (!MasterCancellationTokenSource.IsCancellationRequested)
             {
                 Thread.Sleep(10);
 
-                if (_relevantParamsCount <= 0)
-                    continue;
+                //if (_relevantParamsCount <= 0)
+                //    continue;
 
                 UnifiedTracking.UpdateData();
-
-                var messages = ConstructMessages(_relevantParams);
-                while (messages.Count > 0)
+                
+                // Send all messages in OSCParams.SendQueue
+                if (OSCParams.SendQueue.Count <= 0) continue;
+                
+                var relevantMessages = OSCParams.SendQueue.ToArray();
+                int messageIndex = 0;
+                while (messageIndex < relevantMessages.Length)
                 {
-                    var msgCount = 16;
-                    var msgList = new List<OscMessage>();
-                    while (messages.Count > 0 && msgCount+messages[0].Data.Length+4 < 4096)
-                    {
-                        msgList.Add(messages[0]);
-                        msgCount += messages[0].Data.Length+4;
-                        messages.RemoveAt(0);
-                    }
-                    var bundle = new OscBundle(msgList);
-                    OscMain.Send(bundle.Data);
+                    var length = RustLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
+                        ref messageIndex);
+                    if (length > 4096)
+                        throw new Exception("Bundle size is too large! This should never happen.");
+
+                    OscMain.Send(buffer, length);
                 }
+                OSCParams.SendQueue.Clear();
             }
         }
     }

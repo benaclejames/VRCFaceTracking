@@ -2,106 +2,98 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking.OSC
 {
     public class OSCParams
     {
-        public class BaseParam
+        private const string DefaultPrefix = "/avatar/parameters/";
+        
+        public static readonly Queue<OscMessageMeta> SendQueue = new();
+        
+        public class BaseParam<T> : IParameter
         {
+            protected Func<UnifiedTrackingData, T> getValueFunc;
+
             private readonly string _paramName;
+            
+            private bool _relevant;
 
-            public byte[] ParamValue
+            public bool Relevant
             {
-                get => _paramValue;
+                get => _relevant;
+                private set
+                {
+                    // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
+                    if (_relevant == value || getValueFunc == null) return;
+                    
+                    _relevant = value;
+                    if (value)
+                        UnifiedTracking.OnUnifiedDataUpdated += Process;
+                    else
+                        UnifiedTracking.OnUnifiedDataUpdated -= Process;
+                }
+            }
+
+            public virtual T ParamValue
+            {
+                get => (T)_oscMessage.Value;
                 set
                 {
-                    if (_paramValue.SequenceEqual(value)) return;
+                    // Ensure that the value is different
+                    if (Equals(ParamValue, value)) return;
                     
-                    _paramValue = value;
+                    _oscMessage.Value = value;
                     NeedsSend = true;
                 }
             }
 
-            public char OscType
+            private bool NeedsSend
             {
-                get => _oscType;
-                set
-                {
-                    if (_oscType == value) return;
-                    
-                    _oscType = value;
-                    NeedsSend = true;
-                }
+                set => SendQueue.Enqueue(_oscMessage._meta);
             }
 
-            private byte[] _paramValue = new byte[4];
-            private readonly Type _paramType;
-            private char _oscType;
-            public bool Relevant, NeedsSend = true;
-            public ConfigParser.InputOutputDef OutputInfo;
+            private readonly OscMessage _oscMessage;
 
-            public BaseParam(string name, Type type)
+            protected BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc) : this(name) => this.getValueFunc = getValueFunc;
+
+            public BaseParam(string name)
             {
                 _paramName = name;
-                _paramType = type;
-                OscType = OscUtils.TypeConversions[type].oscType;
+                _oscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
             }
 
-            public virtual void ResetParam(ConfigParser.Parameter[] newParams)
+            public virtual int ResetParam(ConfigParser.Parameter[] newParams)
             {
                 Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
 
                 var compatibleParam = newParams.FirstOrDefault(param =>
                     regex.IsMatch(param.name)
-                    && param.input.Type == _paramType);
+                    && param.input.Type == typeof(T));
 
                 if (compatibleParam != null)
                 {
                     Relevant = true;
-                    OutputInfo = compatibleParam.input;
+                    _oscMessage.Address = compatibleParam.input.address;
                 }
                 else
                 {
                     Relevant = false;
-                    OutputInfo = null;
+                    _oscMessage.Address = DefaultPrefix+_paramName;
                 }
+                
+                return Relevant ? 1 : 0;
             }
+
+            //public ParameterState[] GetSelfAndChildren() => new ParameterState[] {this};
+
+            protected virtual void Process(UnifiedTrackingData data) => ParamValue = getValueFunc.Invoke(data);
         }
 
-        public class FloatBaseParam : BaseParam
+        public class BinaryBaseParameter : BaseParam<float>
         {
-            public FloatBaseParam(string name) : base(name, typeof(float))
-            {
-            }
-
-            public new float ParamValue
-            {
-                set
-                {
-                    var valueArr = BitConverter.GetBytes(value);
-                    Array.Reverse(valueArr);
-                    base.ParamValue = valueArr;
-                }
-            }
-        }
-
-        public class BoolBaseParam : BaseParam
-        {
-            public BoolBaseParam(string name) : base(name, typeof(bool))
-            {
-            }
-
-            public new bool ParamValue
-            {
-                get => OscType == 'T';
-                set => OscType = value ? 'T' : 'F';
-            }
-        }
-
-        public class BinaryBaseParameter : FloatBaseParam
-        {
-            public new double ParamValue
+            public override float ParamValue
             {
                 set
                 {
@@ -122,10 +114,10 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
-            protected readonly Dictionary<int, BoolBaseParam>
-                _params = new Dictionary<int, BoolBaseParam>(); // Int represents binary steps
+            private readonly Dictionary<int, BaseParam<bool>>
+                _params = new(); // Int represents binary steps
 
-            protected readonly BoolBaseParam _negativeParam;
+            private readonly BaseParam<bool> _negativeParam;
             private int _maxPossibleBinaryInt;
             private readonly string _paramName;
 
@@ -145,10 +137,10 @@ namespace VRCFaceTracking.OSC
              * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
              * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
              */
-            public override void ResetParam(ConfigParser.Parameter[] newParams)
+            public override int ResetParam(ConfigParser.Parameter[] newParams)
             {
                 _params.Clear();
-                _negativeParam.ResetParam(newParams);
+                int count = _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
                 Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
@@ -168,16 +160,18 @@ namespace VRCFaceTracking.OSC
                         paramsToCreate.Add(param.name, binaryIndex.Value);
                 }
 
-                if (paramsToCreate.Count == 0) return;
+                if (paramsToCreate.Count == 0) return count;
 
                 // Calculate the highest possible binary number
                 _maxPossibleBinaryInt = (int) Math.Pow(2, paramsToCreate.Values.Count);
                 foreach (var param in paramsToCreate)
                 {
-                    var newBool = new BoolBaseParam(param.Key);
-                    newBool.ResetParam(newParams);
+                    var newBool = new BaseParam<bool>(param.Key);
+                    count += newBool.ResetParam(newParams);
                     _params.Add(param.Value, newBool);
                 }
+
+                return count;
             }
 
             // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
@@ -194,10 +188,10 @@ namespace VRCFaceTracking.OSC
                 return null;
             }
 
-            public BinaryBaseParameter(string paramName) : base(paramName)
+            protected BinaryBaseParameter(string paramName, Func<UnifiedTrackingData, float> getValueFunc) : base(paramName, getValueFunc)
             {
                 _paramName = paramName;
-                _negativeParam = new BoolBaseParam(paramName + "Negative");
+                _negativeParam = new BaseParam<bool>(paramName + "Negative");
             }
         }
     }

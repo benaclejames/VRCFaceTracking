@@ -4,7 +4,7 @@ namespace VRCFaceTracking.Params
 {
     public class XYParam
     {
-        public OSCParams.FloatBaseParam X, Y;
+        public OSCParams.BaseParam<float> X, Y;
 
         protected Vector2 ParamValue
         {
@@ -15,7 +15,7 @@ namespace VRCFaceTracking.Params
             }
         }
 
-        protected XYParam(OSCParams.FloatBaseParam x, OSCParams.FloatBaseParam y)
+        protected XYParam(OSCParams.BaseParam<float> x, OSCParams.BaseParam<float> y)
         {
             X = x;
             Y = y;

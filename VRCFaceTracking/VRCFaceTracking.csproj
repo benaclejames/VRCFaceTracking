@@ -15,6 +15,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -87,7 +88,6 @@
     <Compile Include="Types\ImageData.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainStandalone.cs" />
-    <Compile Include="OSC\OSCBundle.cs" />
     <Compile Include="OSC\OSCMain.cs" />
     <Compile Include="OSC\OSCMessage.cs" />
     <Compile Include="OSC\OSCParams.cs" />
@@ -161,6 +161,9 @@
     <PackageReference Include="System.Text.Json">
       <Version>7.0.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="OSC\fti_osc.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterResolveReferences">
