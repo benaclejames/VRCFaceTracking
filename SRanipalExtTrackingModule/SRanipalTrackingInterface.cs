@@ -18,7 +18,7 @@ namespace SRanipalExtTrackingInterface
     {
         LipData_v2 lipData = default;
         EyeData_v2 eyeData = default;
-        private static bool eyeEnabled = false, lipEnabled = false;
+        private static bool eyeEnabled = false, lipEnabled = false, isViveProEye = false;
 
         private static CancellationTokenSource _cancellationToken;
         
@@ -41,6 +41,8 @@ namespace SRanipalExtTrackingInterface
 
             if (eyeEnabled && Utils.HasAdmin)
             {
+                isViveProEye = SRanipal_Eye_API.IsViveProEye();
+                
                 var found = false;
                 int tries = 0;
                 while (!found && tries < 15)
@@ -263,7 +265,7 @@ namespace SRanipalExtTrackingInterface
             if (external.right.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_PUPIL_DIAMETER_VALIDITY))
                 data.Right.PupilDiameter_MM = external.right.pupil_diameter_mm;
             
-            if (SRanipal_Eye_API.IsViveProEye())
+            if (isViveProEye)
             {
                 if (external.left.GetValidity(SingleEyeDataValidity.SINGLE_EYE_DATA_GAZE_DIRECTION_VALIDITY))
                     data.Left.Gaze = external.left.gaze_direction_normalized.FlipXCoordinates();
