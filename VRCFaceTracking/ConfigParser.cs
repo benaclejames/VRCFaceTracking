@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking
 {
@@ -15,7 +16,7 @@ namespace VRCFaceTracking
             public string type { get; set; }
 
             [JsonIgnore]
-            public Type Type => Utils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
+            public Type Type => OscUtils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
         }
 
         public class Parameter
@@ -60,7 +61,8 @@ namespace VRCFaceTracking
             
             Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
-            foreach (var parameter in UnifiedTrackingData.AllParameters)
+
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
                 parameter.ResetParam(parameters);
 
             OnConfigLoaded();

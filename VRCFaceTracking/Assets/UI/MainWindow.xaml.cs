@@ -1,16 +1,23 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using VRCFaceTracking.Params;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using ContextMenu = System.Windows.Forms.ContextMenu;
 using MenuItem = System.Windows.Forms.MenuItem;
+using Timer = System.Threading.Timer;
 
 namespace VRCFaceTracking.Assets.UI
 {
@@ -31,7 +38,7 @@ namespace VRCFaceTracking.Assets.UI
             Show();
             WindowState = WindowState.Normal;
         }
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -55,9 +62,10 @@ namespace VRCFaceTracking.Assets.UI
                 new MenuItem("Exit", (sender, args) => MainStandalone.Teardown()),
                 new MenuItem("Show", ShowWindow)
             });
-            
+
             // Is this running as admin?
             // If not, disable the re-int button
+            /*
             if (!Utils.HasAdmin)
             {
                 // Apparently, windows form buttons don't allow for text wrapping
@@ -66,6 +74,7 @@ namespace VRCFaceTracking.Assets.UI
                 ReinitializeButton.FontSize = 10f;
                 ReinitializeButton.IsEnabled = false;
             }
+            */
 
             UnifiedLibManager.OnTrackingStateUpdate += (eye, lip) =>
                 Dispatcher.BeginInvoke(new ThreadStart(() => UpdateLogo(eye, lip)));
@@ -87,17 +96,17 @@ namespace VRCFaceTracking.Assets.UI
 
         void UpdateLipImage()
         {
-            if (!IsLipPageVisible || UnifiedTrackingData.LatestLipData.ImageData == null)   // If the image is not initialized
+            if (!IsLipPageVisible || UnifiedTracking.LipImageData.ImageData == null)   // If the image is not initialized
                 return;
 
             var bitmap = LipImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestLipData.ImageSize.x,
-                    UnifiedTrackingData.LatestLipData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.LipImageData.ImageSize.x,
+                    UnifiedTracking.LipImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestLipData.ImageSize.x,
-                UnifiedTrackingData.LatestLipData.ImageSize.y), UnifiedTrackingData.LatestLipData.ImageData, 800, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.LipImageData.ImageSize.x,
+                UnifiedTracking.LipImageData.ImageSize.y), UnifiedTracking.LipImageData.ImageData, 800, 0);
             
             // Set the WPF image name LipImage 
             LipImage.Source = bitmap;
@@ -105,18 +114,18 @@ namespace VRCFaceTracking.Assets.UI
         
         void UpdateEyeImage()
         {
-            if (!IsEyePageVisible || UnifiedTrackingData.LatestEyeData.ImageData == null)   // If the image is not initialized
+            if (!IsEyePageVisible || UnifiedTracking.EyeImageData.ImageData == null)   // If the image is not initialized
                 return;
             
             var bitmap = EyeImage.Source;
             if (bitmap == null || bitmap.GetType() != typeof(WriteableBitmap))
             {
-                bitmap = new WriteableBitmap(UnifiedTrackingData.LatestEyeData.ImageSize.x,
-                    UnifiedTrackingData.LatestEyeData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
+                bitmap = new WriteableBitmap(UnifiedTracking.EyeImageData.ImageSize.x,
+                    UnifiedTracking.EyeImageData.ImageSize.y, 96, 96, PixelFormats.Gray8, null);
             }
             
-            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTrackingData.LatestEyeData.ImageSize.x, 
-                UnifiedTrackingData.LatestEyeData.ImageSize.y), UnifiedTrackingData.LatestEyeData.ImageData, UnifiedTrackingData.LatestEyeData.ImageSize.x, 0);
+            ((WriteableBitmap)bitmap).WritePixels(new Int32Rect(0, 0, UnifiedTracking.EyeImageData.ImageSize.x, 
+                UnifiedTracking.EyeImageData.ImageSize.y), UnifiedTracking.EyeImageData.ImageData, 800, 0);
             
             // Set the WPF image name EyeImage 
             EyeImage.Source = bitmap;
@@ -131,8 +140,17 @@ namespace VRCFaceTracking.Assets.UI
 
         private void ReinitializeClick(object sender, RoutedEventArgs e)
         {
-            Logger.Msg("Reinitializing...");
+            Logger.Msg("Initializing modules in selected order.");
+
             UnifiedLibManager.Initialize();
+        }
+
+        private void ReloadModulesClick(object sender, RoutedEventArgs e)
+        {
+            Logger.Msg("Reloading available modules.");
+
+            UnifiedLibManager.ReloadModules();
+            moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
         }
 
         private void PauseClickEyes(object sender, RoutedEventArgs e)
@@ -145,10 +163,10 @@ namespace VRCFaceTracking.Assets.UI
 
         private void PauseClickMouth(object sender, RoutedEventArgs e)
         {
-            if (UnifiedLibManager.LipStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
+            if (UnifiedLibManager.ExpressionStatus == ModuleState.Uninitialized)   // We don't wanna change states of an inactive module
                 return;
             
-            UnifiedLibManager.LipStatus = UnifiedLibManager.LipStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
+            UnifiedLibManager.ExpressionStatus = UnifiedLibManager.ExpressionStatus == ModuleState.Idle ? ModuleState.Active : ModuleState.Idle;
         }
 
         private void UpdateLogo(ModuleState eyeState, ModuleState lipState)
@@ -169,10 +187,44 @@ namespace VRCFaceTracking.Assets.UI
             } 
         }
 
+        private void MainWindow_Loaded(object sender, EventArgs eventArgs)
+        {
+            moduleListBox.ItemsSource = UnifiedLibManager.AvailableModules;
+            UseCalibration.IsChecked = UnifiedTracking.Mutator.CalibratorMode == UnifiedTrackingMutator.CalibratorState.Inactive ? false : true;
+            //EnableSmoothing.IsChecked = UnifiedTracking.Mutator.SmoothingMode ? true : false;
+        }
+
         private void TabController_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             IsEyePageVisible = TabController.SelectedIndex == 1;
             IsLipPageVisible = TabController.SelectedIndex == 2;
         }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+            UnifiedLibManager.RequestedModules = (((System.Windows.Controls.ListBox)sender).SelectedItems.Cast<Assembly>().ToList());
+
+        private void CalibrationClick(object sender, RoutedEventArgs e)
+        {
+            UseCalibration.IsChecked = true;
+            UnifiedTracking.Mutator.InitializeCalibration();
+        }
+
+        private void UseCalibration_CheckChanged(object sender, RoutedEventArgs e)
+        {
+            if (UseCalibration.IsChecked == true)
+            {
+                Logger.Msg("Enabled fine-tune calibration and using existing calibrated values.");
+                UnifiedTracking.Mutator.CalibrationWeight = 0.25f;
+                UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Calibrating;
+                return;
+            }
+            
+            Logger.Msg("Disabled calibration.");
+            UnifiedTracking.Mutator.CalibratorMode = UnifiedTrackingMutator.CalibratorState.Inactive;
+        }
+
+        //private void EnableSmoothing_CheckChanged(object sender, RoutedEventArgs e) => UnifiedTracking.Mutator.SmoothingMode = (bool)UseCalibration.IsChecked;
+
+        //private void Smooth_Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => UnifiedTracking.Mutator.SetSmoothness((float)e.NewValue);
     }
 }

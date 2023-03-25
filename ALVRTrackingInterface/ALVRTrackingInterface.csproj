@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{296110E5-3AE7-4D9F-BE09-890194CDD76E}</ProjectGuid>
+    <ProjectGuid>{E007AB65-CB96-4A59-B187-59162F2D71C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VRCFT_Module_Example</RootNamespace>
-    <AssemblyName>VRCFT_Module_Example</AssemblyName>
+    <RootNamespace>ALVRTrackingInterface</RootNamespace>
+    <AssemblyName>ALVRTrackingInterface</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>false</SignAssembly>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -86,14 +85,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExternalTrackingDataStructures.cs" />
-    <Compile Include="ExternalTrackingModule.cs" />
+    <Compile Include="ALVRTrackingInterface.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FBData.cs" />
+    <Compile Include="FBExpression.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj">
       <Project>{0767c09e-d536-464b-b0a1-46d5bfa19e98}</Project>
       <Name>VRCFaceTracking</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

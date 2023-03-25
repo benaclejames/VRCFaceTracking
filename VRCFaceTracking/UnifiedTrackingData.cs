@@ -5,6 +5,7 @@ using ViveSR.anipal.Eye;
 using ViveSR.anipal.Lip;
 using VRCFaceTracking.Params;
 using VRCFaceTracking.Params.Eye;
+using VRCFaceTracking.Params.Lip;
 using VRCFaceTracking.Params.LipMerging;
 using Vector2 = VRCFaceTracking.Params.Vector2;
 
@@ -102,8 +103,9 @@ namespace VRCFaceTracking
         public byte[] ImageData;
         public bool SupportsImage;
 
-        public float[] LatestShapes = new float[SRanipal_Lip_v2.WeightingCount];
+        public float[] LatestShapes = new float[(int) UnifiedExpression.Max + 1];
 
+        // Updates only SRanipal_Lip_v2 data. Shapes beyond SRanipal are exposed to module developers, and must be updated manually
         public void UpdateData(LipData_v2 lipData)
         {
             unsafe
