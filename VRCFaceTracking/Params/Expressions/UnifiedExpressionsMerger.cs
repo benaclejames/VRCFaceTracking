@@ -85,19 +85,19 @@ namespace VRCFaceTracking.Params
 
             // -1 = 'Angry', +1 = 'Worried'
             new EParam(exp => 
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight * .5f) -
                 GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight),
                 "v2/BrowExpressionRight"),
 
             new EParam(exp => 
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight) -
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight * .5f) -
                 GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft),
                 "v2/BrowExpressionLeft"),
 
             new EParam(exp =>
-                (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight) -
-                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight)) +
-                (GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight) - GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft)) / 2.0f,
+                (Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight * .5f) -
+                Math.Min(1, exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight * .5f)) +
+                GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight) * .5f - GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft) * .5f,
                 "v2/BrowExpression"),
 
             #endregion
@@ -201,7 +201,7 @@ namespace VRCFaceTracking.Params
 
             new EParam(exp =>
                 GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileRight) * .5f + GetSimpleShape(exp, UnifiedSimpleExpressions.MouthSmileLeft) * .5f -
-                exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight * .5f + exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight * .5f,
+                exp.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight * .5f - exp.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight * .5f,
                 "v2/SmileFrown"),
 
             // Smile 'Sad' contains both the stretcher and frown shapes to represent sad (similar in functionality to SRanipal Sad, just with explicit acknowledgment of lessened tracking fidelity).
