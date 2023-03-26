@@ -51,7 +51,6 @@ namespace VRCFaceTracking
         
         public static void Initialize()
         {
-            var test2 = BitConverter.GetBytes(69.42);
             Logger.Msg("VRCFT Initializing!");
             
             // Parse Arguments
@@ -111,7 +110,7 @@ namespace VRCFaceTracking
                 while (messageIndex < relevantMessages.Length)
                 {
                     byte[] buffer = new byte[4096];
-                    var length = RustLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
+                    var length = SROSCLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
                         ref messageIndex);
                     if (length > 4096)
                         throw new Exception("Bundle size is too large! This should never happen.");

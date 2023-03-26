@@ -34,7 +34,8 @@ namespace VRCFaceTracking.OSC
         public OscValue Value;
     }
     
-    public static class RustLib
+    // Simple Rust OSC Lib wrapper
+    public static class SROSCLib
     {
         [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool parse_osc(byte[] buffer, int bufferLength, ref OscMessageMeta message);
@@ -110,6 +111,6 @@ namespace VRCFaceTracking.OSC
         
         public OscMessage(string address, Type type) : this(address, OscUtils.TypeConversions[type].oscType) {}
 
-        public OscMessage(byte[] bytes) => RustLib.parse_osc(bytes, bytes.Length, ref _meta);
+        public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, ref _meta);
     }
 }
