@@ -26,9 +26,12 @@ namespace VRCFaceTracking.OSC
                 private set
                 {
                     // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
-                    if (_relevant == value || getValueFunc == null) return;
+                    if (_relevant == value) return;
                     
                     _relevant = value;
+
+                    if (getValueFunc == null) return;
+                    
                     if (value)
                         UnifiedTracking.OnUnifiedDataUpdated += Process;
                     else
