@@ -86,9 +86,9 @@ namespace VRCFaceTracking
             if (!bindResults.senderSuccess)
                 Logger.Error("Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
-            ConfigParser.OnConfigLoaded += (count) =>
+            ConfigParser.OnConfigLoaded += relevantParams =>
             {
-                    Logger.Warning(count + " legacy parameters loaded. These are undocumented and outdated parameters.");
+                Logger.Warning(relevantParams.Count(p => p.Relevant) + " legacy parameters loaded. These are undocumented and outdated parameters.");
             };
 
             // Begin main OSC update loop

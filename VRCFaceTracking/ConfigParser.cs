@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using VRCFaceTracking.OSC;
+using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
 {
@@ -33,7 +34,7 @@ namespace VRCFaceTracking
             public List<Parameter> parameters { get; set; }
         }
 
-        public static Action<int> OnConfigLoaded = (int count) => { };
+        public static Action<IParameter[]> OnConfigLoaded = _ => { };
 
         public static void ParseNewAvatar(string newId)
         {
@@ -62,11 +63,11 @@ namespace VRCFaceTracking
             Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
-            int count = 0;
+            List<IParameter> paramList = new List<IParameter>();
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                count += parameter.ResetParam(parameters);
+                paramList.AddRange(parameter.ResetParam(parameters));
 
-            OnConfigLoaded(count);
+            OnConfigLoaded(paramList.ToArray());
         }
     }
 }

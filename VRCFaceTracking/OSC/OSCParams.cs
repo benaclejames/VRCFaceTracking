@@ -70,7 +70,7 @@ namespace VRCFaceTracking.OSC
                 _oscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
             }
 
-            public virtual int ResetParam(ConfigParser.Parameter[] newParams)
+            public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
                 Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
 
@@ -89,7 +89,7 @@ namespace VRCFaceTracking.OSC
                     _oscMessage.Address = DefaultPrefix+_paramName;
                 }
                 
-                return Relevant ? 1 : 0;
+                return Relevant ? new IParameter[] {this} : Array.Empty<IParameter>();
             }
 
             //public ParameterState[] GetSelfAndChildren() => new ParameterState[] {this};
@@ -97,7 +97,7 @@ namespace VRCFaceTracking.OSC
             protected virtual void Process(UnifiedTrackingData data) => ParamValue = getValueFunc.Invoke(data);
         }
 
-        public class BinaryBaseParameter : BaseParam<float>
+        public class BinaryBaseParameter : BaseParam<float>, IParameter
         {
             public override float ParamValue
             {
@@ -143,10 +143,10 @@ namespace VRCFaceTracking.OSC
              * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
              * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
              */
-            public override int ResetParam(ConfigParser.Parameter[] newParams)
+            public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
                 _params.Clear();
-                int count = _negativeParam.ResetParam(newParams);
+                IParameter[] negativeRelevancy = _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
                 Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
@@ -166,19 +166,23 @@ namespace VRCFaceTracking.OSC
                         paramsToCreate.Add(param.name, binaryIndex.Value);
                 }
 
-                if (paramsToCreate.Count == 0) return count;
+                if (paramsToCreate.Count == 0) return negativeRelevancy;
 
                 // Calculate the highest possible binary number
                 _maxPossibleBinaryInt = (int) Math.Pow(2, paramsToCreate.Values.Count);
+                List<IParameter> parameters = new List<IParameter>();
+                parameters.AddRange(negativeRelevancy);
                 foreach (var param in paramsToCreate)
                 {
                     var newBool = new BaseParam<bool>(param.Key);
-                    count += newBool.ResetParam(newParams);
+                    parameters.AddRange(newBool.ResetParam(newParams));
                     _params.Add(param.Value, newBool);
                 }
 
-                return count;
+                return parameters.ToArray();
             }
+
+            public new bool Relevant => false;
 
             // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
             private static int? GetBinarySteps(int index)

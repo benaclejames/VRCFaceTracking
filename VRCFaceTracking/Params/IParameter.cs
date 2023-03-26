@@ -1,11 +1,8 @@
-﻿using VRCFaceTracking.OSC;
-
-namespace VRCFaceTracking.Params
+﻿namespace VRCFaceTracking.Params
 {
     public interface IParameter
     {
-        int ResetParam(ConfigParser.Parameter[] newParams);
-
-        //OSCParams.ParameterState[] GetSelfAndChildren();
+        IParameter[] ResetParam(ConfigParser.Parameter[] newParams);
+        bool Relevant { get; }
     }
 }
