@@ -9,6 +9,7 @@ namespace VRCFaceTracking.OSC
     public class OSCParams
     {
         private const string DefaultPrefix = "/avatar/parameters/";
+        private const string CurrentVersionPrefix = "v2/";
         
         public static readonly List<OscMessageMeta> SendQueue = new();
         
@@ -94,6 +95,8 @@ namespace VRCFaceTracking.OSC
                 return Relevant ? new IParameter[] {this} : Array.Empty<IParameter>();
             }
 
+            public bool Deprecated => !_paramName.StartsWith(CurrentVersionPrefix);
+
             protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
         }
 
@@ -171,7 +174,7 @@ namespace VRCFaceTracking.OSC
                 return parameters.ToArray();
             }
 
-            public bool Relevant => false;
+            public bool Deprecated => false;    // Handled by our children
 
             // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
             private static int? GetBinarySteps(int index)

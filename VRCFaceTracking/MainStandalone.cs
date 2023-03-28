@@ -88,7 +88,15 @@ namespace VRCFaceTracking
 
             ConfigParser.OnConfigLoaded += relevantParams =>
             {
-                Logger.Warning(relevantParams.Count(p => p.Relevant) + " legacy parameters loaded. These are undocumented and outdated parameters.");
+                var deprecatedParams = relevantParams.Count(p => p.Deprecated);
+                
+                Logger.Msg(relevantParams.Length + " parameters loaded.");
+                if (deprecatedParams > 0) 
+                    Logger.Warning(
+                        deprecatedParams +
+                        " Legacy parameters detected. " +
+                        "Please consider updating the avatar to use the latest documented parameters.");
+                
             };
 
             // Begin main OSC update loop

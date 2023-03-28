@@ -85,6 +85,6 @@ namespace VRCFaceTracking.Params
         }
 
         public IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
-        public bool Relevant => false;  // We return false for any parameter "wrapper" as our children will handle this
+        public bool Deprecated => false;    // False as our children will handle this
     }
 }

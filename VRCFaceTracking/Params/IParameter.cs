@@ -3,6 +3,6 @@
     public interface IParameter
     {
         IParameter[] ResetParam(ConfigParser.Parameter[] newParams);
-        bool Relevant { get; }
+        bool Deprecated { get; }
     }
 }
