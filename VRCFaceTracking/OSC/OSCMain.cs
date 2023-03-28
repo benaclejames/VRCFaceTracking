@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace VRCFaceTracking.OSC
@@ -76,6 +75,6 @@ namespace VRCFaceTracking.OSC
             }
         }
 
-        public void Send(byte[] data) => SenderClient.Send(data, data.Length, SocketFlags.None);
+        public void Send(byte[] data, int length) => SenderClient.Send(data, length, SocketFlags.None);
     }
 }

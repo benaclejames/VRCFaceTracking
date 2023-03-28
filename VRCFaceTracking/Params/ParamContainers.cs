@@ -1,82 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Params
 {
-    public class FloatParameter : OSCParams.FloatBaseParam, IParameter
+    public class FloatParameter : OSCParams.BaseParam<float>
     {
-        public FloatParameter(Func<UnifiedTrackingData, float?> getValueFunc,
+        public FloatParameter(Func<UnifiedTrackingData, float> getValueFunc,
             string paramName)
-            : base(paramName) =>
-            UnifiedTracking.OnUnifiedDataUpdated += exp =>
-            {
-                //if (!UnifiedLibManager.EyeEnabled && !UnifiedLibManager.LipEnabled) return;
-                var value = getValueFunc.Invoke(exp);
-                if (value.HasValue)
-                    ParamValue = value.Value;
-            };
-
-        public OSCParams.BaseParam[] GetBase() => new OSCParams.BaseParam[] {this};
+            : base(paramName, getValueFunc) { }
     }
 
-    public class BoolParameter : OSCParams.BoolBaseParam, IParameter
+    public class BoolParameter : OSCParams.BaseParam<bool>
     {
-        public BoolParameter(Func<UnifiedTrackingData, bool?> getValueFunc,
-            string paramName) : base(paramName) =>
-            UnifiedTracking.OnUnifiedDataUpdated += exp =>
-            {
-                var value = getValueFunc.Invoke(exp);
-                if (value.HasValue)
-                    ParamValue = value.Value;
-            };
-
-        public OSCParams.BaseParam[] GetBase()
+        public BoolParameter(Func<UnifiedTrackingData, bool> getValueFunc,
+            string paramName) : base(paramName, getValueFunc)
         {
-            return new OSCParams.BaseParam[] {this};
         }
     }
 
-    public class ConditionalBoolParameter : OSCParams.BoolBaseParam, IParameter
+    // This parameter type will only update parameter 1 if parameter 2 is true
+    public class ConditionalBoolParameter : OSCParams.BaseParam<bool>
     {
-        public ConditionalBoolParameter(Func<UnifiedTrackingData, (bool?, bool?)> getValueFunc, string paramName) : base(paramName) =>
-            UnifiedTracking.OnUnifiedDataUpdated += exp =>
-            {
-                if (getValueFunc.Invoke(exp).Item2.HasValue && getValueFunc.Invoke(exp).Item2.Value)
-                {
-                    var value = getValueFunc.Invoke(exp).Item1;
-                    if (value.HasValue)
-                        ParamValue = value.Value;
-                }
-            };
+        private readonly Func<UnifiedTrackingData, (bool, bool)> _conditionalValueFunc;
+        
+        public ConditionalBoolParameter(Func<UnifiedTrackingData, (bool, bool)> getValueFunc, string paramName) :
+            base(paramName, exp => getValueFunc.Invoke(exp).Item1)
+        => _conditionalValueFunc = getValueFunc;
 
-        public OSCParams.BaseParam[] GetBase()
+        protected override void Process(UnifiedTrackingData exp)
         {
-            return new OSCParams.BaseParam[] { this };
+            if (_conditionalValueFunc.Invoke(exp).Item2)
+                base.Process(exp);
         }
     }
 
-    public class BinaryParameter : OSCParams.BinaryBaseParameter, IParameter
+    public class BinaryParameter : OSCParams.BinaryBaseParameter
     {
-        public BinaryParameter(Func<UnifiedTrackingData, float?> getValueFunc,
-            string paramName) : base(paramName)
+        public BinaryParameter(Func<UnifiedTrackingData, float> getValueFunc,
+            string paramName) : base(paramName, getValueFunc)
         {
-            UnifiedTracking.OnUnifiedDataUpdated += exp =>
-            {
-                var value = getValueFunc.Invoke(exp);
-                if (value.HasValue)
-                    ParamValue = value.Value;
-            };
-        }
-
-        public OSCParams.BaseParam[] GetBase()
-        {
-            OSCParams.BaseParam[] retParams = new OSCParams.BaseParam[_params.Count + 1];
-            // Merge _params.Values and _negativeParam
-            Array.Copy(_params.Values.ToArray(), retParams, _params.Count);
-            retParams[_params.Count] = _negativeParam;
-            return retParams;
         }
     }
 
@@ -86,7 +49,7 @@ namespace VRCFaceTracking.Params
     {
         private readonly IParameter[] _parameter;
 
-        public EParam(Func<UnifiedTrackingData, float?> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
+        public EParam(Func<UnifiedTrackingData, float> getValueFunc, string paramName, float minBoolThreshold = 0.5f, bool skipBinaryParamCreation = false)
         {
             if (skipBinaryParamCreation)
             {
@@ -107,27 +70,21 @@ namespace VRCFaceTracking.Params
             }
         }
 
-        public EParam(Func<UnifiedTrackingData, Vector2?> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
+        public EParam(Func<UnifiedTrackingData, Vector2> getValueFunc, string paramName, float minBoolThreshold = 0.5f)
         {
             _parameter = new IParameter[]
             {
-                new BoolParameter(exp => getValueFunc.Invoke(exp).Value.x < minBoolThreshold, paramName + "X"),
-                new FloatParameter(exp => getValueFunc.Invoke(exp).Value.x, paramName + "X"),
-                new BinaryParameter(exp => getValueFunc.Invoke(exp).Value.x, paramName + "X"),
+                new BoolParameter(exp => getValueFunc.Invoke(exp).x < minBoolThreshold, paramName + "X"),
+                new FloatParameter(exp => getValueFunc.Invoke(exp).x, paramName + "X"),
+                new BinaryParameter(exp => getValueFunc.Invoke(exp).x, paramName + "X"),
 
-                new BoolParameter(exp => getValueFunc.Invoke(exp).Value.y < minBoolThreshold, paramName + "Y"),
-                new FloatParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y"),
-                new BinaryParameter(exp => getValueFunc.Invoke(exp).Value.y, paramName + "Y")
+                new BoolParameter(exp => getValueFunc.Invoke(exp).y < minBoolThreshold, paramName + "Y"),
+                new FloatParameter(exp => getValueFunc.Invoke(exp).y, paramName + "Y"),
+                new BinaryParameter(exp => getValueFunc.Invoke(exp).y, paramName + "Y")
             };
         }
 
-        OSCParams.BaseParam[] IParameter.GetBase() => 
-            _parameter.SelectMany(p => p.GetBase()).ToArray();
-
-        public void ResetParam(ConfigParser.Parameter[] newParams)
-        {
-            foreach (var param in _parameter)
-                param.ResetParam(newParams);
-        }
+        public IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
+        public bool Deprecated => false;    // False as our children will handle this
     }
 }
