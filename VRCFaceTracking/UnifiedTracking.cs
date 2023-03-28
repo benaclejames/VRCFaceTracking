@@ -24,14 +24,15 @@ namespace VRCFaceTracking
         /// <summary>
         /// Latest Expression Data accessible and sent by all VRCFaceTracking modules.
         /// </summary>
-        public static UnifiedTrackingData Data = new UnifiedTrackingData();
+        public static UnifiedTrackingData Data = new();
 
         /// <summary>
         /// Container of all features and functions that mutates the incoming expression data into output data suitable for driving Unified Expressions.
         /// </summary>
         /// <remarks> Mutates data on update. </remarks>
-        public static UnifiedTrackingMutator Mutator = new UnifiedTrackingMutator();
+        public static UnifiedTrackingMutator Mutator = new();
 
+#pragma warning disable CS0618
         /// <summary>
         /// Version 1 (VRCFaceTracking SRanipal) of all accessible output parameters.
         /// </summary>
@@ -42,6 +43,7 @@ namespace VRCFaceTracking
         /// Version 2 (Unified Expressions) of all accessible output parameters.
         /// </summary>
         public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsMerger.ExpressionParameters;
+#pragma warning restore CS0618
 
         /// <summary>
         /// Central update action for all expression data to subscribe to.

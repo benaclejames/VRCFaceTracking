@@ -10,11 +10,11 @@ namespace VRCFaceTracking.OSC
     {
         private const string DefaultPrefix = "/avatar/parameters/";
         
-        public static readonly List<OscMessageMeta> SendQueue = new List<OscMessageMeta>();
+        public static readonly List<OscMessageMeta> SendQueue = new();
         
         public class BaseParam<T> : IParameter
         {
-            protected Func<UnifiedTrackingData, T> getValueFunc;
+            private readonly Func<UnifiedTrackingData, T> _getValueFunc;
 
             private readonly string _paramName;
             
@@ -30,7 +30,7 @@ namespace VRCFaceTracking.OSC
                     
                     _relevant = value;
 
-                    if (getValueFunc == null) return;
+                    if (_getValueFunc == null) return;
                     
                     if (value)
                         UnifiedTracking.OnUnifiedDataUpdated += Process;
@@ -39,7 +39,7 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
-            public virtual T ParamValue
+            public T ParamValue
             {
                 get => (T)_oscMessage.Value;
                 set
@@ -65,11 +65,10 @@ namespace VRCFaceTracking.OSC
 
             private readonly OscMessage _oscMessage;
 
-            protected BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc) : this(name) => this.getValueFunc = getValueFunc;
-
-            public BaseParam(string name)
+            public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc)
             {
                 _paramName = name;
+                _getValueFunc = getValueFunc;
                 _oscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
             }
 
@@ -95,40 +94,28 @@ namespace VRCFaceTracking.OSC
                 return Relevant ? new IParameter[] {this} : Array.Empty<IParameter>();
             }
 
-            //public ParameterState[] GetSelfAndChildren() => new ParameterState[] {this};
-
-            protected virtual void Process(UnifiedTrackingData data) => ParamValue = getValueFunc.Invoke(data);
+            protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
         }
 
-        public class BinaryBaseParameter : BaseParam<float>, IParameter
+        public class BinaryBaseParameter : IParameter
         {
-            public override float ParamValue
-            {
-                set
-                {
-                    // If the value is negative, make it positive
-                    if (!_negativeParam.Relevant &&
-                        value < 0) // If the negative parameter isn't set, cut the negative values
-                        return;
-
-                    // Ensure value going into the bitwise shifts is between 0 and 1
-                    var adjustedValue = Math.Abs(value);
-
-                    var bigValue = (int) (adjustedValue * (_maxPossibleBinaryInt - 1));
-
-                    foreach (var boolChild in _params)
-                        boolChild.Value.ParamValue = ((bigValue >> boolChild.Key) & 1) == 1;
-
-                    _negativeParam.ParamValue = value < 0;
-                }
-            }
-
-            private readonly Dictionary<int, BaseParam<bool>>
-                _params = new(); // Int represents binary steps
+            private readonly List<BaseParam<bool>> _params = new(); // Int represents binary steps
 
             private readonly BaseParam<bool> _negativeParam;
             private int _maxPossibleBinaryInt;
             private readonly string _paramName;
+            private readonly Func<UnifiedTrackingData, float> _getValueFunc;
+
+            private bool ProcessBinary(UnifiedTrackingData data, int binaryIndex)
+            {
+                var value = _getValueFunc.Invoke(data);
+                if (!_negativeParam.Relevant &&
+                    value < 0) // If the negative parameter isn't set, cut the negative values
+                    return false;
+                var adjustedValue = Math.Abs(value);
+                var bigValue = (int) (adjustedValue * (_maxPossibleBinaryInt - 1));
+                return ((bigValue >> binaryIndex) & 1) == 1;
+            }
 
             /* Pretty complicated, but let me try to explain...
              * As with other ResetParam functions, the purpose of this function is to reset all the parameters.
@@ -146,7 +133,7 @@ namespace VRCFaceTracking.OSC
              * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
              * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
              */
-            public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+            public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
                 _params.Clear();
                 IParameter[] negativeRelevancy = _negativeParam.ResetParam(newParams);
@@ -160,8 +147,8 @@ namespace VRCFaceTracking.OSC
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)
                 {
-                    var _name = param.name;
-                    if (!int.TryParse(String.Concat(_name.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
+                    var tempName = param.name;
+                    if (!int.TryParse(String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
@@ -173,19 +160,18 @@ namespace VRCFaceTracking.OSC
 
                 // Calculate the highest possible binary number
                 _maxPossibleBinaryInt = (int) Math.Pow(2, paramsToCreate.Values.Count);
-                List<IParameter> parameters = new List<IParameter>();
-                parameters.AddRange(negativeRelevancy);
-                foreach (var param in paramsToCreate)
+                var parameters = new List<IParameter>(negativeRelevancy);
+                foreach (var newBool in paramsToCreate
+                             .Select(param => new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value))))
                 {
-                    var newBool = new BaseParam<bool>(param.Key);
                     parameters.AddRange(newBool.ResetParam(newParams));
-                    _params.Add(param.Value, newBool);
+                    _params.Add(newBool);
                 }
 
                 return parameters.ToArray();
             }
 
-            public new bool Relevant => false;
+            public bool Relevant => false;
 
             // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
             private static int? GetBinarySteps(int index)
@@ -201,10 +187,11 @@ namespace VRCFaceTracking.OSC
                 return null;
             }
 
-            protected BinaryBaseParameter(string paramName, Func<UnifiedTrackingData, float> getValueFunc) : base(paramName, getValueFunc)
+            protected BinaryBaseParameter(string paramName, Func<UnifiedTrackingData, float> getValueFunc)
             {
                 _paramName = paramName;
-                _negativeParam = new BaseParam<bool>(paramName + "Negative");
+                _getValueFunc = getValueFunc;
+                _negativeParam = new BaseParam<bool>(paramName + "Negative", data => getValueFunc.Invoke(data) < 0);
             }
         }
     }
