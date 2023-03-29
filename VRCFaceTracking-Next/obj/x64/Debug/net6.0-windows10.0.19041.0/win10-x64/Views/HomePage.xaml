@@ -1,0 +1,85 @@
+﻿<Page
+    x:Class="VRCFaceTracking_Next.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:ConnectionId='2' x:Name="ContentArea">
+        <StackPanel Orientation="Vertical">
+            <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                        Margin="15, 0"
+                        Source="ms-appx:///Assets/QuestPro.png"
+                        HorizontalAlignment="Left"
+                        Width="150"
+                        Height="150"
+                        Stretch="Fill"/>
+                    <StackPanel Margin="15, 0" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}">Quest Pro</TextBlock>
+                        <TextBlock>Eye Tracking Possible</TextBlock>
+                        <TextBlock>Face Tracking Possible</TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ToggleButton Margin="15, 0" Padding="15" Content="Toggle Eye Tracking" IsChecked="True"/>
+                        <ToggleButton Margin="15, 0, 25, 0" Padding="15" Content="Toggle Face Tracking" IsChecked="True"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE896;" FontSize="20"/>
+                        <StackPanel Margin="20, 4" Orientation="Vertical">
+                            <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">Update Libraries</TextBlock>
+                            <TextBlock Foreground="LightGray">Update or Reinstall Libraries</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Foreground="LightGray">Last Checked: 12:35AM 1/2/2023</TextBlock>
+                        <Button Margin="10, 4">Update</Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-->
+            <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE768;" FontSize="20"/>
+                        <StackPanel Margin="20, 4" Orientation="Vertical">
+                            <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">Start External Face Tracking Software</TextBlock>
+                            <TextBlock Foreground="LightGray">Start this process prior to launching SteamVR or VRChat. You should still be in the Oculus Dashboard or Home Enviornment.</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Foreground="LightGray">Currently not running.</TextBlock>
+                        <Button Margin="10, 4">Start</Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            </ -->
+        </StackPanel>
+        
+    </Grid>
+</Page>
+

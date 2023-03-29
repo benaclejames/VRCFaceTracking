@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="VRCFaceTracking_Next.Views.OutputPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:ConnectionId='2' x:Name="ContentArea">
+        <Expander
+            HorizontalAlignment="Stretch"
+            IsExpanded="True"
+            ExpandDirection="Down"
+            VerticalAlignment="Top"
+            HorizontalContentAlignment="Left"
+            VerticalContentAlignment="Center">
+            <Expander.Header>
+                <Grid Height="70px">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" x:Uid="Output_Dropdown"/>
+                    <Button Grid.Column="2" HorizontalAlignment="Right" x:Uid="Button_Save"/>
+                </Grid>
+            </Expander.Header>
+            <Expander.Content>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+                    <TextBlock>The UI was initalized properly.</TextBlock>
+                    <TextBlock>Application is currently in qpro_airlink mode.</TextBlock>
+                    <TextBlock>Awaiting connection with device on 127.0.0.1...</TextBlock>
+                    <TextBlock>Connected!</TextBlock>
+                    <TextBlock>Awaiting connection with OSC...</TextBlock>
+                    <TextBlock>Loaded an avatar with 17 variables!</TextBlock>
+                </StackPanel>
+            </Expander.Content>
+        </Expander>
+    </Grid>
+</Page>
+
