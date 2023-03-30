@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking
 {
-    public static class ModuleAttributeHandler
+    public class ModuleAttributeHandler
     {
+        private static ILogger<ModuleAttributeHandler> _logger;
+        public ModuleAttributeHandler(ILogger<ModuleAttributeHandler> logger)
+        {
+            _logger = logger;
+        }
+
         private static void HandleLoadPriorAttribute(Assembly assembly, ref List<Assembly> assemblies, List<Attribute> attributes)
         {
             Assembly tempAssembly;
@@ -25,9 +32,9 @@ namespace VRCFaceTracking
                         int t = assemblies.IndexOf(assembly);
                         while (t > j)
                         {
-                            Logger.Msg("Pushed " + assemblies[t].GetCustomAttribute<AssemblyTitleAttribute>().Title +
-                            " into " + assemblies[t - 1].GetCustomAttribute<AssemblyTitleAttribute>().Title +
-                            " via LoadPrior.");
+                            _logger.LogInformation("Pushed " + assemblies[t].GetCustomAttribute<AssemblyTitleAttribute>().Title +
+                                    " into " + assemblies[t - 1].GetCustomAttribute<AssemblyTitleAttribute>().Title +
+                                    " via LoadPrior.");
                             tempAssembly = assemblies[t];
                             assemblies[t] = assemblies[t - 1];
                             assemblies[t - 1] = tempAssembly;
@@ -50,7 +57,7 @@ namespace VRCFaceTracking
                 }
                 catch (ArgumentNullException)
                 {
-                    Logger.Warning(assemblies[i].FullName + " contains an unimplemented attribute.");
+                    _logger.LogWarning(assemblies[i].FullName + " contains an unimplemented attribute.");
                     continue;
                 }
 

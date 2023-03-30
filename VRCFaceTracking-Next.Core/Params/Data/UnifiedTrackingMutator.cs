@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Windows.Markup;
+using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
@@ -44,6 +45,12 @@ namespace VRCFaceTracking
             Inactive,
             Calibrating,
             Calibrated
+        }
+
+        private static ILogger<UnifiedTrackingMutator> _logger;
+        public static void InitializeLogger(ILoggerFactory factory)
+        {
+            _logger = factory.CreateLogger<UnifiedTrackingMutator>();
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
@@ -114,18 +121,18 @@ namespace VRCFaceTracking
         {
             Thread _thread = new Thread(() =>
             {
-                Logger.Msg("Initialized calibration.");
+                _logger.LogInformation("Initialized calibration.");
 
                 UnifiedTracking.Mutator.SetCalibration();
 
                 UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
                 UnifiedTracking.Mutator.CalibratorMode = CalibratorState.Calibrating;
 
-                Logger.Msg("Calibrating deep normalization for 30s.");
+                _logger.LogInformation("Calibrating deep normalization for 30s.");
                 Thread.Sleep(30000);
 
                 UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
-                Logger.Msg("Fine-tuning normalization. Values will be saved on exit.");
+                _logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
 
             });
             _thread.Start();

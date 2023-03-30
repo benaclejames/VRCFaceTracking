@@ -17,7 +17,6 @@ public class AppNotificationService : IAppNotificationService
     {
         _navigationService = navigationService;
         _logger = logger;
-        _logger.Log(LogLevel.Error, "Meme");
     }
 
     ~AppNotificationService()

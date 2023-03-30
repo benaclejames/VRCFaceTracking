@@ -4,13 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
 {
-    public static class ConfigParser
+    public class ConfigParser
     {
+        private static ILogger<ConfigParser> _logger;
+
+        public ConfigParser(ILogger<ConfigParser> parserLogger)
+        {
+            _logger = parserLogger;
+        }
+
         public class InputOutputDef
         {
             public string address { get; set; }
@@ -56,11 +64,11 @@ namespace VRCFaceTracking
 
             if (avatarConfig == null)
             {
-                Logger.Error("Avatar config file for " + newId + " not found");
+                _logger.LogError("Avatar config file for " + newId + " not found");
                 return;
             }
-            
-            Logger.Msg("Parsing config file for avatar: " + avatarConfig.name);
+
+            _logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
             List<IParameter> paramList = new List<IParameter>();

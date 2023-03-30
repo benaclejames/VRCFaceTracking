@@ -9,7 +9,7 @@ namespace VRCFaceTracking
     /// <summary>
     /// Class that contains all relevant data
     /// </summary>
-    public static class UnifiedTracking
+    public class UnifiedTracking
     {
         /// <summary>
         /// Eye image data sent from the loaded eye module.

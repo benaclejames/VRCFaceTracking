@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using VRCFaceTracking;
 using VRCFaceTracking.OSC;
@@ -14,6 +16,7 @@ using VRCFaceTracking_Next.Notifications;
 using VRCFaceTracking_Next.Services;
 using VRCFaceTracking_Next.ViewModels;
 using VRCFaceTracking_Next.Views;
+using static VRCFaceTracking_Next.ViewModels.OutputViewModel;
 
 namespace VRCFaceTracking_Next;
 
@@ -40,7 +43,7 @@ public partial class App : Application
 
         return service;
     }
-
+    private Thread _initThread;
     public static WindowEx MainWindow { get; } = new MainWindow();
 
     public App()
@@ -49,6 +52,12 @@ public partial class App : Application
 
         Host = Microsoft.Extensions.Hosting.Host.
         CreateDefaultBuilder().
+        ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddDebug();
+            logging.AddProvider(new LoggingService.OutputLogProvider());
+        }).
         UseContentRoot(AppContext.BaseDirectory).
         ConfigureServices((context, services) =>
         {
@@ -67,11 +76,18 @@ public partial class App : Application
             services.AddSingleton<IActivationService, ActivationService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
+            LoggingService.Setup(DispatcherQueue.GetForCurrentThread());
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IMainService, MainStandalone>();
-            services.AddSingleton<IOSCService, OscMain>();
+            _initThread = new Thread(() => { services.BuildServiceProvider().GetService<IMainService>().Initialize(); });
+            services.AddSingleton<OscMain>();
+            services.AddSingleton<ConfigParser>();
+            services.AddSingleton<ModuleAttributeHandler>();
+            services.AddSingleton<UnifiedTracking>();
+            UnifiedLibManager.InitializeLogger(services.BuildServiceProvider().GetService<ILoggerFactory>());
+            UnifiedTrackingMutator.InitializeLogger(services.BuildServiceProvider().GetService<ILoggerFactory>());
 
             // Views and ViewModels
             services.AddTransient<SettingsViewModel>();
@@ -111,6 +127,8 @@ public partial class App : Application
         App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
+
+        _initThread.Start();
     }
 
     public static TEnum GetEnum<TEnum>(string text) where TEnum : struct

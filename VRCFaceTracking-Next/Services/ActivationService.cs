@@ -13,20 +13,13 @@ public class ActivationService : IActivationService
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
-    private readonly IMainService _mainService;
-    private readonly Thread _initThread;
-    private readonly OutputPage _outputPage;
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IMainService mainService, OutputPage outputPage)
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
-        _mainService = mainService;
-        _outputPage = outputPage;
-
-        _initThread = new Thread(() => { _mainService.Initialize(); });
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -76,7 +69,6 @@ public class ActivationService : IActivationService
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
-        _initThread.Start();
         await Task.CompletedTask;
     }
 }

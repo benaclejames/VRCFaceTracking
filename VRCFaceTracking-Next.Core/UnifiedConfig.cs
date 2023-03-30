@@ -29,27 +29,27 @@ namespace VRCFaceTracking.Types
                 {
                     if (config.RequestedModulePaths != null && config.RequestedModulePaths.Count > 0)
                     {
-                        Logger.Msg("Saved module load order initialized.");
+                        //Logger.Msg("Saved module load order initialized.");
                         UnifiedLibManager.RequestedModules = UnifiedLibManager.LoadExternalAssemblies(config.RequestedModulePaths.ToArray());
                     }
-                    else Logger.Msg("Load order not found; initializing default order scheme.");
+                    //else //Logger.Msg("Load order not found; initializing default order scheme.");
 
                     if (config.Mutator != null)
                     {
-                        Logger.Msg("Saved data mutation settings loaded.");
+                        //Logger.Msg("Saved data mutation settings loaded.");
                         UnifiedTracking.Mutator = config.Mutator;
                     }
-                    else Logger.Msg("Mutators not found; initializing default mutator.");
+                   // else Logger.Msg("Mutators not found; initializing default mutator.");
                 }
             }
             catch (FileNotFoundException)
             {
-                Logger.Warning("Configuration file not found; creating placeholder 'Config.json' file.");
+                //Logger.Warning("Configuration file not found; creating placeholder 'Config.json' file.");
                 Save();
             }
             catch (JsonException)
             {
-                Logger.Warning("Configuration file has been corrupted, purging file.");
+               // Logger.Warning("Configuration file has been corrupted, purging file.");
                 File.Delete(unifiedConfigPath);
             }
         }

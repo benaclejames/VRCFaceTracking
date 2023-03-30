@@ -25,13 +25,13 @@
             <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
                         <StackPanel Name="LogStack" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,10,10,0">
-                            <TextBlock>The UI was initialized properly.</TextBlock>
-                            <TextBlock>Application is currently in qpro_airlink mode.</TextBlock>
-                            <TextBlock>Awaiting connection with device on 127.0.0.1...</TextBlock>
-                            <TextBlock>Connected!</TextBlock>
-                            <TextBlock>Awaiting connection with OSC...</TextBlock>
-                            <TextBlock>Loaded an avatar with 17 variables!</TextBlock>
-                            
+                            <ItemsControl ItemsSource="{x:Bind Log}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
             </Border>

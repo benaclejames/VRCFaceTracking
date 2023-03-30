@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
+﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking_Next.Core.Contracts.Services;
@@ -15,26 +8,29 @@ namespace VRCFaceTracking;
 public class MainStandalone : IMainService
 {
     public static OscMain OscMain;
-    public static UnifiedConfig unifiedConfig = new();
+    public static UnifiedConfig UnifiedConfig = new();
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
+    private readonly ILogger _logger;
+    
+    public MainStandalone(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger("MainStandalone");
 
     public void Teardown()
     {
-        unifiedConfig.Save();
+        UnifiedConfig.Save();
 
         // Kill our threads
         MasterCancellationTokenSource.Cancel();
         
         Utils.TimeEndPeriod(1);
-        Logger.Msg("VRCFT Standalone Exiting!");
+        _logger.LogInformation("VRCFT Standalone Exiting!");
         UnifiedLibManager.TeardownAllAndReset();
         Console.WriteLine("Shutting down");
     }
 
     public void Initialize()
     {
-        Logger.Msg("VRCFT Initializing!");
+        _logger.LogInformation("VRCFT Initializing!");
 
         // Parse Arguments
         (var outPort, var ip, var inPort, var enableEye, var enableExpression) = ArgsHandler.HandleArgs();
@@ -42,10 +38,10 @@ public class MainStandalone : IMainService
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
         {
-            Logger.Warning("VRCFT detected OSC was disabled and automatically enabled it.");
+            _logger.LogWarning("VRCFT detected OSC was disabled and automatically enabled it.");
             // If we were launched after VRChat
             if (VRChat.IsVRChatRunning())
-                Logger.Error(
+                _logger.LogError(
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
@@ -54,7 +50,7 @@ public class MainStandalone : IMainService
         UnifiedLibManager.ReloadModules();
 
         // Try to load config and propogate data into Unified if they exist.
-        unifiedConfig.ReadConfiguration();
+        UnifiedConfig.ReadConfiguration();
 
         // Initialize Tracking Runtimes
         UnifiedLibManager.SetTrackingEnabled(enableEye, enableExpression);
@@ -64,20 +60,20 @@ public class MainStandalone : IMainService
         OscMain = new OscMain();
         var bindResults = OscMain.Bind(ip, outPort, inPort);
         if (!bindResults.receiverSuccess)
-            Logger.Error(
+            _logger.LogError(
                 "Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
 
         if (!bindResults.senderSuccess)
-            Logger.Error(
+            _logger.LogError(
                 "Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
         ConfigParser.OnConfigLoaded += relevantParams =>
         {
             var deprecatedParams = relevantParams.Count(p => p.Deprecated);
 
-            Logger.Msg(relevantParams.Length + " parameters loaded.");
+            _logger.LogInformation(relevantParams.Length + " parameters loaded.");
             if (deprecatedParams > 0)
-                Logger.Warning(
+                _logger.LogError(
                     deprecatedParams +
                     " Legacy parameters detected. " +
                     "Please consider updating the avatar to use the latest documented parameters.");
@@ -88,12 +84,11 @@ public class MainStandalone : IMainService
         Utils.TimeBeginPeriod(1);
         while (!MasterCancellationTokenSource.IsCancellationRequested)
         {
-            Thread.Sleep(1000);
-            Logger.Msg("AAA");
+            Thread.Sleep(10);
 
             //if (_relevantParamsCount <= 0)
             //    continue;
-
+            
             UnifiedTracking.UpdateData();
 
             // Send all messages in OSCParams.SendQueue

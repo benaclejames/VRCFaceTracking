@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking;
 
@@ -13,8 +14,13 @@ public static class UnifiedLibManager
 {
     #region Delegates
     public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
+
+    private static ILogger _logger;
+
+    public static void InitializeLogger(ILoggerFactory factory) => _logger = factory.CreateLogger("UnifiedLibManager");
+
     #endregion
-    
+
     #region Statuses
     public static ModuleState EyeStatus
     {
@@ -63,10 +69,10 @@ public static class UnifiedLibManager
             // Attempt to initialize the requested runtimes.
             if (modules != null)
                 InitRequestedRuntimes(modules);
-            else Logger.Warning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
+            else _logger.LogWarning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
 
         });
-        Logger.Msg("Starting initialization for " + (_enableEye ? "eye" : "") + (_enableEye && _enableExpression ? " and " : "") + (_enableExpression ? "expression" : "") + " tracking");
+        _logger.LogInformation("Starting initialization for " + (_enableEye ? "eye" : "") + (_enableEye && _enableExpression ? " and " : "") + (_enableExpression ? "expression" : "") + " tracking");
         _initializeWorker.Start();
     }
 
@@ -109,7 +115,7 @@ public static class UnifiedLibManager
 
     private static ExtTrackingModule LoadExternalModule(Assembly dll)
     {
-        Logger.Msg("Loading External Module " + dll.FullName);
+        _logger.LogInformation("Loading External Module " + dll.FullName);
 
         Type module;
         ExtTrackingModule moduleObj;
@@ -125,17 +131,17 @@ public static class UnifiedLibManager
         {
             foreach (var loaderException in e.LoaderExceptions)
             {
-                Logger.Error("LoaderException: " + loaderException.Message);
+                _logger.LogError("LoaderException: " + loaderException.Message);
             }
-            Logger.Error("Exception loading " + dll + ". Skipping.");
+            _logger.LogError("Exception loading " + dll + ". Skipping.");
         }
         catch (BadImageFormatException e)
         {
-            Logger.Error("Encountered a .dll with an invalid format: " + e.Message + ". Skipping...");
+            _logger.LogError("Encountered a .dll with an invalid format: " + e.Message + ". Skipping...");
         }
         catch (TypeLoadException)
         {
-            Logger.Warning("Module " + dll + " does not implement ExtTrackingModule.");
+            _logger.LogWarning("Module " + dll + " does not implement ExtTrackingModule.");
         }
 
         return null;
@@ -152,14 +158,14 @@ public static class UnifiedLibManager
                 foreach(Type type in loaded.GetExportedTypes())
                     if (type.BaseType == typeof(ExtTrackingModule))
                     {
-                        Logger.Msg(type.ToString() + " implements ExtTrackingModule.");
+                        _logger.LogInformation(type.ToString() + " implements ExtTrackingModule.");
                         returnList.Add(loaded);
                         continue;
                     }
             }
             catch (Exception e)
             {
-                Logger.Warning(e.Message + " Assembly not able to be loaded. Skipping.");
+                _logger.LogWarning(e.Message + " Assembly not able to be loaded. Skipping.");
                 continue;
             }
         }
@@ -171,7 +177,7 @@ public static class UnifiedLibManager
             }
             catch(Exception e)
             {
-                Logger.Error(e.Message);
+                _logger.LogError(e.Message);
             }
         }
 
@@ -200,12 +206,12 @@ public static class UnifiedLibManager
             }
             catch (MissingMethodException)
             {
-                Logger.Error(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
+                _logger.LogError(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
             }
             catch (Exception e)
             {
-                Logger.Error("Exception initializing " + module.GetType().Name + ". Skipping.");
-                Logger.Error(e.Message);
+                _logger.LogError("Exception initializing " + module.GetType().Name + ". Skipping.");
+                _logger.LogError(e.Message);
             }
 
             // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
@@ -228,23 +234,23 @@ public static class UnifiedLibManager
 
     private static void InitRequestedRuntimes(List<Assembly> moduleType)
     {
-        Logger.Msg("Initializing runtimes...");
+        _logger.LogInformation("Initializing runtimes...");
 
         foreach (Assembly module in moduleType)
         {
             if (_loadedEyeModule != null && _loadedExpressionModule != null)
                 break;
 
-            Logger.Msg("Initializing module: " + module.ToString());
+            _logger.LogInformation("Initializing module: " + module.ToString());
             ExtTrackingModule loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
         }
 
-        if (EyeStatus != ModuleState.Uninitialized) Logger.Msg("Eye Tracking Initialized via " + _loadedEyeModule);
-        else Logger.Warning("Eye Tracking will be unavailable for this session.");
+        if (EyeStatus != ModuleState.Uninitialized) _logger.LogInformation("Eye Tracking Initialized via " + _loadedEyeModule);
+        else _logger.LogWarning("Eye Tracking will be unavailable for this session.");
 
-        if (ExpressionStatus != ModuleState.Uninitialized) Logger.Msg("Expression Tracking Initialized via " +  _loadedExpressionModule);
-        else Logger.Warning("Expression Tracking will be unavailable for this session.");
+        if (ExpressionStatus != ModuleState.Uninitialized) _logger.LogInformation("Expression Tracking Initialized via " +  _loadedExpressionModule);
+        else _logger.LogWarning("Expression Tracking will be unavailable for this session.");
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
@@ -252,10 +258,10 @@ public static class UnifiedLibManager
     {
         foreach (var module in UsefulThreads)
         {
-            Logger.Msg("Teardown: " + module.Key.GetType().Name);
+            _logger.LogInformation("Teardown: " + module.Key.GetType().Name);
             module.Key.Teardown();
             module.Value.Cancel();
-            Logger.Msg("Teardown complete: " + module.Key.GetType().Name);
+            _logger.LogInformation("Teardown complete: " + module.Key.GetType().Name);
         }
         UsefulThreads.Clear();
         
