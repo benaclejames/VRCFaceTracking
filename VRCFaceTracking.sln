@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking", "VRCFaceTracking-Next\VRCFaceTracking.csproj", "{8A8F34CE-16E0-4876-84DA-F10A5DF8C153}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking", "VRCFaceTracking\VRCFaceTracking.csproj", "{8A8F34CE-16E0-4876-84DA-F10A5DF8C153}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking-Next.Core", "VRCFaceTracking-Next.Core\VRCFaceTracking-Next.Core.csproj", "{212010C5-82A6-411D-BF4F-B1A65287475D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.Core", "VRCFaceTracking.Core\VRCFaceTracking.Core.csproj", "{212010C5-82A6-411D-BF4F-B1A65287475D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

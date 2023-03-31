@@ -43,9 +43,9 @@ bin/
 obj/
 
 # Ignore files in the VRCFaceTracking-Next folder
-/VRCFaceTracking-Next/bin/
-/VRCFaceTracking-Next/obj/
+/VRCFaceTracking/bin/
+/VRCFaceTracking/obj/
 
 # Ignore files in the VRCFaceTracking-Next.Core folder
-/VRCFaceTracking-Next.Core/bin/
-/VRCFaceTracking-Next.Core/obj/
+/VRCFaceTracking.Core/bin/
+/VRCFaceTracking.Core/obj/

@@ -16,8 +16,13 @@ public static class UnifiedLibManager
     public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
 
     private static ILogger _logger;
+    private static ILoggerFactory _loggerFactory;
 
-    public static void InitializeLogger(ILoggerFactory factory) => _logger = factory.CreateLogger("UnifiedLibManager");
+    public static void InitializeLogger(ILoggerFactory factory)
+    {
+        _loggerFactory = factory;
+        _logger = factory.CreateLogger("UnifiedLibManager");
+    }
 
     #endregion
 
@@ -199,6 +204,8 @@ public static class UnifiedLibManager
     {
         if (module.Supported.SupportsEye || module.Supported.SupportsExpression)
         {
+            module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
+
             bool eyeSuccess = false, expressionSuccess = false;
             try
             {

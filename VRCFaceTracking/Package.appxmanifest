@@ -49,7 +49,7 @@
 
           <com:Extension Category="windows.comServer">
               <com:ComServer>
-                  <com:ExeServer Executable="VRCFaceTracking-Next.exe" Arguments="----AppNotificationActivated:" DisplayName="Toast activator">
+                  <com:ExeServer Executable="VRCFaceTracking.exe" Arguments="----AppNotificationActivated:" DisplayName="Toast activator">
                       <com:Class Id="B3A39389-0C30-4922-8C92-08DCD8E83445" DisplayName="Toast activator"/>
                   </com:ExeServer>
               </com:ComServer>

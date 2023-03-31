@@ -1,9 +1,9 @@
 ﻿{
     "profiles": {
-      "VRCFaceTracking-Next (Package)": {
+      "VRCFaceTracking (Package)": {
         "commandName": "MsixPackage"
       },
-      "VRCFaceTracking-Next (Unpackaged)": {
+      "VRCFaceTracking (Unpackaged)": {
         "commandName": "Project"
       }
     }

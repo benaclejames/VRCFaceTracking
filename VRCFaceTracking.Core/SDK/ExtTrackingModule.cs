@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking
 {
@@ -10,6 +11,8 @@ namespace VRCFaceTracking
         // Should the module be writing to UnifiedTrackingData for eye or lip tracking updates.
         public (ModuleState EyeState, ModuleState ExpressionState) Status = (ModuleState.Uninitialized,
             ModuleState.Uninitialized);
+
+        public ILogger Logger;
 
         public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
 
