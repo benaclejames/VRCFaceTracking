@@ -67,9 +67,34 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private void RecvPort_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    private async void RecvPort_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
         var oldValue = args.OldValue;
         var newValue = args.NewValue;
+
+        if (oldValue == newValue) return;
+
+        ViewModel.RecvPort = (int)newValue;
+        var success = await ViewModel.ReInitOsc();
+        if (!success.Item1)
+        {
+            // If Recv not Success
+            //TODO: Mark box as red-ish or add exclamation mark or something
+        }
+    }
+    private async void SendPort_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        var oldValue = args.OldValue;
+        var newValue = args.NewValue;
+
+        if (oldValue == newValue) return;
+
+        ViewModel.SendPort = (int)newValue;
+        var success = await ViewModel.ReInitOsc();
+        if (!success.Item2)
+        {
+            // If Send not Success
+            //TODO: Mark box as red-ish or add exclamation mark or something
+        }
     }
 }

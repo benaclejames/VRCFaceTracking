@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Contracts.Services;
+﻿namespace VRCFaceTracking_Next.Core.Contracts.Services;
 
 public interface ILocalSettingsService
 {

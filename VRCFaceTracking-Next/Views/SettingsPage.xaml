@@ -72,7 +72,8 @@
                             SpinButtonPlacementMode="Inline"
                             SmallChange="1"
                             LargeChange="10" 
-                            Margin="15, 0, 15, 0"/>
+                            Margin="15, 0, 15, 0"
+                            ValueChanged="SendPort_ValueChanged"/>
                     </StackPanel>
                 </Grid>
             </labs:SettingsCard>

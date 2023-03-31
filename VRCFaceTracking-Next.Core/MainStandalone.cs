@@ -7,13 +7,17 @@ namespace VRCFaceTracking;
 
 public class MainStandalone : IMainService
 {
-    public static OscMain OscMain;
-    public static UnifiedConfig UnifiedConfig = new();
+    public IOSCService OscMain;
+    public UnifiedConfig UnifiedConfig = new();
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
     
-    public MainStandalone(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger("MainStandalone");
+    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService)
+    {
+        _logger = loggerFactory.CreateLogger("MainStandalone");
+        OscMain = oscService;
+    }
 
     public void Teardown()
     {
@@ -28,12 +32,9 @@ public class MainStandalone : IMainService
         Console.WriteLine("Shutting down");
     }
 
-    public void Initialize()
+    public async Task InitializeAsync()
     {
         _logger.LogInformation("VRCFT Initializing!");
-
-        // Parse Arguments
-        (var outPort, var ip, var inPort, var enableEye, var enableExpression) = ArgsHandler.HandleArgs();
 
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
@@ -53,19 +54,8 @@ public class MainStandalone : IMainService
         UnifiedConfig.ReadConfiguration();
 
         // Initialize Tracking Runtimes
-        UnifiedLibManager.SetTrackingEnabled(enableEye, enableExpression);
+        UnifiedLibManager.SetTrackingEnabled(true, true);
         UnifiedLibManager.Initialize();
-
-        // Initialize Locals
-        OscMain = new OscMain();
-        var bindResults = OscMain.Bind(ip, outPort, inPort);
-        if (!bindResults.receiverSuccess)
-            _logger.LogError(
-                "Socket failed to bind to receiver port, please ensure it's not already in use by another program or specify a different one instead.");
-
-        if (!bindResults.senderSuccess)
-            _logger.LogError(
-                "Socket failed to bind to sender port, please ensure it's not already in use by another program or specify a different one instead.");
 
         ConfigParser.OnConfigLoaded += relevantParams =>
         {
@@ -82,32 +72,38 @@ public class MainStandalone : IMainService
 
         // Begin main OSC update loop
         Utils.TimeBeginPeriod(1);
-        while (!MasterCancellationTokenSource.IsCancellationRequested)
+        ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
         {
-            Thread.Sleep(10);
-
-            //if (_relevantParamsCount <= 0)
-            //    continue;
-            
-            UnifiedTracking.UpdateData();
-
-            // Send all messages in OSCParams.SendQueue
-            if (OSCParams.SendQueue.Count <= 0) continue;
-
-            var relevantMessages = OSCParams.SendQueue.ToArray();
-            var messageIndex = 0;
-            while (messageIndex < relevantMessages.Length)
+            var token = (CancellationToken)ct;
+            while (!token.IsCancellationRequested)
             {
-                var buffer = new byte[4096];
-                var length = SROSCLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
-                    ref messageIndex);
-                if (length > 4096)
-                    throw new Exception("Bundle size is too large! This should never happen.");
+                Thread.Sleep(10);
 
-                OscMain.Send(buffer, length);
+                //if (_relevantParamsCount <= 0)
+                //    continue;
+
+                UnifiedTracking.UpdateData();
+
+                // Send all messages in OSCParams.SendQueue
+                if (OSCParams.SendQueue.Count <= 0) continue;
+
+                var relevantMessages = OSCParams.SendQueue.ToArray();
+                var messageIndex = 0;
+                while (messageIndex < relevantMessages.Length)
+                {
+                    var buffer = new byte[4096];
+                    var length = SROSCLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
+                        ref messageIndex);
+                    if (length > 4096)
+                        throw new Exception("Bundle size is too large! This should never happen.");
+
+                    //TOOD: OscMain.Send(buffer, length);
+                }
+
+                OSCParams.SendQueue.Clear();
             }
+        }), MasterCancellationTokenSource.Token);
 
-            OSCParams.SendQueue.Clear();
-        }
+        await Task.CompletedTask;
     }
 }

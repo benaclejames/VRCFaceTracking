@@ -8,5 +8,5 @@ namespace VRCFaceTracking_Next.Core.Contracts.Services;
 public interface IMainService
 {
     void Teardown();
-    void Initialize();
+    Task InitializeAsync();
 }

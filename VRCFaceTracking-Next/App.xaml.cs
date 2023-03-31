@@ -43,7 +43,7 @@ public partial class App : Application
 
         return service;
     }
-    private Thread _initThread;
+
     public static WindowEx MainWindow { get; } = new MainWindow();
 
     public App()
@@ -80,9 +80,8 @@ public partial class App : Application
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IOSCService, OscMain>();
             services.AddSingleton<IMainService, MainStandalone>();
-            _initThread = new Thread(() => { services.BuildServiceProvider().GetService<IMainService>().Initialize(); });
-            services.AddSingleton<OscMain>();
             services.AddSingleton<ConfigParser>();
             services.AddSingleton<ModuleAttributeHandler>();
             services.AddSingleton<UnifiedTracking>();
@@ -127,8 +126,6 @@ public partial class App : Application
         App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
-
-        _initThread.Start();
     }
 
     public static TEnum GetEnum<TEnum>(string text) where TEnum : struct

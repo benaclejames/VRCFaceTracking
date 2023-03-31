@@ -10,6 +10,7 @@ using VRCFaceTracking_Next.Contracts.Services;
 using VRCFaceTracking_Next.Helpers;
 
 using Windows.ApplicationModel;
+using VRCFaceTracking_Next.Core.Contracts.Services;
 
 namespace VRCFaceTracking_Next.ViewModels;
 
@@ -18,7 +19,9 @@ public class SettingsViewModel : ObservableRecipient
     private readonly IThemeSelectorService _themeSelectorService;
     private ElementTheme _elementTheme;
     private string _versionDescription;
-    private int _recvPort;
+    private readonly IOSCService _oscService;
+    private int _recvPort, _sendPort;
+    private string _address;
 
     public ElementTheme ElementTheme
     {
@@ -40,15 +43,29 @@ public class SettingsViewModel : ObservableRecipient
     public int RecvPort
     {
         get => _recvPort;
-        set => SetProperty(ref _recvPort, value);
+        set 
+        {
+            _oscService.InPort = value;
+            SetProperty(ref _recvPort, value);
+        }
     }
 
-    private readonly ILocalSettingsService _localSettingsService;
+    public int SendPort
+    {
+        get => _sendPort;
+        set
+        {
+            _oscService.OutPort = value;
+            SetProperty(ref _sendPort, value);
+        }
+    }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService, ILocalSettingsService localSettingsService)
+    public Task<(bool, bool)> ReInitOsc() => _oscService.InitializeAsync();
+
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, IOSCService oscService)
     {
         _themeSelectorService = themeSelectorService;
-        _localSettingsService = localSettingsService;
+        _oscService = oscService;
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
 

@@ -7,5 +7,11 @@ using System.Threading.Tasks;
 namespace VRCFaceTracking_Next.Core.Contracts.Services;
 public interface IOSCService
 {
-    (bool senderSuccess, bool receiverSuccess) Bind(string address, int outPort, int inPort);
+    int InPort { get; set; }
+    int OutPort { get; set; }
+    string Address { get; set; }
+
+    Task SaveSettings();
+    Task LoadSettings();
+    Task<(bool, bool)> InitializeAsync();
 }

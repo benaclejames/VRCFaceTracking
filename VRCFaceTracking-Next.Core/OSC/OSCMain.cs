@@ -3,39 +3,116 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using VRCFaceTracking_Next.Core.Contracts.Services;
 
 namespace VRCFaceTracking.OSC
 {
     public class OscMain : IOSCService
     {
-        private static readonly Socket SenderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private static readonly Socket ReceiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        private static Socket SenderClient, ReceiverClient;
         private static Thread _receiveThread;
+        private static CancellationTokenSource _recvThreadCts;
+        private readonly ILocalSettingsService _localSettingsService;
+        private readonly ILogger _logger;
 
-        public (bool senderSuccess, bool receiverSuccess) Bind(string address, int outPort, int inPort)
+        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory)
         {
-            (bool senderSuccess, bool receiverSuccess) = (false, false);
+            _localSettingsService = localSettingsService;
+            _logger = loggerFactory.CreateLogger("OSC");
+        }
+
+        public int InPort { get; set; }
+        public int OutPort { get; set; }
+        public string Address { get; set; }
+
+
+        public async Task LoadSettings()
+        {
+            var address = await _localSettingsService.ReadSettingAsync<string>("OSCAddress");
+            Address = address == default ? "127.0.0.1" : address;
+
+            var inPort = await _localSettingsService.ReadSettingAsync<int>("OSCInPort");
+            InPort = inPort == default ? 9001 : inPort;
+
+            var outPort = await _localSettingsService.ReadSettingAsync<int>("OSCOutPort");
+            OutPort = outPort == default ? 9000 : outPort;
+
+            await Task.CompletedTask;
+        }
+
+        public async Task SaveSettings()
+        {
+            await _localSettingsService.SaveSettingAsync("OSCAddress", Address);
+            await _localSettingsService.SaveSettingAsync("OSCInPort", InPort);
+            await _localSettingsService.SaveSettingAsync("OSCOutPort", OutPort);
+
+            await Task.CompletedTask;
+        }
+
+        public async Task<(bool, bool)> InitializeAsync()
+        {
+            await LoadSettings();
+            var result = (false, false);
+
+            if (string.IsNullOrWhiteSpace(Address))
+                return result;  // Return both false as we cant bind to anything without an address
+
+            result.Item1 = BindListener();
+            result.Item2 = BindSender();
+
+            await Task.CompletedTask;
+            return result;
+        }
+
+        private bool BindSender()
+        {
+            _logger.LogTrace("Binding Sender Client");
+            SenderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
             try
             {
-                SenderClient.Connect(new IPEndPoint(IPAddress.Parse(address), outPort));
-                senderSuccess = true;
-                ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(address), inPort));
-                receiverSuccess = true;
-                ReceiverClient.ReceiveTimeout = 1000;
-                
-                _receiveThread = new Thread(() =>
-                {
-                    while (!MainStandalone.MasterCancellationTokenSource.IsCancellationRequested)
-                        Recv();
-                });
-                _receiveThread.Start();
+                SenderClient.Connect(new IPEndPoint(IPAddress.Parse(Address), OutPort));
             }
-            catch (Exception)
+            catch
             {
-                return (senderSuccess, receiverSuccess);
+                return false;
             }
-            return (true, true);
+
+            return true;
+        }
+
+        private bool BindListener()
+        {
+            _logger.LogTrace("Binding Receiver Client");
+            ReceiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            try
+            {
+                ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(Address), InPort));
+
+                StartListenerThread();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void StartListenerThread()
+        {
+            _recvThreadCts?.Cancel();    // In theory, the closure of the client should have already cancelled the token, but just in case
+
+            var newToken = new CancellationTokenSource();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
+            {
+                var token = (CancellationToken)ct;
+                while (!token.IsCancellationRequested)
+                    Recv();
+            }), newToken.Token);
+            _recvThreadCts = newToken;
         }
 
         private void Recv()
@@ -45,7 +122,7 @@ namespace VRCFaceTracking.OSC
             {
                 ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
             }
-            catch (SocketException)
+            catch (Exception)
             {
                 // Ignore as this is most likely a timeout exception
                 return;

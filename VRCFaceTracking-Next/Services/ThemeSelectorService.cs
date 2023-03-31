@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 
 using VRCFaceTracking_Next.Contracts.Services;
+using VRCFaceTracking_Next.Core.Contracts.Services;
 using VRCFaceTracking_Next.Helpers;
 
 namespace VRCFaceTracking_Next.Services;

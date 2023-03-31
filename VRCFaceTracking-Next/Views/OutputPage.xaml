@@ -23,7 +23,7 @@
             </Border>
 
             <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                         <StackPanel Name="LogStack" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,10,10,0">
                             <ItemsControl ItemsSource="{x:Bind Log}">
                                 <ItemsControl.ItemTemplate>
