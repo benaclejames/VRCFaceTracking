@@ -68,7 +68,7 @@ namespace VRCFaceTracking
                 return;
             }
 
-            _logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
+            //_logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
             List<IParameter> paramList = new List<IParameter>();

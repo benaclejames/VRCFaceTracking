@@ -102,7 +102,7 @@ public class MainStandalone : IMainService
                     if (length > 4096)
                         throw new Exception("Bundle size is too large! This should never happen.");
 
-                    //TOOD: OscMain.Send(buffer, length);
+                    OscMain.Send(buffer, length);
                 }
 
                 OSCParams.SendQueue.Clear();

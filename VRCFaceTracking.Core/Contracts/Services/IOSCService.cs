@@ -13,5 +13,6 @@ public interface IOSCService
 
     Task SaveSettings();
     Task LoadSettings();
+    void Send(byte[] data, int length);
     Task<(bool, bool)> InitializeAsync();
 }
