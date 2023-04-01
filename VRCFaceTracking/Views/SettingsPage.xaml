@@ -59,21 +59,19 @@
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                         <NumberBox x:Name="RecvPort"
                             Header="Receive Port"
-                            Value="9001"
                             SpinButtonPlacementMode="Inline"
                             SmallChange="1"
                             LargeChange="10"
                             Margin="15, 0, 15, 0"
-                            ValueChanged="RecvPort_ValueChanged"/>
-                        <TextBox Header="IP Address" PlaceholderText="127.0.0.1" Text="127.0.0.1" />
+                            ValueChanged="RecvPort_OnValueChanged"/>
+                        <TextBox x:Name="Address" Header="IP Address" PlaceholderText="127.0.0.1" Text="127.0.0.1" TextChanged="TextBox_OnTextChanged"/>
                         <NumberBox x:Name="SendPort"
                             Header="Send Port"
-                            Value="9000"
                             SpinButtonPlacementMode="Inline"
                             SmallChange="1"
                             LargeChange="10" 
                             Margin="15, 0, 15, 0"
-                            ValueChanged="SendPort_ValueChanged"/>
+                            ValueChanged="SendPort_OnValueChanged"/>
                     </StackPanel>
                 </Grid>
             </labs:SettingsCard>

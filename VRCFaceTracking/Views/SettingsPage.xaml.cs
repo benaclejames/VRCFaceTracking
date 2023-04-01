@@ -1,7 +1,5 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using VRCFaceTracking_Next.Helpers;
 using VRCFaceTracking_Next.ViewModels;
 using Windows.System;
 
@@ -43,6 +41,10 @@ public sealed partial class SettingsPage : Page
             case ElementTheme.Default:
                 themeMode.SelectedIndex = 2; break;
         }
+        
+        RecvPort.Value = ViewModel.RecvPort;
+        SendPort.Value = ViewModel.SendPort;
+        Address.Text = ViewModel.Address;
     }
 
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
@@ -67,34 +69,18 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async void RecvPort_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    private async void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        var oldValue = args.OldValue;
-        var newValue = args.NewValue;
+        var value = ((TextBox)sender).Text;
 
-        if (oldValue == newValue) return;
-
-        ViewModel.RecvPort = (int)newValue;
-        var success = await ViewModel.ReInitOsc();
-        if (!success.Item1)
+        // Ensure it passes the regex for an IP address
+        if (System.Text.RegularExpressions.Regex.IsMatch(value, @"^(\d{1,3}\.){3}\d{1,3}$"))
         {
-            // If Recv not Success
-            //TODO: Mark box as red-ish or add exclamation mark or something
+            await ViewModel.SetAddress(value);
         }
     }
-    private async void SendPort_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
-    {
-        var oldValue = args.OldValue;
-        var newValue = args.NewValue;
 
-        if (oldValue == newValue) return;
+    private async void SendPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => await ViewModel.SetSendPort((int)args.NewValue);
 
-        ViewModel.SendPort = (int)newValue;
-        var success = await ViewModel.ReInitOsc();
-        if (!success.Item2)
-        {
-            // If Send not Success
-            //TODO: Mark box as red-ish or add exclamation mark or something
-        }
-    }
+    private async void RecvPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => await ViewModel.SetRecvPort((int)args.NewValue);
 }

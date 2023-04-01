@@ -20,7 +20,7 @@ public class SettingsViewModel : ObservableRecipient
     private ElementTheme _elementTheme;
     private string _versionDescription;
     private readonly IOSCService _oscService;
-    private int _recvPort, _sendPort;
+    private int _inPort, _outPort;
     private string _address;
 
     public ElementTheme ElementTheme
@@ -42,30 +42,67 @@ public class SettingsViewModel : ObservableRecipient
 
     public int RecvPort
     {
-        get => _recvPort;
-        set 
-        {
-            _oscService.InPort = value;
-            SetProperty(ref _recvPort, value);
-        }
+        get => _inPort;
+        private set => SetProperty(ref _inPort, value);
     }
 
     public int SendPort
     {
-        get => _sendPort;
-        set
-        {
-            _oscService.OutPort = value;
-            SetProperty(ref _sendPort, value);
-        }
+        get => _outPort;
+        private set => SetProperty(ref _outPort, value);
     }
 
-    public Task<(bool, bool)> ReInitOsc() => _oscService.InitializeAsync();
+    public string Address
+    {
+        get => _address;
+        private set => SetProperty(ref _address, value);
+    }
+
+    public async Task SetRecvPort(int port)
+    {
+        if (RecvPort == port)
+            return;
+
+        RecvPort = port;
+
+        _oscService.InPort = port;
+        await _oscService.SaveSettings();
+        await _oscService.InitializeAsync();
+    }
+
+    public async Task SetSendPort(int port)
+    {
+        if (SendPort == port)
+            return;
+
+        SendPort = port;
+
+        _oscService.OutPort = port;
+        await _oscService.SaveSettings();
+        await _oscService.InitializeAsync();
+    }
+
+    public async Task SetAddress(string address)
+    {
+        if (Address == address)
+            return;
+
+        Address = address;
+
+        _oscService.Address = address;
+        await _oscService.SaveSettings();
+        await _oscService.InitializeAsync();
+    }
 
     public SettingsViewModel(IThemeSelectorService themeSelectorService, IOSCService oscService)
     {
         _themeSelectorService = themeSelectorService;
         _oscService = oscService;
+
+        _inPort = _oscService.InPort;
+        _outPort = _oscService.OutPort;
+        _address = _oscService.Address;
+
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
 

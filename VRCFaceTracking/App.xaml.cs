@@ -16,7 +16,6 @@ using VRCFaceTracking_Next.Notifications;
 using VRCFaceTracking_Next.Services;
 using VRCFaceTracking_Next.ViewModels;
 using VRCFaceTracking_Next.Views;
-using static VRCFaceTracking_Next.ViewModels.OutputViewModel;
 
 namespace VRCFaceTracking_Next;
 
