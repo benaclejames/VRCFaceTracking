@@ -32,6 +32,11 @@ public class MainStandalone : IMainService
         Console.WriteLine("Shutting down");
     }
 
+    public void SetEnabled(bool enabledEyes, bool enabledExpression)
+    {
+        UnifiedLibManager.SetTrackingEnabled(enabledEyes, enabledExpression);
+    }
+
     public async Task InitializeAsync()
     {
         _logger.LogInformation("VRCFT Initializing!");

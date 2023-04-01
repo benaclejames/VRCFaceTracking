@@ -29,8 +29,14 @@
                         <TextBlock>Face Tracking Possible</TextBlock>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ToggleButton Margin="15, 0" Padding="15" Content="Toggle Eye Tracking" IsChecked="True"/>
-                        <ToggleButton Margin="15, 0, 25, 0" Padding="15" Content="Toggle Face Tracking" IsChecked="True"/>
+                        <ToggleButton Margin="15, 0" 
+                                      Padding="15"
+                                      Content="Toggle Eye Tracking"
+                                      IsChecked="{x:Bind ViewModel.EyeEnabled, Mode=TwoWay}"/>
+                        <ToggleButton Margin="15, 0, 25, 0" 
+                                      Padding="15" 
+                                      Content="Toggle Face Tracking" 
+                                      IsChecked="{x:Bind ViewModel.ExpressionEnabled, Mode=TwoWay}"/>
                     </StackPanel>
                 </Grid>
             </Border>

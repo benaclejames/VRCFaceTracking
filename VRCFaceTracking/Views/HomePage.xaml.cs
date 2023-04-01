@@ -1,5 +1,6 @@
-﻿using Microsoft.UI.Xaml.Controls;
-
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using VRCFaceTracking_Next.Core.Contracts.Services;
 using VRCFaceTracking_Next.ViewModels;
 
 namespace VRCFaceTracking_Next.Views;
