@@ -16,7 +16,7 @@ namespace VRCFaceTracking
 
         public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
 
-        public abstract Action GetUpdateThreadFunc(CancellationToken token);
+        public abstract void Update();
 
         public abstract void Teardown();
     }

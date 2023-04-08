@@ -44,7 +44,7 @@ namespace VRCFaceTracking
 
         public static Action<IParameter[]> OnConfigLoaded = _ => { };
 
-        public static void ParseNewAvatar(string newId)
+        public void ParseNewAvatar(string newId)
         {
             AvatarConfigSpec avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))

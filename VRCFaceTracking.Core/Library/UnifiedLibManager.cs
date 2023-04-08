@@ -195,8 +195,12 @@ public static class UnifiedLibManager
             return;
 
         var cts = new CancellationTokenSource();
-        ThreadPool.QueueUserWorkItem(
-            new WaitCallback(state => module.GetUpdateThreadFunc((CancellationToken)state).Invoke()), cts.Token);
+        ThreadPool.QueueUserWorkItem(new WaitCallback(state =>
+        {
+            var token = (CancellationToken)state;
+            while(!token.IsCancellationRequested)
+                module.Update();
+        }), cts.Token);
         UsefulThreads.Add(module, cts);
     }
 

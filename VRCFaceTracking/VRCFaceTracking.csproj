@@ -28,7 +28,6 @@
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/download/v4.0.0/VRCFaceTracking.exe</AppInstallerUri>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="Assets\FaceTrackingIcon3.png" />
     <Content Remove="Assets\qpro - Copy.png" />
     <Content Remove="Assets\qpro.png" />
     <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
@@ -49,6 +48,7 @@
     <Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
     <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
     <Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
+    <Content Remove="Assets\StoreLogo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\qpro.png" />

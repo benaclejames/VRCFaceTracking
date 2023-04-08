@@ -17,7 +17,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Margin="10, 4">Save To File</Button>
+                        <Button Margin="10, 4" Click="ButtonBase_OnClick">Save To File</Button>
                     </StackPanel>
                 </Grid>
             </Border>
