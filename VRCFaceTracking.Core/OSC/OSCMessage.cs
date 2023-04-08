@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using VRCFaceTracking_Next.Core.Types;
+using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking.OSC;
 
@@ -10,24 +12,22 @@ public enum OscValueType : byte {
     Float = 1,
     Bool = 2,
     String = 3,
-    Vector3 = 4,
-    Vector2 = 5,
+    Vector2 = 4,
+    Vector3 = 5,
+    Vector4 = 6,
+    Vector6 = 7,
 }
 
 [StructLayout(LayoutKind.Sequential)]
 public struct OscValue {
     [MarshalAs(UnmanagedType.I4)]
     public int IntValue;
-    [MarshalAs(UnmanagedType.R4)]
-    public float FloatValue;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+    public float[] FloatValues;
     [MarshalAs(UnmanagedType.I1)]
     public bool BoolValue;
     [MarshalAs(UnmanagedType.LPStr)]
     public string StringValue; // Use IntPtr for pointer types
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-    public float[] Vector3;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-    public float[] Vector2;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -44,7 +44,7 @@ public struct OscMessageMeta {
 public static class SROSCLib
 {
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int parse_osc(byte[] buffer, int bufferLength, int offset, ref OscMessageMeta message);
+    public static extern bool parse_osc(byte[] buffer, int bufferLength, ref OscMessageMeta message);
     
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_message([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, ref OscMessageMeta osc_template);
@@ -70,6 +70,11 @@ public class OscMessage
         set => _meta.Type = value;
     }
 
+    public object CachedValue
+    {
+        get;
+        private set;
+    }
     public object Value
     {
         get
@@ -79,33 +84,52 @@ public class OscMessage
                 case OscValueType.Bool:
                     return _meta.Value.BoolValue;
                 case OscValueType.Float:
-                    return _meta.Value.FloatValue;
+                    return _meta.Value.FloatValues[0];
                 case OscValueType.Int:
                     return _meta.Value.IntValue;
                 case OscValueType.String:
                     return _meta.Value.StringValue;
+                case OscValueType.Vector2:
+                    return new Vector2(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1]);
+                case OscValueType.Vector3:
+                    return new Vector3(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1], _meta.Value.FloatValues[2]);
+                case OscValueType.Vector4:
+                    return new Vector4(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1], _meta.Value.FloatValues[2], _meta.Value.FloatValues[3]);
                 default:
                     return null;
             }
         }
         set
         {
-            // Unbox time
-            switch (value)
+            switch (TypeIdentifier)
             {
-                case int intValue:
-                    TypeIdentifier = OscValueType.Int;
-                    _meta.Value.IntValue = intValue;
+                case OscValueType.Int:
+                    _meta.Value.IntValue = (int)value;
                     break;
-                case float floatValue:
-                    TypeIdentifier = OscValueType.Float;
-                    _meta.Value.FloatValue = floatValue;
+                case OscValueType.Float:
+                    _meta.Value.FloatValues = new []{(float)value, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
                     break;
-                case bool boolValue:
-                    TypeIdentifier = OscValueType.Bool;
-                    _meta.Value.BoolValue = boolValue;
+                case OscValueType.Bool:
+                    _meta.Value.BoolValue = (bool)value;
+                    break;
+                case OscValueType.String:
+                    _meta.Value.StringValue = (string)value;
+                    break;
+                case OscValueType.Vector2:
+                    var val = (Vector2)value;
+                    _meta.Value.FloatValues = new []{val.x, val.y, 0.0f, 0.0f, 0.0f, 0.0f};
+                    break;
+                case OscValueType.Vector3:
+                    var val3 = (Vector3)value;
+                    _meta.Value.FloatValues = new []{val3.x, val3.y, val3.z, 0.0f, 0.0f, 0.0f};
+                    break;
+                case OscValueType.Vector4:
+                    var val4 = (Vector4)value;
+                    _meta.Value.FloatValues = new []{val4.x, val4.y, val4.z, val4.w, 0.0f, 0.0f};
                     break;
             }
+            
+            CachedValue = value;
         }
     }
 
@@ -117,5 +141,5 @@ public class OscMessage
     
     public OscMessage(string address, Type type) : this(address, OscUtils.TypeConversions[type].oscType) {}
 
-    public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, 0, ref _meta);
+    public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, ref _meta);
 }

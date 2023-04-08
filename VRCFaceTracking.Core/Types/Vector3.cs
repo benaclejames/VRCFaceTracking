@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking_Next.Core.Types
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector3

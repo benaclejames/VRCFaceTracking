@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using VRCFaceTracking_Next.Core.Types;
 using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Params
@@ -9,6 +10,22 @@ namespace VRCFaceTracking.Params
         public FloatParameter(Func<UnifiedTrackingData, float> getValueFunc,
             string paramName)
             : base(paramName, getValueFunc) { }
+    }
+    
+    public class AlwaysRelevantParameter<T> : OSCParams.BaseParam<T>
+    {
+        public AlwaysRelevantParameter(Func<UnifiedTrackingData, T> getValueFunc,
+            string paramAddress)
+            : base(OSCParams.CurrentVersionPrefix, getValueFunc)
+        {
+            OscMessage.Address = paramAddress;
+            Relevant = true;
+        }
+
+        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        {
+            return new IParameter[] {this};
+        }
     }
 
     public class BoolParameter : OSCParams.BaseParam<bool>

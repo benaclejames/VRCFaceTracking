@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using System.Windows;
+﻿using VRCFaceTracking_Next.Core.Types;
 
 namespace VRCFaceTracking.Params
 {

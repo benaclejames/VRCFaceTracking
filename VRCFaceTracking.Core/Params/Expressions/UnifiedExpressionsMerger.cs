@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VRCFaceTracking_Next.Core.Types;
 
 namespace VRCFaceTracking.Params
 {
     public static class UnifiedExpressionsMerger
     {
+        public static Random rand = new Random();
         public static readonly IParameter[] UnifiedCombinedShapes =
         {    
             // Unified Eye Definitions
@@ -17,6 +14,15 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Eye.Combined().Gaze, "v2/Eyes"),
             new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
             new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
+            new AlwaysRelevantParameter<Vector4>(exp =>
+            {
+                float[] randomFloats = new float[6];
+
+                for (int i = 0; i < randomFloats.Length; i++) {
+                    randomFloats[i] = (float) (rand.NextDouble() * 720 - 360);
+                }
+                return new Vector4(randomFloats[0], randomFloats[1], randomFloats[2], randomFloats[3]);
+            }, "/tracking/eye/LeftRightPitchYaw"),
             
             #endregion
 

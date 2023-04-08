@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using VRCFaceTracking_Next.Core.Types;
 
 namespace VRCFaceTracking.OSC
 {
@@ -11,6 +10,10 @@ namespace VRCFaceTracking.OSC
                 {typeof(bool), (OscValueType.Bool, "Bool")},
                 {typeof(float), (OscValueType.Float, "Float")},
                 {typeof(int), (OscValueType.Int, "Int")},
+                {typeof(string), (OscValueType.String, "String")},
+                {typeof(Vector2), (OscValueType.Vector2, "Vector2")},
+                {typeof(Vector3), (OscValueType.Vector3, "Vector3")},
+                {typeof(Vector4), (OscValueType.Vector4, "Vector4")},
             };
     }
 }

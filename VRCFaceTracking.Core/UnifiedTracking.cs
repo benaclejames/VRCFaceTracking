@@ -48,7 +48,7 @@ namespace VRCFaceTracking
         /// <summary>
         /// Central update action for all expression data to subscribe to.
         /// </summary>
-        public static Action<UnifiedTrackingData> OnUnifiedDataUpdated = _ => { };
+        public static Action<UnifiedTrackingData> OnUnifiedDataUpdated = OnUnifiedDataUpdated ?? (data => {}); 
 
         /// <summary>
         /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.

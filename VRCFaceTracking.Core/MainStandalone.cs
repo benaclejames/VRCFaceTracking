@@ -12,7 +12,6 @@ public class MainStandalone : IMainService
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
-    private int _relevantParams = 0;
     
     public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService)
     {
@@ -55,7 +54,7 @@ public class MainStandalone : IMainService
 
         // Load all available modules.
         UnifiedLibManager.ReloadModules();
-
+        
         // Try to load config and propogate data into Unified if they exist.
         UnifiedConfig.ReadConfiguration();
 
@@ -65,7 +64,6 @@ public class MainStandalone : IMainService
 
         ConfigParser.OnConfigLoaded += relevantParams =>
         {
-            this._relevantParams = relevantParams.Length;
             var deprecatedParams = relevantParams.Count(p => p.Deprecated);
 
             _logger.LogInformation(relevantParams.Length + " parameters loaded.");
@@ -86,9 +84,6 @@ public class MainStandalone : IMainService
             {
                 Thread.Sleep(10);
 
-                if (_relevantParams <= 0)
-                    continue;
-                
                 UnifiedTracking.UpdateData();
 
                 // Send all messages in OSCParams.SendQueue

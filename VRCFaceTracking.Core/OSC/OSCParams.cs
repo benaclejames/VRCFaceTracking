@@ -9,7 +9,7 @@ namespace VRCFaceTracking.OSC
     public class OSCParams
     {
         private const string DefaultPrefix = "/avatar/parameters/";
-        private const string CurrentVersionPrefix = "v2/";
+        public const string CurrentVersionPrefix = "v2/";
         
         public static readonly List<OscMessageMeta> SendQueue = new();
         
@@ -24,7 +24,7 @@ namespace VRCFaceTracking.OSC
             public bool Relevant
             {
                 get => _relevant;
-                private set
+                protected set
                 {
                     // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
                     if (_relevant == value) return;
@@ -42,13 +42,13 @@ namespace VRCFaceTracking.OSC
 
             public T ParamValue
             {
-                get => (T)_oscMessage.Value;
+                get => (T)OscMessage.Value;
                 set
                 {
                     // Ensure that the value is different
-                    if (Equals(ParamValue, value)) return;
+                    if (Equals(OscMessage.CachedValue, value)) return;
                     
-                    _oscMessage.Value = value;
+                    OscMessage.Value = value;
                     NeedsSend = true;
                 }
             }
@@ -60,17 +60,17 @@ namespace VRCFaceTracking.OSC
                     if (!value)
                         return;
                     
-                    SendQueue.Add(_oscMessage._meta);
+                    SendQueue.Add(OscMessage._meta);
                 }
             }
 
-            private readonly OscMessage _oscMessage;
+            protected readonly OscMessage OscMessage;
 
             public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc)
             {
                 _paramName = name;
                 _getValueFunc = getValueFunc;
-                _oscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
+                OscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
             }
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
@@ -84,12 +84,12 @@ namespace VRCFaceTracking.OSC
                 if (compatibleParam != null)
                 {
                     Relevant = true;
-                    _oscMessage.Address = compatibleParam.input.address;
+                    OscMessage.Address = compatibleParam.input.address;
                 }
                 else
                 {
                     Relevant = false;
-                    _oscMessage.Address = DefaultPrefix+_paramName;
+                    OscMessage.Address = DefaultPrefix+_paramName;
                 }
                 
                 return Relevant ? new IParameter[] {this} : Array.Empty<IParameter>();

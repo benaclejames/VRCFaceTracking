@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking_Next.Core.Types
 {
     // Make a nullable class called Vector2
     [StructLayout(LayoutKind.Sequential)]
