@@ -15,10 +15,12 @@ namespace VRCFaceTracking.OSC
         private static CancellationTokenSource _recvThreadCts;
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
+        private readonly ConfigParser _configParser;
 
-        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory)
+        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
         {
             _localSettingsService = localSettingsService;
+            _configParser = configParser;
             _logger = loggerFactory.CreateLogger("OSC");
         }
 
@@ -131,7 +133,7 @@ namespace VRCFaceTracking.OSC
             switch (newMsg.Address)
             {
                 case "/avatar/change":
-                    ConfigParser.ParseNewAvatar((string)newMsg.Value);
+                    _configParser.ParseNewAvatar((string)newMsg.Value);
                     break;
                 case "/avatar/parameters/EyeTrackingActive":
                     if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)

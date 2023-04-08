@@ -10,6 +10,8 @@ public enum OscValueType : byte {
     Float = 1,
     Bool = 2,
     String = 3,
+    Vector3 = 4,
+    Vector2 = 5,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -22,6 +24,10 @@ public struct OscValue {
     public bool BoolValue;
     [MarshalAs(UnmanagedType.LPStr)]
     public string StringValue; // Use IntPtr for pointer types
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+    public float[] Vector3;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+    public float[] Vector2;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -38,12 +44,12 @@ public struct OscMessageMeta {
 public static class SROSCLib
 {
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool parse_osc(byte[] buffer, int bufferLength, ref OscMessageMeta message);
+    public static extern int parse_osc(byte[] buffer, int bufferLength, int offset, ref OscMessageMeta message);
     
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_message([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, ref OscMessageMeta osc_template);
 
-    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)] // pub extern "C" fn create_osc_bundle(buf: *mut c_uchar, messages: *const OscMessage, len: usize) -> usize 
+    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_bundle([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, 
         [MarshalAs(UnmanagedType.LPArray)]  OscMessageMeta[] messages, int len, ref int messageIndex);
 }
@@ -111,5 +117,5 @@ public class OscMessage
     
     public OscMessage(string address, Type type) : this(address, OscUtils.TypeConversions[type].oscType) {}
 
-    public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, ref _meta);
+    public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, 0, ref _meta);
 }
