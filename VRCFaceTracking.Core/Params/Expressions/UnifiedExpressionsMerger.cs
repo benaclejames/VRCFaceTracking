@@ -36,7 +36,8 @@ namespace VRCFaceTracking.Params
                     p.name.Contains("Eye") && 
                     (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
                     (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
-                    .Length == 0),
+                    .Length == 0
+                ),
             
             /*new AlwaysRelevantParameter<Vector4>(exp =>
             {

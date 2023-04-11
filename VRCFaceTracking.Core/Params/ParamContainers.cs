@@ -10,7 +10,7 @@ namespace VRCFaceTracking.Params
             : base(paramName, getValueFunc) { }
     }
     
-    public class AlwaysRelevantParameter<T> : OSCParams.BaseParam<T>
+    public class AlwaysRelevantParameter<T> : OSCParams.BaseParam<T>, IParameter
     {
         public AlwaysRelevantParameter(Func<UnifiedTrackingData, T> getValueFunc,
             string paramAddress)
@@ -19,6 +19,8 @@ namespace VRCFaceTracking.Params
             OscMessage.Address = paramAddress;
             Relevant = true;
         }
+        
+        public new (string, IParameter)[] GetParamNames() => new[] {(OscMessage.Address, (IParameter) this)}; 
 
         public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
         {

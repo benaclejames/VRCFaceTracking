@@ -66,6 +66,9 @@ public class MainStandalone : IMainService
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
+            var hasLoadedNative = relevantParams.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
+            if (hasLoadedNative)
+                _logger.LogWarning("Native tracking parameters detected.");
             var deprecatedParams = relevantParams.Count(p => p.Deprecated);
 
             _logger.LogInformation(relevantParams.Length + " parameters loaded.");
