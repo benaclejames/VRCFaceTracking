@@ -42,5 +42,10 @@ namespace VRCFaceTracking_Next.Core.Types
 
             return this;
         }
+        
+        public Vector2 ToYaw() 
+            => new Vector2((float)(Math.Atan(this.x) * (180/Math.PI)), (float)(Math.Atan(this.y) * (180 / Math.PI)));
+        public Vector2 ToPitch()
+            => new Vector2((float)(Math.Asin(this.x) * (180 / Math.PI)), (float)(Math.Asin(this.y) * (180 / Math.PI)));
     }
 }

@@ -117,12 +117,13 @@ namespace VRCFaceTracking.OSC
             _recvThreadCts = newToken;
         }
 
+        private static byte[] buffer = new byte[2048];
         private void Recv()
         {
-            byte[] buffer = new byte[2048];
+            int bytesReceived = 0;
             try
             {
-                ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                bytesReceived = ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
             }
             catch (Exception)
             {
@@ -130,6 +131,7 @@ namespace VRCFaceTracking.OSC
                 return;
             }
             var newMsg = new OscMessage(buffer);
+            Array.Clear(buffer, 0, bytesReceived);
             switch (newMsg.Address)
             {
                 case "/avatar/change":

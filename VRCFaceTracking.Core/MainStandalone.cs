@@ -32,9 +32,9 @@ public class MainStandalone : IMainService
         Console.WriteLine("Shutting down");
     }
 
-    public void SetEnabled(bool enabledEyes, bool enabledExpression)
+    public void SetEnabled(bool newEnabled)
     {
-        UnifiedLibManager.SetTrackingEnabled(enabledEyes, enabledExpression);
+        UnifiedLibManager.SetTrackingEnabled(newEnabled);
     }
 
     public async Task InitializeAsync()
@@ -59,7 +59,7 @@ public class MainStandalone : IMainService
         UnifiedConfig.ReadConfiguration();
 
         // Initialize Tracking Runtimes
-        UnifiedLibManager.SetTrackingEnabled(true, true);
+        UnifiedLibManager.SetTrackingEnabled(true);
         UnifiedLibManager.Initialize();
 
         ConfigParser.OnConfigLoaded += relevantParams =>
@@ -80,6 +80,8 @@ public class MainStandalone : IMainService
         ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
         {
             var token = (CancellationToken)ct;
+            var buffer = new byte[4096];
+            int oldMsgLen = 0;
             while (!token.IsCancellationRequested)
             {
                 Thread.Sleep(10);
@@ -93,13 +95,17 @@ public class MainStandalone : IMainService
                 var messageIndex = 0;
                 while (messageIndex < relevantMessages.Length)
                 {
-                    var buffer = new byte[4096];
-                    var length = SROSCLib.create_osc_bundle(buffer, relevantMessages, relevantMessages.Length,
-                        ref messageIndex);
+                    var length = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
                     if (length > 4096)
                         throw new Exception("Bundle size is too large! This should never happen.");
+                    
+                    // Zero out any bytes after the oldMessageLength to prevent sending old data.
+                    if (length < oldMsgLen)
+                        Array.Clear(buffer, length, oldMsgLen - length);
 
                     OscMain.Send(buffer, length);
+                    oldMsgLen = length;
+                    messageIndex++;
                 }
 
                 OSCParams.SendQueue.Clear();

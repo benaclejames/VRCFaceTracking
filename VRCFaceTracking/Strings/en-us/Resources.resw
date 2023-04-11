@@ -127,7 +127,7 @@
     <value>Home</value>
   </data>
   <data name="Shell_Devices.Content" xml:space="preserve">
-    <value>Devices</value>
+    <value>Tracking</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
     <value>Output</value>

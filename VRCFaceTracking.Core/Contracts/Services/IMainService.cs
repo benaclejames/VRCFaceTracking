@@ -8,6 +8,6 @@ namespace VRCFaceTracking_Next.Core.Contracts.Services;
 public interface IMainService
 {
     void Teardown();
-    void SetEnabled(bool enabledEyes, bool enabledExpression);
+    void SetEnabled(bool newEnabled);
     Task InitializeAsync();
 }

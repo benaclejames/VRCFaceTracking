@@ -8,6 +8,46 @@
 
     <Grid x:Name="ContentArea">
         <StackPanel Orientation="Vertical">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Modules}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ItemsControl ItemsSource="{Binding Images}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Image Margin="15, 0"
+                                                       Source="{Binding}"
+                                                       HorizontalAlignment="Left"
+                                                       Width="150"
+                                                       Height="150"
+                                                       Stretch="Fill"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <StackPanel Margin="15, 0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+                                        <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Name}"/>
+                                        <TextBlock>Eye Tracking Active</TextBlock>
+                                        <TextBlock>Face Tracking Active</TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <ToggleButton Margin="15, 0, 25, 0" 
+                                                      Padding="15" 
+                                                      Content="Toggle Tracking" 
+                                                      IsChecked="{Binding Active, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            
             <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -17,26 +57,22 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Image Grid.Column="0"
-                        Margin="15, 0"
-                        Source="ms-appx:///Assets/QuestPro.png"
-                        HorizontalAlignment="Left"
-                        Width="150"
-                        Height="150"
-                        Stretch="Fill"/>
+                           Margin="15, 0"
+                           Source="ms-appx:///Assets/QuestPro.png"
+                           HorizontalAlignment="Left"
+                           Width="150"
+                           Height="150"
+                           Stretch="Fill"/>
                     <StackPanel Margin="15, 0" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}">Quest Pro</TextBlock>
-                        <TextBlock>Eye Tracking Possible</TextBlock>
-                        <TextBlock>Face Tracking Possible</TextBlock>
+                        <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}">ALVR Module</TextBlock>
+                        <TextBlock>Eye Tracking Active</TextBlock>
+                        <TextBlock>Face Tracking Active</TextBlock>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ToggleButton Margin="15, 0" 
-                                      Padding="15"
-                                      Content="Toggle Eye Tracking"
-                                      IsChecked="{x:Bind ViewModel.EyeEnabled, Mode=TwoWay}"/>
                         <ToggleButton Margin="15, 0, 25, 0" 
                                       Padding="15" 
-                                      Content="Toggle Face Tracking" 
-                                      IsChecked="{x:Bind ViewModel.ExpressionEnabled, Mode=TwoWay}"/>
+                                      Content="Toggle Tracking" 
+                                      IsChecked="{x:Bind ViewModel.Enabled, Mode=TwoWay}"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -49,15 +85,43 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal" Grid.Column="0">
-                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE896;" FontSize="20"/>
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEC05;" FontSize="20"/>
                         <StackPanel Margin="20, 4" Orientation="Vertical">
-                            <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">Update Libraries</TextBlock>
-                            <TextBlock Foreground="LightGray">Update or Reinstall Libraries</TextBlock>
+                            <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">OSC Status</TextBlock>
+                            <TextBlock Foreground="LightGray">Listener Bound</TextBlock>
+                            <TextBlock Foreground="LightGray">Sender Active</TextBlock>
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center" Foreground="LightGray">Last Checked: 12:35AM 1/2/2023</TextBlock>
-                        <Button Margin="10, 4">Update</Button>
+                    
+                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray">10 m/s Incoming</TextBlock>
+                        <TextBlock HorizontalTextAlignment="Right" Margin="0, 5, 0, 0" VerticalAlignment="Center" Foreground="LightGray">50 m/s Outgoing</TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEE57;" FontSize="20"/>
+                        <StackPanel Margin="20, 4" Orientation="Vertical">
+                            <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">Avatar Status</TextBlock>
+                            <TextBlock Foreground="LightGray">Avatar Name</TextBlock>
+                            <TextBlock Foreground="LightGray">avtr_123456</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray">18 Parameters</TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="Orange" Margin="0,0,5,0"/>
+                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray">5 Legacy Parameters</TextBlock>
+                        </StackPanel>                    
                     </StackPanel>
                 </Grid>
             </Border>

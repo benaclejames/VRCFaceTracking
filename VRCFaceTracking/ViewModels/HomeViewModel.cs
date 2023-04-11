@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using VRCFaceTracking_Next.Core.Contracts.Services;
 
 namespace VRCFaceTracking_Next.ViewModels;
@@ -10,30 +12,40 @@ public class HomeViewModel : ObservableRecipient
         get;
     }
 
-    private bool eyeEnabled = true, expressionEnabled = true;
+    private bool enabled;
 
-    public bool EyeEnabled
+    public bool Enabled
     {
-        get => eyeEnabled;
+        get => enabled;
         set
         {
-            MainService.SetEnabled(value, ExpressionEnabled);
-            SetProperty(ref eyeEnabled, value);
+            MainService.SetEnabled(Enabled);
+            SetProperty(ref enabled, value);
         }
     }
-
-    public bool ExpressionEnabled
+    
+    private List<ModuleViewModule> modules = new();
+    
+    public List<ModuleViewModule> Modules
     {
-        get => expressionEnabled;
-        set
-        {
-            MainService.SetEnabled(value, ExpressionEnabled);
-            SetProperty(ref expressionEnabled, value);
-        }
+        get => modules;
+        set => SetProperty(ref modules, value);
     }
 
     public HomeViewModel(IMainService mainService)
     {
         MainService = mainService;
+        Enabled = true;
+        Modules = new List<ModuleViewModule>()
+        {
+            new ModuleViewModule()
+            {
+                Name = "meme",
+                Images = new List<ImageSource>()
+                {
+                    new BitmapImage(new Uri("ms-appx:///Assets/QuestPro.png"))
+                }
+            }
+        };
     }
 }

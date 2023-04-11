@@ -55,7 +55,7 @@ public static class UnifiedLibManager
     internal static List<Assembly> RequestedModules = new();
     private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
     private static readonly Dictionary<ExtTrackingModule, CancellationTokenSource> UsefulThreads = new();
-    private static bool _enableEye = true, _enableExpression = true;
+    private static bool _enableTracking = true;
     #endregion
 
     private static Thread _initializeWorker;
@@ -77,7 +77,7 @@ public static class UnifiedLibManager
             else _logger.LogWarning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
 
         });
-        _logger.LogInformation("Starting initialization for " + (_enableEye ? "eye" : "") + (_enableEye && _enableExpression ? " and " : "") + (_enableExpression ? "expression" : "") + " tracking");
+        _logger.LogInformation("Starting initialization tracking");
         _initializeWorker.Start();
     }
 
@@ -88,10 +88,9 @@ public static class UnifiedLibManager
         else CreateModuleInitializer(AvailableModules);
     }
 
-    public static void SetTrackingEnabled(bool enableEye, bool enableExpression)
+    public static void SetTrackingEnabled(bool newEnabled)
     {
-        _enableEye = enableEye;
-        _enableExpression = enableExpression;
+        _enableTracking = newEnabled;
     }
 
     public static void ReloadModules()
@@ -195,12 +194,17 @@ public static class UnifiedLibManager
             return;
 
         var cts = new CancellationTokenSource();
-        ThreadPool.QueueUserWorkItem(new WaitCallback(state =>
+        ThreadPool.QueueUserWorkItem(state =>
         {
             var token = (CancellationToken)state;
             while(!token.IsCancellationRequested)
-                module.Update();
-        }), cts.Token);
+            {
+                if (_enableTracking && MainStandalone._numParams > 0)
+                {
+                    module.Update();
+                }
+            }
+        }, cts.Token);
         UsefulThreads.Add(module, cts);
     }
 
@@ -213,7 +217,7 @@ public static class UnifiedLibManager
             bool eyeSuccess = false, expressionSuccess = false;
             try
             {
-                (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null && _enableEye, _loadedExpressionModule == null && _enableExpression);
+                (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
             }
             catch (MissingMethodException)
             {

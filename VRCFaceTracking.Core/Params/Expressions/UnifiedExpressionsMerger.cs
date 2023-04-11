@@ -14,7 +14,12 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Eye.Combined().Gaze, "v2/Eyes"),
             new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
             new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
-            new AlwaysRelevantParameter<Vector4>(exp =>
+            new AlwaysRelevantParameter<Vector2>(exp =>
+            {
+                var combined = exp.Eye.Combined().Gaze;
+                return new Vector2(-combined.ToPitch().y, combined.ToYaw().x);
+            }, "/tracking/eye/CenterPitchYaw"), 
+            /*new AlwaysRelevantParameter<Vector4>(exp =>
             {
                 float[] randomFloats = new float[6];
 
@@ -22,7 +27,7 @@ namespace VRCFaceTracking.Params
                     randomFloats[i] = (float) (rand.NextDouble() * 720 - 360);
                 }
                 return new Vector4(randomFloats[0], randomFloats[1], randomFloats[2], randomFloats[3]);
-            }, "/tracking/eye/LeftRightPitchYaw"),
+            }, "/tracking/eye/LeftRightPitchYaw"),*/ // Screw you vrchat give us individual eyes and fix ur docs u poopyheads
             
             #endregion
 

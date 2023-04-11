@@ -55,7 +55,7 @@
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Shell_Devices" helpers:NavigationHelper.NavigateTo="VRCFaceTracking_Next.ViewModels.DevicesViewModel">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7FC;"/>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF272;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Shell_Output" helpers:NavigationHelper.NavigateTo="VRCFaceTracking_Next.ViewModels.OutputViewModel">
