@@ -75,6 +75,13 @@ namespace VRCFaceTracking.OSC
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
+                if (newParams == null)
+                {
+                    Relevant = false;
+                    OscMessage.Address = DefaultPrefix+_paramName;
+                    return Array.Empty<IParameter>();
+                }
+
                 Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
 
                 var compatibleParam = newParams.FirstOrDefault(param =>
@@ -95,9 +102,16 @@ namespace VRCFaceTracking.OSC
                 return Relevant ? new IParameter[] {this} : Array.Empty<IParameter>();
             }
 
+            public (string, IParameter)[] GetParamNames() => new[] {(_paramName, (IParameter) this)};
+
             public bool Deprecated => !_paramName.StartsWith(CurrentVersionPrefix);
 
             protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
+            
+            ~BaseParam()
+            {
+               // UnifiedTracking.OnUnifiedDataUpdated -= Process;
+            }
         }
 
         public class BinaryBaseParameter : IParameter
@@ -139,7 +153,10 @@ namespace VRCFaceTracking.OSC
             public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
                 _params.Clear();
-                IParameter[] negativeRelevancy = _negativeParam.ResetParam(newParams);
+                var negativeRelevancy = _negativeParam.ResetParam(newParams);
+
+                if (newParams == null)
+                    return Array.Empty<IParameter>();
 
                 // Get all parameters starting with this parameter's name, and of type bool
                 Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
@@ -173,6 +190,8 @@ namespace VRCFaceTracking.OSC
 
                 return parameters.ToArray();
             }
+
+            public (string, IParameter)[] GetParamNames() => _params.SelectMany(p => p.GetParamNames()).Concat(_negativeParam.GetParamNames()).ToArray();
 
             public bool Deprecated => false;    // Handled by our children
 

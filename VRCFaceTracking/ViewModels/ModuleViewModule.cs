@@ -32,5 +32,6 @@ public class ModuleViewModule : ObservableRecipient
     {
         images = new List<ImageSource>();
         active = true;
+        name = "Module";
     }
 }

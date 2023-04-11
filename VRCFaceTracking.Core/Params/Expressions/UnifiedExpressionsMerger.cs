@@ -1,10 +1,20 @@
 ﻿using VRCFaceTracking_Next.Core.Types;
+using VRCFaceTracking.Params.Eye;
 
 namespace VRCFaceTracking.Params
 {
     public static class UnifiedExpressionsMerger
     {
-        public static Random rand = new Random();
+        private static (string paramName, IParameter paramLiteral)[] IsEyeParameter(ConfigParser.Parameter[] param)
+        {
+            // Get all the names of all parameters in both the unified tracking list and the old legacy eye list
+            var allParams = UnifiedTracking.AllParameters_v2.Concat(EyeTrackingParams.ParameterList).ToList()
+                .SelectMany(p => p.GetParamNames());
+                    
+            // Now we match parameters to the literals as a sort of sanity check
+            return allParams.Where(p => param.Any(p2 => p.paramName == p2.name)).ToArray();
+        }
+        
         public static readonly IParameter[] UnifiedCombinedShapes =
         {    
             // Unified Eye Definitions
@@ -14,11 +24,20 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Eye.Combined().Gaze, "v2/Eyes"),
             new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
             new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
-            new AlwaysRelevantParameter<Vector2>(exp =>
-            {
-                var combined = exp.Eye.Combined().Gaze;
-                return new Vector2(-combined.ToPitch().y, combined.ToYaw().x);
-            }, "/tracking/eye/CenterPitchYaw"), 
+            
+            new ConditionalParameter(
+                new AlwaysRelevantParameter<Vector2>(exp =>
+                    {
+                        var combined = exp.Eye.Combined().Gaze;
+                        return new Vector2(-combined.ToPitch().y, combined.ToYaw().x);
+                    }, "/tracking/eye/CenterPitchYaw"),
+                param => IsEyeParameter(
+                    param.Where(p => 
+                    p.name.Contains("Eye") && 
+                    (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
+                    (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                    .Length == 0),
+            
             /*new AlwaysRelevantParameter<Vector4>(exp =>
             {
                 float[] randomFloats = new float[6];

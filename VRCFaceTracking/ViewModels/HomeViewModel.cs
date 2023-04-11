@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using VRCFaceTracking_Next.Core.Contracts.Services;
@@ -24,9 +25,9 @@ public class HomeViewModel : ObservableRecipient
         }
     }
     
-    private List<ModuleViewModule> _modules = new();
+    private ObservableCollection<ModuleViewModule> _modules = new();
     
-    public List<ModuleViewModule> Modules
+    public ObservableCollection<ModuleViewModule> Modules
     {
         get => _modules;
         set => SetProperty(ref _modules, value);
@@ -36,7 +37,7 @@ public class HomeViewModel : ObservableRecipient
     {
         MainService = mainService;
         Enabled = true;
-        Modules = new List<ModuleViewModule>()
+        Modules = new ObservableCollection<ModuleViewModule>()
         {
             new()
             {

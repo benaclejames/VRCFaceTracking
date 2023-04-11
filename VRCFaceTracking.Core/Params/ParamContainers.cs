@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using VRCFaceTracking_Next.Core.Types;
+﻿using VRCFaceTracking_Next.Core.Types;
 using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Params
@@ -24,8 +22,43 @@ namespace VRCFaceTracking.Params
 
         public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
         {
-            return new IParameter[] {this};
+            if (newParams != null)
+            {
+                Relevant = true;
+                return new IParameter[] { this };
+            }
+
+            Relevant = false;
+            return Array.Empty<IParameter>();
+
         }
+    }
+
+    public class ConditionalParameter : IParameter
+    {
+        private readonly IParameter _param;
+        private readonly Func<ConfigParser.Parameter[], bool> _condition;
+
+        public ConditionalParameter(IParameter param, Func<ConfigParser.Parameter[], bool> condition)
+        {
+            _param = param;
+            _condition = condition;
+        }
+
+        public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        {
+            if (!_condition.Invoke(newParams))
+            {
+                _param.ResetParam(null);    // When we pass null, we want to disable for SURE (even if we're always relevant)
+                return Array.Empty<IParameter>();
+            }
+
+            return _param.ResetParam(newParams);
+        }
+
+        public (string, IParameter)[] GetParamNames() => _param.GetParamNames();
+
+        public bool Deprecated => false;
     }
 
     public class BoolParameter : OSCParams.BaseParam<bool>
@@ -102,6 +135,9 @@ namespace VRCFaceTracking.Params
         }
 
         public IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
+
+        public (string, IParameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
+        
         public bool Deprecated => false;    // False as our children will handle this
     }
 }
