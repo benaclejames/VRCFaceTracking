@@ -94,10 +94,11 @@ public partial class App : Application
             services.AddTransient<OutputPage>();
             services.AddTransient<DevicesViewModel>();
             services.AddTransient<DevicesPage>();
-            services.AddTransient<HomeViewModel>();
+            services.AddSingleton<HomeViewModel>();
             services.AddTransient<HomePage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
+            services.AddSingleton<IAvatarInfo, AvatarViewModel>();
 
             // Logging
             services.AddLogging();

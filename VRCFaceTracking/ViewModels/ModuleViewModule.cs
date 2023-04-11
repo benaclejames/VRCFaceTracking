@@ -30,7 +30,7 @@ public class ModuleViewModule : ObservableRecipient
     
     public ModuleViewModule()
     {
-        Images = new List<ImageSource>();
-        Active = true;
+        images = new List<ImageSource>();
+        active = true;
     }
 }

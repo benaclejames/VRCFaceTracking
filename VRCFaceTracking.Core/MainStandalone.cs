@@ -12,11 +12,13 @@ public class MainStandalone : IMainService
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
+    private readonly IAvatarInfo _avatarInfo;
     
-    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService)
+    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo)
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
         OscMain = oscService;
+        _avatarInfo = avatarInfo;
     }
 
     public void Teardown()
@@ -62,7 +64,7 @@ public class MainStandalone : IMainService
         UnifiedLibManager.SetTrackingEnabled(true);
         UnifiedLibManager.Initialize();
 
-        ConfigParser.OnConfigLoaded += relevantParams =>
+        ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
             var deprecatedParams = relevantParams.Count(p => p.Deprecated);
 
@@ -73,6 +75,10 @@ public class MainStandalone : IMainService
                     " Legacy parameters detected. " +
                     "Please consider updating the avatar to use the latest documented parameters.");
 
+            _avatarInfo.Id = configRaw.id;
+            _avatarInfo.Name = configRaw.name;
+            _avatarInfo.CurrentParameters = relevantParams.Length;
+            _avatarInfo.CurrentParametersLegacy = deprecatedParams;
         };
 
         // Begin main OSC update loop

@@ -42,7 +42,7 @@ namespace VRCFaceTracking
             public List<Parameter> parameters { get; set; }
         }
 
-        public static Action<IParameter[]> OnConfigLoaded = _ => { };
+        public static Action<IParameter[], AvatarConfigSpec> OnConfigLoaded = (_, _) => { };
 
         public void ParseNewAvatar(string newId)
         {
@@ -75,7 +75,7 @@ namespace VRCFaceTracking
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
                 paramList.AddRange(parameter.ResetParam(parameters));
 
-            OnConfigLoaded(paramList.ToArray());
+            OnConfigLoaded(paramList.ToArray(), avatarConfig);
         }
     }
 }

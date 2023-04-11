@@ -199,7 +199,7 @@ public static class UnifiedLibManager
             var token = (CancellationToken)state;
             while(!token.IsCancellationRequested)
             {
-                if (_enableTracking && MainStandalone._numParams > 0)
+                if (_enableTracking)
                 {
                     module.Update();
                 }

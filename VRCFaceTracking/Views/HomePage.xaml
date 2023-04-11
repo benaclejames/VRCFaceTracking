@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
+    
     <Grid x:Name="ContentArea">
         <StackPanel Orientation="Vertical">
                 <ItemsControl ItemsSource="{x:Bind ViewModel.Modules}">
@@ -31,7 +31,7 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                    <StackPanel Margin="15, 0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
+                                    <StackPanel Margin="15, 15" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
                                         <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Name}"/>
                                         <TextBlock>Eye Tracking Active</TextBlock>
                                         <TextBlock>Face Tracking Active</TextBlock>
@@ -47,35 +47,6 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            
-            <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0"
-                           Margin="15, 0"
-                           Source="ms-appx:///Assets/QuestPro.png"
-                           HorizontalAlignment="Left"
-                           Width="150"
-                           Height="150"
-                           Stretch="Fill"/>
-                    <StackPanel Margin="15, 0" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}">ALVR Module</TextBlock>
-                        <TextBlock>Eye Tracking Active</TextBlock>
-                        <TextBlock>Face Tracking Active</TextBlock>
-                    </StackPanel>
-                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ToggleButton Margin="15, 0, 25, 0" 
-                                      Padding="15" 
-                                      Content="Toggle Tracking" 
-                                      IsChecked="{x:Bind ViewModel.Enabled, Mode=TwoWay}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
 
             <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <Grid>
@@ -111,17 +82,17 @@
                         <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEE57;" FontSize="20"/>
                         <StackPanel Margin="20, 4" Orientation="Vertical">
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">Avatar Status</TextBlock>
-                            <TextBlock Foreground="LightGray">Avatar Name</TextBlock>
-                            <TextBlock Foreground="LightGray">avtr_123456</TextBlock>
+                            <TextBlock Foreground="LightGray" Text="{x:Bind AvatarViewModel.Name, Mode=OneWay}"/>
+                            <TextBlock Foreground="LightGray" Text="{x:Bind AvatarViewModel.Id, Mode=OneWay}"/>
                         </StackPanel>
                     </StackPanel>
                     
                     <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray">18 Parameters</TextBlock>
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
+                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray" Text="{x:Bind AvatarViewModel.CurrentParametersText, Mode=OneWay}"/>
+                        <StackPanel Visibility="{x:Bind AvatarViewModel.HasAnyLegacy, Mode=OneWay}" Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
                             <Ellipse Width="10" Height="10" Fill="Orange" Margin="0,0,5,0"/>
-                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray">5 Legacy Parameters</TextBlock>
-                        </StackPanel>                    
+                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="LightGray" Text="{x:Bind AvatarViewModel.CurrentParametersLegacyText, Mode=OneWay}"/>
+                        </StackPanel>        
                     </StackPanel>
                 </Grid>
             </Border>

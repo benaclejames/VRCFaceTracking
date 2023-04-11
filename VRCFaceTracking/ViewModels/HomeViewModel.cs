@@ -12,24 +12,24 @@ public class HomeViewModel : ObservableRecipient
         get;
     }
 
-    private bool enabled;
+    private bool _enabled;
 
     public bool Enabled
     {
-        get => enabled;
+        get => _enabled;
         set
         {
             MainService.SetEnabled(Enabled);
-            SetProperty(ref enabled, value);
+            SetProperty(ref _enabled, value);
         }
     }
     
-    private List<ModuleViewModule> modules = new();
+    private List<ModuleViewModule> _modules = new();
     
     public List<ModuleViewModule> Modules
     {
-        get => modules;
-        set => SetProperty(ref modules, value);
+        get => _modules;
+        set => SetProperty(ref _modules, value);
     }
 
     public HomeViewModel(IMainService mainService)
@@ -38,13 +38,9 @@ public class HomeViewModel : ObservableRecipient
         Enabled = true;
         Modules = new List<ModuleViewModule>()
         {
-            new ModuleViewModule()
+            new()
             {
-                Name = "meme",
-                Images = new List<ImageSource>()
-                {
-                    new BitmapImage(new Uri("ms-appx:///Assets/QuestPro.png"))
-                }
+                Name = "Initializing Modules...",
             }
         };
     }

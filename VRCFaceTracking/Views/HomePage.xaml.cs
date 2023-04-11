@@ -11,10 +11,16 @@ public sealed partial class HomePage : Page
     {
         get;
     }
+    
+    public IAvatarInfo AvatarViewModel
+    {
+        get;
+    }
 
     public HomePage()
     {
         ViewModel = App.GetService<HomeViewModel>();
+        AvatarViewModel = App.GetService<IAvatarInfo>();
         InitializeComponent();
     }
 }
