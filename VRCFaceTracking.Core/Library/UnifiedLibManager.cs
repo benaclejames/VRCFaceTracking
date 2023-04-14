@@ -21,17 +21,15 @@ public class UnifiedLibManager : ILibManager
     private static ILogger _logger;
     private static ILoggerFactory _loggerFactory;
     
-    public ObservableCollection<ModuleMetadata> Modules
-    {
-        get;
-        set;
-    }
+    public ObservableCollection<ModuleMetadata> Modules { get; set; }
+    private readonly IDispatcherService _dispatcherService;
 
-    public UnifiedLibManager(ILoggerFactory factory)
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger("UnifiedLibManager");
         Modules = new ObservableCollection<ModuleMetadata>();
+        _dispatcherService = dispatcherService;
     }
 
     #endregion
@@ -269,9 +267,9 @@ public class UnifiedLibManager : ILibManager
                 break;
 
             _logger.LogInformation("Initializing module: " + module.ToString());
-            ExtTrackingModule loadedModule = LoadExternalModule(module);
+            var loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
-            MainStandalone.DispatcherRun.Invoke(() => Modules.Add(loadedModule.ModuleInformation));
+            _dispatcherService.Run(() => Modules.Add(loadedModule.ModuleInformation));
         }
 
         if (EyeStatus != ModuleState.Uninitialized) _logger.LogInformation("Eye Tracking Initialized via " + _loadedEyeModule);

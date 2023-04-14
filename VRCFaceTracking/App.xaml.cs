@@ -76,6 +76,7 @@ public partial class App : Application
             services.AddSingleton<IActivationService, ActivationService>();
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IDispatcherService, DispatcherService>();
             LoggingService.Setup(DispatcherQueue.GetForCurrentThread());
 
             // Core Services

@@ -3,7 +3,6 @@ using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
 
@@ -18,7 +17,6 @@ public class MainStandalone : IMainService
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
-    public static Action<Action> DispatcherRun;
     
     public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
     {
@@ -49,7 +47,6 @@ public class MainStandalone : IMainService
     public async Task InitializeAsync(Action<Action> dispatcherRun)
     {
         _logger.LogInformation("VRCFT Initializing!");
-        DispatcherRun = dispatcherRun;
 
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
