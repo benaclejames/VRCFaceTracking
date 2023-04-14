@@ -1,8 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
+using VRCFaceTracking.ViewModels;
 
-using VRCFaceTracking_Next.ViewModels;
-
-namespace VRCFaceTracking_Next.Views;
+namespace VRCFaceTracking.Views;
 
 public sealed partial class DevicesPage : Page
 {

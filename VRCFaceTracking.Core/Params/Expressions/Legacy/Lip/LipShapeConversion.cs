@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using VRCFaceTracking.Core.Params.Data;
 
-namespace VRCFaceTracking.Params.Lip
+namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Lip
 {
     internal interface ICombinedShape
     {

@@ -1,9 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.ViewModels;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.ViewModels;
-
-namespace VRCFaceTracking_Next.Activation;
+namespace VRCFaceTracking.Activation;
 
 public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
 {

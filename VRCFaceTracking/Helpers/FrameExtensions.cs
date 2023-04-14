@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 
-namespace VRCFaceTracking_Next.Helpers;
+namespace VRCFaceTracking.Helpers;
 
 public static class FrameExtensions
 {

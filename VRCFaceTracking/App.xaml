@@ -1,5 +1,5 @@
 ﻿<Application
-    x:Class="VRCFaceTracking_Next.App"
+    x:Class="VRCFaceTracking.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>

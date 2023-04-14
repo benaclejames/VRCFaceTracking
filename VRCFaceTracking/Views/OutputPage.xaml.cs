@@ -1,16 +1,14 @@
 ﻿using System.Collections.ObjectModel;
-using Microsoft.Extensions.Logging.EventSource;
-using Microsoft.UI.Dispatching;
+using System.Globalization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using VRCFaceTracking_Next.Services;
-using VRCFaceTracking_Next.ViewModels;
+using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Provider;
-using Windows.Storage;
-using System.Globalization;
+using VRCFaceTracking.Services;
+using VRCFaceTracking.ViewModels;
 
-namespace VRCFaceTracking_Next.Views;
+namespace VRCFaceTracking.Views;
 
 public sealed partial class OutputPage : Page
 {

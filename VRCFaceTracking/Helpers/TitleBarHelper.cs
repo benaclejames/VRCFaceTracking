@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Media;
 
 using Windows.UI;
 
-namespace VRCFaceTracking_Next.Helpers;
+namespace VRCFaceTracking.Helpers;
 
 // Helper class to workaround custom title bar bugs.
 // DISCLAIMER: The resource key names and color values used below are subject to change. Do not depend on them.

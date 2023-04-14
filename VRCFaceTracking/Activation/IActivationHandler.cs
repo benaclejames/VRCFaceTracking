@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Activation;
+﻿namespace VRCFaceTracking.Activation;
 
 public interface IActivationHandler
 {

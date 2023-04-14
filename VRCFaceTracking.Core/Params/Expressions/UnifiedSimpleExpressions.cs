@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VRCFaceTracking.Core.Params.Data;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Core.Params.Expressions
 {
     /// <summary> 
     /// Represents the type of transformed and simplified Shape data that is converted from the base UnifiedExpression data in the form of enumerated shapes.

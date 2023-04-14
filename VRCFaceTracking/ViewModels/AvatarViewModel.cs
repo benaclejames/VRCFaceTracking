@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using VRCFaceTracking_Next.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts.Services;
 
-namespace VRCFaceTracking_Next.ViewModels;
+namespace VRCFaceTracking.ViewModels;
 
 public class AvatarViewModel : ObservableRecipient, IAvatarInfo
 {

@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking.Params
+﻿namespace VRCFaceTracking.Core.Params
 {
     public interface IParameter
     {

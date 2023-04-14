@@ -1,12 +1,13 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using VRCFaceTracking.Activation;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.ViewModels;
+using VRCFaceTracking.Views;
 
-using VRCFaceTracking_Next.Activation;
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Core.Contracts.Services;
-using VRCFaceTracking_Next.Views;
-
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 public class ActivationService : IActivationService
 {
@@ -15,20 +16,23 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IOSCService _oscService;
     private readonly IMainService _mainService;
+    private readonly HomeViewModel _homeViewModel;
     private UIElement? _shell = null;
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
         IEnumerable<IActivationHandler> activationHandlers,
         IThemeSelectorService themeSelectorService,
         IOSCService oscService,
-        IMainService mainService
-        )
+        IMainService mainService,
+        HomeViewModel homeViewModel
+    )
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _oscService = oscService;
         _mainService = mainService;
+        _homeViewModel = homeViewModel;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -72,7 +76,10 @@ public class ActivationService : IActivationService
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _oscService.InitializeAsync().ConfigureAwait(false);
-        await _mainService.InitializeAsync().ConfigureAwait(false);
+        await _mainService.InitializeAsync(new Action<Action>(action =>
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(action.Invoke);
+        })).ConfigureAwait(false);
 
         await Task.CompletedTask;
     }

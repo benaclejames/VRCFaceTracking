@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Contracts.ViewModels;
+﻿namespace VRCFaceTracking.Contracts.ViewModels;
 
 public interface INavigationAware
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using VRCFaceTracking.Params.Lip;
-
-namespace VRCFaceTracking.Params.LipMerging
+﻿namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Lip
 {
     [Obsolete("SRanipal Lip Shapes are being phased out. Please switch to Unified Expressions.")]
     public static class LipShapeMerger

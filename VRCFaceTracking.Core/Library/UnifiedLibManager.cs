@@ -1,7 +1,10 @@
+using System.Collections.ObjectModel;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Contracts.Services;
 
-namespace VRCFaceTracking;
+namespace VRCFaceTracking.Core.Library;
 
 public enum ModuleState
 {
@@ -10,18 +13,25 @@ public enum ModuleState
     Active = 1  // We're actively getting tracking data from the module
 }
 
-public static class UnifiedLibManager
+public class UnifiedLibManager : ILibManager
 {
     #region Delegates
     public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
 
     private static ILogger _logger;
     private static ILoggerFactory _loggerFactory;
+    
+    public ObservableCollection<ModuleMetadata> Modules
+    {
+        get;
+        set;
+    }
 
-    public static void InitializeLogger(ILoggerFactory factory)
+    public UnifiedLibManager(ILoggerFactory factory)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger("UnifiedLibManager");
+        Modules = new ObservableCollection<ModuleMetadata>();
     }
 
     #endregion
@@ -61,7 +71,7 @@ public static class UnifiedLibManager
     private static Thread _initializeWorker;
     private static CancellationTokenSource _initCts;
 
-    private static void CreateModuleInitializer(List<Assembly> modules)
+    private void CreateModuleInitializer(List<Assembly> modules)
     {
         if (_initializeWorker != null && _initializeWorker.IsAlive && _initCts != null) _initCts.Cancel();
 
@@ -81,7 +91,7 @@ public static class UnifiedLibManager
         _initializeWorker.Start();
     }
 
-    public static void Initialize()
+    public void Initialize()
     {
         if (RequestedModules != null && RequestedModules.Count > 0)
             CreateModuleInitializer(RequestedModules);
@@ -210,44 +220,46 @@ public static class UnifiedLibManager
 
     private static void AttemptModuleInitialize(ExtTrackingModule module)
     {
-        if (module.Supported.SupportsEye || module.Supported.SupportsExpression)
+        if (!module.Supported.SupportsEye && !module.Supported.SupportsExpression)
         {
-            module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
+            return;
+        }
 
-            bool eyeSuccess = false, expressionSuccess = false;
-            try
-            {
-                (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
-            }
-            catch (MissingMethodException)
-            {
-                _logger.LogError(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Exception initializing " + module.GetType().Name + ". Skipping.");
-                _logger.LogError(e.Message);
-            }
+        module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
-            // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
-            if (eyeSuccess && _loadedEyeModule == null)
-            {
-                _loadedEyeModule = module;
-                EyeStatus = ModuleState.Active;
-                EnsureModuleThreadStarted(module);
-            }
+        bool eyeSuccess = false, expressionSuccess = false;
+        try
+        {
+            (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
+        }
+        catch (MissingMethodException)
+        {
+            _logger.LogError(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Exception initializing " + module.GetType().Name + ". Skipping.");
+            _logger.LogError(e.Message);
+        }
 
-            // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
-            if (expressionSuccess && _loadedExpressionModule == null)
-            {
-                _loadedExpressionModule = module;
-                ExpressionStatus = ModuleState.Active;
-                EnsureModuleThreadStarted(module);
-            }
+        // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
+        if (eyeSuccess && _loadedEyeModule == null)
+        {
+            _loadedEyeModule = module;
+            EyeStatus = ModuleState.Active;
+            EnsureModuleThreadStarted(module);
+        }
+
+        // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
+        if (expressionSuccess && _loadedExpressionModule == null)
+        {
+            _loadedExpressionModule = module;
+            ExpressionStatus = ModuleState.Active;
+            EnsureModuleThreadStarted(module);
         }
     }
 
-    private static void InitRequestedRuntimes(List<Assembly> moduleType)
+    private void InitRequestedRuntimes(List<Assembly> moduleType)
     {
         _logger.LogInformation("Initializing runtimes...");
 
@@ -259,6 +271,7 @@ public static class UnifiedLibManager
             _logger.LogInformation("Initializing module: " + module.ToString());
             ExtTrackingModule loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
+            MainStandalone.DispatcherRun.Invoke(() => Modules.Add(loadedModule.ModuleInformation));
         }
 
         if (EyeStatus != ModuleState.Uninitialized) _logger.LogInformation("Eye Tracking Initialized via " + _loadedEyeModule);

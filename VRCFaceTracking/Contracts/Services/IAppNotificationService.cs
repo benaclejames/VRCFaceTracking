@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace VRCFaceTracking_Next.Contracts.Services;
+namespace VRCFaceTracking.Contracts.Services;
 
 public interface IAppNotificationService
 {

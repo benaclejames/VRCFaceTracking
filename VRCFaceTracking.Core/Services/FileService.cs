@@ -1,10 +1,8 @@
 ﻿using System.Text;
-
 using Newtonsoft.Json;
+using VRCFaceTracking.Core.Contracts.Services;
 
-using VRCFaceTracking_Next.Core.Contracts.Services;
-
-namespace VRCFaceTracking_Next.Core.Services;
+namespace VRCFaceTracking.Core.Services;
 
 public class FileService : IFileService
 {

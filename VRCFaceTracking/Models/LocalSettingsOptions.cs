@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Models;
+﻿namespace VRCFaceTracking.Models;
 
 public class LocalSettingsOptions
 {

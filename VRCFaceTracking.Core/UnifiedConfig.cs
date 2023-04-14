@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using VRCFaceTracking.Params;
+using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Types
 {

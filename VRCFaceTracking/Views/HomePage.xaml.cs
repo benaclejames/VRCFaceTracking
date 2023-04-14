@@ -1,9 +1,9 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using VRCFaceTracking_Next.Core.Contracts.Services;
-using VRCFaceTracking_Next.ViewModels;
+﻿using Microsoft.UI.Xaml.Controls;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.ViewModels;
 
-namespace VRCFaceTracking_Next.Views;
+namespace VRCFaceTracking.Views;
 
 public sealed partial class HomePage : Page
 {
@@ -16,11 +16,17 @@ public sealed partial class HomePage : Page
     {
         get;
     }
+    
+    public ILibManager LibManager
+    {
+        get;
+    }
 
     public HomePage()
     {
         ViewModel = App.GetService<HomeViewModel>();
         AvatarViewModel = App.GetService<IAvatarInfo>();
+        LibManager = App.GetService<ILibManager>();
         InitializeComponent();
     }
 }

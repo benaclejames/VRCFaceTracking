@@ -1,7 +1,6 @@
-﻿using VRCFaceTracking_Next.Core.Types;
-using VRCFaceTracking.OSC;
+﻿using VRCFaceTracking.OSC;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Core.Types
 {
     public class XYParam
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace VRCFaceTracking_Next.Core.Helpers;
+namespace VRCFaceTracking.Core.Helpers;
 
 public static class Json
 {

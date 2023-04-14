@@ -1,10 +1,10 @@
 ﻿using Microsoft.UI.Xaml;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Core.Contracts.Services;
-using VRCFaceTracking_Next.Helpers;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Helpers;
 
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 public class ThemeSelectorService : IThemeSelectorService
 {

@@ -4,20 +4,21 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using VRCFaceTracking;
-using VRCFaceTracking.OSC;
-using VRCFaceTracking_Next.Activation;
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Core.Contracts.Services;
-using VRCFaceTracking_Next.Core.Services;
-using VRCFaceTracking_Next.Helpers;
-using VRCFaceTracking_Next.Models;
-using VRCFaceTracking_Next.Notifications;
-using VRCFaceTracking_Next.Services;
-using VRCFaceTracking_Next.ViewModels;
-using VRCFaceTracking_Next.Views;
+using VRCFaceTracking.Activation;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.Helpers;
+using VRCFaceTracking.Models;
+using VRCFaceTracking.Notifications;
+using VRCFaceTracking.Services;
+using VRCFaceTracking.ViewModels;
+using VRCFaceTracking.Views;
 
-namespace VRCFaceTracking_Next;
+namespace VRCFaceTracking;
 
 // To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
 public partial class App : Application
@@ -84,7 +85,7 @@ public partial class App : Application
             services.AddSingleton<ConfigParser>();
             services.AddSingleton<ModuleAttributeHandler>();
             services.AddSingleton<UnifiedTracking>();
-            UnifiedLibManager.InitializeLogger(services.BuildServiceProvider().GetService<ILoggerFactory>());
+            services.AddSingleton<ILibManager, UnifiedLibManager>();
             UnifiedTrackingMutator.InitializeLogger(services.BuildServiceProvider().GetService<ILoggerFactory>());
 
             // Views and ViewModels

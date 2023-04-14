@@ -2,12 +2,11 @@
 
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Contracts.ViewModels;
+using VRCFaceTracking.Helpers;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Contracts.ViewModels;
-using VRCFaceTracking_Next.Helpers;
-
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 // For more information on navigation between pages see
 // https://github.com/microsoft/TemplateStudio/blob/main/docs/WinUI/navigation.md

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Windows.ApplicationModel.Resources;
 
-namespace VRCFaceTracking_Next.Helpers;
+namespace VRCFaceTracking.Helpers;
 
 public static class ResourceExtensions
 {

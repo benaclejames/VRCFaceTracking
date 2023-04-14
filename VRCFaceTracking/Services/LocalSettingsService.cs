@@ -1,15 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
-
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Core.Contracts.Services;
-using VRCFaceTracking_Next.Core.Helpers;
-using VRCFaceTracking_Next.Helpers;
-using VRCFaceTracking_Next.Models;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Helpers;
+using VRCFaceTracking.Helpers;
+using VRCFaceTracking.Models;
 
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 public class LocalSettingsService : ILocalSettingsService
 {

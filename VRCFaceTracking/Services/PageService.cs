@@ -2,11 +2,11 @@
 
 using Microsoft.UI.Xaml.Controls;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.ViewModels;
-using VRCFaceTracking_Next.Views;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.ViewModels;
+using VRCFaceTracking.Views;
 
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 public class PageService : IPageService
 {

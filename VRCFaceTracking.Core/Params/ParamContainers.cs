@@ -1,7 +1,8 @@
-﻿using VRCFaceTracking_Next.Core.Types;
+﻿using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Types;
 using VRCFaceTracking.OSC;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Core.Params
 {
     public class FloatParameter : OSCParams.BaseParam<float>
     {
@@ -9,8 +10,8 @@ namespace VRCFaceTracking.Params
             string paramName)
             : base(paramName, getValueFunc) { }
     }
-    
-    public class AlwaysRelevantParameter<T> : OSCParams.BaseParam<T>, IParameter
+
+    public class AlwaysRelevantParameter<T> : OSCParams.BaseParam<T>, IParameter where T : struct
     {
         public AlwaysRelevantParameter(Func<UnifiedTrackingData, T> getValueFunc,
             string paramAddress)
@@ -19,48 +20,33 @@ namespace VRCFaceTracking.Params
             OscMessage.Address = paramAddress;
             Relevant = true;
         }
+
+        public new (string, IParameter)[] GetParamNames() => new[] { (OscMessage.Address, (IParameter)this) };
         
-        public new (string, IParameter)[] GetParamNames() => new[] {(OscMessage.Address, (IParameter) this)}; 
-
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
-        {
-            if (newParams != null)
-            {
-                Relevant = true;
-                return new IParameter[] { this };
-            }
-
-            Relevant = false;
-            return Array.Empty<IParameter>();
-
-        }
+        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => new IParameter[] { this };
     }
 
-    public class ConditionalParameter : IParameter
+    public class NativeParameter<T> : AlwaysRelevantParameter<T>, IParameter where T : struct
     {
-        private readonly IParameter _param;
         private readonly Func<ConfigParser.Parameter[], bool> _condition;
-
-        public ConditionalParameter(IParameter param, Func<ConfigParser.Parameter[], bool> condition)
+        
+        public NativeParameter(Func<UnifiedTrackingData, T> getValueFunc, Func<ConfigParser.Parameter[], bool> condition, string paramAddress) : base(getValueFunc, paramAddress)
         {
-            _param = param;
             _condition = condition;
         }
-
-        public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        
+        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
         {
             if (!_condition.Invoke(newParams))
             {
-                _param.ResetParam(null);    // When we pass null, we want to disable for SURE (even if we're always relevant)
+                Relevant = false;
                 return Array.Empty<IParameter>();
             }
-
-            return _param.ResetParam(newParams);
+            
+            return base.ResetParam(newParams);
         }
-
-        public (string, IParameter)[] GetParamNames() => _param.GetParamNames();
-
-        public bool Deprecated => false;
+        
+        public new (string, IParameter)[] GetParamNames() => new (string, IParameter)[] { (OscMessage.Address, this) };
     }
 
     public class BoolParameter : OSCParams.BaseParam<bool>

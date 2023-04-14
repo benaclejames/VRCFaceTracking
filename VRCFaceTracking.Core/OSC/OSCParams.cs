@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using VRCFaceTracking.Params;
+﻿using System.Text.RegularExpressions;
+using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.OSC
 {
@@ -13,7 +12,7 @@ namespace VRCFaceTracking.OSC
         
         public static readonly List<OscMessageMeta> SendQueue = new();
         
-        public class BaseParam<T> : IParameter
+        public class BaseParam<T> : IParameter where T : struct
         {
             private readonly Func<UnifiedTrackingData, T> _getValueFunc;
 
@@ -75,13 +74,6 @@ namespace VRCFaceTracking.OSC
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
-                if (newParams == null)
-                {
-                    Relevant = false;
-                    OscMessage.Address = DefaultPrefix+_paramName;
-                    return Array.Empty<IParameter>();
-                }
-
                 Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
 
                 var compatibleParam = newParams.FirstOrDefault(param =>
@@ -109,8 +101,9 @@ namespace VRCFaceTracking.OSC
             protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
             
             ~BaseParam()
-            {
-               // UnifiedTracking.OnUnifiedDataUpdated -= Process;
+            {   
+                // Not sure if this is actually needed, but it's good practice
+               UnifiedTracking.OnUnifiedDataUpdated -= Process;
             }
         }
 
@@ -154,9 +147,6 @@ namespace VRCFaceTracking.OSC
             {
                 _params.Clear();
                 var negativeRelevancy = _negativeParam.ResetParam(newParams);
-
-                if (newParams == null)
-                    return Array.Empty<IParameter>();
 
                 // Get all parameters starting with this parameter's name, and of type bool
                 Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");

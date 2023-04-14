@@ -1,10 +1,6 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace VRCFaceTracking_Next.ViewModels;
+namespace VRCFaceTracking.ViewModels;
 
 // Output
 public class OutputViewModel : ObservableRecipient

@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Behaviors;
+﻿namespace VRCFaceTracking.Behaviors;
 
 public enum NavigationViewHeaderMode
 {

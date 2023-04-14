@@ -2,10 +2,9 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
+using VRCFaceTracking.Contracts.Services;
 
-using VRCFaceTracking_Next.Contracts.Services;
-
-namespace VRCFaceTracking_Next.Behaviors;
+namespace VRCFaceTracking.Behaviors;
 
 public class NavigationViewHeaderBehavior : Behavior<NavigationView>
 {

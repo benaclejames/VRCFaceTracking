@@ -2,11 +2,10 @@
 using System.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Windows.AppNotifications;
+using VRCFaceTracking.Contracts.Services;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.ViewModels;
 
-namespace VRCFaceTracking_Next.Notifications;
+namespace VRCFaceTracking.Notifications;
 
 public class AppNotificationService : IAppNotificationService
 {

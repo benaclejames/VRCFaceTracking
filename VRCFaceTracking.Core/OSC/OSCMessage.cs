@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using VRCFaceTracking_Next.Core.Types;
-using VRCFaceTracking.Params;
+﻿using System.Runtime.InteropServices;
+using VRCFaceTracking.Core.Types;
+using VRCFaceTracking.OSC;
 
-namespace VRCFaceTracking.OSC;
+namespace VRCFaceTracking.Core.OSC;
 
 public enum OscValueType : byte {
     Int = 0,

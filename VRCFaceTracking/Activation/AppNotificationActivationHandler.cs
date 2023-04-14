@@ -1,12 +1,9 @@
 ﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
-using Microsoft.Windows.AppNotifications;
+using VRCFaceTracking.Contracts.Services;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.ViewModels;
-
-namespace VRCFaceTracking_Next.Activation;
+namespace VRCFaceTracking.Activation;
 
 public class AppNotificationActivationHandler : ActivationHandler<LaunchActivatedEventArgs>
 {

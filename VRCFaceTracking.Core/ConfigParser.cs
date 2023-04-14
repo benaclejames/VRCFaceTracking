@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.OSC;
-using VRCFaceTracking.Params;
 
 namespace VRCFaceTracking
 {
@@ -43,9 +44,13 @@ namespace VRCFaceTracking
         }
 
         public static Action<IParameter[], AvatarConfigSpec> OnConfigLoaded = (_, _) => { };
+        public static string AvatarId = "";
 
         public void ParseNewAvatar(string newId)
         {
+            if (newId == AvatarId)
+                return;
+            
             AvatarConfigSpec avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
             {
@@ -76,6 +81,7 @@ namespace VRCFaceTracking
                 paramList.AddRange(parameter.ResetParam(parameters));
 
             OnConfigLoaded(paramList.ToArray(), avatarConfig);
+            AvatarId = newId;
         }
     }
 }

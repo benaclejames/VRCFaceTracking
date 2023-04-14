@@ -1,6 +1,7 @@
-﻿using VRCFaceTracking_Next.Core.Types;
+﻿using VRCFaceTracking.Core.Params.Expressions;
+using VRCFaceTracking.Core.Types;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Core.Params.Data
 {
     /// <summary>
     /// Struct that represents a single eye.

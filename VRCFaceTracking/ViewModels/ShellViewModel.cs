@@ -2,10 +2,10 @@
 
 using Microsoft.UI.Xaml.Navigation;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Views;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Views;
 
-namespace VRCFaceTracking_Next.ViewModels;
+namespace VRCFaceTracking.ViewModels;
 
 public class ShellViewModel : ObservableRecipient
 {

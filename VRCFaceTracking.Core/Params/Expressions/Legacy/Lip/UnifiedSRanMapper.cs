@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using VRCFaceTracking.Core.Params.Data;
 
-namespace VRCFaceTracking.Params.Lip
+namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Lip
 {
     internal static class UnifiedSRanMapper
     {

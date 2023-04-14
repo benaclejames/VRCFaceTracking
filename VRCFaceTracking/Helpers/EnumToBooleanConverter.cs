@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace VRCFaceTracking_Next.Helpers;
+namespace VRCFaceTracking.Helpers;
 
 public class EnumToBooleanConverter : IValueConverter
 {

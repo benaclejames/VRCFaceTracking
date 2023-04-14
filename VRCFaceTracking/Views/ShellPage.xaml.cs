@@ -2,14 +2,12 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Helpers;
-using VRCFaceTracking_Next.ViewModels;
-
 using Windows.System;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Helpers;
+using VRCFaceTracking.ViewModels;
 
-namespace VRCFaceTracking_Next.Views;
+namespace VRCFaceTracking.Views;
 
 // TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page

@@ -1,12 +1,10 @@
 ﻿<Page
-    x:Class="VRCFaceTracking_Next.Views.ShellPage"
+    x:Class="VRCFaceTracking.Views.ShellPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:helpers="using:VRCFaceTracking_Next.Helpers"
-    xmlns:behaviors="using:VRCFaceTracking_Next.Behaviors"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors1="using:VRCFaceTracking.Behaviors"
+    xmlns:helpers1="using:VRCFaceTracking.Helpers"
     Loaded="OnLoaded">
 
     <Page.Resources>
@@ -48,17 +46,17 @@
                 TODO: Update item icons by updating FontIcon.Glyph properties.
                 https://docs.microsoft.com/windows/apps/design/style/segoe-fluent-icons-font#icon-list
                 -->
-                <NavigationViewItem x:Uid="Shell_Home" helpers:NavigationHelper.NavigateTo="VRCFaceTracking_Next.ViewModels.HomeViewModel">
+                <NavigationViewItem x:Uid="Shell_Home" helpers1:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.HomeViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE80F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Uid="Shell_Devices" helpers:NavigationHelper.NavigateTo="VRCFaceTracking_Next.ViewModels.DevicesViewModel">
+                <NavigationViewItem x:Uid="Shell_Devices" helpers1:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.DevicesViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xF272;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Uid="Shell_Output" helpers:NavigationHelper.NavigateTo="VRCFaceTracking_Next.ViewModels.OutputViewModel">
+                <NavigationViewItem x:Uid="Shell_Output" helpers1:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.OutputViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe7c3;"/>
                     </NavigationViewItem.Icon>
@@ -74,9 +72,9 @@
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
             <i:Interaction.Behaviors>
-                <behaviors:NavigationViewHeaderBehavior
+                <behaviors1:NavigationViewHeaderBehavior
                     DefaultHeader="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}">
-                    <behaviors:NavigationViewHeaderBehavior.DefaultHeaderTemplate>
+                    <behaviors1:NavigationViewHeaderBehavior.DefaultHeaderTemplate>
                         <DataTemplate>
                             <Grid>
                                 <TextBlock
@@ -84,8 +82,8 @@
                                     Style="{ThemeResource TitleTextBlockStyle}" />
                             </Grid>
                         </DataTemplate>
-                    </behaviors:NavigationViewHeaderBehavior.DefaultHeaderTemplate>
-                </behaviors:NavigationViewHeaderBehavior>
+                    </behaviors1:NavigationViewHeaderBehavior.DefaultHeaderTemplate>
+                </behaviors1:NavigationViewHeaderBehavior>
             </i:Interaction.Behaviors>
             <Grid Margin="{StaticResource NavigationViewPageContentMargin}">
                 <Frame x:Name="NavigationFrame" />

@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 
-namespace VRCFaceTracking_Next.Contracts.Services;
+namespace VRCFaceTracking.Contracts.Services;
 
 public interface IThemeSelectorService
 {

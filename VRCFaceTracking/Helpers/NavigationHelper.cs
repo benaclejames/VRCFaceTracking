@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace VRCFaceTracking_Next.Helpers;
+namespace VRCFaceTracking.Helpers;
 
 // Helper class to set the navigation target for a NavigationViewItem.
 //

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace VRCFaceTracking_Next.ViewModels;
+namespace VRCFaceTracking.ViewModels;
 
 public class DevicesViewModel : ObservableRecipient
 {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using VRCFaceTracking.Core.Params.Data;
 
-namespace VRCFaceTracking.Params.Eye
+namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
 {
     public static class EyeTrackingParams
     {

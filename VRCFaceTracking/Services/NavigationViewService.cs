@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.UI.Xaml.Controls;
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Helpers;
+using VRCFaceTracking.ViewModels;
 
-using VRCFaceTracking_Next.Contracts.Services;
-using VRCFaceTracking_Next.Helpers;
-using VRCFaceTracking_Next.ViewModels;
-
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 
 public class NavigationViewService : INavigationViewService
 {

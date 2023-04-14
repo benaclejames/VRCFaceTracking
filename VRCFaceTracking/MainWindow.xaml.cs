@@ -1,6 +1,6 @@
-﻿using VRCFaceTracking_Next.Helpers;
+﻿using VRCFaceTracking.Helpers;
 
-namespace VRCFaceTracking_Next;
+namespace VRCFaceTracking;
 
 public sealed partial class MainWindow : WindowEx
 {

@@ -1,14 +1,19 @@
 ﻿<Page
-    x:Class="VRCFaceTracking_Next.Views.HomePage"
+    x:Class="VRCFaceTracking.Views.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:VRCFaceTracking.Helpers"
     mc:Ignorable="d">
     
-    <Grid x:Name="ContentArea">
+    <Page.Resources>
+        <local:StreamToBitmapConverter x:Key="ImageConverter"/>
+    </Page.Resources>
+    
+    <Grid>
         <StackPanel Orientation="Vertical">
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Modules}">
+                <ItemsControl ItemsSource="{x:Bind LibManager.Modules}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
@@ -19,15 +24,20 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <ItemsControl ItemsSource="{Binding Images}">
+                                    <ItemsControl ItemsSource="{Binding StaticImages, Converter={StaticResource ImageConverter}}" Grid.Column="0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Image Margin="15, 0"
+                                                <Image Margin="15, 15"
                                                        Source="{Binding}"
-                                                       HorizontalAlignment="Left"
-                                                       Width="150"
+                                                       HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Top"
                                                        Height="150"
-                                                       Stretch="Fill"/>
+                                                       Stretch="UniformToFill"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace VRCFaceTracking_Next.Contracts.Services;
+namespace VRCFaceTracking.Contracts.Services;
 
 public interface INavigationService
 {

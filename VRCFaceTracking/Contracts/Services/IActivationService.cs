@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking_Next.Contracts.Services;
+﻿namespace VRCFaceTracking.Contracts.Services;
 
 public interface IActivationService
 {

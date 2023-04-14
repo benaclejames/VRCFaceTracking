@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 
-namespace VRCFaceTracking_Next.Services;
+namespace VRCFaceTracking.Services;
 public class LoggingService
 {
     public static ObservableCollection<string> Logs = new ();

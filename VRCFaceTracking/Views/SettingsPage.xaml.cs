@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using VRCFaceTracking_Next.ViewModels;
 using Windows.System;
+using VRCFaceTracking.ViewModels;
 
-namespace VRCFaceTracking_Next.Views;
+namespace VRCFaceTracking.Views;
 
 // TODO: Set the URL for your privacy policy by updating SettingsPage_PrivacyTermsLink.NavigateUri in Resources.resw.
 public sealed partial class SettingsPage : Page

@@ -1,5 +1,6 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Library;
 
 namespace VRCFaceTracking
 {
@@ -13,6 +14,8 @@ namespace VRCFaceTracking
             ModuleState.Uninitialized);
 
         public ILogger Logger;
+
+        public ModuleMetadata ModuleInformation;
 
         public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
 

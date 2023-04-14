@@ -4,7 +4,8 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Windows.Markup;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Params;
+using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Params.Expressions;
 
 namespace VRCFaceTracking
 {

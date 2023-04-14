@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking.Params
+﻿namespace VRCFaceTracking.Core.Params.Expressions
 {
     // TODO: Create expressions map to relate legacy shapes to new ones
 

@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
-using VRCFaceTracking_Next.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking;
 
@@ -13,12 +17,15 @@ public class MainStandalone : IMainService
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
+    private readonly ILibManager _libManager;
+    public static Action<Action> DispatcherRun;
     
-    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo)
+    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
         OscMain = oscService;
         _avatarInfo = avatarInfo;
+        _libManager = libManager;
     }
 
     public void Teardown()
@@ -39,9 +46,10 @@ public class MainStandalone : IMainService
         UnifiedLibManager.SetTrackingEnabled(newEnabled);
     }
 
-    public async Task InitializeAsync()
+    public async Task InitializeAsync(Action<Action> dispatcherRun)
     {
         _logger.LogInformation("VRCFT Initializing!");
+        DispatcherRun = dispatcherRun;
 
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
@@ -62,7 +70,7 @@ public class MainStandalone : IMainService
 
         // Initialize Tracking Runtimes
         UnifiedLibManager.SetTrackingEnabled(true);
-        UnifiedLibManager.Initialize();
+        _libManager.Initialize();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
@@ -89,8 +97,8 @@ public class MainStandalone : IMainService
         ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
         {
             var token = (CancellationToken)ct;
+            
             var buffer = new byte[4096];
-            int oldMsgLen = 0;
             while (!token.IsCancellationRequested)
             {
                 Thread.Sleep(10);
@@ -104,16 +112,11 @@ public class MainStandalone : IMainService
                 var messageIndex = 0;
                 while (messageIndex < relevantMessages.Length)
                 {
-                    var length = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
-                    if (length > 4096)
+                    var nextByteIndex = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
+                    if (nextByteIndex > 4096)
                         throw new Exception("Bundle size is too large! This should never happen.");
                     
-                    // Zero out any bytes after the oldMessageLength to prevent sending old data.
-                    if (length < oldMsgLen)
-                        Array.Clear(buffer, length, oldMsgLen - length);
-
-                    OscMain.Send(buffer, length);
-                    oldMsgLen = length;
+                    OscMain.Send(buffer, nextByteIndex);
                     messageIndex++;
                 }
 

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
-using VRCFaceTracking.Params;
-using VRCFaceTracking.Params.Eye;
-using VRCFaceTracking.Params.LipMerging;
+using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Params.Expressions;
+using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
+using VRCFaceTracking.Core.Params.Expressions.Legacy.Lip;
+using VRCFaceTracking.Core.Types;
 
 namespace VRCFaceTracking
 {
@@ -48,7 +51,7 @@ namespace VRCFaceTracking
         /// <summary>
         /// Central update action for all expression data to subscribe to.
         /// </summary>
-        public static Action<UnifiedTrackingData> OnUnifiedDataUpdated = OnUnifiedDataUpdated ?? (data => {}); 
+        public static Action<UnifiedTrackingData> OnUnifiedDataUpdated = OnUnifiedDataUpdated + (_ => { }) ?? (_ => {}); 
 
         /// <summary>
         /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.

@@ -11,8 +11,8 @@
 
   <Identity
     Name="3B0C50A1-C1BE-4F6B-9A96-840C2A1C1EE5"
-    Publisher="CN=benaclejames"
-    Version="4.0.0.0" />
+    Publisher="CN=E=benaclejames@gmail.com, &quot;Open Source Developer, Benjamin Thomas&quot;, O=Open Source Developer, L=Gloucester, S=Gloucestershire, C=GB"
+    Version="5.0.0.0" />
 
   <Properties>
     <DisplayName>VRCFaceTracking</DisplayName>

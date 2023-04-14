@@ -1,12 +1,10 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking_Next.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Library;
 
-namespace VRCFaceTracking.OSC
+namespace VRCFaceTracking.Core.OSC
 {
     public class OscMain : IOSCService
     {

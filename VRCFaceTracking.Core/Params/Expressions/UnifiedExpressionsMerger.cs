@@ -1,7 +1,9 @@
-﻿using VRCFaceTracking_Next.Core.Types;
-using VRCFaceTracking.Params.Eye;
+﻿using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
+using VRCFaceTracking.Core.Types;
 
-namespace VRCFaceTracking.Params
+namespace VRCFaceTracking.Core.Params.Expressions
 {
     public static class UnifiedExpressionsMerger
     {
@@ -25,19 +27,32 @@ namespace VRCFaceTracking.Params
             new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
             new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
             
-            new ConditionalParameter(
-                new AlwaysRelevantParameter<Vector2>(exp =>
+            new NativeParameter<Vector2>(exp =>
                     {
                         var combined = exp.Eye.Combined().Gaze;
                         return new Vector2(-combined.ToPitch().y, combined.ToYaw().x);
-                    }, "/tracking/eye/CenterPitchYaw"),
+                    },
                 param => IsEyeParameter(
                     param.Where(p => 
                     p.name.Contains("Eye") && 
                     (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
                     (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
-                    .Length == 0
+                    .Length == 0,
+                "/tracking/eye/CenterPitchYaw"
                 ),
+
+            new NativeParameter<float>(exp =>
+                {
+                    return exp.Eye.Combined().Openness;
+                },
+                param => IsEyeParameter(
+                        param.Where(p =>
+                            p.name.Contains("Eye") &&
+                            (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) &&
+                            (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                    .Length == 0,
+                "/tracking/eye/EyesClosedAmount"
+            ),
             
             /*new AlwaysRelevantParameter<Vector4>(exp =>
             {
