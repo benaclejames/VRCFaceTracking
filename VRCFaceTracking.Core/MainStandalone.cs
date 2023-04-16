@@ -35,13 +35,8 @@ public class MainStandalone : IMainService
         
         Utils.TimeEndPeriod(1);
         _logger.LogInformation("VRCFT Standalone Exiting!");
-        UnifiedLibManager.TeardownAllAndReset();
+        _libManager.TeardownAllAndReset();
         Console.WriteLine("Shutting down");
-    }
-
-    public void SetEnabled(bool newEnabled)
-    {
-        UnifiedLibManager.SetTrackingEnabled(newEnabled);
     }
 
     public async Task InitializeAsync(Action<Action> dispatcherRun)
@@ -65,8 +60,6 @@ public class MainStandalone : IMainService
         // Try to load config and propogate data into Unified if they exist.
         UnifiedConfig.ReadConfiguration();
 
-        // Initialize Tracking Runtimes
-        UnifiedLibManager.SetTrackingEnabled(true);
         _libManager.Initialize();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>

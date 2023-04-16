@@ -6,11 +6,11 @@ using CommunityToolkit.Mvvm.Input;
 
 using Microsoft.UI.Xaml;
 
-
-using Windows.ApplicationModel;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Helpers;
+
+using Windows.ApplicationModel;
 
 namespace VRCFaceTracking.ViewModels;
 

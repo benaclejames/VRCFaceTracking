@@ -43,7 +43,7 @@ namespace VRCFaceTracking.Core.Params.Expressions
 
             new NativeParameter<float>(exp =>
                 {
-                    return exp.Eye.Combined().Openness;
+                    return 1 - exp.Eye.Combined().Openness;
                 },
                 param => IsEyeParameter(
                         param.Where(p =>

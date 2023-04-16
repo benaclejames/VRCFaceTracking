@@ -1,10 +1,9 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.ViewModels;
 using VRCFaceTracking.Views;
 
 namespace VRCFaceTracking.Services;
@@ -16,23 +15,16 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IOSCService _oscService;
     private readonly IMainService _mainService;
-    private readonly HomeViewModel _homeViewModel;
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
-        IEnumerable<IActivationHandler> activationHandlers,
-        IThemeSelectorService themeSelectorService,
-        IOSCService oscService,
-        IMainService mainService,
-        HomeViewModel homeViewModel
-    )
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
+        IMainService mainService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _oscService = oscService;
         _mainService = mainService;
-        _homeViewModel = homeViewModel;
     }
 
     public async Task ActivateAsync(object activationArgs)

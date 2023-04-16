@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.ViewModels;
 
@@ -21,7 +22,7 @@ public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventAr
 
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {
-        _navigationService.NavigateTo(typeof(HomeViewModel).FullName!, args.Arguments);
+        _navigationService.NavigateTo(typeof(MainViewModel).FullName!, args.Arguments);
 
         await Task.CompletedTask;
     }

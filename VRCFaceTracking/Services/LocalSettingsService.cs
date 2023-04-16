@@ -1,9 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
-using Windows.Storage;
+
+using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
+
+using Windows.ApplicationModel;
+using Windows.Storage;
 
 namespace VRCFaceTracking.Services;
 

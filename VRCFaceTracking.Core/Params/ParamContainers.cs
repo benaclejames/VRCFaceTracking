@@ -23,7 +23,11 @@ namespace VRCFaceTracking.Core.Params
 
         public new (string, IParameter)[] GetParamNames() => new[] { (OscMessage.Address, (IParameter)this) };
         
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => new IParameter[] { this };
+        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        {
+            Relevant = true;
+            return new IParameter[] { this };
+        }
     }
 
     public class NativeParameter<T> : AlwaysRelevantParameter<T>, IParameter where T : struct

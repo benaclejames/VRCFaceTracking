@@ -14,10 +14,10 @@ public class PageService : IPageService
 
     public PageService()
     {
-        Configure<HomeViewModel, HomePage>();
-        Configure<DevicesViewModel, DevicesPage>();
-        Configure<OutputViewModel, OutputPage>();
+        Configure<MainViewModel, MainPage>();
         Configure<SettingsViewModel, SettingsPage>();
+        Configure<OutputViewModel, OutputPage>();
+        Configure<ParametersViewModel, ParametersPage>();
     }
 
     public Type GetPageType(string key)

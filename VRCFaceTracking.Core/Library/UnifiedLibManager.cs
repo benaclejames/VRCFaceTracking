@@ -28,8 +28,9 @@ public class UnifiedLibManager : ILibManager
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger("UnifiedLibManager");
-        Modules = new ObservableCollection<ModuleMetadata>();
         _dispatcherService = dispatcherService;
+
+        Modules = new ObservableCollection<ModuleMetadata>();
     }
 
     #endregion
@@ -63,7 +64,6 @@ public class UnifiedLibManager : ILibManager
     internal static List<Assembly> RequestedModules = new();
     private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
     private static readonly Dictionary<ExtTrackingModule, CancellationTokenSource> UsefulThreads = new();
-    private static bool _enableTracking = true;
     #endregion
 
     private static Thread _initializeWorker;
@@ -94,11 +94,6 @@ public class UnifiedLibManager : ILibManager
         if (RequestedModules != null && RequestedModules.Count > 0)
             CreateModuleInitializer(RequestedModules);
         else CreateModuleInitializer(AvailableModules);
-    }
-
-    public static void SetTrackingEnabled(bool newEnabled)
-    {
-        _enableTracking = newEnabled;
     }
 
     public static void ReloadModules()
@@ -207,7 +202,7 @@ public class UnifiedLibManager : ILibManager
             var token = (CancellationToken)state;
             while(!token.IsCancellationRequested)
             {
-                if (_enableTracking)
+                if (module.Status.EyeState == ModuleState.Active || module.Status.ExpressionState == ModuleState.Active)
                 {
                     module.Update();
                 }
@@ -216,7 +211,7 @@ public class UnifiedLibManager : ILibManager
         UsefulThreads.Add(module, cts);
     }
 
-    private static void AttemptModuleInitialize(ExtTrackingModule module)
+    private void AttemptModuleInitialize(ExtTrackingModule module)
     {
         if (!module.Supported.SupportsEye && !module.Supported.SupportsExpression)
         {
@@ -240,11 +235,23 @@ public class UnifiedLibManager : ILibManager
             _logger.LogError(e.Message);
         }
 
+        module.ModuleInformation.OnActiveChange = state =>
+        {
+            module.Status.ExpressionState = state ? ModuleState.Active : ModuleState.Idle;
+            module.Status.EyeState = state ? ModuleState.Active : ModuleState.Idle;
+        };
+
         // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
         if (eyeSuccess && _loadedEyeModule == null)
         {
             _loadedEyeModule = module;
             EyeStatus = ModuleState.Active;
+            module.ModuleInformation.Active = true;
+            _dispatcherService.Run(() =>
+            {
+                if (!Modules.Contains(module.ModuleInformation))
+                    Modules.Add(module.ModuleInformation);
+            });
             EnsureModuleThreadStarted(module);
         }
 
@@ -253,12 +260,24 @@ public class UnifiedLibManager : ILibManager
         {
             _loadedExpressionModule = module;
             ExpressionStatus = ModuleState.Active;
+            module.ModuleInformation.Active = true;
+            _dispatcherService.Run(() =>
+            {
+                if (!Modules.Contains(module.ModuleInformation))
+                    Modules.Add(module.ModuleInformation);
+            });
             EnsureModuleThreadStarted(module);
         }
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
     {
+        /*_dispatcherService.Run(() => Modules.Add(new()
+        {
+            Active = false,
+            Name = "Loading Modules..."
+        }));*/
+
         _logger.LogInformation("Initializing runtimes...");
 
         foreach (Assembly module in moduleType)
@@ -269,7 +288,6 @@ public class UnifiedLibManager : ILibManager
             _logger.LogInformation("Initializing module: " + module.ToString());
             var loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
-            _dispatcherService.Run(() => Modules.Add(loadedModule.ModuleInformation));
         }
 
         if (EyeStatus != ModuleState.Uninitialized) _logger.LogInformation("Eye Tracking Initialized via " + _loadedEyeModule);
@@ -277,10 +295,26 @@ public class UnifiedLibManager : ILibManager
 
         if (ExpressionStatus != ModuleState.Uninitialized) _logger.LogInformation("Expression Tracking Initialized via " +  _loadedExpressionModule);
         else _logger.LogWarning("Expression Tracking will be unavailable for this session.");
+        
+        // If both modules are uninitialized, we can't do anything
+        /*if (EyeStatus == ModuleState.Uninitialized && ExpressionStatus == ModuleState.Uninitialized)
+        {
+            _dispatcherService.Run(() => Modules[0] = new ModuleMetadata()
+                {
+                    Name = "Couldn't load any modules!",
+                    Active = false
+                }
+            );
+        }
+        else
+        {
+            // Remove the loading module
+            _dispatcherService.Run(() => Modules.RemoveAt(0));
+        }*/
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
-    public static void TeardownAllAndReset()
+    public void TeardownAllAndReset()
     {
         foreach (var module in UsefulThreads)
         {
@@ -296,5 +330,7 @@ public class UnifiedLibManager : ILibManager
 
         _loadedEyeModule = null;
         _loadedExpressionModule = null;
+
+        //_dispatcherService.Run(() => Modules.Clear());
     }
 }

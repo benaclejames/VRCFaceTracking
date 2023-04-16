@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>VRCFaceTracking</RootNamespace>
-    <ApplicationIcon>Assets\WindowIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
@@ -14,109 +14,41 @@
 	<UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <PackageCertificateThumbprint>EEF215D509BA7B20E38BBFF6BEBC3124EE08F35C</PackageCertificateThumbprint>
-    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>EEF215D509BA7B20E38BBFF6BEBC3124EE08F35C</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxBundle>Never</AppxBundle>
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/download/v4.0.0/VRCFaceTracking.exe</AppInstallerUri>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Assets\qpro - Copy.png" />
-    <Content Remove="Assets\qpro.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-100.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-125.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-150.png" />
-    <Content Remove="Assets\Square44x44Logo.scale-400.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-16.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-24.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
-    <Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
-    <Content Remove="Assets\StoreLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\qpro.png" />
-    <None Remove="Assets\Tiles\SmallTile-github.png" />
-    <None Remove="Assets\WindowIcon.ico" />
-    <None Remove="BlankPage1.xaml" />
-  </ItemGroup>
 
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.17" />
+    <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230217.4" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.8" />
-    <PackageReference Include="WinUIEx" Version="1.8.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
+    <PackageReference Include="WinUIEx" Version="2.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Assets\ActivityLogos\Active\Bottom.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\ActivityLogos\Active\Top.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\ActivityLogos\Idle\Bottom.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\ActivityLogos\Idle\Top.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\ActivityLogos\Uninitialized\Bottom.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\ActivityLogos\Uninitialized\Top.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\QuestPro.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\Tiles\SmallTile-github.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\WindowIcon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Update="BlankPage1.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\ActivityLogos\" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

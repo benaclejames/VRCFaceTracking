@@ -123,14 +123,14 @@
   <data name="AppDescription" xml:space="preserve">
     <value>VRCFaceTracking</value>
   </data>
-  <data name="Shell_Home.Content" xml:space="preserve">
+  <data name="Shell_Main.Content" xml:space="preserve">
     <value>Home</value>
   </data>
-  <data name="Shell_Devices.Content" xml:space="preserve">
-    <value>Tracking</value>
+  <data name="ListDetails_NoSelection.Text" xml:space="preserve">
+    <value>Select an item from the list.</value>
   </data>
-  <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Output</value>
+  <data name="Shell_ListDetails.Content" xml:space="preserve">
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
     <value>Personalization</value>
@@ -151,38 +151,32 @@
     <value>About this application</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>This application is designed to allow your face tracking devices to communicate with your VRChat avatar via the Avatars OSC system. You MUST have an avatar that supports face tracking to fully utilize this applcation. Below you can find a button to join our Discord, and to accordance a Privacy Statement to list this application on the Microsoft Store.</value>
+    <value>VRChat OSC App to allow AV3 Avatars to interact with eye and lip tracking runtimes</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
     <value>Privacy Statement</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
-    <value>https://www.youtube.com/shorts/6pdH_x1e3Dw</value>
+    <value>https://github.com/benaclejames/VRCFaceTracking</value>
   </data>
   <data name="AppNotificationSamplePayload" xml:space="preserve">
     <value>&lt;toast launch="action=ToastClick"&gt;
   &lt;visual&gt;
     &lt;binding template="ToastGeneric"&gt;
-      &lt;text&gt;VRCFT Notification&lt;/text&gt;
+      &lt;text&gt;App Notification&lt;/text&gt;
       &lt;text&gt;&lt;/text&gt;
       &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
     &lt;/binding&gt;
   &lt;/visual&gt;
+  &lt;actions&gt;
+    &lt;action content="Settings" arguments="action=Settings"/&gt;
+  &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="Button_Clear.Content" xml:space="preserve">
-    <value>Clear</value>
-  </data>
-  <data name="Button_Reset.Content" xml:space="preserve">
-    <value>Reset</value>
-  </data>
-  <data name="Button_Save.Content" xml:space="preserve">
-    <value>Save</value>
-  </data>
-  <data name="Output_Dropdown.Text" xml:space="preserve">
+  <data name="Shell_Output.Content" xml:space="preserve">
     <value>Output</value>
   </data>
-  <data name="Shell_About.Content" xml:space="preserve">
-    <value>About</value>
+  <data name="Shell_Parameters.Content" xml:space="preserve">
+    <value>Parameters</value>
   </data>
 </root>

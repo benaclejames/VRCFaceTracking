@@ -1,12 +1,13 @@
 ﻿using System.Reflection;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
@@ -80,6 +81,7 @@ public partial class App : Application
             LoggingService.Setup(DispatcherQueue.GetForCurrentThread());
 
             // Core Services
+            services.AddSingleton<ISampleDataService, SampleDataService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IOSCService, OscMain>();
             services.AddSingleton<IMainService, MainStandalone>();
@@ -87,23 +89,19 @@ public partial class App : Application
             services.AddSingleton<ModuleAttributeHandler>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
-            UnifiedTrackingMutator.InitializeLogger(services.BuildServiceProvider().GetService<ILoggerFactory>());
 
             // Views and ViewModels
-            services.AddTransient<SettingsViewModel>();
-            services.AddTransient<SettingsPage>();
+            services.AddTransient<ParametersViewModel>();
+            services.AddTransient<ParametersPage>();
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
-            services.AddTransient<DevicesViewModel>();
-            services.AddTransient<DevicesPage>();
-            services.AddSingleton<HomeViewModel>();
-            services.AddTransient<HomePage>();
+            services.AddTransient<SettingsViewModel>();
+            services.AddTransient<SettingsPage>();
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
             services.AddSingleton<IAvatarInfo, AvatarViewModel>();
-
-            // Logging
-            services.AddLogging();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

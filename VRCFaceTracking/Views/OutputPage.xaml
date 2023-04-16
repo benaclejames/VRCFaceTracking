@@ -6,35 +6,51 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea">
-        <StackPanel Orientation="Vertical">
-            <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Margin="10, 4" Click="ButtonBase_OnClick">Save To File</Button>
-                    </StackPanel>
-                </Grid>
-            </Border>
+  <Grid x:Name="ContentArea">
+      <StackPanel Orientation="Vertical">
+          <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+              <Grid>
+                  <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <StackPanel Padding="10, 10, 0, 10" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                      <Button ToolTipService.ToolTip="Copy to Clipboard" Click="CopyToClipboard_OnClick" Height="36">
+                          <Button.Content>
+                              <FontIcon FontSize="20" Glyph="&#xE8C8;" />
+                          </Button.Content>
+                      </Button>
+                      <AppBarSeparator Margin="5, 0, 5, 0"/>
+                      <Button ToolTipService.ToolTip="Save to File" Click="SaveToFile_OnClick" Height="36">
+                          <Button.Content>
+                              <FontIcon FontSize="20" Glyph="&#xEA35;" />
+                          </Button.Content>
+                      </Button>
+                      <TextBlock x:Name="SaveStatus" TextWrapping="Wrap" VerticalAlignment="Center" Style="{ThemeResource DetailBodyBaseMediumStyle}" Padding="20, 0, 0, 0"/>
+                  </StackPanel>
+              </Grid>
+          </Border>
 
-            <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                        <StackPanel Name="LogStack" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,10,10,0">
-                            <ItemsControl ItemsSource="{x:Bind Log}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
-            </Border>
-        </StackPanel>
-    </Grid>
+          <Border Margin="0, 20, 0, 20" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+              <ScrollViewer Grid.Row="1"
+                            Padding="10,0,10,0"
+                            IsTabStop="False"
+                            UseSystemFocusVisuals="False"
+                            VerticalScrollBarVisibility="Auto"
+                            VerticalScrollMode="Auto">
+                  <StackPanel Name="LogStack" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                      <ItemsControl ItemsSource="{x:Bind Log}">
+                          <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding}"/>
+                              </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                  </StackPanel>
+              </ScrollViewer>
+          </Border>
+      </StackPanel>
+  </Grid>
 </Page>

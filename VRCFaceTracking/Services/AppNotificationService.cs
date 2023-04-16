@@ -1,21 +1,20 @@
 ﻿using System.Collections.Specialized;
 using System.Web;
-using Microsoft.Extensions.Logging;
-using Microsoft.Windows.AppNotifications;
-using VRCFaceTracking.Contracts.Services;
 
+using Microsoft.Windows.AppNotifications;
+
+using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Notifications;
 
 public class AppNotificationService : IAppNotificationService
 {
     private readonly INavigationService _navigationService;
-    private readonly ILogger<AppNotificationService> _logger;
 
-    public AppNotificationService(INavigationService navigationService, ILogger<AppNotificationService> logger)
+    public AppNotificationService(INavigationService navigationService)
     {
         _navigationService = navigationService;
-        _logger = logger;
     }
 
     ~AppNotificationService()

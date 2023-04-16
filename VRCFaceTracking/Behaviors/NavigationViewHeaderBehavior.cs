@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Xaml.Interactivity;
+
 using VRCFaceTracking.Contracts.Services;
 
 namespace VRCFaceTracking.Behaviors;

@@ -2,10 +2,12 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Windows.System;
+
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.ViewModels;
+
+using Windows.System;
 
 namespace VRCFaceTracking.Views;
 
@@ -36,8 +38,6 @@ public sealed partial class ShellPage : Page
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        TitleBarHelper.UpdateTitleBar(RequestedTheme);
-
         KeyboardAccelerators.Add(BuildKeyboardAccelerator(VirtualKey.Left, VirtualKeyModifiers.Menu));
         KeyboardAccelerators.Add(BuildKeyboardAccelerator(VirtualKey.GoBack));
     }

@@ -1,6 +1,7 @@
-﻿using Windows.Storage;
+﻿using VRCFaceTracking.Core.Helpers;
+
+using Windows.Storage;
 using Windows.Storage.Streams;
-using VRCFaceTracking.Core.Helpers;
 
 namespace VRCFaceTracking.Helpers;
 

@@ -2,9 +2,9 @@
 
 namespace VRCFaceTracking.ViewModels;
 
-public class OutputViewModel : ObservableRecipient
+public class ParametersViewModel : ObservableRecipient
 {
-    public OutputViewModel()
+    public ParametersViewModel()
     {
     }
 }

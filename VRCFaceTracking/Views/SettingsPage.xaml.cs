@@ -1,7 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.System;
+
 using VRCFaceTracking.ViewModels;
+using Windows.System;
 
 namespace VRCFaceTracking.Views;
 
@@ -9,13 +10,13 @@ namespace VRCFaceTracking.Views;
 public sealed partial class SettingsPage : Page
 {
     public string Version
+    {
+        get
         {
-            get
-            {
-                var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-                return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
-            }
+            var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+            return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
         }
+    }
 
     public SettingsViewModel ViewModel
     {
@@ -41,7 +42,7 @@ public sealed partial class SettingsPage : Page
             case ElementTheme.Default:
                 themeMode.SelectedIndex = 2; break;
         }
-        
+
         RecvPort.Value = ViewModel.RecvPort;
         SendPort.Value = ViewModel.SendPort;
         Address.Text = ViewModel.Address;

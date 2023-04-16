@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.UI.Xaml.Controls;
+
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.ViewModels;

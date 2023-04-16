@@ -7,8 +7,11 @@ public class StreamToBitmapConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        var imageSources = (List<Stream>)value;
         var bitmapImages = new List<BitmapImage>();
+        if (value == null)
+            return bitmapImages;
+        
+        var imageSources = (List<Stream>)value;
         foreach (var imageSource in imageSources)
         {
             var bitmapImage = new BitmapImage();
