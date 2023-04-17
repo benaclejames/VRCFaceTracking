@@ -17,7 +17,15 @@ public class MainStandalone : IMainService
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
-    
+
+    public Action<string, float> ParameterUpdate
+    {
+        get;
+        set;
+    } = (s, f) =>
+    {
+    };
+
     public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
@@ -106,6 +114,8 @@ public class MainStandalone : IMainService
                     if (nextByteIndex > 4096)
                         throw new Exception("Bundle size is too large! This should never happen.");
                     
+                    if (relevantMessages[messageIndex].Type == OscValueType.Float)
+                        ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
                     OscMain.Send(buffer, nextByteIndex);
                     messageIndex++;
                 }

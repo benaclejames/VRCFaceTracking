@@ -14,12 +14,16 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
+        public Action OnMessageDispatched { get; set; }
+        public Action<OscMessageMeta> OnMessageReceived { get; set; }
 
         public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
         {
             _localSettingsService = localSettingsService;
             _configParser = configParser;
             _logger = loggerFactory.CreateLogger("OSC");
+            OnMessageDispatched = () => { };
+            OnMessageReceived = HandleNewMessage;
         }
 
         public int InPort { get; set; }
@@ -130,15 +134,20 @@ namespace VRCFaceTracking.Core.OSC
             }
             var newMsg = new OscMessage(buffer);
             Array.Clear(buffer, 0, bytesReceived);
-            switch (newMsg.Address)
+            OnMessageReceived(newMsg._meta);
+        }
+        
+        private void HandleNewMessage(OscMessageMeta msg)
+        {
+            switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar((string)newMsg.Value);
+                    _configParser.ParseNewAvatar(msg.Value.StringValue);
                     break;
                 case "/avatar/parameters/EyeTrackingActive":
                     if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)
                     {
-                        if (!(bool)newMsg.Value)
+                        if (!msg.Value.BoolValue)
                             UnifiedLibManager.EyeStatus = ModuleState.Idle;
                         else UnifiedLibManager.EyeStatus = ModuleState.Active;
                     }
@@ -147,7 +156,7 @@ namespace VRCFaceTracking.Core.OSC
                 case "/avatar/parameters/ExpressionTrackingActive":
                     if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
                     {
-                        if (!(bool)newMsg.Value)
+                        if (!msg.Value.BoolValue)
                             UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
                         else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
                     }
@@ -155,6 +164,10 @@ namespace VRCFaceTracking.Core.OSC
             }
         }
 
-        public void Send(byte[] data, int length) => SenderClient.Send(data, length, SocketFlags.None);
+        public void Send(byte[] data, int length)
+        {
+            SenderClient.Send(data, length, SocketFlags.None);
+            OnMessageDispatched();
+        }
     }
 }

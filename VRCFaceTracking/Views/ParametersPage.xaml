@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:VRCFaceTracking.Views"
     mc:Ignorable="d">
 
     <Border Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
@@ -20,39 +21,16 @@
                 <!-- Horizontal separator -->
                 <NavigationViewItemSeparator Margin="0, 10, 0, 10"/>
                
-                <Border Padding="10" CornerRadius="6" BorderThickness="1" Margin="10" Background="{ThemeResource LayerFillColorAltBrush}">
+                <Border x:Name="TrackedEyeParameters" Padding="10" CornerRadius="6" BorderThickness="1" Margin="10" Background="{ThemeResource LayerFillColorAltBrush}">
                     <StackPanel>
-                        <Grid Padding="0,2,0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4*" /> <!-- sets the width of the first column to fit the TextBlock content -->
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="6*" /> <!-- sets the width of the second column to take up the remaining space -->
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource DetailSubTitleStyle}" Text="RightEyeOpenness" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                            <AppBarSeparator Grid.Column="1" Margin="10,0,10, 0" VerticalAlignment="Stretch"/>
-                            <ProgressBar Grid.Column="2" Value="40"/>
-                        </Grid>
-                        <Grid Padding="0,2,0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4*" /> <!-- sets the width of the first column to fit the TextBlock content -->
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="6*" /> <!-- sets the width of the second column to take up the remaining space -->
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource DetailSubTitleStyle}" Text="LeftEyeOpenness" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                            <AppBarSeparator Grid.Column="1" Margin="10,0,10, 0" VerticalAlignment="Stretch"/>
-                            <ProgressBar Grid.Column="2" Value="80"/>
-                        </Grid>
-                        <Grid Padding="0,2,0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="4*" /> <!-- sets the width of the first column to fit the TextBlock content -->
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="6*" /> <!-- sets the width of the second column to take up the remaining space -->
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Style="{StaticResource DetailSubTitleStyle}" Text="JawX" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                            <AppBarSeparator Grid.Column="1" Margin="10,0,10, 0" VerticalAlignment="Stretch"/>
-                            <ProgressBar Grid.Column="2" Value="70"/>
-                        </Grid>
-                    </StackPanel>
+                      <ItemsControl ItemsSource="{x:Bind _trackedParameters, Mode=OneWay}">
+                          <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                  <views:ParameterDebugUserControl/>
+                              </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                  </StackPanel>
                 </Border>
             </StackPanel>
 

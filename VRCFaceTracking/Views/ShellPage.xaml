@@ -48,11 +48,11 @@
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE80F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Uid="Shell_Parameters" helpers:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.ParametersViewModel">
+                <!--<NavigationViewItem x:Uid="Shell_Parameters" helpers:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.ParametersViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE9E9;"/>
                     </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                </NavigationViewItem>-->
                 <NavigationViewItem x:Uid="Shell_Output" helpers:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.OutputViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;"/>
