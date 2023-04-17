@@ -202,11 +202,8 @@ public class UnifiedLibManager : ILibManager
             var token = (CancellationToken)state;
             while(!token.IsCancellationRequested)
             {
-                if (module.Status.EyeState == ModuleState.Active || module.Status.ExpressionState == ModuleState.Active)
-                {
                     module.Update();
                 }
-            }
         }, cts.Token);
         UsefulThreads.Add(module, cts);
     }
