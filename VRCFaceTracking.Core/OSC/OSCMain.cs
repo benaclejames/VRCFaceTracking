@@ -135,6 +135,7 @@ namespace VRCFaceTracking.Core.OSC
                 case "/avatar/change":
                     _configParser.ParseNewAvatar((string)newMsg.Value);
                     break;
+                /*
                 case "/avatar/parameters/EyeTrackingActive":
                     if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)
                     {
@@ -152,6 +153,7 @@ namespace VRCFaceTracking.Core.OSC
                         else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
                     }
                     break;
+                */
             }
         }
 
