@@ -1,0 +1,76 @@
+﻿<UserControl
+    x:Class="VRCFaceTracking.Views.ModuleRegistryDetailControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <ScrollViewer
+        Name="ForegroundElement"
+        HorizontalAlignment="Stretch"
+        VerticalScrollMode="Enabled"
+        IsTabStop="True">
+        <StackPanel HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBlock
+                    Margin="{StaticResource SmallLeftMargin}"
+                    VerticalAlignment="Center"
+                    Text="{x:Bind ListDetailsMenuItem.ModuleName, Mode=OneWay}"
+                    Style="{ThemeResource TitleTextBlockStyle}" />
+            </StackPanel>
+            <StackPanel Padding="0,15,0,0">
+                <TextBlock Text="Author" Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.AuthorName, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Version"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.Version, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Downloads"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.Downloads, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Rating"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <RatingControl AutomationProperties.Name="Module Rating" IsClearEnabled="False"
+                               IsReadOnly="False" Caption="312 ratings" PlaceholderValue="{x:Bind ListDetailsMenuItem.Rating}" 
+                               HorizontalAlignment="Left"/>
+                
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Module Page"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <HyperlinkButton Content="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}"  NavigateUri="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}" Padding="0" Margin="0"/>
+                
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Last Updated"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.LastUpdated, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Description"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.ModuleDescription, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                
+                <TextBlock
+                    Margin="{StaticResource SmallTopMargin}"
+                    Text="Usage Instructions"
+                    Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock Text="{x:Bind ListDetailsMenuItem.UsageInstructions, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
+                
+                <AppBarSeparator/>
+                
+                <Button Content="Install Module" Click="Install_Click" />
+                
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

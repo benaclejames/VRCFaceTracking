@@ -179,4 +179,10 @@
   <data name="Shell_Parameters.Content" xml:space="preserve">
     <value>Parameters</value>
   </data>
+  <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
+    <value>Select an item from the list.</value>
+  </data>
+  <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
+    <value>Module Registry</value>
+  </data>
 </root>
