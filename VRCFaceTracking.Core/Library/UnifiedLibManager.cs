@@ -154,7 +154,7 @@ public class UnifiedLibManager : ILibManager
         return null;
     }
 
-    public static List<Assembly> LoadExternalAssemblies(string[] path, bool useAttributes = true)
+    public static List<Assembly> LoadExternalAssemblies(string[] path)
     {
         var returnList = new List<Assembly>();
         foreach (var dll in path)
@@ -174,17 +174,6 @@ public class UnifiedLibManager : ILibManager
             {
                 _logger.LogWarning(e.Message + " Assembly not able to be loaded. Skipping.");
                 continue;
-            }
-        }
-        if (useAttributes) 
-        {
-            try
-            {
-                ModuleAttributeHandler.HandleModuleAttributes(ref returnList);
-            }
-            catch(Exception e)
-            {
-                _logger.LogError(e.Message);
             }
         }
 
