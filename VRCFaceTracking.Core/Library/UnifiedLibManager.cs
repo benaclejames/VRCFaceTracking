@@ -15,13 +15,10 @@ public enum ModuleState
 
 public class UnifiedLibManager : ILibManager
 {
-    #region Delegates
-    public static Action<ModuleState, ModuleState> OnTrackingStateUpdate = (b, b1) => { };
-
     private static ILogger _logger;
     private static ILoggerFactory _loggerFactory;
     
-    public ObservableCollection<ModuleMetadata> Modules { get; set; }
+    public ObservableCollection<ModuleMetadata> ModuleMetadatas { get; set; }
     private readonly IDispatcherService _dispatcherService;
 
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService)
@@ -30,39 +27,18 @@ public class UnifiedLibManager : ILibManager
         _logger = factory.CreateLogger("UnifiedLibManager");
         _dispatcherService = dispatcherService;
 
-        Modules = new ObservableCollection<ModuleMetadata>();
+        ModuleMetadatas = new ObservableCollection<ModuleMetadata>();
     }
-
-    #endregion
 
     #region Statuses
-    public static ModuleState EyeStatus
-    {
-        get => _loadedEyeModule?.Status.EyeState ?? ModuleState.Uninitialized;
-        set
-        {
-            if (_loadedEyeModule != null)
-                _loadedEyeModule.Status.EyeState = value;
-            OnTrackingStateUpdate.Invoke(value, ExpressionStatus);
-        }
-    }
-
-    public static ModuleState ExpressionStatus
-    {
-        get => _loadedExpressionModule?.Status.ExpressionState ?? ModuleState.Uninitialized;
-        set
-        {
-            if (_loadedExpressionModule != null)
-                _loadedExpressionModule.Status.ExpressionState = value;
-            OnTrackingStateUpdate.Invoke(EyeStatus, value);
-        }
-    }
+    public static ModuleState EyeStatus { get; private set; }
+    public static ModuleState ExpressionStatus { get; private set; }
     #endregion
 
     #region Modules
     public static List<Assembly> AvailableModules { get; private set; }
     internal static List<Assembly> RequestedModules = new();
-    private static ExtTrackingModule _loadedEyeModule, _loadedExpressionModule;
+    internal static List<ExtTrackingModule> ActiveModules = new();
     private static readonly Dictionary<ExtTrackingModule, CancellationTokenSource> UsefulThreads = new();
     #endregion
 
@@ -104,13 +80,6 @@ public class UnifiedLibManager : ILibManager
     private static string[] GetAllModulePaths()
     {
         List<string> modulePaths = new List<string>();
-
-        /*
-        string customLibsExe = "CustomLibs";
-
-        if (Directory.Exists(customLibsExe))
-            modulePaths.AddRange(Directory.GetFiles(customLibsExe, "*.dll"));
-        */
 
         if (!Directory.Exists(Utils.CustomLibsDirectory))
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
@@ -191,8 +160,8 @@ public class UnifiedLibManager : ILibManager
             var token = (CancellationToken)state;
             while(!token.IsCancellationRequested)
             {
-                    module.Update();
-                }
+                module.Update();
+            }
         }, cts.Token);
         UsefulThreads.Add(module, cts);
     }
@@ -200,60 +169,43 @@ public class UnifiedLibManager : ILibManager
     private void AttemptModuleInitialize(ExtTrackingModule module)
     {
         if (!module.Supported.SupportsEye && !module.Supported.SupportsExpression)
-        {
             return;
-        }
 
         module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
         bool eyeSuccess = false, expressionSuccess = false;
         try
         {
-            (eyeSuccess, expressionSuccess) = module.Initialize(_loadedEyeModule == null, _loadedExpressionModule == null);
+            (eyeSuccess, expressionSuccess) = module.Initialize(EyeStatus == ModuleState.Uninitialized, ExpressionStatus == ModuleState.Uninitialized);
         }
         catch (MissingMethodException)
         {
             _logger.LogError(module.GetType().Name + " does not properly implement ExtTrackingModule. Skipping.");
+            return;
         }
         catch (Exception e)
         {
             _logger.LogError("Exception initializing " + module.GetType().Name + ". Skipping.");
             _logger.LogError(e.Message);
+            return;
         }
 
         module.ModuleInformation.OnActiveChange = state =>
-        {
-            module.Status.ExpressionState = state ? ModuleState.Active : ModuleState.Idle;
-            module.Status.EyeState = state ? ModuleState.Active : ModuleState.Idle;
-        };
+            module.Status = state ? ModuleState.Active : ModuleState.Idle;
 
-        // If eyeSuccess is true, set the eye status to active and load the eye module slot. Overlapping eye modules won't be loaded.
-        if (eyeSuccess && _loadedEyeModule == null)
-        {
-            _loadedEyeModule = module;
-            EyeStatus = ModuleState.Active;
-            module.ModuleInformation.Active = true;
-            _dispatcherService.Run(() =>
-            {
-                if (!Modules.Contains(module.ModuleInformation))
-                    Modules.Add(module.ModuleInformation);
-            });
-            EnsureModuleThreadStarted(module);
-        }
+        // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
+        if (!eyeSuccess && !expressionSuccess) return;
+        EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        EyeStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
-        // If expressionSuccess is true, set the eye status to active and load the expressions/s module slot. Overlapping expression modules won't be loaded (may change in the future).
-        if (expressionSuccess && _loadedExpressionModule == null)
+        ActiveModules.Add(module);
+        module.ModuleInformation.Active = true;
+        _dispatcherService.Run(() =>
         {
-            _loadedExpressionModule = module;
-            ExpressionStatus = ModuleState.Active;
-            module.ModuleInformation.Active = true;
-            _dispatcherService.Run(() =>
-            {
-                if (!Modules.Contains(module.ModuleInformation))
-                    Modules.Add(module.ModuleInformation);
-            });
-            EnsureModuleThreadStarted(module);
-        }
+            if (!ModuleMetadatas.Contains(module.ModuleInformation))
+                ModuleMetadatas.Add(module.ModuleInformation);
+        });
+        EnsureModuleThreadStarted(module);
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
@@ -268,19 +220,16 @@ public class UnifiedLibManager : ILibManager
 
         foreach (Assembly module in moduleType)
         {
-            if (_loadedEyeModule != null && _loadedExpressionModule != null)
-                break;
-
             _logger.LogInformation("Initializing module: " + module.ToString());
             var loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
         }
 
-        if (EyeStatus != ModuleState.Uninitialized) _logger.LogInformation("Eye Tracking Initialized via " + _loadedEyeModule);
-        else _logger.LogWarning("Eye Tracking will be unavailable for this session.");
-
-        if (ExpressionStatus != ModuleState.Uninitialized) _logger.LogInformation("Expression Tracking Initialized via " +  _loadedExpressionModule);
-        else _logger.LogWarning("Expression Tracking will be unavailable for this session.");
+        foreach (ExtTrackingModule module in ActiveModules)
+        {
+            if (module.ModuleInformation.Active)
+                _logger.LogInformation("Tracking initialized using " + module.ToString());
+        }
         
         // If both modules are uninitialized, we can't do anything
         /*if (EyeStatus == ModuleState.Uninitialized && ExpressionStatus == ModuleState.Uninitialized)
@@ -314,8 +263,7 @@ public class UnifiedLibManager : ILibManager
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
 
-        _loadedEyeModule = null;
-        _loadedExpressionModule = null;
+        ActiveModules.Clear();
 
         //_dispatcherService.Run(() => Modules.Clear());
     }
