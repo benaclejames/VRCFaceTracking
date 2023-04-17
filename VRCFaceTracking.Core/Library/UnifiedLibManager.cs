@@ -38,7 +38,7 @@ public class UnifiedLibManager : ILibManager
     #region Modules
     public static List<Assembly> AvailableModules { get; private set; }
     internal static List<Assembly> RequestedModules = new();
-    internal static List<ExtTrackingModule> ActiveModules = new();
+    private static readonly List<ExtTrackingModule> ActiveModules = new();
     private static readonly Dictionary<ExtTrackingModule, CancellationTokenSource> UsefulThreads = new();
     #endregion
 
@@ -228,7 +228,7 @@ public class UnifiedLibManager : ILibManager
         foreach (ExtTrackingModule module in ActiveModules)
         {
             if (module.ModuleInformation.Active)
-                _logger.LogInformation("Tracking initialized using " + module.ToString());
+                _logger.LogInformation("Tracking initialized via " + module.ToString());
         }
         
         // If both modules are uninitialized, we can't do anything
