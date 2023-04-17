@@ -148,7 +148,7 @@
     <value>Default</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>About this application</value>
+    <value>VRChat OSC App to allow AV3 Avatars to interact with eye and lip tracking runtimes</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
     <value>VRChat OSC App to allow AV3 Avatars to interact with eye and lip tracking runtimes</value>

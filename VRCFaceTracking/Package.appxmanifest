@@ -13,13 +13,13 @@
   <Identity
     Name="96ba052f-0948-44d8-86c4-a0212e4ae047"
     Publisher="CN=E=benaclejames@gmail.com, &quot;Open Source Developer, Benjamin Thomas&quot;, O=Open Source Developer, L=Gloucester, S=Gloucestershire, C=GB"
-    Version="5.0.1.0" />
+    Version="5.0.2.0" />
     
   <mp:PhoneIdentity PhoneProductId="96ba052f-0948-44d8-86c4-a0212e4ae047" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
   <Properties>
     <DisplayName>VRCFaceTracking</DisplayName>
-    <PublisherDisplayName>Ben</PublisherDisplayName>
+    <PublisherDisplayName>benaclejames</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -42,8 +42,9 @@
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badgeAndTileText"/>
       </uap:VisualElements>
       <Extensions>
           <desktop:Extension Category="windows.toastNotificationActivation">
