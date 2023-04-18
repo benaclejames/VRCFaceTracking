@@ -15,11 +15,35 @@ public enum ModuleState
 
 public class UnifiedLibManager : ILibManager
 {
+    #region Logger
     private static ILogger _logger;
     private static ILoggerFactory _loggerFactory;
-    
+    #endregion
+
+    #region Observables
     public ObservableCollection<ModuleMetadata> ModuleMetadatas { get; set; }
     private readonly IDispatcherService _dispatcherService;
+    #endregion
+
+    #region Statuses
+    public static ModuleState EyeStatus { get; private set; }
+    public static ModuleState ExpressionStatus { get; private set; }
+    #endregion
+
+    #region Modules
+    private struct ModuleThread
+    {
+        public ExtTrackingModule module;
+        public CancellationTokenSource token;
+    }
+    public static List<Assembly> AvailableModules { get; private set; }
+    private static readonly List<ModuleThread> ModuleThreads = new();
+    #endregion
+
+    #region Thread
+    private static Thread _initializeWorker;
+    private static readonly CancellationTokenSource _initCts;
+    #endregion
 
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService)
     {
@@ -30,22 +54,7 @@ public class UnifiedLibManager : ILibManager
         ModuleMetadatas = new ObservableCollection<ModuleMetadata>();
     }
 
-    #region Statuses
-    public static ModuleState EyeStatus { get; private set; }
-    public static ModuleState ExpressionStatus { get; private set; }
-    #endregion
-
-    #region Modules
-    public static List<Assembly> AvailableModules { get; private set; }
-    internal static List<Assembly> RequestedModules = new();
-    private static readonly List<ExtTrackingModule> ActiveModules = new();
-    private static readonly Dictionary<ExtTrackingModule, CancellationTokenSource> UsefulThreads = new();
-    #endregion
-
-    private static Thread _initializeWorker;
-    private static CancellationTokenSource _initCts;
-
-    private void CreateModuleInitializer(List<Assembly> modules)
+    public void Initialize()
     {
         if (_initializeWorker != null && _initializeWorker.IsAlive && _initCts != null) _initCts.Cancel();
 
@@ -55,38 +64,25 @@ public class UnifiedLibManager : ILibManager
             // Kill lingering threads
             TeardownAllAndReset();
 
+            // Load all modules
+            AvailableModules = LoadAssembliesFromPath(GetModulePaths());
+
             // Attempt to initialize the requested runtimes.
-            if (modules != null)
-                InitRequestedRuntimes(modules);
-            else _logger.LogWarning("Select a module under the 'Modules' tab and/or obtain a VRCFaceTracking tracking extension module.");
+            if (AvailableModules != null)
+                InitRequestedRuntimes(AvailableModules);
+            else _logger.LogWarning("No modules loaded.");
 
         });
         _logger.LogInformation("Starting initialization tracking");
         _initializeWorker.Start();
     }
 
-    public void Initialize()
+    private static string[] GetModulePaths()
     {
-        if (RequestedModules != null && RequestedModules.Count > 0)
-            CreateModuleInitializer(RequestedModules);
-        else CreateModuleInitializer(AvailableModules);
-    }
-
-    public static void ReloadModules()
-    {
-        AvailableModules = LoadExternalAssemblies(GetAllModulePaths());
-    }
-
-    private static string[] GetAllModulePaths()
-    {
-        List<string> modulePaths = new List<string>();
-
         if (!Directory.Exists(Utils.CustomLibsDirectory))
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
 
-        modulePaths.AddRange(Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll"));
-
-        return modulePaths.ToArray();
+        return Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
     }
 
     private static ExtTrackingModule LoadExternalModule(Assembly dll)
@@ -111,19 +107,15 @@ public class UnifiedLibManager : ILibManager
             }
             _logger.LogError("Exception loading " + dll + ". Skipping.");
         }
-        catch (BadImageFormatException e)
+        catch (Exception e)
         {
-            _logger.LogError("Encountered a .dll with an invalid format: " + e.Message + ". Skipping...");
-        }
-        catch (TypeLoadException)
-        {
-            _logger.LogWarning("Module " + dll + " does not implement ExtTrackingModule.");
+            _logger.LogError(e.Message + ". Skipping...");
         }
 
         return null;
     }
 
-    public static List<Assembly> LoadExternalAssemblies(string[] path)
+    public static List<Assembly> LoadAssembliesFromPath(string[] path)
     {
         var returnList = new List<Assembly>();
         foreach (var dll in path)
@@ -151,8 +143,9 @@ public class UnifiedLibManager : ILibManager
 
     private static void EnsureModuleThreadStarted(ExtTrackingModule module)
     {
-        if (UsefulThreads.ContainsKey(module))
-            return;
+        foreach (var pair in ModuleThreads)
+            if (pair.module == module)
+                return;
 
         var cts = new CancellationTokenSource();
         ThreadPool.QueueUserWorkItem(state =>
@@ -163,7 +156,12 @@ public class UnifiedLibManager : ILibManager
                 module.Update();
             }
         }, cts.Token);
-        UsefulThreads.Add(module, cts);
+
+        var _pair = new ModuleThread();
+        _pair.module = module;
+        _pair.token = cts;
+
+        ModuleThreads.Add(_pair);
     }
 
     private void AttemptModuleInitialize(ExtTrackingModule module)
@@ -198,7 +196,6 @@ public class UnifiedLibManager : ILibManager
         EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         EyeStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
-        ActiveModules.Add(module);
         module.ModuleInformation.Active = true;
         _dispatcherService.Run(() =>
         {
@@ -210,12 +207,6 @@ public class UnifiedLibManager : ILibManager
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
     {
-        /*_dispatcherService.Run(() => Modules.Add(new()
-        {
-            Active = false,
-            Name = "Loading Modules..."
-        }));*/
-
         _logger.LogInformation("Initializing runtimes...");
 
         foreach (Assembly module in moduleType)
@@ -225,46 +216,28 @@ public class UnifiedLibManager : ILibManager
             AttemptModuleInitialize(loadedModule);
         }
 
-        foreach (ExtTrackingModule module in ActiveModules)
+        foreach (var pair in ModuleThreads)
         {
-            if (module.ModuleInformation.Active)
-                _logger.LogInformation("Tracking initialized via " + module.ToString());
+            if (pair.module.ModuleInformation.Active)
+                _logger.LogInformation("Tracking initialized via " + pair.module.ToString());
         }
-        
-        // If both modules are uninitialized, we can't do anything
-        /*if (EyeStatus == ModuleState.Uninitialized && ExpressionStatus == ModuleState.Uninitialized)
-        {
-            _dispatcherService.Run(() => Modules[0] = new ModuleMetadata()
-                {
-                    Name = "Couldn't load any modules!",
-                    Active = false
-                }
-            );
-        }
-        else
-        {
-            // Remove the loading module
-            _dispatcherService.Run(() => Modules.RemoveAt(0));
-        }*/
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
     public void TeardownAllAndReset()
     {
-        foreach (var module in UsefulThreads)
+        foreach (var modulePair in ModuleThreads)
         {
-            _logger.LogInformation("Teardown: " + module.Key.GetType().Name);
-            module.Key.Teardown();
-            module.Value.Cancel();
-            _logger.LogInformation("Teardown complete: " + module.Key.GetType().Name);
+            _logger.LogInformation("Teardown: " + modulePair.module.GetType().Name);
+            modulePair.module.Teardown();
+            modulePair.token.Cancel();
+            _logger.LogInformation("Teardown complete: " + modulePair.module.GetType().Name);
         }
-        UsefulThreads.Clear();
+
+        ModuleThreads.Clear();
+        ModuleThreads.Clear();
         
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
-
-        ActiveModules.Clear();
-
-        //_dispatcherService.Run(() => Modules.Clear());
     }
 }

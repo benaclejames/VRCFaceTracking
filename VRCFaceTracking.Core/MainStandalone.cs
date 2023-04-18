@@ -61,9 +61,6 @@ public class MainStandalone : IMainService
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
-
-        // Load all available modules.
-        UnifiedLibManager.ReloadModules();
         
         // Try to load config and propogate data into Unified if they exist.
         UnifiedConfig.ReadConfiguration();
