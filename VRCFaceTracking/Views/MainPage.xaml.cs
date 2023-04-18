@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;

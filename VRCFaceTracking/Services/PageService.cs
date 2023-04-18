@@ -18,6 +18,7 @@ public class PageService : IPageService
         Configure<SettingsViewModel, SettingsPage>();
         Configure<OutputViewModel, OutputPage>();
         Configure<ParametersViewModel, ParametersPage>();
+        Configure<ModuleRegistryViewModel, ModuleRegistryPage>();
     }
 
     public Type GetPageType(string key)

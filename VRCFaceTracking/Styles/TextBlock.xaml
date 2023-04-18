@@ -46,5 +46,11 @@
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="15" />
     </Style>
+    
+    <!-- Style for hyperlinkbutton to not offset it and to look similar to DetailBodyBaseMediumStyle -->
+    <Style x:Key="DetailBodyHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
 
 </ResourceDictionary>

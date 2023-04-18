@@ -90,6 +90,8 @@ public partial class App : Application
             services.AddSingleton<ILibManager, UnifiedLibManager>();
 
             // Views and ViewModels
+            services.AddTransient<ModuleRegistryViewModel>();
+            services.AddTransient<ModuleRegistryPage>();
             services.AddTransient<ParameterViewModel>();
             services.AddTransient<ParametersViewModel>();
             services.AddTransient<ParametersPage>();
