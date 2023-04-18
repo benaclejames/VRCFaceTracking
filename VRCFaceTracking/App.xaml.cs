@@ -86,7 +86,6 @@ public partial class App : Application
             services.AddSingleton<IOSCService, OscMain>();
             services.AddSingleton<IMainService, MainStandalone>();
             services.AddSingleton<ConfigParser>();
-            services.AddSingleton<ModuleAttributeHandler>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
 
