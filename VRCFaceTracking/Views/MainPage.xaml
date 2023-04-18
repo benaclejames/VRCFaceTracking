@@ -13,7 +13,7 @@
 
     <Grid x:Name="ContentArea">
         <StackPanel Orientation="Vertical">
-            <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.Modules}">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.ModuleMetadatas}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">

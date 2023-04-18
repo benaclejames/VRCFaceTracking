@@ -81,7 +81,8 @@ public partial class App : Application
             LoggingService.Setup(DispatcherQueue.GetForCurrentThread());
 
             // Core Services
-            services.AddSingleton<ISampleDataService, SampleDataService>();
+            services.AddSingleton<IIdentityService, IdentityService>();
+            services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IOSCService, OscMain>();
             services.AddSingleton<IMainService, MainStandalone>();

@@ -10,7 +10,7 @@ namespace VRCFaceTracking.ViewModels;
 
 public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly ISampleDataService _sampleDataService;
+    private readonly IModuleDataService _moduleDataService;
     private RemoteTrackingModule? _selected;
 
     public RemoteTrackingModule? Selected
@@ -19,23 +19,23 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
         set => SetProperty(ref _selected, value);
     }
 
-    public ObservableCollection<RemoteTrackingModule> SampleItems { get; private set; } = new ObservableCollection<RemoteTrackingModule>();
+    public ObservableCollection<RemoteTrackingModule> ModuleInfos { get; private set; } = new ObservableCollection<RemoteTrackingModule>();
 
-    public ModuleRegistryViewModel(ISampleDataService sampleDataService)
+    public ModuleRegistryViewModel(IModuleDataService moduleDataService)
     {
-        _sampleDataService = sampleDataService;
+        _moduleDataService = moduleDataService;
     }
 
     public async void OnNavigatedTo(object parameter)
     {
-        SampleItems.Clear();
+        ModuleInfos.Clear();
 
         // TODO: Replace with real data.
-        var data = await _sampleDataService.GetListDetailsDataAsync();
+        var data = await _moduleDataService.GetListDetailsDataAsync();
 
         foreach (var item in data)
         {
-            SampleItems.Add(item);
+            ModuleInfos.Add(item);
         }
     }
 
@@ -47,7 +47,7 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
     {
         if (Selected == null)
         {
-            Selected = SampleItems.First();
+            Selected = ModuleInfos.First();
         }
     }
 }
