@@ -24,8 +24,17 @@ public sealed partial class OutputPage : Page
     public OutputPage()
     {
         ViewModel = App.GetService<OutputViewModel>();
+        
+        // Start a timer and log every 10 seconsd
+        var timer = new DispatcherTimer();
+        timer.Interval = TimeSpan.FromSeconds(1);
+        timer.Tick += (sender, args) => Log.Add($"Log at {DateTime.Now}");
+        timer.Start();
+        
         InitializeComponent();
     }
+    
+    private void ScrollToBottom() => LogScroller.ChangeView(null, LogScroller.ScrollableHeight, null);
 
     private async void SaveToFile_OnClick(object sender, RoutedEventArgs e)
     {
@@ -84,5 +93,25 @@ public sealed partial class OutputPage : Page
         package.SetText(logString);
         Clipboard.SetContent(package);
         SaveStatus.Text = "Copied to clipboard.";
+    }
+
+    private void LogScroller_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        ScrollToBottom();
+        
+        // We need to subscribe to the observablecollection onchanged event to scroll to the bottom. Note that we need a small delay because windows.
+        // If we don't then we'll be scrolling a line too short.
+        Log.CollectionChanged += (sender, args) =>
+        {
+            // Start a timer for 1ms to scroll to the bottom
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(1);
+            timer.Tick += (sender, args) =>
+            {
+                timer.Stop();
+                ScrollToBottom();
+            };
+            timer.Start();
+        };
     }
 }

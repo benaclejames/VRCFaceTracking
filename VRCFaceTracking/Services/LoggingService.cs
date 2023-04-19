@@ -6,7 +6,32 @@ using Microsoft.UI.Dispatching;
 namespace VRCFaceTracking.Services;
 public class LoggingService
 {
-    public static ObservableCollection<string> Logs = new();
+    public static ObservableCollection<string> Logs = new()
+    {
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+        "Application started",
+    };
     private static DispatcherQueue dispatcher;
 
     // We need to be adding all logs to the staticLog from the dispatcher thread

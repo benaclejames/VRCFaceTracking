@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Windows.ApplicationModel;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;

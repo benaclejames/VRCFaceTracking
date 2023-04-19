@@ -6,9 +6,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-  <Grid x:Name="ContentArea">
-      <StackPanel Orientation="Vertical">
-          <Border Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+          <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0, 20, 0, 0" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
               <Grid>
                   <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="Auto"/>
@@ -33,24 +36,26 @@
               </Grid>
           </Border>
 
-          <Border Margin="0, 20, 0, 20" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-              <ScrollViewer Grid.Row="1"
-                            Padding="10,0,10,0"
-                            IsTabStop="False"
-                            UseSystemFocusVisuals="False"
-                            VerticalScrollBarVisibility="Auto"
-                            VerticalScrollMode="Auto">
-                  <StackPanel Name="LogStack" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                      <ItemsControl ItemsSource="{x:Bind Log}">
-                          <ItemsControl.ItemTemplate>
-                              <DataTemplate>
-                                  <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding}"/>
-                              </DataTemplate>
-                          </ItemsControl.ItemTemplate>
-                      </ItemsControl>
-                  </StackPanel>
-              </ScrollViewer>
-          </Border>
-      </StackPanel>
-  </Grid>
+        <Border Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0, 20, 0, 20" Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+            <ScrollViewer 
+                x:Name = "LogScroller"
+                Loaded="LogScroller_OnLoaded"
+                Padding="10"
+                IsTabStop="False"
+                UseSystemFocusVisuals="False"
+                VerticalScrollBarVisibility="Auto"
+                VerticalScrollMode="Auto"
+                Height="Auto">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <ItemsControl ItemsSource="{x:Bind Log}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
 </Page>
