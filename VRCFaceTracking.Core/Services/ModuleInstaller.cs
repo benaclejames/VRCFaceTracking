@@ -104,4 +104,26 @@ public class ModuleInstaller
         
         return Path.Combine(moduleDirectory, module.DllFileName);
     }
+    
+    public void UninstallModule(RemoteTrackingModule module)
+    {
+        _logger.LogDebug("Uninstalling module {module}", module.ModuleId);
+        var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, module.ModuleId.ToString());
+        if (Directory.Exists(moduleDirectory))
+        {
+            try
+            {
+                Directory.Delete(moduleDirectory, true);
+                _logger.LogInformation("Uninstalled module {module} from {moduleDirectory}", module.ModuleId, moduleDirectory);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to uninstall module {module} from {moduleDirectory}", module.ModuleId, moduleDirectory);
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Module {module} could not be found where it was expected in {moduleDirectory}", module.ModuleId, moduleDirectory);
+        }
+    }
 }

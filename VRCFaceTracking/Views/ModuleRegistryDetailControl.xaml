@@ -68,7 +68,7 @@
                 
                 <AppBarSeparator/>
                 
-                <Button Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
+                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Loaded="InstallButton_OnLoaded" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
                 
             </StackPanel>
         </StackPanel>

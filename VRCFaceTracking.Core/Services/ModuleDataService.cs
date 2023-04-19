@@ -9,7 +9,8 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleDataService : IModuleDataService
 {
-    private List<RemoteTrackingModule> _remoteModules, _installedModules;
+    private List<RemoteTrackingModule> _remoteModules;
+    private List<LocalTrackingModule> _installedModules;
     private readonly Dictionary<Guid, int> _ratingCache = new();
 
     private readonly IIdentityService _identityService;
@@ -42,11 +43,11 @@ public class ModuleDataService : IModuleDataService
         return _remoteModules;
     }
     
-    public async Task<IEnumerable<RemoteTrackingModule>> GetInstalledModulesAsync()
+    public async Task<IEnumerable<LocalTrackingModule>> GetInstalledModulesAsync()
     {
         if (_installedModules == null)
         {
-            _installedModules = new List<RemoteTrackingModule>(AllInstalled());
+            _installedModules = new List<LocalTrackingModule>(AllInstalled());
         }
 
         await Task.CompletedTask;
@@ -103,11 +104,11 @@ public class ModuleDataService : IModuleDataService
         return Task.CompletedTask;
     }
 
-    private IEnumerable<RemoteTrackingModule> AllInstalled()
+    private IEnumerable<LocalTrackingModule> AllInstalled()
     {
         // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
         // If it does, deserialize it and add it to the list of installed modules.
-        var installedModules = new List<RemoteTrackingModule>();
+        var installedModules = new List<LocalTrackingModule>();
         var moduleFolders = Directory.GetDirectories(Utils.CustomLibsDirectory);
         foreach (var moduleFolder in moduleFolders)
         {
@@ -117,7 +118,9 @@ public class ModuleDataService : IModuleDataService
                 var moduleJson = File.ReadAllText(moduleJsonPath);
                 try
                 {
-                    var module = JsonConvert.DeserializeObject<RemoteTrackingModule>(moduleJson);
+                    var module = JsonConvert.DeserializeObject<LocalTrackingModule>(moduleJson);
+                    module.InstallationState = InstallState.Installed;
+                    module.AssemblyLoadPath = Path.Combine(moduleFolder, module.DllFileName);
                     installedModules.Add(module);
                 }
                 catch (Exception e)

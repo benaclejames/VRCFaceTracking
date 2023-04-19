@@ -7,5 +7,5 @@ public interface IModuleDataService
     Task<IEnumerable<RemoteTrackingModule>> GetListDetailsDataAsync();
     Task<int> GetMyRatingAsync(RemoteTrackingModule module);
     Task SetMyRatingAsync(RemoteTrackingModule module, int rating);
-    Task<IEnumerable<RemoteTrackingModule>> GetInstalledModulesAsync();
+    Task<IEnumerable<LocalTrackingModule>> GetInstalledModulesAsync();
 }

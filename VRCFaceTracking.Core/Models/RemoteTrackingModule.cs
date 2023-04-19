@@ -2,13 +2,6 @@
 
 namespace VRCFaceTracking.Core.Models;
 
-public enum InstallState
-{
-    NotInstalled,
-    Installed,
-    Outdated
-}
-
 public class RemoteTrackingModule
 {
     public Guid ModuleId
@@ -76,13 +69,13 @@ public class RemoteTrackingModule
     {
         get; set;
     }
-
+    
     [JsonIgnore]
     public InstallState InstallationState
     {
         get; set;
     }
-    
+
     public bool VersionEqual(RemoteTrackingModule module)
     {
         return module.Version == Version;

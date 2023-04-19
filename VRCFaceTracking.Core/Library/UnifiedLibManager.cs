@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 
 namespace VRCFaceTracking.Core.Library;
@@ -35,9 +35,11 @@ public class UnifiedLibManager : ILibManager
     {
         public ExtTrackingModule module;
         public CancellationTokenSource token;
+        public AssemblyLoadContext alc;
     }
     public static List<Assembly> AvailableModules { get; private set; }
     private static readonly List<ModuleThread> ModuleThreads = new();
+    private static IModuleDataService _moduleDataService;
     #endregion
 
     #region Thread
@@ -45,11 +47,12 @@ public class UnifiedLibManager : ILibManager
     private static readonly CancellationTokenSource _initCts;
     #endregion
 
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService)
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger("UnifiedLibManager");
         _dispatcherService = dispatcherService;
+        _moduleDataService = moduleDataService;
 
         ModuleMetadatas = new ObservableCollection<ModuleMetadata>();
     }
@@ -57,6 +60,14 @@ public class UnifiedLibManager : ILibManager
     public void Initialize()
     {
         if (_initializeWorker != null && _initializeWorker.IsAlive && _initCts != null) _initCts.Cancel();
+        
+        
+            ModuleMetadatas.Clear();
+            ModuleMetadatas.Add(new ModuleMetadata
+            {
+                Active = false,
+                Name = "Initializing Modules..."
+            });
 
         // Start Initialization
         _initializeWorker = new Thread(() =>
@@ -64,13 +75,35 @@ public class UnifiedLibManager : ILibManager
             // Kill lingering threads
             TeardownAllAndReset();
 
+            // Find all modules
+            var modulePaths = GetModulePaths();
+            foreach (var module in _moduleDataService.GetInstalledModulesAsync().Result)
+            {
+                if (!string.IsNullOrEmpty(module.AssemblyLoadPath))
+                {
+                    modulePaths = modulePaths.Append(module.AssemblyLoadPath).ToArray();
+                }
+            }
+            
             // Load all modules
             AvailableModules = LoadAssembliesFromPath(GetModulePaths());
 
             // Attempt to initialize the requested runtimes.
             if (AvailableModules != null)
                 InitRequestedRuntimes(AvailableModules);
-            else _logger.LogWarning("No modules loaded.");
+            else
+            {
+                _dispatcherService.Run(() =>
+                {
+                    ModuleMetadatas.Clear();
+                    ModuleMetadatas.Add(new ModuleMetadata
+                    {
+                        Active = false,
+                        Name = "No Modules Loaded"
+                    });
+                });
+                _logger.LogWarning("No modules loaded.");
+            }
 
         });
         _logger.LogInformation("Starting initialization tracking");
@@ -99,17 +132,9 @@ public class UnifiedLibManager : ILibManager
 
             return moduleObj;
         }
-        catch (ReflectionTypeLoadException e)
-        {
-            foreach (var loaderException in e.LoaderExceptions)
-            {
-                _logger.LogError("LoaderException: " + loaderException.Message);
-            }
-            _logger.LogError("Exception loading " + dll + ". Skipping.");
-        }
         catch (Exception e)
         {
-            _logger.LogError(e.Message + ". Skipping...");
+            _logger.LogError("Exception loading {dll}. Skipping. {e}", dll.FullName, e);
         }
 
         return null;
@@ -122,19 +147,19 @@ public class UnifiedLibManager : ILibManager
         {
             try
             {
-                Assembly loaded = Assembly.LoadFrom(dll);
-                foreach(Type type in loaded.GetExportedTypes())
+                var loaded = Assembly.LoadFrom(dll);
+                foreach(var type in loaded.GetExportedTypes())
+                {
                     if (type.BaseType == typeof(ExtTrackingModule))
                     {
-                        _logger.LogInformation(type.ToString() + " implements ExtTrackingModule.");
+                        _logger.LogDebug("{module} properly implements ExtTrackingModule.", type.Name);
                         returnList.Add(loaded);
-                        continue;
                     }
+                }
             }
             catch (Exception e)
             {
                 _logger.LogWarning(e.Message + " Assembly not able to be loaded. Skipping.");
-                continue;
             }
         }
 
@@ -143,9 +168,11 @@ public class UnifiedLibManager : ILibManager
 
     private static void EnsureModuleThreadStarted(ExtTrackingModule module)
     {
-        foreach (var pair in ModuleThreads)
-            if (pair.module == module)
-                return;
+        if (ModuleThreads.Any(pair => pair.module == module))
+        {
+            AssemblyLoadContext.GetLoadContext(module.GetType().Assembly).Unload();
+            return;
+        }
 
         var cts = new CancellationTokenSource();
         ThreadPool.QueueUserWorkItem(state =>
@@ -157,9 +184,12 @@ public class UnifiedLibManager : ILibManager
             }
         }, cts.Token);
 
-        var _pair = new ModuleThread();
-        _pair.module = module;
-        _pair.token = cts;
+        var _pair = new ModuleThread
+        {
+            module = module,
+            token = cts,
+            alc = AssemblyLoadContext.GetLoadContext(module.GetType().Assembly)
+        };
 
         ModuleThreads.Add(_pair);
     }
@@ -167,7 +197,9 @@ public class UnifiedLibManager : ILibManager
     private void AttemptModuleInitialize(ExtTrackingModule module)
     {
         if (!module.Supported.SupportsEye && !module.Supported.SupportsExpression)
+        {
             return;
+        }
 
         module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
@@ -183,8 +215,7 @@ public class UnifiedLibManager : ILibManager
         }
         catch (Exception e)
         {
-            _logger.LogError("Exception initializing " + module.GetType().Name + ". Skipping.");
-            _logger.LogError(e.Message);
+            _logger.LogError("Exception initializing {module}. Skipping. {e}", module.GetType().Name, e);
             return;
         }
 
@@ -200,7 +231,9 @@ public class UnifiedLibManager : ILibManager
         _dispatcherService.Run(() =>
         {
             if (!ModuleMetadatas.Contains(module.ModuleInformation))
+            {
                 ModuleMetadatas.Add(module.ModuleInformation);
+            }
         });
         EnsureModuleThreadStarted(module);
     }
@@ -211,27 +244,53 @@ public class UnifiedLibManager : ILibManager
 
         foreach (Assembly module in moduleType)
         {
-            _logger.LogInformation("Initializing module: " + module.ToString());
+            _logger.LogInformation("Initializing {module}", module.ToString());
             var loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
         }
 
-        foreach (var pair in ModuleThreads)
+        if (ModuleThreads.Count == 0)
         {
-            if (pair.module.ModuleInformation.Active)
-                _logger.LogInformation("Tracking initialized via " + pair.module.ToString());
+            _logger.LogWarning("No modules loaded.");
+            _dispatcherService.Run(() =>
+            {
+                ModuleMetadatas.Clear();
+                ModuleMetadatas.Add(new ModuleMetadata
+                {
+                    Active = false,
+                    Name = "No Modules Loaded"
+                });
+            });
+        }
+        else
+        {
+            _dispatcherService.Run(() =>
+            {
+                // Remove our dummy module
+                ModuleMetadatas.RemoveAt(0);
+            });
+            foreach (var pair in ModuleThreads)
+            {
+                if (pair.module.ModuleInformation.Active)
+                {
+                    _logger.LogInformation("Tracking initialized via {module}", pair.module.ToString());
+                }
+            }
         }
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
     public void TeardownAllAndReset()
     {
+        _logger.LogInformation("Tearing down all modules...");
         foreach (var modulePair in ModuleThreads)
         {
-            _logger.LogInformation("Teardown: " + modulePair.module.GetType().Name);
+            _logger.LogInformation("Tearing down {module} ", modulePair.module.GetType().Name);
             modulePair.module.Teardown();
             modulePair.token.Cancel();
-            _logger.LogInformation("Teardown complete: " + modulePair.module.GetType().Name);
+            _logger.LogInformation("Teardown complete for {module}. Unloading assembly context...", modulePair.module.GetType().Name);
+            modulePair.alc.Unload();
+            _logger.LogInformation("Assembly context unloaded.");
         }
 
         ModuleThreads.Clear();

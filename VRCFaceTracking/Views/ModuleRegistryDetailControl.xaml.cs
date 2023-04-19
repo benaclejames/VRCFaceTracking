@@ -16,6 +16,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
 
     private readonly IModuleDataService _moduleDataService;
     private readonly ModuleInstaller _moduleInstaller;
+    private readonly ILibManager _libManager;
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(RemoteTrackingModule), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -24,6 +25,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         InitializeComponent();
         _moduleDataService = App.GetService<IModuleDataService>();
         _moduleInstaller = App.GetService<ModuleInstaller>();
+        _libManager = App.GetService<ILibManager>();
     }
     
 
@@ -37,11 +39,32 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
 
     private async void Install_Click(object sender, RoutedEventArgs e)
     {
-        var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
-        if (path != null)
+        switch (ListDetailsMenuItem!.InstallationState)
         {
-            ListDetailsMenuItem!.InstallationState = InstallState.Installed;
+            case InstallState.NotInstalled or InstallState.Outdated:
+            {
+                var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
+                if (path != null)
+                {
+                    ListDetailsMenuItem!.InstallationState = InstallState.Installed;
+                    _libManager.Initialize();
+                    InstallButton.Content = "Uninstall";
+                    InstallButton.IsEnabled = true;
+                }
+                break;
+            }
+            case InstallState.Installed:
+            {
+                InstallButton.Content = "Install";
+                InstallButton.IsEnabled = true;
+                _libManager.TeardownAllAndReset();
+                _moduleInstaller.UninstallModule(ListDetailsMenuItem!);
+                ListDetailsMenuItem!.InstallationState = InstallState.NotInstalled;
+                _libManager.Initialize();
+                break;
+            }
         }
+        
     }
 
     private async void RatingControl_OnLoaded(object sender, RoutedEventArgs e)
@@ -68,5 +91,23 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         RatingControl.Caption = "Your Rating";
         
         await _moduleDataService.SetMyRatingAsync(ListDetailsMenuItem!, (int)RatingControl.Value);
+    }
+
+    private void InstallButton_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        // Set our state depending on our assigned installation state.
+        switch (ListDetailsMenuItem!.InstallationState)
+        {
+            case InstallState.NotInstalled:
+                InstallButton.Content = "Install";
+                break;
+            case InstallState.Installed:
+                InstallButton.Content = "Uninstall";
+                break;
+            case InstallState.Outdated:
+                InstallButton.Content = "Update";
+                break;
+        }
+        InstallButton.IsEnabled = true;
     }
 }

@@ -45,6 +45,7 @@
                 UseSystemFocusVisuals="False"
                 VerticalScrollBarVisibility="Auto"
                 VerticalScrollMode="Auto"
+                HorizontalScrollBarVisibility="Auto"
                 Height="Auto">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ItemsControl ItemsSource="{x:Bind Log}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

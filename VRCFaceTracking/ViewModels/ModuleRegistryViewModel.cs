@@ -58,6 +58,9 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
             }
         }
 
+        // Sort our data so that installed or outdated modules are at the top of the list.
+        data = data.OrderByDescending(x => x.InstallationState);
+        
         foreach (var item in data)
         {
             ModuleInfos.Add(item);

@@ -69,8 +69,14 @@
                         <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEC05;" FontSize="20"/>
                         <StackPanel Margin="20, 4" Orientation="Vertical">
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}">OSC Status</TextBlock>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">Listener Bound</TextBlock>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">Sender Active</TextBlock>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Listening on Port:"/>
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.OscService.InPort, Mode=OneWay}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Sending on Port:"/>
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.OscService.OutPort, Mode=OneWay}"/>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
 
