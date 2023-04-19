@@ -24,13 +24,6 @@ public sealed partial class OutputPage : Page
     public OutputPage()
     {
         ViewModel = App.GetService<OutputViewModel>();
-        
-        // Start a timer and log every 10 seconsd
-        var timer = new DispatcherTimer();
-        timer.Interval = TimeSpan.FromSeconds(1);
-        timer.Tick += (sender, args) => Log.Add($"Log at {DateTime.Now}");
-        timer.Start();
-        
         InitializeComponent();
     }
     
