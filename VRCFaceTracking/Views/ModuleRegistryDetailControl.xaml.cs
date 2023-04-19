@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Views;
 
@@ -13,7 +14,8 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         set => SetValue(ListDetailsMenuItemProperty, value);
     }
 
-    private IModuleDataService _moduleDataService;
+    private readonly IModuleDataService _moduleDataService;
+    private readonly ModuleInstaller _moduleInstaller;
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(RemoteTrackingModule), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -21,6 +23,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     {
         InitializeComponent();
         _moduleDataService = App.GetService<IModuleDataService>();
+        _moduleInstaller = App.GetService<ModuleInstaller>();
     }
     
 
@@ -32,9 +35,13 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         }
     }
 
-    private void Install_Click(object sender, RoutedEventArgs e)
+    private async void Install_Click(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
+        if (path != null)
+        {
+            ListDetailsMenuItem!.InstallationState = RemoteTrackingModule.InstallState.Installed;
+        }
     }
 
     private async void RatingControl_OnLoaded(object sender, RoutedEventArgs e)

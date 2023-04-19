@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Mime;
 using System.Text;
 using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts.Services;
@@ -16,7 +15,9 @@ public class ModuleDataService : IModuleDataService
         public int Rating { get; set; }
     }
     
-    private List<RemoteTrackingModule> _allModules;
+    private List<RemoteTrackingModule> _remoteModules, _installedModules;
+    private Dictionary<Guid, int> _ratingCache = new Dictionary<Guid, int>();
+
     private IIdentityService _identityService;
     
     public ModuleDataService(IIdentityService identityService)
@@ -36,19 +37,34 @@ public class ModuleDataService : IModuleDataService
 
     public async Task<IEnumerable<RemoteTrackingModule>> GetListDetailsDataAsync()
     {
-        if (_allModules == null)
+        if (_remoteModules == null)
         {
-            _allModules = new List<RemoteTrackingModule>(AllModules());
+            _remoteModules = new List<RemoteTrackingModule>(AllModules());
         }
 
         await Task.CompletedTask;
-        return _allModules;
+        return _remoteModules;
+    }
+    
+    public async Task<IEnumerable<RemoteTrackingModule>> GetInstalledModulesAsync()
+    {
+        if (_installedModules == null)
+        {
+            _installedModules = new List<RemoteTrackingModule>(AllInstalled());
+        }
+
+        await Task.CompletedTask;
+        return _installedModules;
     }
 
     public async Task<int> GetMyRatingAsync(RemoteTrackingModule module)
     {
+        if (_ratingCache.TryGetValue(module.ModuleId, out var async))
+            return async;
+        
         var client = new HttpClient();
-        var rating = new RatingObject{UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString()};
+        var rating = new RatingObject
+            { UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString() };
         var content = new StringContent(JsonConvert.SerializeObject(rating), Encoding.UTF8, "application/json");
         var request = new HttpRequestMessage
         {
@@ -61,6 +77,7 @@ public class ModuleDataService : IModuleDataService
         if (response.StatusCode == HttpStatusCode.NotFound)
             return 0;
         var ratingResponse = JsonConvert.DeserializeObject<RatingObject>(response.Content.ReadAsStringAsync().Result);
+        _ratingCache[module.ModuleId] = ratingResponse.Rating;
         return ratingResponse.Rating;
     }
 
@@ -71,6 +88,27 @@ public class ModuleDataService : IModuleDataService
         var ratingObject = new RatingObject{UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString(), Rating = rating};
         var content = new StringContent(JsonConvert.SerializeObject(ratingObject), Encoding.UTF8, "application/json");
         var response = client.PutAsync("https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/rating", content).Result;
+        _ratingCache[module.ModuleId] = rating;
         return Task.CompletedTask;
+    }
+
+    public static IEnumerable<RemoteTrackingModule> AllInstalled()
+    {
+        // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
+        // If it does, deserialize it and add it to the list of installed modules.
+        var installedModules = new List<RemoteTrackingModule>();
+        var moduleFolders = Directory.GetDirectories(Utils.CustomLibsDirectory);
+        foreach (var moduleFolder in moduleFolders)
+        {
+            var moduleJsonPath = Path.Combine(moduleFolder, "module.json");
+            if (File.Exists(moduleJsonPath))
+            {
+                var moduleJson = File.ReadAllText(moduleJsonPath);
+                var module = JsonConvert.DeserializeObject<RemoteTrackingModule>(moduleJson);
+                installedModules.Add(module);
+            }
+        }
+        
+        return installedModules;
     }
 }

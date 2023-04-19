@@ -82,6 +82,7 @@ public partial class App : Application
 
             // Core Services
             services.AddSingleton<IIdentityService, IdentityService>();
+            services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IOSCService, OscMain>();

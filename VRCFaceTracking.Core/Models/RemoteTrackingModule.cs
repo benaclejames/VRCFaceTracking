@@ -1,4 +1,6 @@
-﻿namespace VRCFaceTracking.Core.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace VRCFaceTracking.Core.Models;
 
 // Model for the SampleDataService. Replace with your own model.
 public class RemoteTrackingModule
@@ -63,4 +65,27 @@ public class RemoteTrackingModule
         get;
         set;
     } = "(No page provided)";
+    
+    public string DllFileName
+    {
+        get; set;
+    }
+
+    public enum InstallState
+    {
+        NotInstalled,
+        Installed,
+        Outdated
+    }
+    
+    [JsonIgnore]
+    public InstallState InstallationState
+    {
+        get; set;
+    }
+    
+    public bool VersionEqual(RemoteTrackingModule module)
+    {
+        return module.Version == Version;
+    }
 }
