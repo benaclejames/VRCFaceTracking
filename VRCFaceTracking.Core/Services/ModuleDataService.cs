@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
@@ -8,21 +9,16 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleDataService : IModuleDataService
 {
-    private struct RatingObject
-    {
-        public string UserId { get; set; }
-        public string ModuleId { get; set; }
-        public int Rating { get; set; }
-    }
-    
     private List<RemoteTrackingModule> _remoteModules, _installedModules;
-    private Dictionary<Guid, int> _ratingCache = new Dictionary<Guid, int>();
+    private readonly Dictionary<Guid, int> _ratingCache = new();
 
-    private IIdentityService _identityService;
-    
-    public ModuleDataService(IIdentityService identityService)
+    private readonly IIdentityService _identityService;
+    private readonly ILogger<ModuleDataService> _logger;
+
+    public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger)
     {
         _identityService = identityService;
+        _logger = logger;
     }
 
     private static IEnumerable<RemoteTrackingModule> AllModules()
@@ -60,8 +56,11 @@ public class ModuleDataService : IModuleDataService
     public async Task<int> GetMyRatingAsync(RemoteTrackingModule module)
     {
         if (_ratingCache.TryGetValue(module.ModuleId, out var async))
+        {
+            _logger.LogDebug("Rating for {ModuleId} was cached as {Rating}", module.ModuleId, async);
             return async;
-        
+        }
+
         var client = new HttpClient();
         var rating = new RatingObject
             { UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString() };
@@ -75,8 +74,14 @@ public class ModuleDataService : IModuleDataService
         var response = await client.SendAsync(request);
         // Deserialize the input content but extract the Rating property. Be careful though, we might 404 if the user hasn't rated the module yet.
         if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            _logger.LogDebug("Rating for {ModuleId} was not found", module.ModuleId);
             return 0;
+        }
+
         var ratingResponse = JsonConvert.DeserializeObject<RatingObject>(response.Content.ReadAsStringAsync().Result);
+        
+        _logger.LogDebug("Rating for {ModuleId} was {Rating}. Caching...", module.ModuleId, ratingResponse.Rating);
         _ratingCache[module.ModuleId] = ratingResponse.Rating;
         return ratingResponse.Rating;
     }
@@ -88,11 +93,17 @@ public class ModuleDataService : IModuleDataService
         var ratingObject = new RatingObject{UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString(), Rating = rating};
         var content = new StringContent(JsonConvert.SerializeObject(ratingObject), Encoding.UTF8, "application/json");
         var response = client.PutAsync("https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/rating", content).Result;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            _logger.LogError("Failed to set rating for {ModuleId} to {Rating}. Status code: {StatusCode}", module.ModuleId, rating, response.StatusCode);
+            return Task.CompletedTask;
+        }
+        _logger.LogDebug("Rating for {ModuleId} was set to {Rating}. Caching...", module.ModuleId, rating);
         _ratingCache[module.ModuleId] = rating;
         return Task.CompletedTask;
     }
 
-    public static IEnumerable<RemoteTrackingModule> AllInstalled()
+    private IEnumerable<RemoteTrackingModule> AllInstalled()
     {
         // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
         // If it does, deserialize it and add it to the list of installed modules.
@@ -104,8 +115,15 @@ public class ModuleDataService : IModuleDataService
             if (File.Exists(moduleJsonPath))
             {
                 var moduleJson = File.ReadAllText(moduleJsonPath);
-                var module = JsonConvert.DeserializeObject<RemoteTrackingModule>(moduleJson);
-                installedModules.Add(module);
+                try
+                {
+                    var module = JsonConvert.DeserializeObject<RemoteTrackingModule>(moduleJson);
+                    installedModules.Add(module);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Failed to deserialize module.json for {ModuleFolder}", moduleFolder);
+                }
             }
         }
         

@@ -2,7 +2,13 @@
 
 namespace VRCFaceTracking.Core.Models;
 
-// Model for the SampleDataService. Replace with your own model.
+public enum InstallState
+{
+    NotInstalled,
+    Installed,
+    Outdated
+}
+
 public class RemoteTrackingModule
 {
     public Guid ModuleId
@@ -71,13 +77,6 @@ public class RemoteTrackingModule
         get; set;
     }
 
-    public enum InstallState
-    {
-        NotInstalled,
-        Installed,
-        Outdated
-    }
-    
     [JsonIgnore]
     public InstallState InstallationState
     {

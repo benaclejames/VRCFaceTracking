@@ -40,7 +40,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
         if (path != null)
         {
-            ListDetailsMenuItem!.InstallationState = RemoteTrackingModule.InstallState.Installed;
+            ListDetailsMenuItem!.InstallationState = InstallState.Installed;
         }
     }
 
