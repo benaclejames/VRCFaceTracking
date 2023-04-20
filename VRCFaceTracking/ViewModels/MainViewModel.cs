@@ -62,9 +62,9 @@ public class MainViewModel : ObservableRecipient
         LibManager = App.GetService<ILibManager>();
         OscService = App.GetService<IOSCService>();
         var moduleDataService = App.GetService<IModuleDataService>();
-        NoModulesInstalled = moduleDataService.GetInstalledModulesAsync().Result.Count() == 0;
-        
-        LibManager.OnLoad += _ => NoModulesInstalled = false;
+        var installedNewModules = moduleDataService.GetInstalledModulesAsync().Result;
+        var installedLegacyModules = moduleDataService.GetLegacyModules().Count();
+        NoModulesInstalled = installedNewModules.Count() == 0 && installedLegacyModules == 0;
         
         // We now start 2 new threads to count both the send rate and recv rate of the osc service over 1 second intervals at a time
         // This is done in a separate thread to not block the UI thread

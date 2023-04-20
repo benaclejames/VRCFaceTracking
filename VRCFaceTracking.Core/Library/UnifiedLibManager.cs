@@ -23,7 +23,6 @@ public class UnifiedLibManager : ILibManager
     #region Observables
     public ObservableCollection<ModuleMetadata> ModuleMetadatas { get; set; }
     private readonly IDispatcherService _dispatcherService;
-    public Action<string[]> OnLoad { get; set; }
     #endregion
 
     #region Statuses
@@ -92,7 +91,6 @@ public class UnifiedLibManager : ILibManager
             // Attempt to initialize the requested runtimes.
             if (AvailableModules != null)
             {
-                OnLoad?.Invoke(modulePaths.ToArray());
                 InitRequestedRuntimes(AvailableModules);
             }
             else
