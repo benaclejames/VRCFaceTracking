@@ -48,7 +48,7 @@ namespace VRCFaceTracking
 
         public void ParseNewAvatar(string newId)
         {
-            if (newId == AvatarId)
+            if (newId == AvatarId || string.IsNullOrEmpty(newId))
                 return;
             
             AvatarConfigSpec avatarConfig = null;

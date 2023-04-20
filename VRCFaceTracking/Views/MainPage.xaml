@@ -99,8 +99,14 @@
                     </StackPanel>
 
                     <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.MessagesInPerSecText, Mode=OneWay}"/>
-                        <TextBlock HorizontalTextAlignment="Right" Margin="0, 5, 0, 0" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.MessagesOutPerSecText, Mode=OneWay}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
+                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.MessagesInPerSec, Mode=OneWay}"/>
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="m/s Incoming"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
+                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.MessagesOutPerSec, Mode=OneWay}"/>
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="m/s Outgoing"/>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -122,10 +128,16 @@
                     </StackPanel>
 
                     <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParametersText, Mode=OneWay}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
+                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParameters, Mode=OneWay}"/>
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Parameters"/>
+                        </StackPanel> 
                         <StackPanel Visibility="{x:Bind ViewModel.AvatarInfo.HasAnyLegacy, Mode=OneWay}" Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
                             <Ellipse Width="10" Height="10" Fill="Orange" Margin="0,0,5,0"/>
-                            <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParametersLegacyText, Mode=OneWay}"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
+                                <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParametersLegacy, Mode=OneWay}"/>
+                                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Legacy Parameters"/>
+                            </StackPanel> 
                         </StackPanel>
                     </StackPanel>
                 </Grid>

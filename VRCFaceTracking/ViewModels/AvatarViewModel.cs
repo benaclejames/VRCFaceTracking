@@ -26,11 +26,7 @@ public class AvatarViewModel : ObservableRecipient, IAvatarInfo
     public int CurrentParameters
     {
         get => _currentParameters;
-        set => App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-        {
-            SetProperty(ref _currentParameters, value);
-            OnPropertyChanged(nameof(CurrentParametersText));
-        });
+        set => App.MainWindow.DispatcherQueue.TryEnqueue(() => SetProperty(ref _currentParameters, value));
     }
     
     public int CurrentParametersLegacy
@@ -39,13 +35,9 @@ public class AvatarViewModel : ObservableRecipient, IAvatarInfo
         set => App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
             SetProperty(ref _currentParametersLegacy, value);
-            OnPropertyChanged(nameof(CurrentParametersLegacyText));
             OnPropertyChanged(nameof(HasAnyLegacy));
         });
     }
-    
-    public string CurrentParametersText => $"{CurrentParameters} Parameters";
-    public string CurrentParametersLegacyText => $"{CurrentParametersLegacy} Legacy Parameters";
     public bool HasAnyLegacy => CurrentParametersLegacy > 0;
     
     public AvatarViewModel()

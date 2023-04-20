@@ -26,28 +26,16 @@ public class MainViewModel : ObservableRecipient
     public int MessagesInPerSec
     {
         get => _messagesInPerSec;
-        set
-        {
-            SetProperty(ref _messagesInPerSec, value);
-            OnPropertyChanged(nameof(MessagesInPerSecText));
-        }
+        set => SetProperty(ref _messagesInPerSec, value);
     }
-
-    public string MessagesInPerSecText => $"{MessagesInPerSec} m/s Incoming";
 
     private int _messagesSent;
     private int _messagesOutPerSec;
     public int MessagesOutPerSec
     {
         get => _messagesOutPerSec;
-        set
-        {
-            SetProperty(ref _messagesOutPerSec, value);
-            OnPropertyChanged(nameof(MessagesOutPerSecText));
-        }
+        set => SetProperty(ref _messagesOutPerSec, value);
     }
-
-    public string MessagesOutPerSecText => $"{MessagesOutPerSec} m/s Outgoing";
 
     private bool _noModulesInstalled;
     public bool NoModulesInstalled
