@@ -64,6 +64,7 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
+    <Capability Name="internetClientServer"/>
   </Capabilities>
 
   <genTemplate:Metadata>
