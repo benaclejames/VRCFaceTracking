@@ -221,7 +221,7 @@ public class UnifiedLibManager : ILibManager
         // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
         if (!eyeSuccess && !expressionSuccess) return;
         EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-        EyeStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
         module.ModuleInformation.Active = true;
         module.ModuleInformation.UsingEye = eyeSuccess;
@@ -242,6 +242,10 @@ public class UnifiedLibManager : ILibManager
 
         foreach (Assembly module in moduleType)
         {
+            if (EyeStatus > ModuleState.Uninitialized && ExpressionStatus > ModuleState.Uninitialized)
+            {
+                break;
+            }
             _logger.LogInformation("Initializing {module}", module.ToString());
             var loadedModule = LoadExternalModule(module);
             AttemptModuleInitialize(loadedModule);
