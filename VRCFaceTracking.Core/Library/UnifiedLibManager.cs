@@ -178,6 +178,7 @@ public class UnifiedLibManager : ILibManager
                 module.Update();
             }
         });
+        thread.Start();
 
         var _pair = new ModuleThread
         {
@@ -295,7 +296,6 @@ public class UnifiedLibManager : ILibManager
             modulePair.alc.Unload();    //TODO: Ensure this doesn't cause a crash
         }
 
-        ModuleThreads.Clear();
         ModuleThreads.Clear();
         
         EyeStatus = ModuleState.Uninitialized;
