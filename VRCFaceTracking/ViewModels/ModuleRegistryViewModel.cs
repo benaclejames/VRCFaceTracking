@@ -32,12 +32,10 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
 
         var data = await _moduleDataService.GetListDetailsDataAsync();
         
-        
-        
         // Now comes the tricky bit, we get all locally installed modules and add them to the list.
         // If any of the IDs match a remote module and the other data contained within does not match,
         // then we need to set the local module install state to outdated. If everything matches then we need to set the install state to installed.
-        var installedModules = await _moduleDataService.GetInstalledModulesAsync();
+        var installedModules = _moduleDataService.GetInstalledModules();
         var localModules = new List<RemoteTrackingModule>();    // dw about it
         foreach (var installedModule in installedModules)
         {
@@ -50,14 +48,7 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
             else
             {
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
-                if (remoteModule.Version != installedModule.Version)
-                {
-                    remoteModule.InstallationState = InstallState.Outdated;
-                }
-                else
-                {
-                    remoteModule.InstallationState = InstallState.Installed;
-                }
+                remoteModule.InstallationState = remoteModule.Version != installedModule.Version ? InstallState.Outdated : InstallState.Installed;
             }
         }
 

@@ -32,11 +32,47 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     }
     
 
-    private static void OnListDetailsMenuItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static async void OnListDetailsMenuItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is ModuleRegistryDetailControl control)
         {
             control.ForegroundElement.ChangeView(0, 0, 1);
+            control.InstallButton.IsEnabled = true;
+            switch (control.ListDetailsMenuItem!.InstallationState)
+            {
+                case InstallState.NotInstalled:
+                    control.InstallButton.Content = "Install";
+                    break;
+                case InstallState.Installed:
+                    control.InstallButton.Content = "Uninstall";
+                    break;
+                case InstallState.Outdated:
+                    control.InstallButton.Content = "Update";
+                    break;
+                case InstallState.AwaitingRestart:
+                    control.InstallButton.Content = "Please Restart VRCFT";
+                    control.InstallButton.IsEnabled = false;
+                    break;
+            }
+            
+            // Attempt to get our rating from the API.
+            var rating = await control._moduleDataService.GetMyRatingAsync(control.ListDetailsMenuItem!);
+            if (rating > 0) // If we already rated this module, set the rating control to that value.
+            {
+                control.RatingControl.PlaceholderValue = rating;
+                control.RatingControl.Value = rating;
+                control.RatingControl.Caption = "Your Rating";
+            }
+            else // Otherwise, set the rating control to the average rating.
+            {
+                control.RatingControl.ClearValue(RatingControl.ValueProperty);
+                control.RatingControl.ClearValue(RatingControl.PlaceholderValueProperty);
+
+                if (control.ListDetailsMenuItem!.Rating > 0)
+                    control.RatingControl.PlaceholderValue = control.ListDetailsMenuItem!.Rating;
+
+                control.RatingControl.Caption = $"{control.ListDetailsMenuItem!.Ratings} ratings";
+            }
         }
     }
 
@@ -73,52 +109,10 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         
     }
 
-    private async void RatingControl_OnLoaded(object sender, RoutedEventArgs e)
-    {
-        // Attempt to get our rating from the API.
-        var rating = await _moduleDataService.GetMyRatingAsync(ListDetailsMenuItem!);
-        if (rating > 0) // If we already rated this module, set the rating control to that value.
-        {
-            RatingControl.PlaceholderValue = rating;
-            RatingControl.Value = rating;
-            RatingControl.Caption = "Your Rating";
-        }
-        else // Otherwise, set the rating control to the average rating.
-        {
-            if (ListDetailsMenuItem!.Rating > 0)
-                RatingControl.PlaceholderValue = ListDetailsMenuItem!.Rating;
-
-            RatingControl.Caption = $"{ListDetailsMenuItem!.Ratings} ratings";
-        }
-    }
-
     private async void RatingControl_OnValueChanged(RatingControl sender, object args)
     {
         RatingControl.Caption = "Your Rating";
         
         await _moduleDataService.SetMyRatingAsync(ListDetailsMenuItem!, (int)RatingControl.Value);
-    }
-
-    private void InstallButton_OnLoaded(object sender, RoutedEventArgs e)
-    {
-        // Set our state depending on our assigned installation state.
-        
-        InstallButton.IsEnabled = true;
-        switch (ListDetailsMenuItem!.InstallationState)
-        {
-            case InstallState.NotInstalled:
-                InstallButton.Content = "Install";
-                break;
-            case InstallState.Installed:
-                InstallButton.Content = "Uninstall";
-                break;
-            case InstallState.Outdated:
-                InstallButton.Content = "Update";
-                break;
-            case InstallState.AwaitingRestart:
-                InstallButton.Content = "Please Restart VRCFT";
-                InstallButton.IsEnabled = false;
-                break;
-        }
     }
 }

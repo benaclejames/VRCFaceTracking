@@ -62,7 +62,7 @@ public class MainViewModel : ObservableRecipient
         LibManager = App.GetService<ILibManager>();
         OscService = App.GetService<IOSCService>();
         var moduleDataService = App.GetService<IModuleDataService>();
-        var installedNewModules = moduleDataService.GetInstalledModulesAsync().Result;
+        var installedNewModules = moduleDataService.GetInstalledModules();
         var installedLegacyModules = moduleDataService.GetLegacyModules().Count();
         NoModulesInstalled = installedNewModules.Count() == 0 && installedLegacyModules == 0;
         

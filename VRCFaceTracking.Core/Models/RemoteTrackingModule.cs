@@ -12,12 +12,13 @@ public class RemoteTrackingModule
     public DateTime LastUpdated
     {
         get; set;
-    }
-    
+    } = DateTime.Now;
+
     public string Version
     {
-        get; set;
-    }
+        get;
+        set;
+    } = "Unknown";
     
     public int Downloads
     {
@@ -37,12 +38,12 @@ public class RemoteTrackingModule
     public string AuthorName
     {
         get; set;
-    }
+    } = "(No author provided)";
 
     public string ModuleName
     {
         get; set;
-    }
+    } = "(No name provided)";
     
     public string ModuleDescription
     {
@@ -57,27 +58,22 @@ public class RemoteTrackingModule
     public string DownloadUrl
     {
         get; set;
-    }
+    } = "(No download provided)";
 
     public string ModulePageUrl
     {
         get;
         set;
-    } = "(No page provided)";
+    }
     
     public string DllFileName
     {
         get; set;
-    }
+    } = "(No DLL provided)";
     
     [JsonIgnore]
     public InstallState InstallationState
     {
         get; set;
-    }
-
-    public bool VersionEqual(RemoteTrackingModule module)
-    {
-        return module.Version == Version;
     }
 }

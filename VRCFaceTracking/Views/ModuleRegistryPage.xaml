@@ -8,9 +8,12 @@
     xmlns:models="using:VRCFaceTracking.Core.Models"
     xmlns:views="using:VRCFaceTracking.Views"
     xmlns:behaviors="using:VRCFaceTracking.Behaviors"
+    xmlns:helpers="using:VRCFaceTracking.Helpers"
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     mc:Ignorable="d">
     <Page.Resources>
+        <helpers:EnumToStringConverter x:Key="EnumToStringConverter" />
+        
         <DataTemplate x:Key="ItemTemplate" x:DataType="models:RemoteTrackingModule">
             <Grid Height="60">
                 <Grid.ColumnDefinitions>
@@ -22,7 +25,10 @@
                     Margin="{StaticResource SmallLeftMargin}"
                     VerticalAlignment="Center">
                     <TextBlock Text="{x:Bind ModuleName}" Style="{StaticResource ListTitleStyle}" />
-                    <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
+                        <TextBlock Text="{x:Bind InstallationState, Converter={StaticResource EnumToStringConverter}, Mode=OneWay}" Style="{StaticResource ListSubTitleStyle}" />
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </DataTemplate>

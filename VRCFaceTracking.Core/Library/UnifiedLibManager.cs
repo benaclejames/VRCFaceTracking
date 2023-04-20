@@ -78,7 +78,7 @@ public class UnifiedLibManager : ILibManager
 
             // Find all modules
             var modulePaths = _moduleDataService.GetLegacyModules();
-            foreach (var module in _moduleDataService.GetInstalledModulesAsync().Result)
+            foreach (var module in _moduleDataService.GetInstalledModules())
             {
                 if (!string.IsNullOrEmpty(module.AssemblyLoadPath))
                 {

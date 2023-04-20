@@ -6,6 +6,7 @@ public class LogFileLogger : ILogger
 {
     private readonly string _categoryName;
     private readonly StreamWriter _file;
+    private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1,1);
 
     public LogFileLogger(string categoryName, StreamWriter file)
     {
@@ -24,7 +25,15 @@ public class LogFileLogger : ILogger
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        await _file.WriteAsync($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
-        await _file.FlushAsync();
+        await semaphoreSlim.WaitAsync(); // Wait for the semaphore to be released
+        try
+        {
+            await _file.WriteAsync($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
+            await _file.FlushAsync();
+        }
+        finally
+        {
+            semaphoreSlim.Release(); // Release the semaphore
+        }
     }
 }

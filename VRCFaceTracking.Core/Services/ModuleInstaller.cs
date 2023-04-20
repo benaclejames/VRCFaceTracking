@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Core.Models;
 
 namespace VRCFaceTracking.Core.Services;
@@ -13,6 +14,43 @@ public class ModuleInstaller
     {
         _logger = logger;
     }
+
+    private async Task DownloadToFile(RemoteTrackingModule module, string filePath)
+    {
+        using var client = new HttpClient();
+        var response = await client.GetAsync(module.DownloadUrl);
+        var content = await response.Content.ReadAsByteArrayAsync();
+        await File.WriteAllBytesAsync(filePath, content);
+        await Task.CompletedTask;
+    }
+
+    private async Task<string> TryFindModuleDll(string moduleDirectory, RemoteTrackingModule module)
+    {
+        // Attempt to find the first DLL. If there's more than one, try find the one with the same name as the module
+        var dllFiles = Directory.GetFiles(moduleDirectory, "*.dll");
+        
+        if (dllFiles.Length == 0)
+            return null;
+
+        if (dllFiles.Length == 1)   // If there's only one, just return it
+            return Path.GetFileName(dllFiles[0]);
+        
+        // Else we'll try find the one with the closest name to the module using Levenshtein distance
+        var targetFileName = Path.GetFileNameWithoutExtension(module.DownloadUrl);
+        var dllFile = dllFiles.Select(x => new { FileName = Path.GetFileNameWithoutExtension(x), Distance = LevenshteinDistance.Calculate(targetFileName, Path.GetFileNameWithoutExtension(x)) }).MinBy(x => x.Distance);
+
+        if (dllFile == null)
+        {
+            _logger.LogError(
+                "Module {module} has no .dll file name specified and no .dll files were found in the extracted zip",
+                module.ModuleId);
+            return null;
+        }
+        
+        _logger.LogDebug("Module {module} didn't specify a target dll, and contained multiple. Using {dll} as its distance of {distance} was closest to the module name",
+            module.ModuleId, dllFile.FileName, dllFile.Distance);
+        return Path.GetFileName(dllFile.FileName);
+    }
     
     public async Task<string> InstallRemoteModule(RemoteTrackingModule module)
     {
@@ -20,20 +58,10 @@ public class ModuleInstaller
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as
         // still support unofficial modules.
+        
+        // First we need to create the directory for the module. If it already exists, we'll delete it and start fresh.
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, module.ModuleId.ToString());
-        if (Directory.Exists(moduleDirectory))
-        {
-            _logger.LogDebug("Deleting existing module directory {moduleDirectory}", moduleDirectory);
-            try
-            {
-                Directory.Delete(moduleDirectory, true);
-            }
-            catch (Exception)
-            {
-                _logger.LogWarning("Failed to delete existing module directory {moduleDirectory}", moduleDirectory);
-                return "";
-            }
-        }
+        UninstallModule(module);
         Directory.CreateDirectory(moduleDirectory);
         
         // Time to download the main files
@@ -47,13 +75,9 @@ public class ModuleInstaller
             }
             Directory.CreateDirectory(tempDirectory);
             var tempZipPath = Path.Combine(tempDirectory, "module.zip");
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync(module.DownloadUrl);
-                var content = await response.Content.ReadAsByteArrayAsync();
-                await File.WriteAllBytesAsync(tempZipPath, content);
-            }
+            await DownloadToFile(module, tempZipPath);
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
+            
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
             foreach (var file in Directory.GetFiles(tempDirectory, "*", SearchOption.AllDirectories))
@@ -67,44 +91,22 @@ public class ModuleInstaller
                 }
             }
             Directory.Delete(tempDirectory, true);
+            
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
-            if (string.IsNullOrWhiteSpace(module.DllFileName))
+            module.DllFileName ??= await TryFindModuleDll(moduleDirectory, module);
+            if (module.DllFileName == null)
             {
-                // Attempt to find the first DLL. If there's more than one, try find the one with the same name as the module
-                var dllFiles = Directory.GetFiles(moduleDirectory, "*.dll");
-                if (dllFiles.Length == 0)
-                {
-                    _logger.LogError("Module {module} has no .dll file name specified and no .dll files were found in the extracted zip", module.ModuleId);
-                    return null;
-                }
-                if (dllFiles.Length == 1)
-                {
-                    _logger.LogWarning("Module {module} has no .dll file name specified and only one .dll file was found in the extracted zip. We'll assume {dllFile} is the correct file", module.ModuleId, Path.GetFileName(dllFiles[0]));
-                    module.DllFileName = Path.GetFileName(dllFiles[0]);
-                }
-                else
-                {
-                    var dllFile = dllFiles.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == module.ModuleName);
-                    if (dllFile == null)
-                    {
-                        _logger.LogError("Module {module} has no .dll file name specified and multiple .dll files were found in the extracted zip", module.ModuleId);
-                        return null;
-                    }
-                    module.DllFileName = Path.GetFileName(dllFile);
-                }
+                _logger.LogError("Module {module} has no .dll file name specified and no .dll files were found in the extracted zip", module.ModuleId);
+                return null;
             }
         }
         else
         {
-            using var client = new HttpClient();
-            var response = await client.GetAsync(module.DownloadUrl);
-            var content = await response.Content.ReadAsByteArrayAsync();
-            if (string.IsNullOrWhiteSpace(module.DllFileName))
-            {
-                module.DllFileName = Path.GetFileName(module.DownloadUrl);
-            }
+            module.DllFileName ??= Path.GetFileName(module.DownloadUrl);
             var dllPath = Path.Combine(moduleDirectory, module.DllFileName);
-            await File.WriteAllBytesAsync(dllPath, content);
+            
+            await DownloadToFile(module, dllPath);
+            
             _logger.LogDebug("Downloaded module {module} to {dllPath}", module.ModuleId, dllPath);
         }
         

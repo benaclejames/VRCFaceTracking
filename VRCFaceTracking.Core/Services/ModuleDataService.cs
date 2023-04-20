@@ -10,7 +10,6 @@ namespace VRCFaceTracking.Core.Services;
 public class ModuleDataService : IModuleDataService
 {
     private List<RemoteTrackingModule> _remoteModules;
-    private List<LocalTrackingModule> _installedModules;
     private readonly Dictionary<Guid, int> _ratingCache = new();
 
     private readonly IIdentityService _identityService;
@@ -34,22 +33,13 @@ public class ModuleDataService : IModuleDataService
 
     public async Task<IEnumerable<RemoteTrackingModule>> GetListDetailsDataAsync()
     {
-        if (_remoteModules == null)
-        {
-            _remoteModules = new List<RemoteTrackingModule>(AllModules());
-        }
+        _remoteModules ??= new List<RemoteTrackingModule>(AllModules());
 
         await Task.CompletedTask;
         return _remoteModules;
     }
     
-    public async Task<IEnumerable<LocalTrackingModule>> GetInstalledModulesAsync()
-    {
-        _installedModules = new List<LocalTrackingModule>(AllInstalled());
-
-        await Task.CompletedTask;
-        return _installedModules;
-    }
+    public IEnumerable<LocalTrackingModule> GetInstalledModules() => AllInstalled();
 
     public Task IncrementDownloadsAsync(RemoteTrackingModule module)
     {
@@ -104,6 +94,7 @@ public class ModuleDataService : IModuleDataService
         if (response.StatusCode == HttpStatusCode.NotFound)
         {
             _logger.LogDebug("Rating for {ModuleId} was not found", module.ModuleId);
+            _ratingCache[module.ModuleId] = 0;
             return 0;
         }
 
@@ -155,6 +146,28 @@ public class ModuleDataService : IModuleDataService
                     _logger.LogError(e, "Failed to deserialize module.json for {ModuleFolder}", moduleFolder);
                 }
             }
+            else
+            {
+                
+            }
+        }
+        
+        // Now we account for legacy modules
+        var moduleDlls = Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
+        foreach (var moduleDll in moduleDlls)
+        {
+            var module = new LocalTrackingModule
+            {
+                AssemblyLoadPath = moduleDll,
+                DllFileName = Path.GetFileName(moduleDll),
+                InstallationState = InstallState.Installed,
+                ModuleId = Guid.Empty,
+                ModuleName = Path.GetFileNameWithoutExtension(moduleDll),
+                ModuleDescription = "Legacy module",
+                AuthorName = "Local",
+                ModulePageUrl = "file:///"+Path.GetDirectoryName(moduleDll)
+            };
+            installedModules.Add(module);
         }
         
         return installedModules;

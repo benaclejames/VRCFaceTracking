@@ -40,7 +40,7 @@
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <RatingControl x:Name="RatingControl" AutomationProperties.Name="Module Rating" IsClearEnabled="False"
                                IsReadOnly="False"
-                               HorizontalAlignment="Left" Loaded="RatingControl_OnLoaded" ValueChanged="RatingControl_OnValueChanged"/>
+                               HorizontalAlignment="Left" ValueChanged="RatingControl_OnValueChanged"/>
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
@@ -68,7 +68,7 @@
                 
                 <AppBarSeparator/>
                 
-                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Loaded="InstallButton_OnLoaded" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
+                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
                 
             </StackPanel>
         </StackPanel>
