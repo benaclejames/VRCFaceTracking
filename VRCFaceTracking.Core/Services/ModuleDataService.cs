@@ -146,10 +146,6 @@ public class ModuleDataService : IModuleDataService
                     _logger.LogError(e, "Failed to deserialize module.json for {ModuleFolder}", moduleFolder);
                 }
             }
-            else
-            {
-                
-            }
         }
         
         // Now we account for legacy modules

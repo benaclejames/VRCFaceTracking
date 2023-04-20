@@ -32,6 +32,8 @@ public partial class App : Application
     {
         get;
     }
+    
+    private ILogger _logger;
 
     public static T GetService<T>()
         where T : class
@@ -112,6 +114,9 @@ public partial class App : Application
         }).
         Build();
 
+        var logBuilder = App.GetService<ILoggerFactory>();
+        _logger = logBuilder.CreateLogger("App");
+        
         App.GetService<IAppNotificationService>().Initialize();
 
         UnhandledException += App_UnhandledException;
@@ -119,8 +124,7 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        // TODO: Log and handle exceptions as appropriate.
-        // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+        _logger.LogError(e.Exception, "Unhandled exception: {0}", e.Exception.Message);
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
