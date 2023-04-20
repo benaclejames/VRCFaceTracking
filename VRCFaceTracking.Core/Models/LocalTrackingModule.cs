@@ -6,7 +6,8 @@ public enum InstallState
 {
     NotInstalled,
     Installed,
-    Outdated
+    Outdated,
+    AwaitingRestart
 }
 
 public class LocalTrackingModule : RemoteTrackingModule

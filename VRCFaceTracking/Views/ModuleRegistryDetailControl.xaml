@@ -46,7 +46,7 @@
                     Margin="{StaticResource SmallTopMargin}"
                     Text="Module Page"
                     Style="{StaticResource DetailSubTitleStyle}" />
-                <HyperlinkButton Content="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}"  NavigateUri="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}" Padding="0" Margin="0"/>
+                <HyperlinkButton Content="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}"  NavigateUri="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}" Padding="0"/>
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"

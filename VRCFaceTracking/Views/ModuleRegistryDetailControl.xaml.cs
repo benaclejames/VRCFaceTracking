@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
 
@@ -17,6 +18,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     private readonly IModuleDataService _moduleDataService;
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
+    private readonly MainViewModel _mainViewModel;
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(RemoteTrackingModule), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -26,6 +28,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         _moduleDataService = App.GetService<IModuleDataService>();
         _moduleInstaller = App.GetService<ModuleInstaller>();
         _libManager = App.GetService<ILibManager>();
+        _mainViewModel = App.GetService<MainViewModel>();
     }
     
 
@@ -47,19 +50,22 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
                 if (path != null)
                 {
                     ListDetailsMenuItem!.InstallationState = InstallState.Installed;
+                    await _moduleDataService.IncrementDownloadsAsync(ListDetailsMenuItem!);
+                    ListDetailsMenuItem!.Downloads++;
                     _libManager.Initialize();
                     InstallButton.Content = "Uninstall";
                     InstallButton.IsEnabled = true;
+                    _mainViewModel.NoModulesInstalled = false;
                 }
                 break;
             }
             case InstallState.Installed:
             {
-                InstallButton.Content = "Install";
-                InstallButton.IsEnabled = true;
+                InstallButton.Content = "Please Restart VRCFT";
+                InstallButton.IsEnabled = false;
                 _libManager.TeardownAllAndReset();
                 _moduleInstaller.UninstallModule(ListDetailsMenuItem!);
-                ListDetailsMenuItem!.InstallationState = InstallState.NotInstalled;
+                ListDetailsMenuItem!.InstallationState = InstallState.AwaitingRestart;
                 _libManager.Initialize();
                 break;
             }
@@ -96,6 +102,8 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     private void InstallButton_OnLoaded(object sender, RoutedEventArgs e)
     {
         // Set our state depending on our assigned installation state.
+        
+        InstallButton.IsEnabled = true;
         switch (ListDetailsMenuItem!.InstallationState)
         {
             case InstallState.NotInstalled:
@@ -107,7 +115,10 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
             case InstallState.Outdated:
                 InstallButton.Content = "Update";
                 break;
+            case InstallState.AwaitingRestart:
+                InstallButton.Content = "Please Restart VRCFT";
+                InstallButton.IsEnabled = false;
+                break;
         }
-        InstallButton.IsEnabled = true;
     }
 }

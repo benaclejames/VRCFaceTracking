@@ -23,6 +23,7 @@ public class UnifiedLibManager : ILibManager
     #region Observables
     public ObservableCollection<ModuleMetadata> ModuleMetadatas { get; set; }
     private readonly IDispatcherService _dispatcherService;
+    public Action<string[]> OnLoad { get; set; }
     #endregion
 
     #region Statuses
@@ -76,21 +77,24 @@ public class UnifiedLibManager : ILibManager
             TeardownAllAndReset();
 
             // Find all modules
-            var modulePaths = GetModulePaths();
+            var modulePaths = _moduleDataService.GetLegacyModules();
             foreach (var module in _moduleDataService.GetInstalledModulesAsync().Result)
             {
                 if (!string.IsNullOrEmpty(module.AssemblyLoadPath))
                 {
-                    modulePaths = modulePaths.Append(module.AssemblyLoadPath).ToArray();
+                    modulePaths = modulePaths.Append(module.AssemblyLoadPath);
                 }
             }
             
             // Load all modules
-            AvailableModules = LoadAssembliesFromPath(GetModulePaths());
+            AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
 
             // Attempt to initialize the requested runtimes.
             if (AvailableModules != null)
+            {
+                OnLoad?.Invoke(modulePaths.ToArray());
                 InitRequestedRuntimes(AvailableModules);
+            }
             else
             {
                 _dispatcherService.Run(() =>
@@ -108,14 +112,6 @@ public class UnifiedLibManager : ILibManager
         });
         _logger.LogInformation("Starting initialization tracking");
         _initializeWorker.Start();
-    }
-
-    private static string[] GetModulePaths()
-    {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
-
-        return Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
     }
 
     private static ExtTrackingModule LoadExternalModule(Assembly dll)
@@ -147,7 +143,8 @@ public class UnifiedLibManager : ILibManager
         {
             try
             {
-                var loaded = Assembly.LoadFrom(dll);
+                var alc = new AssemblyLoadContext(dll, true);
+                var loaded = alc.LoadFromAssemblyPath(dll);
                 foreach(var type in loaded.GetExportedTypes())
                 {
                     if (type.BaseType == typeof(ExtTrackingModule))
@@ -226,8 +223,10 @@ public class UnifiedLibManager : ILibManager
         if (!eyeSuccess && !expressionSuccess) return;
         EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         EyeStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-
+        
         module.ModuleInformation.Active = true;
+        module.ModuleInformation.UsingEye = eyeSuccess;
+        module.ModuleInformation.UsingExpression = expressionSuccess;
         _dispatcherService.Run(() =>
         {
             if (!ModuleMetadatas.Contains(module.ModuleInformation))
@@ -288,9 +287,6 @@ public class UnifiedLibManager : ILibManager
             _logger.LogInformation("Tearing down {module} ", modulePair.module.GetType().Name);
             modulePair.module.Teardown();
             modulePair.token.Cancel();
-            _logger.LogInformation("Teardown complete for {module}. Unloading assembly context...", modulePair.module.GetType().Name);
-            modulePair.alc.Unload();
-            _logger.LogInformation("Assembly context unloaded.");
         }
 
         ModuleThreads.Clear();

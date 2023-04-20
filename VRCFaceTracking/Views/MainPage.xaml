@@ -11,7 +11,7 @@
         <local:StreamToBitmapConverter x:Key="ImageConverter"/>
     </Page.Resources>
 
-    <Grid x:Name="ContentArea">
+    <Grid>
         <StackPanel Orientation="Vertical">
             <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.ModuleMetadatas}">
                 <ItemsControl.ItemTemplate>
@@ -43,8 +43,8 @@
                                 </ItemsControl>
                                 <StackPanel Margin="15, 15" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
                                     <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Name, Mode=OneWay}"/>
-                                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">Eye Tracking Active</TextBlock>
-                                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}">Face Tracking Active</TextBlock>
+                                    <TextBlock Visibility="{Binding UsingEye, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}">Eye Tracking Active</TextBlock>
+                                    <TextBlock Visibility="{Binding UsingExpression, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}">Face Tracking Active</TextBlock>
                                 </StackPanel>
                                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ToggleButton Margin="15, 0, 25, 0" 
@@ -58,6 +58,24 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <Border Visibility="{x:Bind ViewModel.NoModulesInstalled, Mode=OneWay}" Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;" FontSize="20"/>
+                        <StackPanel Margin="20, 4" Orientation="Vertical">
+                            <TextBlock FontSize="20" Style="{ThemeResource SubtitleTextBlockStyle}">No Modules Installed</TextBlock>
+                            <TextBlock FontSize="17" Foreground="{ThemeResource TextFillColorSecondaryBrush}">You appear to have no modules installed.</TextBlock>
+                            <HyperlinkButton FontSize="17" Padding="0" Content="Install some from here!" Click="NoModuleButton_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
             <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -24,7 +24,15 @@ public class ModuleInstaller
         if (Directory.Exists(moduleDirectory))
         {
             _logger.LogDebug("Deleting existing module directory {moduleDirectory}", moduleDirectory);
-            Directory.Delete(moduleDirectory, true);
+            try
+            {
+                Directory.Delete(moduleDirectory, true);
+            }
+            catch (Exception)
+            {
+                _logger.LogWarning("Failed to delete existing module directory {moduleDirectory}", moduleDirectory);
+                return "";
+            }
         }
         Directory.CreateDirectory(moduleDirectory);
         
@@ -46,13 +54,17 @@ public class ModuleInstaller
                 await File.WriteAllBytesAsync(tempZipPath, content);
             }
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
-            var extractedDirectory = Directory.GetDirectories(tempDirectory).First();
-            var extractedFiles = Directory.GetFiles(extractedDirectory);
-            foreach (var extractedFile in extractedFiles)
+            // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
+            File.Delete(tempZipPath);
+            foreach (var file in Directory.GetFiles(tempDirectory, "*", SearchOption.AllDirectories))
             {
-                var fileName = Path.GetFileName(extractedFile);
-                var destinationPath = Path.Combine(moduleDirectory, fileName);
-                File.Copy(extractedFile, destinationPath);
+                var path = Path.GetDirectoryName(file);
+                var newPath = path?.Replace(tempDirectory, moduleDirectory);
+                if (newPath != null)
+                {
+                    Directory.CreateDirectory(newPath);
+                    File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
+                }
             }
             Directory.Delete(tempDirectory, true);
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model

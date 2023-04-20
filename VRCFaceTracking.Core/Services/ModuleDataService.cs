@@ -45,13 +45,40 @@ public class ModuleDataService : IModuleDataService
     
     public async Task<IEnumerable<LocalTrackingModule>> GetInstalledModulesAsync()
     {
-        if (_installedModules == null)
-        {
-            _installedModules = new List<LocalTrackingModule>(AllInstalled());
-        }
+        _installedModules = new List<LocalTrackingModule>(AllInstalled());
 
         await Task.CompletedTask;
         return _installedModules;
+    }
+
+    public Task IncrementDownloadsAsync(RemoteTrackingModule module)
+    {
+        // send a PATCH request to https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/downloads with the module ID in the body
+        var client = new HttpClient();
+        var rating = new RatingObject
+            { UserId = _identityService.GetUniqueUserId(), ModuleId = module.ModuleId.ToString() };
+        var content = new StringContent(JsonConvert.SerializeObject(rating), Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Patch,
+            RequestUri = new Uri("https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/downloads"),
+            Content = content,
+        };
+        var response = client.SendAsync(request).Result;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            _logger.LogError("Failed to increment downloads for {ModuleId}. Status code: {StatusCode}", module.ModuleId, response.StatusCode);
+            return Task.CompletedTask;
+        }
+        return Task.CompletedTask;
+    }
+
+    public IEnumerable<string> GetLegacyModules()
+    {
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+
+        return Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
     }
 
     public async Task<int> GetMyRatingAsync(RemoteTrackingModule module)

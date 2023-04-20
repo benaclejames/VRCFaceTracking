@@ -18,4 +18,20 @@ public struct ModuleMetadata
             OnActiveChange?.Invoke(value);
         }
     }
+    
+    //Temporary for the menu display
+    private bool _usingEye;
+    private bool _usingExpression;
+    
+    public bool UsingEye
+    {
+        get => _usingEye;
+        internal set => _usingEye = value;
+    }
+    
+    public bool UsingExpression
+    {
+        get => _usingExpression;
+        internal set => _usingExpression = value;
+    }
 }

@@ -49,11 +49,22 @@ public class MainViewModel : ObservableRecipient
 
     public string MessagesOutPerSecText => $"{MessagesOutPerSec} m/s Outgoing";
 
+    private bool _noModulesInstalled;
+    public bool NoModulesInstalled
+    {
+        get => _noModulesInstalled;
+        set => SetProperty(ref _noModulesInstalled, value);
+    }
+
     public MainViewModel()
     {
         AvatarInfo = App.GetService<IAvatarInfo>();
         LibManager = App.GetService<ILibManager>();
         OscService = App.GetService<IOSCService>();
+        var moduleDataService = App.GetService<IModuleDataService>();
+        NoModulesInstalled = moduleDataService.GetInstalledModulesAsync().Result.Count() == 0;
+        
+        LibManager.OnLoad += _ => NoModulesInstalled = false;
         
         // We now start 2 new threads to count both the send rate and recv rate of the osc service over 1 second intervals at a time
         // This is done in a separate thread to not block the UI thread
