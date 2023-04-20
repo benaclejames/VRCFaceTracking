@@ -36,6 +36,7 @@ public class UnifiedLibManager : ILibManager
         public ExtTrackingModule module;
         public CancellationTokenSource token;
         public AssemblyLoadContext alc;
+        public Thread thread;
     }
     public static List<Assembly> AvailableModules { get; private set; }
     private static readonly List<ModuleThread> ModuleThreads = new();
@@ -170,20 +171,20 @@ public class UnifiedLibManager : ILibManager
         }
 
         var cts = new CancellationTokenSource();
-        ThreadPool.QueueUserWorkItem(state =>
+        var thread = new Thread(() =>
         {
-            var token = (CancellationToken)state;
-            while(!token.IsCancellationRequested)
+            while (!cts.IsCancellationRequested)
             {
                 module.Update();
             }
-        }, cts.Token);
+        });
 
         var _pair = new ModuleThread
         {
             module = module,
             token = cts,
-            alc = AssemblyLoadContext.GetLoadContext(module.GetType().Assembly)
+            alc = AssemblyLoadContext.GetLoadContext(module.GetType().Assembly),
+            thread = thread
         };
 
         ModuleThreads.Add(_pair);
@@ -285,6 +286,9 @@ public class UnifiedLibManager : ILibManager
             _logger.LogInformation("Tearing down {module} ", modulePair.module.GetType().Name);
             modulePair.module.Teardown();
             modulePair.token.Cancel();
+            if (modulePair.thread.IsAlive)  // Edge case, we wait for the thread to finish before unloading the assembly
+                modulePair.thread.Join();
+            modulePair.alc.Unload();    //TODO: Ensure this doesn't cause a crash
         }
 
         ModuleThreads.Clear();
