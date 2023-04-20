@@ -19,7 +19,7 @@ public sealed partial class OutputPage : Page
         get;
     }
 
-    public ObservableCollection<string> Log => LoggingService.Logs;
+    public ObservableCollection<string> Log => OutputPageLogger.Logs;
 
     public OutputPage()
     {

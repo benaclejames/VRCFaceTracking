@@ -12,7 +12,6 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Services;
-using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Notifications;
 using VRCFaceTracking.Services;
@@ -57,7 +56,8 @@ public partial class App : Application
         {
             logging.ClearProviders();
             logging.AddDebug();
-            logging.AddProvider(new LoggingService.OutputLogProvider());
+            logging.AddProvider(new OutputLogProvider());
+            logging.AddProvider(new LogFileProvider());
         }).
         UseContentRoot(AppContext.BaseDirectory).
         ConfigureServices((context, services) =>
@@ -78,7 +78,7 @@ public partial class App : Application
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
-            LoggingService.Setup(DispatcherQueue.GetForCurrentThread());
+            OutputPageLogger._dispatcher = DispatcherQueue.GetForCurrentThread();
 
             // Core Services
             services.AddSingleton<IIdentityService, IdentityService>();
