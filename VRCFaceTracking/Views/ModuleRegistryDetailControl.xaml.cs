@@ -34,45 +34,47 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
 
     private static async void OnListDetailsMenuItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is ModuleRegistryDetailControl control)
+        if (d is not ModuleRegistryDetailControl control)
         {
-            control.ForegroundElement.ChangeView(0, 0, 1);
-            control.InstallButton.IsEnabled = true;
-            switch (control.ListDetailsMenuItem!.InstallationState)
-            {
-                case InstallState.NotInstalled:
-                    control.InstallButton.Content = "Install";
-                    break;
-                case InstallState.Installed:
-                    control.InstallButton.Content = "Uninstall";
-                    break;
-                case InstallState.Outdated:
-                    control.InstallButton.Content = "Update";
-                    break;
-                case InstallState.AwaitingRestart:
-                    control.InstallButton.Content = "Please Restart VRCFT";
-                    control.InstallButton.IsEnabled = false;
-                    break;
-            }
+            return;
+        }
+
+        control.ForegroundElement.ChangeView(0, 0, 1);
+        control.InstallButton.IsEnabled = true;
+        switch (control.ListDetailsMenuItem!.InstallationState)
+        {
+            case InstallState.NotInstalled:
+                control.InstallButton.Content = "Install";
+                break;
+            case InstallState.Installed:
+                control.InstallButton.Content = "Uninstall";
+                break;
+            case InstallState.Outdated:
+                control.InstallButton.Content = "Update";
+                break;
+            case InstallState.AwaitingRestart:
+                control.InstallButton.Content = "Please Restart VRCFT";
+                control.InstallButton.IsEnabled = false;
+                break;
+        }
             
-            // Attempt to get our rating from the API.
-            var rating = await control._moduleDataService.GetMyRatingAsync(control.ListDetailsMenuItem!);
-            if (rating > 0) // If we already rated this module, set the rating control to that value.
-            {
-                control.RatingControl.PlaceholderValue = rating;
-                control.RatingControl.Value = rating;
-                control.RatingControl.Caption = "Your Rating";
-            }
-            else // Otherwise, set the rating control to the average rating.
-            {
-                control.RatingControl.ClearValue(RatingControl.ValueProperty);
-                control.RatingControl.ClearValue(RatingControl.PlaceholderValueProperty);
+        // Attempt to get our rating from the API.
+        var rating = await control._moduleDataService.GetMyRatingAsync(control.ListDetailsMenuItem!);
+        if (rating > 0) // If we already rated this module, set the rating control to that value.
+        {
+            control.RatingControl.PlaceholderValue = rating;
+            control.RatingControl.Value = rating;
+            control.RatingControl.Caption = "Your Rating";
+        }
+        else // Otherwise, set the rating control to the average rating.
+        {
+            control.RatingControl.ClearValue(RatingControl.ValueProperty);
+            control.RatingControl.ClearValue(RatingControl.PlaceholderValueProperty);
 
-                if (control.ListDetailsMenuItem!.Rating > 0)
-                    control.RatingControl.PlaceholderValue = control.ListDetailsMenuItem!.Rating;
+            if (control.ListDetailsMenuItem!.Rating > 0)
+                control.RatingControl.PlaceholderValue = control.ListDetailsMenuItem!.Rating;
 
-                control.RatingControl.Caption = $"{control.ListDetailsMenuItem!.Ratings} ratings";
-            }
+            control.RatingControl.Caption = $"{control.ListDetailsMenuItem!.Ratings} ratings";
         }
     }
 

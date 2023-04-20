@@ -289,10 +289,10 @@ public class UnifiedLibManager : ILibManager
         foreach (var modulePair in ModuleThreads)
         {
             _logger.LogInformation("Tearing down {module} ", modulePair.module.GetType().Name);
-            modulePair.module.Teardown();
             modulePair.token.Cancel();
             if (modulePair.thread.IsAlive)  // Edge case, we wait for the thread to finish before unloading the assembly
                 modulePair.thread.Join();
+            modulePair.module.Teardown();
             modulePair.alc.Unload();    //TODO: Ensure this doesn't cause a crash
         }
 
