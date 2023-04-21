@@ -40,8 +40,8 @@
                     <EntranceThemeTransition FromVerticalOffset="50" />
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
                 </StackPanel.ChildrenTransitions>
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Appearance" />
-                <labs:SettingsCard Description="Select which app theme to display" Header="App theme">
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Appearance" />
+                <labs:SettingsCard x:Uid="Select_which_app_theme_to_display" Header="App theme">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -53,7 +53,7 @@
                 </labs:SettingsCard>
 
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="OSC" />
-                <labs:SettingsCard Description="Where should OSC Data be sent?" Header="OSC Address">
+                <labs:SettingsCard x:Uid="Where_should_OSC_Data_be_sent" Header="OSC Address">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC05;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -85,8 +85,8 @@
                 </labs:SettingsCard>
 
                 <!--  About  -->
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
-                <labs:SettingsExpander Description="© 2023 VRCFaceTracking. All rights reserved." Header="VRCFaceTracking">
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
+                <labs:SettingsExpander x:Uid="copyright" Header="VRCFaceTracking">
                     <labs:SettingsExpander.HeaderIcon>
                         <BitmapIcon ShowAsMonochrome="true" UriSource="/Assets/Tiles/SmallTile-github.png" />
                     </labs:SettingsExpander.HeaderIcon>
@@ -96,7 +96,7 @@
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard Header="To clone this repository">
+                        <labs:SettingsCard x:Uid="To_clone_this_repository">
                             <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     IsTextSelectionEnabled="True"
@@ -105,7 +105,7 @@
                         <labs:SettingsCard
                                 x:Name="bugRequestCard"
                                 Click="bugRequestCard_Click"
-                                Header="File a bug or request new sample"
+                                x:Uid="File_a_bug_or_request_new_sample"
                                 IsClickEnabled="True">
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
@@ -114,7 +114,7 @@
                         <labs:SettingsCard
                                 HorizontalContentAlignment="Left"
                                 ContentAlignment="Vertical"
-                                Header="Dependencies &amp; references">
+                                x:Uid="Dependencies_references">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton Content="SimpleRustOSC" NavigateUri="https://github.com/benaclejames/SimpleRustOSC" />
                             </StackPanel>
@@ -122,7 +122,7 @@
                         <labs:SettingsCard
                                 HorizontalContentAlignment="Left"
                                 ContentAlignment="Vertical"
-                                Header="THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.">
+                                x:Uid="Disclaimer">
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>

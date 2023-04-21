@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Home</value>
+    <value>主页</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Select an item from the list.</value>
+    <value>从列表中选择一个项目。</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>ListDetails</value>
+    <value>清单详情</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalization</value>
+    <value>个性化</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Theme</value>
+    <value>主题</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>亮色</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>暗色</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Default</value>
+    <value>跟随系统</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>VRChat OSC App to allow AV3 Avatars to interact with eye and lip tracking runtimes</value>
+    <value>允许 AV3 头像通过 VRChat OSC 应用程序与眼睛和嘴唇追踪运行时进行交互。</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>VRChat OSC App to allow AV3 Avatars to interact with eye and lip tracking runtimes</value>
+    <value>允许 AV3 头像通过 VRChat OSC 应用程序与眼睛和嘴唇追踪运行时进行交互。</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Privacy Statement</value>
+    <value>个性化隐私声明</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,105 +174,105 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Output</value>
+    <value>输出</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
-    <value>Parameters</value>
+    <value>参数</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Select an item from the list.</value>
+    <value>从列表中选择一个项目。</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Module Registry</value>
+    <value>官方模块库</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>About</value>
+    <value>关于</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Appearance</value>
+    <value>外观</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
-    <value>Author</value>
+    <value>作者</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Avatar Status</value>
+    <value>模型状态</value>
   </data>
   <data name="copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. All rights reserved.</value>
+    <value>© 2023 VRCFaceTracking。版权所有。</value>
   </data>
   <data name="Dependencies_references.Header" xml:space="preserve">
-    <value>Dependencies &amp; references</value>
+    <value>依赖 &amp; 参考</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Description</value>
+    <value>描述</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.</value>
+    <value>本代码和信息按“原样”提供，不提供任何明示或暗示的保证，包括但不限于对适销性和/或特定用途适用性的暗示保证。</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Downloads</value>
+    <value>下载量</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Eye Tracking Active</value>
+    <value>眼追已激活</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Face Tracking Active</value>
+    <value>面捕已激活</value>
   </data>
   <data name="File_a_bug_or_request_new_sample.Header" xml:space="preserve">
-    <value>File a bug or request new sample</value>
+    <value>提交BUG或请求新功能</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>LastUpdated</value>
+    <value>最近更新时间</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Legacy Parameters</value>
+    <value>旧参数</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Listening on Port:</value>
+    <value>监听端口：</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>ModulePage</value>
+    <value>模块页</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>m/s Incoming</value>
+    <value>m/s 传入</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>m/s Outgoing</value>
+    <value>m/s 传出</value>
   </data>
   <data name="NoModulesInstalled.Text" xml:space="preserve">
-    <value>No Modules Installed</value>
+    <value>没有安装模块</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
-    <value>OSC Status</value>
+    <value>OSC状态</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
-    <value>Parameters</value>
+    <value>参数</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Rating</value>
+    <value>评分</value>
   </data>
   <data name="Select_which_app_theme_to_display.Description" xml:space="preserve">
-    <value>Select which app theme to display</value>
+    <value>选择要显示的应用主题</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Sending on Port:</value>
+    <value>发送端口：</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Toggle Tracking</value>
+    <value>追踪开关</value>
   </data>
   <data name="To_clone_this_repository.Header" xml:space="preserve">
-    <value>To clone this repository</value>
+    <value>克隆此存储库</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>UsageInstructions</value>
+    <value>使用说明</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Version</value>
+    <value>版本号</value>
   </data>
   <data name="Where_should_OSC_Data_be_sent.Description" xml:space="preserve">
-    <value>Where should OSC Data be sent?</value>
+    <value>OSC 数据应该发送到哪里？</value>
   </data>
   <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
-    <value>You appear to have no modules installed.</value>
+    <value>您似乎没有安装任何模块。</value>
   </data>
 </root>
