@@ -19,24 +19,24 @@
                     Style="{ThemeResource TitleTextBlockStyle}" />
             </StackPanel>
             <StackPanel Padding="0,15,0,0">
-                <TextBlock Text="Author" Style="{StaticResource DetailSubTitleStyle}" />
+                <TextBlock x:Uid="Author" Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.AuthorName, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Version"
+                    x:Uid="Version"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.Version, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Downloads"
+                    x:Uid="Downloads"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.Downloads, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Rating"
+                    x:Uid="Rating"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <RatingControl x:Name="RatingControl" AutomationProperties.Name="Module Rating" IsClearEnabled="False"
                                IsReadOnly="False"
@@ -44,25 +44,25 @@
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Module Page"
+                    x:Uid="ModulePage"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <HyperlinkButton Content="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}"  NavigateUri="{x:Bind ListDetailsMenuItem.ModulePageUrl, Mode=OneWay}" Padding="0"/>
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Last Updated"
+                    x:Uid="LastUpdated"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.LastUpdated, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Description"
+                    x:Uid="Description"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.ModuleDescription, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
                 
                 <TextBlock
                     Margin="{StaticResource SmallTopMargin}"
-                    Text="Usage Instructions"
+                    x:Uid="UsageInstructions"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.UsageInstructions, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
                 

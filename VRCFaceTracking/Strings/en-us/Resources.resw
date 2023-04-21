@@ -185,4 +185,94 @@
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
     <value>Module Registry</value>
   </data>
+  <data name="About.Text" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Appearance.Text" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Author.Text" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="AvatarStatus.Text" xml:space="preserve">
+    <value>Avatar Status</value>
+  </data>
+  <data name="copyright.Description" xml:space="preserve">
+    <value>© 2023 VRCFaceTracking. All rights reserved.</value>
+  </data>
+  <data name="Dependencies_references.Header" xml:space="preserve">
+    <value>Dependencies &amp; references</value>
+  </data>
+  <data name="Description.Text" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Disclaimer.Header" xml:space="preserve">
+    <value>THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.</value>
+  </data>
+  <data name="Downloads.Text" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="EyeTrackingActive.Text" xml:space="preserve">
+    <value>Eye Tracking Active</value>
+  </data>
+  <data name="FaceTrackingActive.Text" xml:space="preserve">
+    <value>Face Tracking Active</value>
+  </data>
+  <data name="File_a_bug_or_request_new_sample.Header" xml:space="preserve">
+    <value>File a bug or request new sample</value>
+  </data>
+  <data name="LastUpdated.Text" xml:space="preserve">
+    <value>LastUpdated</value>
+  </data>
+  <data name="LegacyParameters.Text" xml:space="preserve">
+    <value>Legacy Parameters</value>
+  </data>
+  <data name="Listening_on_Port.Text" xml:space="preserve">
+    <value>Listening on Port:</value>
+  </data>
+  <data name="ModulePage.Text" xml:space="preserve">
+    <value>ModulePage</value>
+  </data>
+  <data name="msIncoming.Text" xml:space="preserve">
+    <value>m/s Incoming</value>
+  </data>
+  <data name="msOutgoing.Text" xml:space="preserve">
+    <value>m/s Outgoing</value>
+  </data>
+  <data name="NoModulesInstalled.Text" xml:space="preserve">
+    <value>No Modules Installed</value>
+  </data>
+  <data name="OSCStatus.Text" xml:space="preserve">
+    <value>OSC Status</value>
+  </data>
+  <data name="Parameters.Text" xml:space="preserve">
+    <value>Parameters</value>
+  </data>
+  <data name="Rating.Text" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="Select_which_app_theme_to_display.Description" xml:space="preserve">
+    <value>Select which app theme to display</value>
+  </data>
+  <data name="Sending_on_Port.Text" xml:space="preserve">
+    <value>Sending on Port:</value>
+  </data>
+  <data name="ToggleTracking.Content" xml:space="preserve">
+    <value>Toggle Tracking</value>
+  </data>
+  <data name="To_clone_this_repository.Header" xml:space="preserve">
+    <value>To clone this repository</value>
+  </data>
+  <data name="UsageInstructions.Text" xml:space="preserve">
+    <value>UsageInstructions</value>
+  </data>
+  <data name="Version.Text" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="Where_should_OSC_Data_be_sent.Description" xml:space="preserve">
+    <value>Where should OSC Data be sent?</value>
+  </data>
+  <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
+    <value>You appear to have no modules installed.</value>
+  </data>
 </root>
