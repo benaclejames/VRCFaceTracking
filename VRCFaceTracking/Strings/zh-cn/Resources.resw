@@ -228,7 +228,7 @@
     <value>旧参数</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>监听端口</value>
+    <value>监听端口：</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
     <value>模块页</value>
