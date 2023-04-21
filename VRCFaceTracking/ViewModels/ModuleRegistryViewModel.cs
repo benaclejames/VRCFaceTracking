@@ -53,7 +53,8 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
         }
 
         // Sort our data by name, then place any modules with the author name VRCFT Team at the top of the list. (unbiased)
-        data = data.OrderBy(x => x.ModuleName).ThenBy(x => x.AuthorName != "VRCFT Team");
+        data = data.OrderBy(x => x.ModuleName);
+        data = data.OrderBy(x => x.AuthorName != "VRCFT Team");
         
         // Then prepend the local modules to the list.
         data = localModules.Concat(data);
