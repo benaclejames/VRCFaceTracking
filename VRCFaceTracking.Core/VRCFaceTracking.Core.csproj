@@ -5,6 +5,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Platforms>x86;x64;arm64;AnyCPU</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyVersion>5.0.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="fti_osc.dll" />

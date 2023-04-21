@@ -144,6 +144,22 @@ public class UnifiedLibManager : ILibManager
             {
                 var alc = new AssemblyLoadContext(dll, true);
                 var loaded = alc.LoadFromAssemblyPath(dll);
+                
+                var references = loaded.GetReferencedAssemblies();
+                var oldRefs = false;
+                foreach (var reference in references)
+                {
+                    if (reference.Name == "VRCFaceTracking" || reference.Name == "VRCFaceTracking.Core")
+                    {
+                        if (reference.Version < new Version(5, 0, 0, 0))
+                        {
+                            _logger.LogWarning("Module {dll} references an older version of VRCFaceTracking. Skipping.", Path.GetFileName(dll));
+                            oldRefs = true;
+                        }
+                    }
+                }
+                if (oldRefs) continue;
+                
                 foreach(var type in loaded.GetExportedTypes())
                 {
                     if (type.BaseType == typeof(ExtTrackingModule))
