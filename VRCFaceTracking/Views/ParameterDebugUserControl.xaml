@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="VRCFaceTracking.Views.ParameterDebugUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:services="using:VRCFaceTracking.Services"
+             mc:Ignorable="d">
+
+    <Grid Padding="0,2,0,2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*" /> <!-- sets the width of the first column to fit the TextBlock content -->
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="6*" /> <!-- sets the width of the second column to take up the remaining space -->
+        </Grid.ColumnDefinitions>
+        <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+        <TextBlock Style="{StaticResource DetailSubTitleStyle}" Text="{x:Bind ViewModel.ParameterName}" TextTrimming="None" TextWrapping="NoWrap" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        </Viewbox>
+        <AppBarSeparator Grid.Column="1" Margin="10,0,10, 0" VerticalAlignment="Stretch"/>
+        <ProgressBar Grid.Column="2" Value="{x:Bind ViewModel.ParameterValue, Mode=OneWay}" Maximum="1" Minimum="{x:Bind ViewModel.MinValue}"/>
+    </Grid>
+</UserControl>

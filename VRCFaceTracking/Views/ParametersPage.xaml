@@ -1,0 +1,48 @@
+﻿<Page
+    x:Class="VRCFaceTracking.Views.ParametersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:VRCFaceTracking.Views"
+    mc:Ignorable="d">
+
+    <Border Padding="5" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left column with "Eye" title -->
+            <StackPanel Grid.Column="0" Margin="10">
+                <TextBlock Text="Eye" FontSize="25" TextAlignment="Center"/>
+                <!-- Horizontal separator -->
+                <NavigationViewItemSeparator Margin="0, 10, 0, 10"/>
+               
+                <Border x:Name="TrackedEyeParameters" Padding="10" CornerRadius="6" BorderThickness="1" Margin="10" Background="{ThemeResource LayerFillColorAltBrush}">
+                    <StackPanel>
+                      <ItemsControl ItemsSource="{x:Bind _trackedParameters, Mode=OneWay}">
+                          <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                  <views:ParameterDebugUserControl/>
+                              </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                  </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Separator between columns -->
+            <AppBarSeparator Grid.Column="1" VerticalAlignment="Stretch" />
+
+            <!-- Right column with "Lip" title -->
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Lip" FontSize="25" Margin="0,5,0,0" TextAlignment="Center"/>
+                <AppBarSeparator VerticalAlignment="Stretch" />
+                <!-- Add your content here -->
+            </StackPanel>
+        </Grid>
+    </Border>
+</Page>

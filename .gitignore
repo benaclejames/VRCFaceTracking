@@ -1,8 +1,51 @@
+# Visual Studio files
+.vs/
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
-VRCFaceTracking/ParamLib
-VRCFaceTracking/ParamLib/*
-/.vs/VRCFaceTracking
+*.exe
+*.pdb
+*.dll
+*.user
+*.suo
+*.cache
+*.log
+*.vspscc
+*.vssscc
+*.psess
+*.dbmdl
+*.dbproj*
+*.VC.db
+*.csproj.user
+*.bak
+*.cache
+*.sln.docstates
+*.sln.ide-shadows
+[Tt]humbs.db
+*.dbmdl
+*.dbproj*
+*.VC.db
+*.csproj.user
+*.bak
+*.cache
+*.sln.docstates
+*.sln.ide-shadows
+[Tt]humbs.db
+
+# JetBrains Rider files
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Build results
+bin/
+obj/
+
+# Ignore files in the VRCFaceTracking-Next folder
+/VRCFaceTracking/bin/
+/VRCFaceTracking/obj/
+
+# Ignore files in the VRCFaceTracking-Next.Core folder
+/VRCFaceTracking.Core/bin/
+/VRCFaceTracking.Core/obj/
