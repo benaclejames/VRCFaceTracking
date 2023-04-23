@@ -96,11 +96,11 @@ public static class UnifiedExpressionsMerger
 
         #region Eyelids Combined
 
-        new EParam(exp => exp.Eye.Left.Openness * .5f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .5f, "v2/EyeLidLeft"),
-        new EParam(exp => exp.Eye.Right.Openness * .5f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .5f, "v2/EyeLidRight"),
+        new EParam(exp => exp.Eye.Left.Openness * .75f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .25f, "v2/EyeLidLeft"),
+        new EParam(exp => exp.Eye.Right.Openness * .75f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .25f, "v2/EyeLidRight"),
         new EParam(exp =>
-            ((exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f) * .5f +
-            ((exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f) * .5f,
+            ((exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f) * .75f +
+            ((exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f) * .25f,
             "v2/EyeLid"),
        
         #endregion
