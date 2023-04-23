@@ -8,10 +8,12 @@
     <AssemblyVersion>5.0.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="fti_osc.dll" />
+    <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fti_osc.dll">
+    <Content Include="..\..\..\..\..\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
