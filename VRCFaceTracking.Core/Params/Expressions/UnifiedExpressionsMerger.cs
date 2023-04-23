@@ -27,12 +27,12 @@ public static class UnifiedExpressionsMerger
         new EParam(exp => exp.Eye.Left.Gaze, "v2/EyeLeft"),
         new EParam(exp => exp.Eye.Right.Gaze, "v2/EyeRight"),
         
+        // Use when tracking interface is sending verbose gaze data.
         new NativeParameter<Vector2>(exp =>
-                {
-                    var combined = exp.Eye.Combined().Gaze;
-                    return new Vector2(-combined.ToPitch().y, combined.ToYaw().x);
-                },
-            param => IsEyeParameter(
+            new Vector2(exp.Eye.Combined().Gaze.ToPitch(), 
+                        exp.Eye.Combined().Gaze.ToYaw()),
+            param => 
+                IsEyeParameter(
                 param.Where(p => 
                 p.name.Contains("Eye") && 
                 (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
@@ -40,6 +40,22 @@ public static class UnifiedExpressionsMerger
                 .Length == 0,
             "/tracking/eye/CenterPitchYaw"
             ),
+        /*
+        // Use when tracking interface is sending combined gaze data.
+        new NativeParameter<Vector4>(exp =>
+            new Vector4(exp.Eye.Right.Gaze.ToPitch(), 
+                        exp.Eye.Right.Gaze.ToYaw(), 
+                        exp.Eye.Left.Gaze.ToPitch(), 
+                        exp.Eye.Left.Gaze.ToYaw()),
+            param => 
+                IsEyeParameter(
+                param.Where(p =>
+                    p.name.Contains("Eye") &&
+                    (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                    .Length == 0,
+            "/tracking/eye/LeftRightPitchYaw" // THE INPUT IS BACKWARDSSSSS
+        ),
+        */
 
         new NativeParameter<float>(exp =>
             {
@@ -48,21 +64,10 @@ public static class UnifiedExpressionsMerger
             param => IsEyeParameter(
                     param.Where(p =>
                         p.name.Contains("Eye") &&
-                        (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) &&
-                        (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                (p.name.Contains("Open") || p.name.Contains("Lid"))).ToArray())
                 .Length == 0,
             "/tracking/eye/EyesClosedAmount"
         ),
-        
-        /*new AlwaysRelevantParameter<Vector4>(exp =>
-        {
-            float[] randomFloats = new float[6];
-
-            for (int i = 0; i < randomFloats.Length; i++) {
-                randomFloats[i] = (float) (rand.NextDouble() * 720 - 360);
-            }
-            return new Vector4(randomFloats[0], randomFloats[1], randomFloats[2], randomFloats[3]);
-        }, "/tracking/eye/LeftRightPitchYaw"),*/ // Screw you vrchat give us individual eyes and fix ur docs u poopyheads
         
         #endregion
 
@@ -158,8 +163,8 @@ public static class UnifiedExpressionsMerger
 
         new EParam(exp => (exp.Shapes[(int)UnifiedExpressions.CheekSquintLeft].Weight + exp.Shapes[(int)UnifiedExpressions.CheekSquintRight].Weight) / 2.0f, "v2/CheekSquint"),
 
-        new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight, "v2/CheekLeftPuffSuck"),
-        new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight, "v2/CheekRightPuffSuck"),
+        new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckLeft].Weight, "v2/CheekPuffSuckLeft"),
+        new EParam(exp => exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight - exp.Shapes[(int)UnifiedExpressions.CheekSuckRight].Weight, "v2/CheekPuffSuckRight"),
 
         new EParam(exp =>
             (exp.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight + exp.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight) / 2.0f -
