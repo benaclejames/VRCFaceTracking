@@ -30,7 +30,7 @@ public class RemoteTrackingModule
         get; set;
     }
     
-    public int Rating
+    public float Rating
     {
         get; set;
     }
