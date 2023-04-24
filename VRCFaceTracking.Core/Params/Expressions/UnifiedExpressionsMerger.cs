@@ -281,6 +281,7 @@ public static class UnifiedExpressionsMerger
         #endregion
 
         new ConditionalBoolParameter(exp => (UnifiedLibManager.EyeStatus == ModuleState.Active, UnifiedLibManager.EyeStatus != ModuleState.Uninitialized), "EyeTrackingActive"),
+        new ConditionalBoolParameter(exp => (UnifiedLibManager.ExpressionStatus == ModuleState.Active, UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized), "ExpressionTrackingActive"),
         new ConditionalBoolParameter(exp => (UnifiedLibManager.ExpressionStatus == ModuleState.Active, UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized), "LipTrackingActive")
 
     };
