@@ -14,7 +14,7 @@
     <Page.Resources>
         <helpers:EnumToStringConverter x:Key="EnumToStringConverter" />
         
-        <DataTemplate x:Key="ItemTemplate" x:DataType="models:RemoteTrackingModule">
+        <DataTemplate x:Key="ItemTemplate" x:DataType="models:InstallableTrackingModule">
             <Grid Height="60">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

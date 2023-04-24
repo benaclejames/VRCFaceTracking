@@ -10,8 +10,14 @@ public enum InstallState
     AwaitingRestart
 }
 
-public class LocalTrackingModule : RemoteTrackingModule
+public class InstallableTrackingModule : TrackingModuleMetadata
 {
+    [JsonIgnore]
+    public InstallState InstallationState
+    {
+        get; set;
+    }
+    
     [JsonIgnore]
     public string AssemblyLoadPath
     {

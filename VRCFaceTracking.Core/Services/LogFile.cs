@@ -14,7 +14,7 @@ public class LogFileLogger : ILogger
         _file = file;
     }
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => default!;
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
@@ -22,8 +22,8 @@ public class LogFileLogger : ILogger
         LogLevel logLevel,
         EventId eventId,
         TState state,
-        Exception? exception,
-        Func<TState, Exception?, string> formatter)
+        Exception exception,
+        Func<TState, Exception, string> formatter)
     {
         await semaphoreSlim.WaitAsync(); // Wait for the semaphore to be released
         try

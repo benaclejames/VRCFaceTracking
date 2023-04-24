@@ -1,9 +1,11 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Views;
 
 namespace VRCFaceTracking.Services;
@@ -15,16 +17,26 @@ public class ActivationService : IActivationService
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IOSCService _oscService;
     private readonly IMainService _mainService;
+    private readonly IModuleDataService _moduleDataService;
+    private readonly ModuleInstaller _moduleInstaller;
+    private readonly ILibManager _libManager;
+    private readonly ILogger<ActivationService> _logger;
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
-        IMainService mainService)
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
+        IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
+        IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
+        ILogger<ActivationService> logger)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
         _oscService = oscService;
         _mainService = mainService;
+        _moduleDataService = moduleDataService;
+        _moduleInstaller = moduleInstaller;
+        _libManager = libManager;
+        _logger = logger;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -68,10 +80,26 @@ public class ActivationService : IActivationService
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
         await _oscService.InitializeAsync().ConfigureAwait(false);
-        await _mainService.InitializeAsync(new Action<Action>(action =>
+
+        await _mainService.InitializeAsync(action =>
         {
             App.MainWindow.DispatcherQueue.TryEnqueue(action.Invoke);
-        })).ConfigureAwait(false);
+        }).ConfigureAwait(false);
+        
+        // Before we initialize, we need to check for updates for all our installed modules
+        _logger.LogInformation("Checking for updates for installed modules...");
+        var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
+        var remoteModules = await _moduleDataService.GetRemoteModules();
+        var outdatedModules = remoteModules.Where(rm => localModules.Any(lm => rm.ModuleId == lm.ModuleId && rm.Version != lm.Version));
+        foreach (var outdatedModule in outdatedModules)
+        {
+            _logger.LogInformation($"Updating {outdatedModule.ModuleName} from {localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version} to {outdatedModule.Version}");
+            await _moduleInstaller.InstallRemoteModule(outdatedModule);
+        }
+        
+        _logger.LogInformation("Initializing modules...");
+
+        _libManager.Initialize();
 
         await Task.CompletedTask;
     }

@@ -4,10 +4,10 @@ namespace VRCFaceTracking.Core.Contracts.Services;
 
 public interface IModuleDataService
 {
-    Task<IEnumerable<RemoteTrackingModule>> GetListDetailsDataAsync();
-    Task<int> GetMyRatingAsync(RemoteTrackingModule module);
-    Task SetMyRatingAsync(RemoteTrackingModule module, int rating);
-    IEnumerable<LocalTrackingModule> GetInstalledModules();
-    Task IncrementDownloadsAsync(RemoteTrackingModule module);
+    Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules();
+    Task<int> GetMyRatingAsync(TrackingModuleMetadata moduleMetadata);
+    Task SetMyRatingAsync(TrackingModuleMetadata moduleMetadata, int rating);
+    IEnumerable<InstallableTrackingModule> GetInstalledModules();
+    Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata);
     IEnumerable<string> GetLegacyModules();
 }

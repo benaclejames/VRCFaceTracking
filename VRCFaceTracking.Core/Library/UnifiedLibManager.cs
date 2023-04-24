@@ -62,19 +62,18 @@ public class UnifiedLibManager : ILibManager
     {
         if (_initializeWorker != null && _initializeWorker.IsAlive && _initCts != null) _initCts.Cancel();
         
-        
-            ModuleMetadatas.Clear();
-            ModuleMetadatas.Add(new ModuleMetadata
-            {
-                Active = false,
-                Name = "Initializing Modules..."
-            });
+        ModuleMetadatas.Clear();
+        ModuleMetadatas.Add(new ModuleMetadata
+        { 
+            Active = false,
+            Name = "Initializing Modules..."
+        });
 
         // Start Initialization
         _initializeWorker = new Thread(() =>
         {
             // Kill lingering threads
-            TeardownAllAndReset();
+            TeardownAllAndResetAsync();
 
             // Find all modules
             var modulePaths = _moduleDataService.GetLegacyModules();
@@ -107,7 +106,6 @@ public class UnifiedLibManager : ILibManager
                 });
                 _logger.LogWarning("No modules loaded.");
             }
-
         });
         _logger.LogInformation("Starting initialization tracking");
         _initializeWorker.Start();
@@ -181,10 +179,7 @@ public class UnifiedLibManager : ILibManager
     private static void EnsureModuleThreadStarted(ExtTrackingModule module)
     {
         if (ModuleThreads.Any(pair => pair.module == module))
-        {
-            AssemblyLoadContext.GetLoadContext(module.GetType().Assembly).Unload();
             return;
-        }
 
         var cts = new CancellationTokenSource();
         var thread = new Thread(() =>
@@ -216,7 +211,7 @@ public class UnifiedLibManager : ILibManager
 
         module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
-        bool eyeSuccess = false, expressionSuccess = false;
+        bool eyeSuccess, expressionSuccess;
         try
         {
             (eyeSuccess, expressionSuccess) = module.Initialize(EyeStatus == ModuleState.Uninitialized, ExpressionStatus == ModuleState.Uninitialized);
@@ -236,20 +231,16 @@ public class UnifiedLibManager : ILibManager
             module.Status = state ? ModuleState.Active : ModuleState.Idle;
 
         // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
-        if (!eyeSuccess && !expressionSuccess) return;
+        if (!eyeSuccess && !expressionSuccess)
+            return;
+        
         EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
         module.ModuleInformation.Active = true;
         module.ModuleInformation.UsingEye = eyeSuccess;
         module.ModuleInformation.UsingExpression = expressionSuccess;
-        _dispatcherService.Run(() =>
-        {
-            if (!ModuleMetadatas.Contains(module.ModuleInformation))
-            {
-                ModuleMetadatas.Add(module.ModuleInformation);
-            }
-        });
+        _dispatcherService.Run(() => { if (!ModuleMetadatas.Contains(module.ModuleInformation)) ModuleMetadatas.Add(module.ModuleInformation); });
         EnsureModuleThreadStarted(module);
     }
 
@@ -299,9 +290,10 @@ public class UnifiedLibManager : ILibManager
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
-    public void TeardownAllAndReset()
+    public Task TeardownAllAndResetAsync()
     {
         _logger.LogInformation("Tearing down all modules...");
+        
         foreach (var modulePair in ModuleThreads)
         {
             _logger.LogInformation("Tearing down {module} ", modulePair.module.GetType().Name);
@@ -310,11 +302,14 @@ public class UnifiedLibManager : ILibManager
                 modulePair.thread.Join();
             modulePair.module.Teardown();
             modulePair.alc.Unload();    //TODO: Ensure this doesn't cause a crash
+            ModuleMetadatas.Remove(modulePair.module.ModuleInformation);
         }
 
         ModuleThreads.Clear();
         
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
+        
+        return Task.CompletedTask;
     }
 }

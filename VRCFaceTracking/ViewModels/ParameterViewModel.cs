@@ -4,9 +4,9 @@ namespace VRCFaceTracking.ViewModels;
 
 public class ParameterViewModel : ObservableRecipient
 {
-    public string ParameterName { get; set; }
+    public string? ParameterName { get; set; }
 
-    public float _parameterValue;
+    private float _parameterValue;
     public float ParameterValue
     {
         get => _parameterValue;

@@ -31,8 +31,7 @@ namespace VRCFaceTracking
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern uint GetFileAttributes(string lpFileName);
         
-        public static readonly bool HasAdmin =
-            new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+        public static readonly bool HasAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
         
         public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
         public static readonly string CustomLibsDirectory = PersistentDataDirectory + "\\CustomLibs";

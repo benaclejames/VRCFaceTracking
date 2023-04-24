@@ -19,7 +19,7 @@ namespace VRCFaceTracking.Core
             
             var keys = regKey.GetValueNames().Where(x => x.ToLower().Contains("osc"));
 
-            bool wasOscForced = false;
+            var wasOscForced = false;
             foreach (var key in keys)
             {
                 if ((int) regKey.GetValue(key) == 0)

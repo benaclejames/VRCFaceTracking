@@ -7,12 +7,16 @@ namespace VRCFaceTracking.Services;
 public class OutputPageLogger : ILogger
 {
     private readonly string _categoryName;
-    public static ObservableCollection<string> Logs = new();
-    public static DispatcherQueue _dispatcher;
+    public static readonly ObservableCollection<string> Logs = new();
+    private static DispatcherQueue? _dispatcher;
 
-    public OutputPageLogger(string categoryName) => _categoryName = categoryName;
+    public OutputPageLogger(string categoryName, DispatcherQueue? queue)
+    {
+        _categoryName = categoryName;
+        _dispatcher = queue;
+    }
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => default!;
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
@@ -24,6 +28,6 @@ public class OutputPageLogger : ILogger
         Func<TState, Exception?, string> formatter)
     {
         // Add to the staticLog from the dispatcher thread
-        _dispatcher.TryEnqueue(() => Logs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}"));
+        _dispatcher?.TryEnqueue(() => Logs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}"));
     }
 }

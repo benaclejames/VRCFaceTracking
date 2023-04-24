@@ -8,8 +8,7 @@ namespace VRCFaceTracking.Core.OSC
 {
     public class OscMain : IOSCService
     {
-        private static Socket SenderClient, ReceiverClient;
-        private static Thread _receiveThread;
+        private static Socket _senderClient, _receiverClient;
         private static CancellationTokenSource _recvThreadCts;
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
@@ -72,11 +71,11 @@ namespace VRCFaceTracking.Core.OSC
         private bool BindSender()
         {
             _logger.LogTrace("Binding Sender Client");
-            SenderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            _senderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
-                SenderClient.Connect(new IPEndPoint(IPAddress.Parse(Address), OutPort));
+                _senderClient.Connect(new IPEndPoint(IPAddress.Parse(Address), OutPort));
             }
             catch
             {
@@ -89,11 +88,11 @@ namespace VRCFaceTracking.Core.OSC
         private bool BindListener()
         {
             _logger.LogTrace("Binding Receiver Client");
-            ReceiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            _receiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
-                ReceiverClient.Bind(new IPEndPoint(IPAddress.Parse(Address), InPort));
+                _receiverClient.Bind(new IPEndPoint(IPAddress.Parse(Address), InPort));
 
                 StartListenerThread();
             }
@@ -125,7 +124,7 @@ namespace VRCFaceTracking.Core.OSC
             int bytesReceived = 0;
             try
             {
-                bytesReceived = ReceiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
             }
             catch (Exception)
             {
@@ -168,7 +167,7 @@ namespace VRCFaceTracking.Core.OSC
 
         public void Send(byte[] data, int length)
         {
-            SenderClient.Send(data, length, SocketFlags.None);
+            _senderClient.Send(data, length, SocketFlags.None);
             OnMessageDispatched();
         }
     }

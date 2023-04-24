@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,7 +59,7 @@ public partial class App : Application
         {
             logging.ClearProviders();
             logging.AddDebug();
-            logging.AddProvider(new OutputLogProvider());
+            logging.AddProvider(new OutputLogProvider(DispatcherQueue.GetForCurrentThread()));
             logging.AddProvider(new LogFileProvider());
         }).
         UseContentRoot(AppContext.BaseDirectory).
@@ -80,7 +81,6 @@ public partial class App : Application
             services.AddSingleton<IPageService, PageService>();
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
-            OutputPageLogger._dispatcher = DispatcherQueue.GetForCurrentThread();
 
             // Core Services
             services.AddSingleton<IIdentityService, IdentityService>();
@@ -117,6 +117,15 @@ public partial class App : Application
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
         
+        // Kill any other instances of VRCFaceTracking.exe
+        foreach (var proc in Process.GetProcessesByName("VRCFaceTracking"))
+        {
+            if (proc.Id != Process.GetCurrentProcess().Id)
+            {
+                proc.Kill();
+            }
+        }
+
         App.GetService<IAppNotificationService>().Initialize();
 
         UnhandledException += App_UnhandledException;

@@ -11,15 +11,15 @@ namespace VRCFaceTracking.ViewModels;
 public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
 {
     private readonly IModuleDataService _moduleDataService;
-    private RemoteTrackingModule? _selected;
+    private InstallableTrackingModule? _selected;
 
-    public RemoteTrackingModule? Selected
+    public InstallableTrackingModule? Selected
     {
         get => _selected;
         set => SetProperty(ref _selected, value);
     }
 
-    public ObservableCollection<RemoteTrackingModule> ModuleInfos { get; private set; } = new ObservableCollection<RemoteTrackingModule>();
+    public ObservableCollection<InstallableTrackingModule> ModuleInfos { get; private set; } = new ObservableCollection<InstallableTrackingModule>();
     
     public ModuleRegistryViewModel(IModuleDataService moduleDataService)
     {
@@ -30,13 +30,13 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
     {
         ModuleInfos.Clear();
 
-        var data = await _moduleDataService.GetListDetailsDataAsync();
+        var data = await _moduleDataService.GetRemoteModules();
         
         // Now comes the tricky bit, we get all locally installed modules and add them to the list.
         // If any of the IDs match a remote module and the other data contained within does not match,
         // then we need to set the local module install state to outdated. If everything matches then we need to set the install state to installed.
         var installedModules = _moduleDataService.GetInstalledModules();
-        var localModules = new List<RemoteTrackingModule>();    // dw about it
+        var localModules = new List<InstallableTrackingModule>();    // dw about it
         foreach (var installedModule in installedModules)
         {
             var remoteModule = data.FirstOrDefault(x => x.ModuleId == installedModule.ModuleId);

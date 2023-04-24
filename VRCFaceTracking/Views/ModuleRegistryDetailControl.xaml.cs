@@ -9,9 +9,9 @@ namespace VRCFaceTracking.Views;
 
 public sealed partial class ModuleRegistryDetailControl : UserControl
 {
-    public RemoteTrackingModule? ListDetailsMenuItem
+    public InstallableTrackingModule? ListDetailsMenuItem
     {
-        get => GetValue(ListDetailsMenuItemProperty) as RemoteTrackingModule;
+        get => GetValue(ListDetailsMenuItemProperty) as InstallableTrackingModule;
         set => SetValue(ListDetailsMenuItemProperty, value);
     }
 
@@ -20,7 +20,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     private readonly ILibManager _libManager;
     private readonly MainViewModel _mainViewModel;
 
-    public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(RemoteTrackingModule), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
+    public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(TrackingModuleMetadata), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
     public ModuleRegistryDetailControl()
     {
@@ -84,6 +84,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         {
             case InstallState.NotInstalled or InstallState.Outdated:
             {
+                await _libManager.TeardownAllAndResetAsync();
                 var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
                 if (path != null)
                 {
@@ -101,7 +102,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
             {
                 InstallButton.Content = "Please Restart VRCFT";
                 InstallButton.IsEnabled = false;
-                _libManager.TeardownAllAndReset();
+                await _libManager.TeardownAllAndResetAsync();
                 _moduleInstaller.UninstallModule(ListDetailsMenuItem!);
                 ListDetailsMenuItem!.InstallationState = InstallState.AwaitingRestart;
                 _libManager.Initialize();

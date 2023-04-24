@@ -2,7 +2,7 @@
 
 namespace VRCFaceTracking.Core.Models;
 
-public class RemoteTrackingModule
+public class TrackingModuleMetadata
 {
     public Guid ModuleId
     {
@@ -70,10 +70,4 @@ public class RemoteTrackingModule
     {
         get; set;
     } = "(No DLL provided)";
-    
-    [JsonIgnore]
-    public InstallState InstallationState
-    {
-        get; set;
-    }
 }

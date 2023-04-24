@@ -43,7 +43,7 @@ public class MainStandalone : IMainService
         
         Utils.TimeEndPeriod(1);
         _logger.LogInformation("VRCFT Standalone Exiting!");
-        _libManager.TeardownAllAndReset();
+        _libManager.TeardownAllAndResetAsync();
         Console.WriteLine("Shutting down");
     }
 
@@ -64,8 +64,6 @@ public class MainStandalone : IMainService
         
         // Try to load config and propogate data into Unified if they exist.
         UnifiedConfig.ReadConfiguration();
-
-        _libManager.Initialize();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {

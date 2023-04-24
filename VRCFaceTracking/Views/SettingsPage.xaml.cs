@@ -13,8 +13,8 @@ public sealed partial class SettingsPage : Page
     {
         get
         {
-            var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-            return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+            var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version;
+            return version != null ? $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}" : "Unknown";
         }
     }
 
