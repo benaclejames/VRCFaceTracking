@@ -7,6 +7,10 @@ public interface IOSCService
     int OutPort { get; set; }
     string Address { get; set; }
     
+    // Temporary action as I can't figure out a better way to relay the changing of this back to winui
+    Action<bool> OnConnectedDisconnected { get; set; } 
+    bool IsConnected { get; set; }
+    
     Action OnMessageDispatched { get; set; }
     Action<OscMessageMeta> OnMessageReceived { get; set; }
 

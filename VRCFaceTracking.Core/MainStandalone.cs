@@ -3,7 +3,6 @@ using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
-using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking;
@@ -74,7 +73,7 @@ public class MainStandalone : IMainService
 
             _logger.LogInformation(relevantParams.Length + " parameters loaded.");
             if (deprecatedParams > 0)
-                _logger.LogError(
+                _logger.LogWarning(
                     deprecatedParams +
                     " Legacy parameters detected. " +
                     "Please consider updating the avatar to use the latest documented parameters.");

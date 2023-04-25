@@ -87,7 +87,7 @@
                         <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEC05;" FontSize="20"/>
                         <StackPanel Margin="20, 4" Orientation="Vertical">
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}" x:Uid="OSCStatus"/>
-                            <StackPanel Orientation="Horizontal" Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="5" Visibility="{x:Bind ViewModel.IsRecvConnected}">
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Listening_on_Port"/>
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.OscService.InPort, Mode=OneWay}"/>
                             </StackPanel>

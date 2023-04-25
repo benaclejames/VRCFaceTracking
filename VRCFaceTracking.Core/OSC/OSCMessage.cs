@@ -138,5 +138,5 @@ public class OscMessage
     
     public OscMessage(string address, Type type) : this(address, OscUtils.TypeConversions[type].oscType) {}
 
-    public OscMessage(byte[] bytes) => SROSCLib.parse_osc(bytes, bytes.Length, ref _meta);
+    public OscMessage(byte[] bytes, int len) => SROSCLib.parse_osc(bytes, len, ref _meta);
 }

@@ -57,10 +57,8 @@ public static class UnifiedExpressionsMerger
         ),
         */
 
-        new NativeParameter<float>(exp =>
-            {
-                return 1 - exp.Eye.Combined().Openness;
-            },
+        new NativeParameter<float>(
+            exp => 1 - exp.Eye.Combined().Openness,
             param => IsEyeParameter(
                     param.Where(p =>
                         p.name.Contains("Eye") &&

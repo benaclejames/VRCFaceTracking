@@ -114,6 +114,7 @@ namespace VRCFaceTracking.OSC
             private int _maxPossibleBinaryInt;
             private readonly string _paramName;
             private readonly Func<UnifiedTrackingData, float> _getValueFunc;
+            private readonly Regex _regex;
 
             private bool ProcessBinary(UnifiedTrackingData data, int binaryIndex, bool negativeRelevant)
             {
@@ -150,17 +151,14 @@ namespace VRCFaceTracking.OSC
                 var _negativeParam = new BaseParam<bool>(_paramName + "Negative", data => _getValueFunc.Invoke(data) < 0);
                 var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
-                // Get all parameters starting with this parameter's name, and of type bool
-                Regex regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
-
                 var boolParams = newParams.Where(p => 
-                    p.input.Type == typeof(bool) && regex.IsMatch(p.name));
+                    p.input.Type == typeof(bool) && _regex.IsMatch(p.name));
 
                 var paramsToCreate = new Dictionary<string, int>();
                 foreach (var param in boolParams)
                 {
                     var tempName = param.name;
-                    if (!int.TryParse(String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
+                    if (!int.TryParse(string.Concat(tempName.Remove(0, _paramName.Length).ToArray().TakeWhile(char.IsNumber)), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
@@ -205,6 +203,7 @@ namespace VRCFaceTracking.OSC
             protected BinaryBaseParameter(string paramName, Func<UnifiedTrackingData, float> getValueFunc)
             {
                 _paramName = paramName;
+                _regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
                 _getValueFunc = getValueFunc;
             }
         }
