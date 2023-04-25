@@ -3,7 +3,6 @@ using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
-using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking;

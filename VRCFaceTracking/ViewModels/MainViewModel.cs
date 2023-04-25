@@ -43,6 +43,13 @@ public class MainViewModel : ObservableRecipient
         get => _noModulesInstalled;
         set => SetProperty(ref _noModulesInstalled, value);
     }
+    
+    private bool _isRecvConnected;
+    public bool IsRecvConnected
+    {
+        get => _isRecvConnected;
+        set => SetProperty(ref _isRecvConnected, value);
+    }
 
     public MainViewModel()
     {
@@ -76,5 +83,8 @@ public class MainViewModel : ObservableRecipient
             _messagesSent = 0;
         };
         outTimer.Start();
+        
+        IsRecvConnected = OscService.IsConnected;
+        OscService.OnConnectedDisconnected += b => { IsRecvConnected = b; };
     }
 }
