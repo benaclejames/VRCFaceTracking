@@ -13,6 +13,7 @@ namespace VRCFaceTracking
 {
     public class ConfigParser
     {
+        private static AvatarConfigSpec avatarConfig;
         private static ILogger<ConfigParser> _logger;
 
         public ConfigParser(ILogger<ConfigParser> parserLogger)
@@ -46,12 +47,29 @@ namespace VRCFaceTracking
         public static Action<IParameter[], AvatarConfigSpec> OnConfigLoaded = (_, _) => { };
         public static string AvatarId = "";
 
+        private static void Propogate()
+        {
+            var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
+
+            List<IParameter> paramList = new List<IParameter>();
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+                paramList.AddRange(parameter.ResetParam(parameters));
+
+            OnConfigLoaded(paramList.ToArray(), avatarConfig);
+        }
+
         public void ParseNewAvatar(string newId)
         {
-            if (newId == AvatarId || string.IsNullOrEmpty(newId))
+            if (string.IsNullOrEmpty(newId))
                 return;
-            
-            AvatarConfigSpec avatarConfig = null;
+
+            if (newId == AvatarId)
+            {
+                Propogate();
+                return;
+            }
+
+            avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
             {
                 if (Directory.Exists(userFolder + "\\Avatars"))
@@ -73,14 +91,8 @@ namespace VRCFaceTracking
                 return;
             }
 
-            //_logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
-            var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
+            Propogate();
 
-            List<IParameter> paramList = new List<IParameter>();
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                paramList.AddRange(parameter.ResetParam(parameters));
-
-            OnConfigLoaded(paramList.ToArray(), avatarConfig);
             AvatarId = newId;
         }
     }
