@@ -26,6 +26,8 @@ namespace VRCFaceTracking.OSC
                 get => _relevant;
                 protected set
                 {
+                    if (value) Enqueue();
+                    
                     // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
                     if (_relevant == value) return;
                     
@@ -34,10 +36,7 @@ namespace VRCFaceTracking.OSC
                     if (_getValueFunc == null) return;
 
                     if (value)
-                    {
                         UnifiedTracking.OnUnifiedDataUpdated += Process;
-                        Enqueue();  // Enqueue a new message to ensure initial values are what we expect
-                    }
                     else
                         UnifiedTracking.OnUnifiedDataUpdated -= Process;
                 }
