@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Library;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -13,8 +12,12 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
+
         public Action OnMessageDispatched { get; set; }
         public Action<OscMessageMeta> OnMessageReceived { get; set; }
+        public Action<bool> OnConnectedDisconnected { get; set; } = b => { };
+        public bool IsConnected { get; set; }
+
 
         public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
         {
@@ -23,6 +26,7 @@ namespace VRCFaceTracking.Core.OSC
             _logger = loggerFactory.CreateLogger("OSC");
             OnMessageDispatched = () => { };
             OnMessageReceived = HandleNewMessage;
+            OnConnectedDisconnected = b => {IsConnected = b;};
         }
 
         public int InPort { get; set; }
@@ -98,9 +102,12 @@ namespace VRCFaceTracking.Core.OSC
             }
             catch
             {
+                _logger.LogError("Failed to bind to port {0}", InPort);
+                OnConnectedDisconnected(false);
                 return false;
             }
-
+            
+            OnConnectedDisconnected(true);
             return true;
         }
 
@@ -131,7 +138,7 @@ namespace VRCFaceTracking.Core.OSC
                 // Ignore as this is most likely a timeout exception
                 return;
             }
-            var newMsg = new OscMessage(buffer);
+            var newMsg = new OscMessage(buffer, bytesReceived);
             Array.Clear(buffer, 0, bytesReceived);
             OnMessageReceived(newMsg._meta);
         }
