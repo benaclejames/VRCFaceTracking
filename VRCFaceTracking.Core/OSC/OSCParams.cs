@@ -109,17 +109,16 @@ namespace VRCFaceTracking.OSC
 
         public class BinaryBaseParameter : IParameter
         {
-            private readonly List<BaseParam<bool>> _params = new(); // Int represents binary steps
+            private readonly List<BaseParam<bool>> _params = new(); // Count represents binary steps + negative
 
-            private readonly BaseParam<bool> _negativeParam;
             private int _maxPossibleBinaryInt;
             private readonly string _paramName;
             private readonly Func<UnifiedTrackingData, float> _getValueFunc;
 
-            private bool ProcessBinary(UnifiedTrackingData data, int binaryIndex)
+            private bool ProcessBinary(UnifiedTrackingData data, int binaryIndex, bool negativeRelevant)
             {
                 var value = _getValueFunc.Invoke(data);
-                if (!_negativeParam.Relevant &&
+                if (!negativeRelevant &&
                     value < 0) // If the negative parameter isn't set, cut the negative values
                     return false;
                 var adjustedValue = Math.Abs(value);
@@ -146,6 +145,9 @@ namespace VRCFaceTracking.OSC
             public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
                 _params.Clear();
+
+                // Alloc negative param and add them into _params pool.
+                var _negativeParam = new BaseParam<bool>(_paramName + "Negative", data => _getValueFunc.Invoke(data) < 0);
                 var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
                 // Get all parameters starting with this parameter's name, and of type bool
@@ -172,16 +174,17 @@ namespace VRCFaceTracking.OSC
                 _maxPossibleBinaryInt = (int) Math.Pow(2, paramsToCreate.Values.Count);
                 var parameters = new List<IParameter>(negativeRelevancy);
                 foreach (var newBool in paramsToCreate
-                             .Select(param => new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value))))
+                             .Select(param => new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value, negativeRelevancy.Length > 0))))
                 {
                     parameters.AddRange(newBool.ResetParam(newParams));
                     _params.Add(newBool);
                 }
+                _params.Add(_negativeParam); // might not be necessary but you never know when you need a funny negative param lol.
 
                 return parameters.ToArray();
             }
 
-            public (string, IParameter)[] GetParamNames() => _params.SelectMany(p => p.GetParamNames()).Concat(_negativeParam.GetParamNames()).ToArray();
+            public (string, IParameter)[] GetParamNames() => _params.SelectMany(p => p.GetParamNames()).ToArray();
 
             public bool Deprecated => false;    // Handled by our children
 
@@ -203,7 +206,6 @@ namespace VRCFaceTracking.OSC
             {
                 _paramName = paramName;
                 _getValueFunc = getValueFunc;
-                _negativeParam = new BaseParam<bool>(paramName + "Negative", data => getValueFunc.Invoke(data) < 0);
             }
         }
     }
