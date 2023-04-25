@@ -73,7 +73,7 @@ public class MainStandalone : IMainService
 
             _logger.LogInformation(relevantParams.Length + " parameters loaded.");
             if (deprecatedParams > 0)
-                _logger.LogError(
+                _logger.LogWarning(
                     deprecatedParams +
                     " Legacy parameters detected. " +
                     "Please consider updating the avatar to use the latest documented parameters.");
