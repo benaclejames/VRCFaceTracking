@@ -17,6 +17,7 @@ namespace VRCFaceTracking.OSC
             private readonly Func<UnifiedTrackingData, T> _getValueFunc;
 
             private readonly string _paramName;
+            private readonly Regex _regex;
             
             private bool _relevant;
 
@@ -31,9 +32,12 @@ namespace VRCFaceTracking.OSC
                     _relevant = value;
 
                     if (_getValueFunc == null) return;
-                    
+
                     if (value)
+                    {
                         UnifiedTracking.OnUnifiedDataUpdated += Process;
+                        Enqueue();  // Enqueue a new message to ensure initial values are what we expect
+                    }
                     else
                         UnifiedTracking.OnUnifiedDataUpdated -= Process;
                 }
@@ -48,36 +52,26 @@ namespace VRCFaceTracking.OSC
                     if (Equals(OscMessage.CachedValue, value)) return;
                     
                     OscMessage.Value = value;
-                    NeedsSend = true;
+                    Enqueue();
                 }
             }
 
-            private bool NeedsSend
-            {
-                set
-                {
-                    if (!value)
-                        return;
-                    
-                    SendQueue.Add(OscMessage._meta);
-                }
-            }
+            private void Enqueue() => SendQueue.Add(OscMessage._meta);
 
             protected readonly OscMessage OscMessage;
 
             public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc)
             {
                 _paramName = name;
+                _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
                 _getValueFunc = getValueFunc;
                 OscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
             }
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
-                Regex regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
-
                 var compatibleParam = newParams.FirstOrDefault(param =>
-                    regex.IsMatch(param.name)
+                    _regex.IsMatch(param.name)
                     && param.input.Type == typeof(T));
 
                 if (compatibleParam != null)
