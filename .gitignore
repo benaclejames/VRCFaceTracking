@@ -1,3 +1,6 @@
+# VSCode Files
+.vscode/
+
 # Visual Studio files
 .vs/
 bin/
