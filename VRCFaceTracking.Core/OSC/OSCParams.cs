@@ -149,7 +149,7 @@ namespace VRCFaceTracking.OSC
                 foreach (var param in boolParams)
                 {
                     var tempName = param.name;
-                    if (!int.TryParse(string.Concat(tempName.Remove(0, _paramName.Length).ToArray().TakeWhile(char.IsNumber)), out var index)) continue;
+                    if (!int.TryParse(String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber).Reverse()), out var index)) continue;
                     // Get the shift steps
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
