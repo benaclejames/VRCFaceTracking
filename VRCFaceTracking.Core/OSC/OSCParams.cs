@@ -20,13 +20,14 @@ namespace VRCFaceTracking.OSC
             private readonly Regex _regex;
             
             private bool _relevant;
+            private bool _sendOnLoad;
 
             public bool Relevant
             {
                 get => _relevant;
                 protected set
                 {
-                    if (value) Enqueue();
+                    if (_sendOnLoad && value) Enqueue();
                     
                     // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
                     if (_relevant == value) return;
@@ -59,12 +60,13 @@ namespace VRCFaceTracking.OSC
 
             protected readonly OscMessage OscMessage;
 
-            public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc)
+            public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc, bool sendOnLoad = false)
             {
                 _paramName = name;
                 _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
                 _getValueFunc = getValueFunc;
                 OscMessage = new OscMessage(DefaultPrefix+name, typeof(T));
+                _sendOnLoad = sendOnLoad;
             }
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
@@ -163,7 +165,7 @@ namespace VRCFaceTracking.OSC
                 _maxPossibleBinaryInt = (int) Math.Pow(2, paramsToCreate.Values.Count);
                 var parameters = new List<IParameter>(negativeRelevancy);
                 foreach (var newBool in paramsToCreate
-                             .Select(param => new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value))))
+                             .Select(param => new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value), true)))
                 {
                     parameters.AddRange(newBool.ResetParam(newParams));
                     _params.Add(newBool);
@@ -195,7 +197,7 @@ namespace VRCFaceTracking.OSC
                 _paramName = paramName;
                 _regex = new Regex(@"(?<!(v\d+))/" + _paramName + @"\d+$|^" + _paramName + @"\d+$");
                 _getValueFunc = getValueFunc;
-                _negativeParam = new BaseParam<bool>(paramName + "Negative", data => getValueFunc.Invoke(data) < 0);
+                _negativeParam = new BaseParam<bool>(paramName + "Negative", data => getValueFunc.Invoke(data) < 0, true);
             }
         }
     }
