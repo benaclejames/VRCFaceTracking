@@ -9,5 +9,5 @@ public interface IModuleDataService
     Task SetMyRatingAsync(TrackingModuleMetadata moduleMetadata, int rating);
     IEnumerable<InstallableTrackingModule> GetInstalledModules();
     Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata);
-    IEnumerable<string> GetLegacyModules();
+    IEnumerable<InstallableTrackingModule> GetLegacyModules();
 }

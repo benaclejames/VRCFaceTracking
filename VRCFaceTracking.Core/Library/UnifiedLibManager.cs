@@ -76,15 +76,9 @@ public class UnifiedLibManager : ILibManager
             TeardownAllAndResetAsync();
 
             // Find all modules
-            var modulePaths = _moduleDataService.GetLegacyModules();
-            foreach (var module in _moduleDataService.GetInstalledModules())
-            {
-                if (!string.IsNullOrEmpty(module.AssemblyLoadPath))
-                {
-                    modulePaths = modulePaths.Append(module.AssemblyLoadPath);
-                }
-            }
-            
+            var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
             // Load all modules
             AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
 

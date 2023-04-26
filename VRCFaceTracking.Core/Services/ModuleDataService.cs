@@ -61,12 +61,30 @@ public class ModuleDataService : IModuleDataService
         return Task.CompletedTask;
     }
 
-    public IEnumerable<string> GetLegacyModules()
+    public IEnumerable<InstallableTrackingModule> GetLegacyModules()
     {
         if (!Directory.Exists(Utils.CustomLibsDirectory))
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
+        
+        var legacyModules = new List<InstallableTrackingModule>();
+        var moduleDlls = Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
+        foreach (var moduleDll in moduleDlls)
+        {
+            var module = new InstallableTrackingModule
+            {
+                AssemblyLoadPath = moduleDll,
+                DllFileName = Path.GetFileName(moduleDll),
+                InstallationState = InstallState.Installed,
+                ModuleId = Guid.Empty,
+                ModuleName = Path.GetFileNameWithoutExtension(moduleDll),
+                ModuleDescription = "Legacy module",
+                AuthorName = "Local",
+                ModulePageUrl = "file:///"+Path.GetDirectoryName(moduleDll)
+            };
+            legacyModules.Add(module);
+        }
 
-        return Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
+        return legacyModules;
     }
 
     public async Task<int> GetMyRatingAsync(TrackingModuleMetadata moduleMetadata)
@@ -148,24 +166,6 @@ public class ModuleDataService : IModuleDataService
                 _logger.LogError(e, "Failed to deserialize module.json for {ModuleFolder}", moduleFolder);
             }
         }
-        
-        // Now we account for legacy modules
-        var moduleDlls = Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
-        foreach (var moduleDll in moduleDlls)
-        {
-            var module = new InstallableTrackingModule
-            {
-                AssemblyLoadPath = moduleDll,
-                DllFileName = Path.GetFileName(moduleDll),
-                InstallationState = InstallState.Installed,
-                ModuleId = Guid.Empty,
-                ModuleName = Path.GetFileNameWithoutExtension(moduleDll),
-                ModuleDescription = "Legacy module",
-                AuthorName = "Local",
-                ModulePageUrl = "file:///"+Path.GetDirectoryName(moduleDll)
-            };
-            installedModules.Add(module);
-        }
-        
+
         return installedModules;
     } }
