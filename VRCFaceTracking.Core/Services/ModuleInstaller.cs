@@ -54,6 +54,9 @@ public class ModuleInstaller
     
     public async Task<string> InstallRemoteModule(TrackingModuleMetadata moduleMetadata)
     {
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+        
         // If our download type is not a .dll, we'll download to a temp directory and then extract to the modules directory
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as

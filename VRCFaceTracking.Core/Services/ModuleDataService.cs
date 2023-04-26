@@ -122,6 +122,9 @@ public class ModuleDataService : IModuleDataService
 
     public IEnumerable<InstallableTrackingModule> GetInstalledModules()
     {
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+        
         // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
         // If it does, deserialize it and add it to the list of installed modules.
         var installedModules = new List<InstallableTrackingModule>();
