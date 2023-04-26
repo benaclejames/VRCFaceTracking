@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
@@ -46,10 +47,8 @@ public class MainStandalone : IMainService
         Console.WriteLine("Shutting down");
     }
 
-    public async Task InitializeAsync(Action<Action> dispatcherRun)
+    public async Task InitializeAsync()
     {
-        _logger.LogInformation("VRCFT Initializing!");
-
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
         {

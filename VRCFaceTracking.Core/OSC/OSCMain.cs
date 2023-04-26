@@ -59,6 +59,8 @@ namespace VRCFaceTracking.Core.OSC
 
         public async Task<(bool, bool)> InitializeAsync()
         {
+            _logger.LogDebug("OSC Service Initializing");
+            
             await LoadSettings();
             var result = (false, false);
 
@@ -67,22 +69,24 @@ namespace VRCFaceTracking.Core.OSC
 
             result.Item1 = BindListener();
             result.Item2 = BindSender();
-
+            
+            _logger.LogDebug("OSC Service Initialized with result {0}", result);
             await Task.CompletedTask;
             return result;
         }
 
         private bool BindSender()
         {
-            _logger.LogTrace("Binding Sender Client");
+            _logger.LogDebug("Binding Sender Client");
             _senderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
                 _senderClient.Connect(new IPEndPoint(IPAddress.Parse(Address), OutPort));
             }
-            catch
+            catch(Exception e)
             {
+                _logger.LogDebug("Failed to bind to port {0} with reason {1}", OutPort, e.Message);
                 return false;
             }
 

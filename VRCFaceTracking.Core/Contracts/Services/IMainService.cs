@@ -2,6 +2,6 @@
 public interface IMainService
 {
     void Teardown();
-    Task InitializeAsync(Action<Action> dispatcherRun);
+    Task InitializeAsync();
     Action<string, float> ParameterUpdate { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -79,13 +80,20 @@ public class ActivationService : IActivationService
     private async Task InitializeAsync()
     {
         await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+
+        await Task.CompletedTask;
+    }
+
+    private async Task StartupAsync()
+    {
+        await _themeSelectorService.SetRequestedThemeAsync();
+        
+        _logger.LogDebug("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
+        
         await _oscService.InitializeAsync().ConfigureAwait(false);
 
-        await _mainService.InitializeAsync(action =>
-        {
-            App.MainWindow.DispatcherQueue.TryEnqueue(action.Invoke);
-        }).ConfigureAwait(false);
-        
+        await _mainService.InitializeAsync().ConfigureAwait(false);
+
         // Before we initialize, we need to check for updates for all our installed modules
         _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
@@ -99,14 +107,8 @@ public class ActivationService : IActivationService
         
         _logger.LogInformation("Initializing modules...");
 
-        _libManager.Initialize();
-
-        await Task.CompletedTask;
-    }
-
-    private async Task StartupAsync()
-    {
-        await _themeSelectorService.SetRequestedThemeAsync();
+        App.MainWindow.DispatcherQueue.TryEnqueue(() => _libManager.Initialize());
+        
         await Task.CompletedTask;
     }
 }
