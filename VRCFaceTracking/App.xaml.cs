@@ -116,7 +116,7 @@ public partial class App : Application
 
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
-        
+
         // Kill any other instances of VRCFaceTracking.exe
         foreach (var proc in Process.GetProcessesByName("VRCFaceTracking"))
         {

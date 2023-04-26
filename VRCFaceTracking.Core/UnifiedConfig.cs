@@ -20,7 +20,7 @@ namespace VRCFaceTracking.Types
 
         public void ReadConfiguration()
         {
-            UnifiedConfig config = new UnifiedConfig();
+            var config = new UnifiedConfig();
             try
             {
                 string jsonString = File.ReadAllText(unifiedConfigPath);
@@ -41,21 +41,20 @@ namespace VRCFaceTracking.Types
             }
         }
 
-        public void Save()
+        public static void Save()
         {
-            using (Stream stream = File.Open(unifiedConfigPath, FileMode.Create))
+            using Stream stream = File.Open(unifiedConfigPath, FileMode.Create);
+            
+            var tempConfig = new UnifiedConfig
             {
-                UnifiedConfig tempConfig = new UnifiedConfig();
-
                 // UnifiedTrackingData
-                tempConfig.Data = UnifiedTracking.Data;
-
+                Data = UnifiedTracking.Data,
                 // UnifiedTrackingMutator
-                tempConfig.Mutator = UnifiedTracking.Mutator;
+                Mutator = UnifiedTracking.Mutator
+            };
 
-                JsonSerializer.Serialize(stream, tempConfig, jsonSerializerOptions);
-                stream.Dispose();
-            }
+            JsonSerializer.Serialize(stream, tempConfig, jsonSerializerOptions);
+            stream.Dispose();
         }
     }
 }

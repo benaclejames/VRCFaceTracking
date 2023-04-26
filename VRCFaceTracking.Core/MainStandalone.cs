@@ -36,15 +36,18 @@ public class MainStandalone : IMainService
 
     public void Teardown()
     {
+        _logger.LogInformation("VRCFT Standalone Exiting!");
+        _libManager.TeardownAllAndResetAsync();
+
+        _logger.LogDebug("Saving configuration...");
         UnifiedConfig.Save();
 
         // Kill our threads
+        _logger.LogDebug("Cancelling token sources...");
         MasterCancellationTokenSource.Cancel();
         
+        _logger.LogDebug("Resetting our time end period...");
         Utils.TimeEndPeriod(1);
-        _logger.LogInformation("VRCFT Standalone Exiting!");
-        _libManager.TeardownAllAndResetAsync();
-        Console.WriteLine("Shutting down");
     }
 
     public async Task InitializeAsync()
@@ -61,10 +64,12 @@ public class MainStandalone : IMainService
         }
         
         // Try to load config and propogate data into Unified if they exist.
+        _logger.LogDebug("Reading configuration...");
         UnifiedConfig.ReadConfiguration();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
+            _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
             var hasLoadedNative = relevantParams.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
             if (hasLoadedNative)
                 _logger.LogWarning("Native tracking parameters detected.");
@@ -77,6 +82,7 @@ public class MainStandalone : IMainService
                     " Legacy parameters detected. " +
                     "Please consider updating the avatar to use the latest documented parameters.");
 
+            _logger.LogDebug("Updating avatar info...");
             _avatarInfo.Id = configRaw.id;
             _avatarInfo.Name = configRaw.name;
             _avatarInfo.CurrentParameters = relevantParams.Length;
@@ -84,8 +90,9 @@ public class MainStandalone : IMainService
         };
 
         // Begin main OSC update loop
+        _logger.LogDebug("Starting OSC update loop...");
         Utils.TimeBeginPeriod(1);
-        ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
+        ThreadPool.QueueUserWorkItem(ct =>
         {
             var token = (CancellationToken)ct;
             
@@ -105,17 +112,21 @@ public class MainStandalone : IMainService
                 {
                     var nextByteIndex = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
                     if (nextByteIndex > 4096)
-                        throw new Exception("Bundle size is too large! This should never happen.");
+                    {
+                        _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
+                        break;
+                    }
                     
-                    if (relevantMessages[messageIndex].Type == OscValueType.Float)
-                        ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
+                    //if (relevantMessages[messageIndex].Type == OscValueType.Float)  // Little update function for debug parameter tab.
+                    //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
+                    
                     OscMain.Send(buffer, nextByteIndex);
                     messageIndex++;
                 }
 
                 OSCParams.SendQueue.Clear();
             }
-        }), MasterCancellationTokenSource.Token);
+        }, MasterCancellationTokenSource.Token);
 
         await Task.CompletedTask;
     }

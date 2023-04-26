@@ -75,6 +75,16 @@ namespace VRCFaceTracking.Core.OSC
             return result;
         }
 
+        public void Teardown()
+        {
+            // We just need to cancel our listener thread and close the sockets
+            _logger.LogDebug("OSC Service Teardown");
+            _recvThreadCts?.Cancel();
+            
+            _senderClient?.Close();
+            _receiverClient?.Close();
+        }
+
         private bool BindSender()
         {
             _logger.LogDebug("Binding Sender Client");

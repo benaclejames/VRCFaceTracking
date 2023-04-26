@@ -18,4 +18,5 @@ public interface IOSCService
     Task LoadSettings();
     void Send(byte[] data, int length);
     Task<(bool, bool)> InitializeAsync();
+    void Teardown();
 }

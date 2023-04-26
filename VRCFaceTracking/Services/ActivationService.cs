@@ -88,10 +88,12 @@ public class ActivationService : IActivationService
     {
         await _themeSelectorService.SetRequestedThemeAsync();
         
-        _logger.LogDebug("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
+        _logger.LogInformation("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
         
+        _logger.LogInformation("Initializing OSC...");
         await _oscService.InitializeAsync().ConfigureAwait(false);
 
+        _logger.LogInformation("Initializing main service...");
         await _mainService.InitializeAsync().ConfigureAwait(false);
 
         // Before we initialize, we need to check for updates for all our installed modules
@@ -106,7 +108,6 @@ public class ActivationService : IActivationService
         }
         
         _logger.LogInformation("Initializing modules...");
-
         App.MainWindow.DispatcherQueue.TryEnqueue(() => _libManager.Initialize());
         
         await Task.CompletedTask;
