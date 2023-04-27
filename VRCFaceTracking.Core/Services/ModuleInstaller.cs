@@ -121,6 +121,14 @@ public class ModuleInstaller
         
         return Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
     }
+
+    public void MarkModuleForDeletion(InstallableTrackingModule module)
+    {
+        module.InstallationState = InstallState.AwaitingRestart;
+        var moduleJsonPath = Path.Combine(Utils.CustomLibsDirectory, module.ModuleId.ToString(), "module.json");
+        File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
+        _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
+    }
     
     public void UninstallModule(TrackingModuleMetadata moduleMetadata)
     {

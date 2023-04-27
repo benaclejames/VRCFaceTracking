@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Views;
 
@@ -96,7 +97,12 @@ public class ActivationService : IActivationService
         _logger.LogInformation("Initializing main service...");
         await _mainService.InitializeAsync().ConfigureAwait(false);
 
-        // Before we initialize, we need to check for updates for all our installed modules
+        // Before we initialize, we need to delete pending restart modules and check for updates for all our installed modules
+        var needsDeleting = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules())
+            .Where(m => m.InstallationState == InstallState.AwaitingRestart);
+        foreach (var deleteModule in needsDeleting)
+            _moduleInstaller.UninstallModule(deleteModule);
+        
         _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
         var remoteModules = await _moduleDataService.GetRemoteModules();

@@ -103,8 +103,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
                 InstallButton.Content = "Please Restart VRCFT";
                 InstallButton.IsEnabled = false;
                 await _libManager.TeardownAllAndResetAsync();
-                _moduleInstaller.UninstallModule(ListDetailsMenuItem!);
-                ListDetailsMenuItem!.InstallationState = InstallState.AwaitingRestart;
+                _moduleInstaller.MarkModuleForDeletion(ListDetailsMenuItem!);
                 _libManager.Initialize();
                 break;
             }

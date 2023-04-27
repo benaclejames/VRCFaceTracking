@@ -157,7 +157,6 @@ public class ModuleDataService : IModuleDataService
             try
             {
                 var module = JsonConvert.DeserializeObject<InstallableTrackingModule>(moduleJson);
-                module.InstallationState = InstallState.Installed;
                 module.AssemblyLoadPath = Path.Combine(moduleFolder, module.DllFileName);
                 installedModules.Add(module);
             }

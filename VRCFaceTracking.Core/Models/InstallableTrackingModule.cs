@@ -12,7 +12,6 @@ public enum InstallState
 
 public class InstallableTrackingModule : TrackingModuleMetadata
 {
-    [JsonIgnore]
     public InstallState InstallationState
     {
         get; set;
