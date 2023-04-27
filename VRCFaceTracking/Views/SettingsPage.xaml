@@ -40,7 +40,7 @@
                     <EntranceThemeTransition FromVerticalOffset="50" />
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
                 </StackPanel.ChildrenTransitions>
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Appearance" />
+                
                 <labs:SettingsCard x:Uid="Select_which_app_theme_to_display" Header="App theme">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
@@ -52,7 +52,6 @@
                     </ComboBox>
                 </labs:SettingsCard>
 
-                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="OSC" />
                 <labs:SettingsCard x:Uid="Where_should_OSC_Data_be_sent" Header="OSC Address">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC05;" />
@@ -83,6 +82,44 @@
                         </StackPanel>
                     </Grid>
                 </labs:SettingsCard>
+                
+                <labs:SettingsExpander Description="Danger, danger. High voltage.." Header="Risky Settings">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE7BA;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <ToggleSwitch x:Name="dangerAcceptToggle" Toggled="AcceptToggle_OnToggled" OnContent="Gremlin Mode" />
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            x:Name="allParamsRelevant"
+                            Header="Force Relevancy"
+                            IsEnabled="False"
+                            Description="Forces sending of all parameters every frame by forcing relevancy">
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" Toggled="allParamsRelevant_Toggled" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            x:Name="forceReInit"
+                            Header="Force Re-Initialize"
+                            IsEnabled="False"
+                            Description="Force VRCFT to unload and reinitialize all modules">
+                            <Button x:Name="forceReInitButton" Click="forceReInitButton_OnClick" Content="Re-Initialize" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            x:Name="resetVRCFT"
+                            Header="Reset VRCFT"
+                            IsEnabled="False"
+                            Description="Reset all data stored by VRCFT in your AppData folder">
+                            <Button x:Name="resetVRCFTButton" Click="resetVRCFTButton_OnClick" Content="Reset" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            x:Name="resetAvatarConfig"
+                            Header="Reset VRChat Configs"
+                            IsEnabled="False"
+                            Description="Reset all VRChat OSC config data (will be regenerated when avatar is reloaded)">
+                            <Button x:Name="resetVRCAvatarConf" Click="resetVRCAvatarConf_OnClick" Content="Reset"/>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
