@@ -85,6 +85,7 @@ public class UnifiedLibManager : ILibManager
             // Attempt to initialize the requested runtimes.
             if (AvailableModules != null)
             {
+                _logger.LogDebug("Initializing requested runtimes...");
                 InitRequestedRuntimes(AvailableModules);
             }
             else
@@ -178,10 +179,12 @@ public class UnifiedLibManager : ILibManager
         var cts = new CancellationTokenSource();
         var thread = new Thread(() =>
         {
+            _logger.LogDebug("Starting thread for {module}", module.GetType().Name);
             while (!cts.IsCancellationRequested)
             {
                 module.Update();
             }
+            _logger.LogDebug("Thread for {module} ended", module.GetType().Name);
         });
         thread.Start();
 
