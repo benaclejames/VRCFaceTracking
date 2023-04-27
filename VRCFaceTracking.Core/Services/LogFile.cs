@@ -18,18 +18,18 @@ public class LogFileLogger : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public async void Log<TState>(
+    public void Log<TState>(
         LogLevel logLevel,
         EventId eventId,
         TState state,
         Exception exception,
         Func<TState, Exception, string> formatter)
     {
-        await semaphoreSlim.WaitAsync(); // Wait for the semaphore to be released
+        semaphoreSlim.Wait(); // Wait for the semaphore to be released
         try
         {
-            await _file.WriteAsync($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
-            await _file.FlushAsync();
+            _file.Write($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
+            _file.Flush();
         }
         finally
         {

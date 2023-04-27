@@ -284,7 +284,7 @@ public class UnifiedLibManager : ILibManager
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
-    public Task TeardownAllAndResetAsync()
+    public void TeardownAllAndResetAsync()
     {
         _logger.LogInformation("Tearing down all modules...");
 
@@ -308,7 +308,5 @@ public class UnifiedLibManager : ILibManager
         
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
-        
-        return Task.CompletedTask;
     }
 }

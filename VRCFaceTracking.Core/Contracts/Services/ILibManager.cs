@@ -6,5 +6,5 @@ public interface ILibManager
 {
     public ObservableCollection<ModuleMetadata> ModuleMetadatas { get; set; }
     public void Initialize();
-    Task TeardownAllAndResetAsync();
+    void TeardownAllAndResetAsync();
 }

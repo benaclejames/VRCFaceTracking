@@ -48,6 +48,8 @@ public class MainStandalone : IMainService
         
         _logger.LogDebug("Resetting our time end period...");
         Utils.TimeEndPeriod(1);
+        
+        _logger.LogDebug("Teardown successful. Awaiting exit...");
     }
 
     public async Task InitializeAsync()

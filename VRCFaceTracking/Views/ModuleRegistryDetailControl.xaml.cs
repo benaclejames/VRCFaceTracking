@@ -84,7 +84,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         {
             case InstallState.NotInstalled or InstallState.Outdated:
             {
-                await _libManager.TeardownAllAndResetAsync();
+                _libManager.TeardownAllAndResetAsync();
                 var path = await _moduleInstaller.InstallRemoteModule(ListDetailsMenuItem!);
                 if (path != null)
                 {
@@ -102,7 +102,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
             {
                 InstallButton.Content = "Please Restart VRCFT";
                 InstallButton.IsEnabled = false;
-                await _libManager.TeardownAllAndResetAsync();
+                _libManager.TeardownAllAndResetAsync();
                 _moduleInstaller.MarkModuleForDeletion(ListDetailsMenuItem!);
                 _libManager.Initialize();
                 break;
