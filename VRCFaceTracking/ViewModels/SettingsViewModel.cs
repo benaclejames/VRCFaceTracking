@@ -18,7 +18,7 @@ public class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private ElementTheme _elementTheme;
-    private string _versionDescription;
+    
     private readonly IOSCService _oscService;
     private int _inPort, _outPort;
     private string _address;
@@ -29,12 +29,6 @@ public class SettingsViewModel : ObservableRecipient
         set => SetProperty(ref _elementTheme, value);
     }
 
-    public string VersionDescription
-    {
-        get => _versionDescription;
-        set => SetProperty(ref _versionDescription, value);
-    }
-
     public ICommand SwitchThemeCommand
     {
         get;
@@ -43,55 +37,31 @@ public class SettingsViewModel : ObservableRecipient
     public int RecvPort
     {
         get => _inPort;
-        private set => SetProperty(ref _inPort, value);
+        set
+        {
+            _oscService.InPort = value;
+            SetProperty(ref _inPort, value);
+        }
     }
 
     public int SendPort
     {
         get => _outPort;
-        private set => SetProperty(ref _outPort, value);
+        set
+        {
+            _oscService.OutPort = value;
+            SetProperty(ref _outPort, value);
+        }
     }
 
     public string Address
     {
         get => _address;
-        private set => SetProperty(ref _address, value);
-    }
-
-    public async Task SetRecvPort(int port)
-    {
-        if (RecvPort == port)
-            return;
-
-        RecvPort = port;
-
-        _oscService.InPort = port;
-        await _oscService.SaveSettings();
-        await _oscService.InitializeAsync();
-    }
-
-    public async Task SetSendPort(int port)
-    {
-        if (SendPort == port)
-            return;
-
-        SendPort = port;
-
-        _oscService.OutPort = port;
-        await _oscService.SaveSettings();
-        await _oscService.InitializeAsync();
-    }
-
-    public async Task SetAddress(string address)
-    {
-        if (Address == address)
-            return;
-
-        Address = address;
-
-        _oscService.Address = address;
-        await _oscService.SaveSettings();
-        await _oscService.InitializeAsync();
+        set
+        {
+            _oscService.Address = value;
+            SetProperty(ref _address, value);
+        }
     }
 
     public SettingsViewModel(IThemeSelectorService themeSelectorService, IOSCService oscService)
@@ -103,8 +73,17 @@ public class SettingsViewModel : ObservableRecipient
         _outPort = _oscService.OutPort;
         _address = _oscService.Address;
 
+        PropertyChanged += async (sender, args) =>
+        {
+            // If the property changed is either the in port, out port, or the address, then we need to save the settings
+            if (args.PropertyName is not (nameof(RecvPort) or nameof(SendPort) or nameof(Address)))
+                return;
+
+            await _oscService.SaveSettings();
+            await _oscService.InitializeAsync();
+        };
+
         _elementTheme = _themeSelectorService.Theme;
-        _versionDescription = GetVersionDescription();
 
         SwitchThemeCommand = new RelayCommand<ElementTheme>(
             async (param) =>
@@ -115,23 +94,5 @@ public class SettingsViewModel : ObservableRecipient
                     await _themeSelectorService.SetThemeAsync(param);
                 }
             });
-    }
-
-    private static string GetVersionDescription()
-    {
-        Version version;
-
-        if (RuntimeHelper.IsMSIX)
-        {
-            var packageVersion = Package.Current.Id.Version;
-
-            version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
-        }
-        else
-        {
-            version = Assembly.GetExecutingAssembly().GetName().Version!;
-        }
-
-        return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
 }

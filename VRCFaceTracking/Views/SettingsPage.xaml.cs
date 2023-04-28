@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
 using Windows.System;
+using VRCFaceTracking.Core.Contracts.Services;
 
 namespace VRCFaceTracking.Views;
 
@@ -26,6 +27,7 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
+        
         Loaded += OnPageLoaded;
         InitializeComponent();
     }
@@ -57,7 +59,6 @@ public sealed partial class SettingsPage : Page
     {
         var selectedTheme = ((ComboBoxItem)themeMode.SelectedItem)?.Tag?.ToString();
 
-
         if (selectedTheme != null)
         {
             var themeEnum = App.GetEnum<ElementTheme>(selectedTheme);
@@ -70,20 +71,18 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private async void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+    private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        var value = ((TextBox)sender).Text;
+        var value = Address.Text;
 
         // Ensure it passes the regex for an IP address
         if (System.Text.RegularExpressions.Regex.IsMatch(value, @"^(\d{1,3}\.){3}\d{1,3}$"))
-        {
-            await ViewModel.SetAddress(value);
-        }
+            ViewModel.Address = value;
     }
 
-    private async void SendPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => await ViewModel.SetSendPort((int)args.NewValue);
+    private void SendPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewModel.SendPort = (int)SendPort.Value;
 
-    private async void RecvPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => await ViewModel.SetRecvPort((int)args.NewValue);
+    private void RecvPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewModel.RecvPort = (int)RecvPort.Value;
 
     private void AcceptToggle_OnToggled(object sender, RoutedEventArgs e)
     {
@@ -122,6 +121,11 @@ public sealed partial class SettingsPage : Page
     {
         throw new NotImplementedException();
     }
+    
+    private void forceReInitButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e)
     {
@@ -129,11 +133,6 @@ public sealed partial class SettingsPage : Page
     }
 
     private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-
-    private void forceReInitButton_OnClick(object sender, RoutedEventArgs e)
     {
         throw new NotImplementedException();
     }

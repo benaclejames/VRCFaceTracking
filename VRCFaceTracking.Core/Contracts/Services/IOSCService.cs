@@ -1,7 +1,7 @@
 ﻿using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking.Core.Contracts.Services;
-public interface IOSCService
+public interface IOSCService 
 {
     int InPort { get; set; }
     int OutPort { get; set; }
