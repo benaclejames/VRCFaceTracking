@@ -70,15 +70,20 @@
                                 SmallChange="1"
                                 LargeChange="10"
                                 Margin="15, 0, 15, 0"
-                                ValueChanged="RecvPort_OnValueChanged"/>
-                            <TextBox x:Name="Address" Header="IP Address" PlaceholderText="127.0.0.1" Text="127.0.0.1" TextChanged="TextBox_OnTextChanged"/>
+                                Value="{x:Bind OscViewModel.RecvPort, Mode=TwoWay}"/>
+                            
+                            <TextBox x:Name="Address" 
+                                     Header="IP Address" 
+                                     PlaceholderText="127.0.0.1" 
+                                     Text="{x:Bind OscViewModel.Address, Mode=TwoWay}"/>
+                            
                             <NumberBox x:Name="SendPort"
                                 Header="Send Port"
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10" 
                                 Margin="15, 0, 15, 0"
-                                ValueChanged="SendPort_OnValueChanged"/>
+                                Value="{x:Bind OscViewModel.SendPort, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
                 </labs:SettingsCard>

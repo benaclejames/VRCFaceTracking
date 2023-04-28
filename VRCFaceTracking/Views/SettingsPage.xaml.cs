@@ -23,10 +23,16 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
+    
+    public OscViewModel OscViewModel
+    {
+        get;
+    }
 
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
+        OscViewModel = App.GetService<OscViewModel>();
         
         Loaded += OnPageLoaded;
         InitializeComponent();
@@ -44,10 +50,6 @@ public sealed partial class SettingsPage : Page
             case ElementTheme.Default:
                 themeMode.SelectedIndex = 2; break;
         }
-
-        RecvPort.Value = ViewModel.RecvPort;
-        SendPort.Value = ViewModel.SendPort;
-        Address.Text = ViewModel.Address;
     }
 
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
@@ -70,19 +72,6 @@ public sealed partial class SettingsPage : Page
             ViewModel.SwitchThemeCommand.Execute(themeEnum);
         }
     }
-
-    private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-    {
-        var value = Address.Text;
-
-        // Ensure it passes the regex for an IP address
-        if (System.Text.RegularExpressions.Regex.IsMatch(value, @"^(\d{1,3}\.){3}\d{1,3}$"))
-            ViewModel.Address = value;
-    }
-
-    private void SendPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewModel.SendPort = (int)SendPort.Value;
-
-    private void RecvPort_OnValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewModel.RecvPort = (int)RecvPort.Value;
 
     private void AcceptToggle_OnToggled(object sender, RoutedEventArgs e)
     {
