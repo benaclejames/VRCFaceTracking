@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Services;
 
+[ProviderAlias("Debug")]
 public class LogFileProvider : ILoggerProvider
 {
     private readonly FileStream _file;
