@@ -92,14 +92,14 @@
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
                     </labs:SettingsExpander.HeaderIcon>
-                    <ToggleSwitch x:Name="dangerAcceptToggle" Toggled="AcceptToggle_OnToggled" OnContent="Gremlin Mode" />
+                    <ToggleSwitch x:Name="dangerAcceptToggle" Toggled="AcceptToggle_OnToggled" OnContent="Gremlin Mode" IsOn="{x:Bind RiskySettingsViewModel.Enabled, Mode=OneWay}"/>
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
                             x:Name="allParamsRelevant"
                             Header="Force Relevancy"
                             IsEnabled="False"
                             Description="Forces sending of all parameters every frame by forcing relevancy">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" Toggled="allParamsRelevant_Toggled" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="forceReInit"

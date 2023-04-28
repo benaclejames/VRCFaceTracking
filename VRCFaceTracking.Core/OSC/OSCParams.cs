@@ -11,6 +11,7 @@ namespace VRCFaceTracking.OSC
         public const string CurrentVersionPrefix = "v2/";
         
         public static readonly List<OscMessageMeta> SendQueue = new();
+        public static bool AlwaysRelevantDebug = false;
         
         public class BaseParam<T> : IParameter where T : struct
         {
@@ -71,6 +72,14 @@ namespace VRCFaceTracking.OSC
 
             public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
             {
+                if (AlwaysRelevantDebug)
+                {
+                    Relevant = true;
+                    OscMessage.Address = DefaultPrefix+_paramName;
+                    
+                    return new IParameter[] { this };
+                }
+
                 var compatibleParam = newParams.FirstOrDefault(param =>
                     _regex.IsMatch(param.name)
                     && param.input.Type == typeof(T));

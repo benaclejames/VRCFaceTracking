@@ -3,11 +3,9 @@ using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
 using Windows.System;
-using VRCFaceTracking.Core.Contracts.Services;
 
 namespace VRCFaceTracking.Views;
 
-// TODO: Set the URL for your privacy policy by updating SettingsPage_PrivacyTermsLink.NavigateUri in Resources.resw.
 public sealed partial class SettingsPage : Page
 {
     public string Version
@@ -28,11 +26,17 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
+    
+    public RiskySettingsViewModel RiskySettingsViewModel
+    {
+        get;
+    }
 
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
         OscViewModel = App.GetService<OscViewModel>();
+        RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
         
         Loaded += OnPageLoaded;
         InitializeComponent();
@@ -75,7 +79,8 @@ public sealed partial class SettingsPage : Page
 
     private void AcceptToggle_OnToggled(object sender, RoutedEventArgs e)
     {
-        if (dangerAcceptToggle.IsOn)
+        RiskySettingsViewModel.Enabled = dangerAcceptToggle.IsOn;
+        if (RiskySettingsViewModel.Enabled)
         {
             // Enable cards
             allParamsRelevant.IsEnabled = true;
@@ -106,15 +111,7 @@ public sealed partial class SettingsPage : Page
         }
     }
 
-    private void allParamsRelevant_Toggled(object sender, RoutedEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-    
-    private void forceReInitButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
+    private void forceReInitButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ForceReInit();
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e)
     {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.OSC;
 using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
@@ -18,13 +17,19 @@ public class MainStandalone : IMainService
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
 
-    public Action<string, float> ParameterUpdate
+    public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
+
+    public bool AllParametersRelevant
     {
-        get;
-        set;
-    } = (s, f) =>
-    {
-    };
+        get => OSCParams.AlwaysRelevantDebug;
+        set
+        {
+            OSCParams.AlwaysRelevantDebug = value;
+            
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+                parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
+        }
+    }
 
     public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
     {
