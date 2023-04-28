@@ -115,6 +115,18 @@ public partial class App : Application
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
         }).
         Build();
+        
+        // Check for a "reset" file in the root of the app directory. If one is found, wipe all files from inside it
+        // and delete the file.
+        var resetFile = Path.Combine(Utils.PersistentDataDirectory, "reset");
+        if (File.Exists(resetFile))
+        {
+            foreach (var file in Directory.GetFiles(Utils.PersistentDataDirectory))
+            {
+                File.Delete(file);
+            }
+            File.Delete(resetFile);
+        }
 
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
