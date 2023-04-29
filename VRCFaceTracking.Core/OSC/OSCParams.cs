@@ -165,7 +165,7 @@ namespace VRCFaceTracking.OSC
                     var binaryIndex = GetBinarySteps(index);
                     // If this index has a shift step, create the parameter
                     if (binaryIndex.HasValue)
-                        paramsToCreate.Add(param.name, binaryIndex.Value);
+                        paramsToCreate.Add(_paramName+index, binaryIndex.Value);
                 }
 
                 if (paramsToCreate.Count == 0) return negativeRelevancy;
