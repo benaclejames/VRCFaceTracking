@@ -125,7 +125,6 @@ public partial class App : Application
             {
                 File.Delete(file);
             }
-            File.Delete(resetFile);
         }
 
         var logBuilder = App.GetService<ILoggerFactory>();
