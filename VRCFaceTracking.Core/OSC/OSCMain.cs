@@ -142,19 +142,19 @@ namespace VRCFaceTracking.Core.OSC
         private static byte[] buffer = new byte[2048];
         private void Recv()
         {
-            int bytesReceived = 0;
             try
             {
-                bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                int bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                var newMsg = new OscMessage(buffer, bytesReceived);
+                Array.Clear(buffer, 0, bytesReceived);
+                OnMessageReceived(newMsg._meta);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // Ignore as this is most likely a timeout exception
+                _logger.LogTrace("Failed to receive message: {0}", e.Message);
                 return;
             }
-            var newMsg = new OscMessage(buffer, bytesReceived);
-            Array.Clear(buffer, 0, bytesReceived);
-            OnMessageReceived(newMsg._meta);
         }
         
         private void HandleNewMessage(OscMessageMeta msg)
