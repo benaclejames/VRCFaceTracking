@@ -21,6 +21,15 @@ public sealed partial class ParametersPage : Page
         ViewModel = App.GetService<ParametersViewModel>();
         MainService = App.GetService<IMainService>();
         var dispatcher = App.GetService<IDispatcherService>();
+        _trackedParameters.Add(new ParameterDebugUserControl()
+        {
+            ViewModel =
+            {
+                ParameterName = "REEE",
+                ParameterValue = 0.5f
+            }
+        });
+        
         this.DataContext = this;
         InitializeComponent();
 

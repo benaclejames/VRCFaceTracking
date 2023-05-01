@@ -12,10 +12,13 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="6*" /> <!-- sets the width of the second column to take up the remaining space -->
         </Grid.ColumnDefinitions>
-        <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
         <TextBlock Style="{StaticResource DetailSubTitleStyle}" Text="{x:Bind ViewModel.ParameterName}" TextTrimming="None" TextWrapping="NoWrap" Width="Auto" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        </Viewbox>
-        <AppBarSeparator Grid.Column="1" Margin="10,0,10, 0" VerticalAlignment="Stretch"/>
-        <ProgressBar Grid.Column="2" Value="{x:Bind ViewModel.ParameterValue, Mode=OneWay}" Maximum="1" Minimum="{x:Bind ViewModel.MinValue}"/>
+        <AppBarSeparator Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Stretch"/>
+        <Grid>
+            <Line Grid.Column="1" X1="0" X2="100" Stroke="SteelBlue" StrokeThickness="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Fill" />
+
+            <Line Grid.Column="1" X1="0" X2="100" Stroke="SteelBlue" StrokeThickness="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Fill" />
+        </Grid>
     </Grid>
+
 </UserControl>

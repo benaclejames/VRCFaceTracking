@@ -98,6 +98,7 @@ public class ActivationService : IActivationService
         await _mainService.InitializeAsync().ConfigureAwait(false);
 
         // Before we initialize, we need to delete pending restart modules and check for updates for all our installed modules
+        _logger.LogDebug("Checking for deletion requests for installed modules...");
         var needsDeleting = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules())
             .Where(m => m.InstallationState == InstallState.AwaitingRestart);
         foreach (var deleteModule in needsDeleting)
