@@ -27,6 +27,11 @@ public sealed partial class SettingsPage : Page
         get;
     }
     
+    public CalibrationSettingsViewModel CalibrationSettingsViewModel
+    {
+        get;
+    }
+    
     public RiskySettingsViewModel RiskySettingsViewModel
     {
         get;
@@ -36,6 +41,7 @@ public sealed partial class SettingsPage : Page
     {
         ViewModel = App.GetService<SettingsViewModel>();
         OscViewModel = App.GetService<OscViewModel>();
+        CalibrationSettingsViewModel = App.GetService<CalibrationSettingsViewModel>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
         
         Loaded += OnPageLoaded;

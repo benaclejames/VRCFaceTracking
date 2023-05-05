@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
+﻿namespace VRCFaceTracking.Core.Contracts.Services;
 
-namespace VRCFaceTracking.Core.Contracts.Services;
-
-public interface IAvatarInfo : INotifyPropertyChanged
+public interface IAvatarInfo
 {
     public string Name { get; set; }
     public string Id { get; set; }

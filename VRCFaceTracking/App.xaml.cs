@@ -102,6 +102,7 @@ public partial class App : Application
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();
+            services.AddTransient<ICalibrationSettings, CalibrationSettingsViewModel>();
             services.AddSingleton<RiskySettingsViewModel>();
             services.AddTransient<OscViewModel>();
             services.AddTransient<SettingsPage>();
