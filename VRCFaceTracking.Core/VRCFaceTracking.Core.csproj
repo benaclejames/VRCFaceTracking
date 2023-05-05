@@ -6,6 +6,7 @@
     <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyVersion>5.0.2.0</AssemblyVersion>
+    <Configurations>Debug;Release;VRCFTPimaxModule.Net7</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
