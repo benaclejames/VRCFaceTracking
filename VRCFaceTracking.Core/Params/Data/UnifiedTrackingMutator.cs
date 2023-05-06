@@ -1,9 +1,7 @@
-using System;
-using System.Drawing.Drawing2D;
-using System.Text.Json.Serialization;
-using System.Threading;
-using System.Windows.Markup;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 
@@ -12,7 +10,7 @@ namespace VRCFaceTracking
     /// <summary>
     /// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
     /// </summary>
-    public class UnifiedTrackingMutator
+    public class UnifiedTrackingMutator : INotifyPropertyChanged
     {
         public struct Mutation
         {
@@ -34,9 +32,28 @@ namespace VRCFaceTracking
         public MutationData mutationData = new MutationData();
 
         public CalibratorState CalibratorMode = CalibratorState.Inactive;
-        public float CalibrationWeight;
+        private float _calibrationWeight;
+        public float CalibrationWeight
+        {
+            get => _calibrationWeight;
+            set => SetField(ref _calibrationWeight, value);
+        }
+        
+        private bool _continuousCalibration;
+        public bool ContinuousCalibration
+        {
+            get => _continuousCalibration;
+            set => SetField(ref _continuousCalibration, value);
+        }
 
         public bool SmoothingMode = false;
+
+        private bool _enabled;
+        public bool Enabled 
+        {
+            get => _enabled;
+            set => SetField(ref _enabled, value);
+        }
 
         /// <summary>
         /// Represents the state of calibration within the mutator.
@@ -44,14 +61,17 @@ namespace VRCFaceTracking
         public enum CalibratorState
         {
             Inactive,
-            Calibrating,
-            Calibrated
+            Calibrating
         }
 
-        private static ILogger<UnifiedTrackingMutator> _logger;
-        public static void InitializeLogger(ILoggerFactory factory)
+        private readonly ILogger<UnifiedTrackingMutator> _logger;
+        private readonly IDispatcherService _dispatcherService;
+
+        public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, IDispatcherService dispatcherService)
         {
-            _logger = factory.CreateLogger<UnifiedTrackingMutator>();
+            UnifiedTracking.Mutator = this;
+            _logger = logger;
+            _dispatcherService = dispatcherService;
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
@@ -171,6 +191,19 @@ namespace VRCFaceTracking
 
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
                 mutationData.ShapeMutations[i].SmoothnessMult = setValue;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

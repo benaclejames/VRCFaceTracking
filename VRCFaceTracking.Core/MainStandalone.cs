@@ -31,7 +31,8 @@ public class MainStandalone : IMainService
         }
     }
 
-    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
+    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager,
+        UnifiedTrackingMutator mutator)
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
         OscMain = oscService;

@@ -97,22 +97,22 @@
                         <labs:SettingsCard
                             Header="Calibration Enabled"
                             Description="Toggles whether or not calibration is enabled">
-                            <ToggleSwitch IsOn="{x:Bind CalibrationSettingsViewModel.Enabled, Mode=TwoWay}" />
+                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.Enabled, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Header="Continuous Calibration"
                             Description="Slowly calibrates to your facial expressions over time">
-                            <ToggleSwitch IsOn="{x:Bind CalibrationSettingsViewModel.ContinuousCalibration, Mode=TwoWay}" />
+                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.ContinuousCalibration, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Header="Calibrate"
                             Description="Heighten the influence your expressions make on calibration temporarily">
-                            <Button Style="{StaticResource AccentButtonStyle}" Content="Calibrate" />
+                            <Button Style="{StaticResource AccentButtonStyle}" Content="Calibrate" Click="ButtonBase_OnClick" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             Header="Calibration Influence"
                             Description="Controls how much of an influence your facial expressions have on overall calibration over time">
-                            <Slider Width="200" Minimum="0" Maximum="100" TickFrequency="25" SnapsTo="StepValues" TickPlacement="Outside" Value="{x:Bind CalibrationSettingsViewModel.Influence, Mode=TwoWay}" />
+                            <Slider Width="200" Minimum="0.00" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind CalibrationSettings.CalibrationWeight, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>

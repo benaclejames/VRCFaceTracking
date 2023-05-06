@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using VRCFaceTracking.Core.Params;
+﻿using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
@@ -33,7 +31,7 @@ namespace VRCFaceTracking
         /// Container of all features and functions that mutates the incoming expression data into output data suitable for driving Unified Expressions.
         /// </summary>
         /// <remarks> Mutates data on update. </remarks>
-        public static UnifiedTrackingMutator Mutator = new();
+        public static UnifiedTrackingMutator Mutator;
 
 #pragma warning disable CS0618
         /// <summary>

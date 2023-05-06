@@ -27,7 +27,7 @@ public sealed partial class SettingsPage : Page
         get;
     }
     
-    public CalibrationSettingsViewModel CalibrationSettingsViewModel
+    public UnifiedTrackingMutator CalibrationSettings
     {
         get;
     }
@@ -41,7 +41,7 @@ public sealed partial class SettingsPage : Page
     {
         ViewModel = App.GetService<SettingsViewModel>();
         OscViewModel = App.GetService<OscViewModel>();
-        CalibrationSettingsViewModel = App.GetService<CalibrationSettingsViewModel>();
+        CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
         
         Loaded += OnPageLoaded;
@@ -122,4 +122,6 @@ public sealed partial class SettingsPage : Page
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
 
     private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCAvatarConf();
+
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => CalibrationSettings.InitializeCalibration();
 }
