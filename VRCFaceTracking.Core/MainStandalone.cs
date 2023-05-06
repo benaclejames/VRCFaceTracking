@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.OSC;
-using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.OSC;
@@ -10,12 +9,12 @@ namespace VRCFaceTracking;
 public class MainStandalone : IMainService
 {
     public IOSCService OscMain;
-    public UnifiedConfig UnifiedConfig = new();
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
+    private readonly UnifiedTrackingMutator _mutator;
 
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
@@ -38,6 +37,7 @@ public class MainStandalone : IMainService
         OscMain = oscService;
         _avatarInfo = avatarInfo;
         _libManager = libManager;
+        _mutator = mutator;
     }
 
     public void Teardown()
@@ -45,8 +45,7 @@ public class MainStandalone : IMainService
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        _logger.LogDebug("Saving configuration...");
-        UnifiedConfig.Save();
+        _mutator.SaveCalibration();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
@@ -70,10 +69,6 @@ public class MainStandalone : IMainService
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
-        
-        // Try to load config and propogate data into Unified if they exist.
-        _logger.LogDebug("Reading configuration...");
-        UnifiedConfig.ReadConfiguration();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
@@ -96,6 +91,8 @@ public class MainStandalone : IMainService
             _avatarInfo.CurrentParameters = relevantParams.Length;
             _avatarInfo.CurrentParametersLegacy = deprecatedParams;
         };
+        
+        _mutator.LoadCalibration();
 
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");

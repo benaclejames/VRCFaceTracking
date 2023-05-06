@@ -266,6 +266,9 @@
   <data name="CloneRepoCard.Header" xml:space="preserve">
     <value>To clone this repository</value>
   </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>Open Local Storage</value>
+  </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Usage Instructions</value>
   </data>

@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Diagnostics;
+using Windows.Storage;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
@@ -63,9 +65,10 @@ public sealed partial class SettingsPage : Page
     }
 
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
-    {
-        await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/issues/new/choose"));
-    }
+    => await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/issues/new/choose"));
+    
+    private async void openLocalFolder_OnClick(object sender, RoutedEventArgs e)
+        => await Launcher.LaunchFolderAsync(await StorageFolder.GetFolderFromPathAsync(Utils.PersistentDataDirectory));
 
     private void themeMode_SelectionChanged(object sender, RoutedEventArgs e)
     {
