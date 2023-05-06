@@ -72,6 +72,10 @@ namespace VRCFaceTracking
             UnifiedTracking.Mutator = this;
             _logger = logger;
             _dispatcherService = dispatcherService;
+            
+            Enabled = true;
+            ContinuousCalibration = true;
+            CalibrationWeight = 0.2f;
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
@@ -125,7 +129,7 @@ namespace VRCFaceTracking
         /// <returns> Mutated Expression Data. </returns>
         public UnifiedTrackingData MutateData(UnifiedTrackingData input)
         {
-            if (CalibratorMode == CalibratorState.Inactive && SmoothingMode == false)
+            if (CalibratorMode == CalibratorState.Inactive && SmoothingMode == false && !Enabled)
                 return input;
 
             UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
