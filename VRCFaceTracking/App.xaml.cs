@@ -147,7 +147,10 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        _logger.LogError(e.Exception, "Unhandled exception: {0}", e.Exception.Message);
+        _logger.LogError(e.Exception, "Unhandled exception");
+        _logger.LogCritical("Stacktrace: {0}", e.Exception.StackTrace);
+        _logger.LogCritical("Inner exception: {0}", e.Exception.InnerException);
+        _logger.LogCritical("Message: {0}", e.Exception.Message);
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
