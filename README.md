@@ -1,7 +1,7 @@
 ﻿# 👀 VRCFaceTracking
 
 Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK.
-Get started (here!)[https://docs.vrcft.io/docs/intro/getting-started] (We are in the process of migrating our documentation for V5+, but all legacy parameters should still work!)
+Get started [here!](https://docs.vrcft.io/docs/intro/getting-started) (We are in the process of migrating our documentation for V5+, but all legacy parameters should still work!)
 
 [![Discord](https://discord.com/api/guilds/849300336128032789/widget.png)](https://discord.gg/Fh4FNehzKn)
 
