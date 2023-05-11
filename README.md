@@ -1,6 +1,7 @@
 ﻿# 👀 VRCFaceTracking
 
 Provides real eye tracking and lip tracking in VRChat via the HTC Vive Pro Eye's SRanipal SDK.
+Get started [here!](https://docs.vrcft.io/docs/intro/getting-started) (We are in the process of migrating our documentation for V5+, but all legacy parameters should still work!)
 
 [![Discord](https://discord.com/api/guilds/849300336128032789/widget.png)](https://discord.gg/Fh4FNehzKn)
 
@@ -14,11 +15,11 @@ https://youtu.be/5h4_mYDcgzM
 
 For this app to work, you'll need to be using an avatar with the correct parameters or an avatar config file with the correct mappings. The system is designed to control your avatar's eyes and lips via simple blend states but what the parameters control is completely up to you.
 
-Here is a [template](https://github.com/Adjerry91/VRCFaceTracking-Templates) that you can use to add face/eye tracking to your avatar. You can replace the animations in the template with your own, or simply use this template as a reference. This template includes [Oscmooth](https://github.com/regzo2/OSCmooth) which is required to have your animations look smooth to other people! To have smooth animations in less parameters space, you can use [Binary Parameters](https://github.com/regzo2/BinaryParameterTool).
+Here is a [template](https://github.com/Adjerry91/VRCFaceTracking-Templates) that you can use to add face/eye tracking to your avatar. You can replace the animations in the template with your own, or simply use this template as a reference. This template includes [Oscmooth](https://github.com/Adjerry91/OSCmooth/releases/tag/V1.1.1-BETA) which is required to have your animations look smooth to other people! This tool also lets you add binary parameters, allowing smooth animations to take up less parameter space.
 
-### [List of Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters)
+### [List of Parameters](https://docs.vrcft.io/docs/tutorial-avatars/tutorial-avatars-extras/parameters/)
 
-## 👀 [Eye Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#eye-tracking-parameters)
+## 👀 [Eye Parameters](https://docs.vrcft.io/docs/tutorial-avatars/tutorial-avatars-extras/parameters/#eye-tracking-parameters)
 
 ### [Eye Tracking Setup Guide](https://github.com/benaclejames/VRCFaceTracking/wiki/Eye-Tracking-Setup)
 
@@ -31,9 +32,9 @@ If your avatar uses bones for eye control, you can toss this [controller](https:
 
 Feel free to [consult the wiki](https://github.com/benaclejames/VRCFaceTracking/wiki/Eye-Tracking-Setup) for a setup guide and more info as to what each parameter does
 
-## :lips: [Lip Parameters](https://github.com/benaclejames/VRCFaceTracking/wiki/Parameters#lip-tracking-parameters)
+## :lips: [Lip and Face Parameters](https://docs.vrcft.io/docs/tutorial-avatars/tutorial-avatars-extras/parameters/#expression-tracking-parameters)
 
-There are a large number of parameters you can use for lip tracking. 
+There are a large number of parameters you can use for lip and face tracking. 
 
 ### [Lip Tracking Setup Guide](https://github.com/benaclejames/VRCFaceTracking/wiki/Lip-Tracking-Setup) - Basic setup guide
 
@@ -57,4 +58,4 @@ Use the following modules to add support for other hardware:
 
 * [VIVE](https://www.vive.com/) for the SRanipal SDK and their awesome hardware! ❤
 
-![](https://i.imgur.com/HDAhf8d.jpg)
+![](https://i.imgur.com/iQkw12C.jpg)
