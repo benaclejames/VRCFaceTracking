@@ -33,7 +33,7 @@ namespace VRCFaceTracking
         
         public static readonly bool HasAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
         
-        public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
+        public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetEnvironmentVariable("appdata"), "VRCFaceTracking");
         public static readonly string CustomLibsDirectory = PersistentDataDirectory + "\\CustomLibs";
     }
 }
