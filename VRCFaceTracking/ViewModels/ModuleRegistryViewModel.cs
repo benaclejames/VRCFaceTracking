@@ -71,7 +71,7 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
 
     public void EnsureItemSelected()
     {
-        if (Selected == null)
+        if (Selected == null && ModuleInfos.Any())
         {
             Selected = ModuleInfos.First();
         }
