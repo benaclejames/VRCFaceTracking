@@ -157,17 +157,18 @@
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
+                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
+                    
+                </labs:SettingsExpander>
+                    
                 <labs:SettingsExpander x:Uid="Copyright" Header="VRCFaceTracking">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <BitmapIcon UriSource="/Assets/Square44x44Logo.png" />
-                    </labs:SettingsExpander.HeaderIcon>
                     <TextBlock
                             Margin="0,-2,0,0"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="OpenLocalStorageCard" IsClickEnabled="True">
+                        <labs:SettingsCard x:Uid="OpenLocalStorageCard" IsClickEnabled="True" Click="openLocalFolder_OnClick">
                             <labs:SettingsCard.ActionIcon>
                                     <FontIcon FontSize="20" Glyph="&#xEC50;" />
                             </labs:SettingsCard.ActionIcon>
@@ -181,7 +182,8 @@
                         <labs:SettingsCard
                                 x:Name="bugRequestCard"
                                 x:Uid="BugRequestCard"
-                                IsClickEnabled="True">
+                                IsClickEnabled="True"
+                                Click="bugRequestCard_Click">
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
