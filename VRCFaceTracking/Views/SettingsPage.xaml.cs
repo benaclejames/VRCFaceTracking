@@ -5,6 +5,8 @@ using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
 using Windows.System;
+using VRCFaceTracking.Models;
+using VRCFaceTracking.Services;
 
 namespace VRCFaceTracking.Views;
 
@@ -38,19 +40,19 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
-
+    
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
         OscViewModel = App.GetService<OscViewModel>();
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
-        
+
         Loaded += OnPageLoaded;
         InitializeComponent();
     }
 
-    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    private async void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         var currentTheme = ViewModel.ElementTheme;
         switch (currentTheme)

@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 
 using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Models;
+using VRCFaceTracking.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
@@ -13,6 +15,7 @@ public class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private ElementTheme _elementTheme;
+    private List<GithubContributor> _contributors;
 
     public ElementTheme ElementTheme
     {
@@ -25,9 +28,27 @@ public class SettingsViewModel : ObservableRecipient
         get;
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    private GithubService GithubService
+    {
+        get;
+        set;
+    }
+    
+    public List<GithubContributor> Contributors
+    {
+        get => _contributors;
+        set => SetProperty(ref _contributors, value);
+    }
+    
+    private async void LoadContributors()
+    {
+        Contributors = await GithubService.GetContributors("benaclejames/VRCFaceTracking");
+    }
+
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, GithubService githubService)
     {
         _themeSelectorService = themeSelectorService;
+        GithubService = githubService;
 
         _elementTheme = _themeSelectorService.Theme;
 
@@ -40,5 +61,7 @@ public class SettingsViewModel : ObservableRecipient
                     await _themeSelectorService.SetThemeAsync(param);
                 }
             });
+        
+        LoadContributors();
     }
 }

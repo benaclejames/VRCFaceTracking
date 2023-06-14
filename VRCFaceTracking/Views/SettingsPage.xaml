@@ -157,8 +157,22 @@
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
-                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
-                    
+                <labs:SettingsExpander x:Name="Credits" x:Uid="Credits" Header="Credits">
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard HorizontalContentAlignment="Left"
+                                           ContentAlignment="Vertical"
+                                           x:Uid="ContributorsCard">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <HyperlinkButton Content="{Binding login}" NavigateUri="{Binding html_url}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                     
                 <labs:SettingsExpander x:Uid="Copyright" Header="VRCFaceTracking">
