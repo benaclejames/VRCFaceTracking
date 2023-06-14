@@ -19,7 +19,7 @@ public class LocalSettingsService : ILocalSettingsService
     private readonly IFileService _fileService;
     private readonly LocalSettingsOptions _options;
 
-    private readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private readonly string _localApplicationData = Utils.PersistentDataDirectory;
     private readonly string _applicationDataFolder;
     private readonly string _localsettingsFile;
 
