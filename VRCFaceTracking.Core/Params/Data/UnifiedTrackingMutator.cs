@@ -61,7 +61,7 @@ namespace VRCFaceTracking
 
         private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
         {
-            if (!Enabled) 
+            if (true || !Enabled) 
                 return;
 
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)

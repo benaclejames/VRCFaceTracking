@@ -159,18 +159,28 @@
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
                 <labs:SettingsExpander x:Name="Credits" x:Uid="Credits" Header="Credits">
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard HorizontalContentAlignment="Left"
+                        <labs:SettingsCard HorizontalContentAlignment="Stretch"
                                            ContentAlignment="Vertical"
                                            x:Uid="ContributorsCard">
-                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <HyperlinkButton Content="{Binding login}" NavigateUri="{Binding html_url}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Left alligned hyperlink w/ text -->
+                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{Binding login}" NavigateUri="{Binding html_url}"/>
+                                                
+                                                <!-- Right alligned text -->
+                                                <TextBlock Grid.Column="1" Text="{Binding contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                                <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                            </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                            </StackPanel>
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
