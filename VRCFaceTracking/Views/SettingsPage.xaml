@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:helpers1="using:VRCFaceTracking.Helpers"
+    xmlns:models="using:VRCFaceTracking.Models"
     mc:Ignorable="d">
     <Page.Resources>
         <helpers1:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -164,7 +165,7 @@
                                            x:Uid="ContributorsCard">
                                 <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="models:GithubContributor">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
@@ -172,10 +173,10 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <!-- Left alligned hyperlink w/ text -->
-                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{Binding login}" NavigateUri="{Binding html_url}"/>
+                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{x:Bind login}" NavigateUri="{x:Bind html_url}"/>
                                                 
                                                 <!-- Right alligned text -->
-                                                <TextBlock Grid.Column="1" Text="{Binding contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                                <TextBlock Grid.Column="1" Text="{x:Bind contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
                                                 <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
                                             </Grid>
                                         </DataTemplate>

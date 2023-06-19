@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:VRCFaceTracking.Helpers"
+    xmlns:models="using:VRCFaceTracking"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -15,7 +16,7 @@
         <StackPanel Orientation="Vertical">
             <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.ModuleMetadatas}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:ModuleMetadata">
                         <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                             <Grid Margin="15, 15">
                                 <Grid.ColumnDefinitions>
@@ -24,7 +25,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ItemsControl ItemsSource="{Binding StaticImages, Converter={StaticResource ImageConverter}}" Grid.Column="0">
+                                <ItemsControl ItemsSource="{x:Bind StaticImages, Converter={StaticResource ImageConverter}}" Grid.Column="0">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -42,15 +43,15 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <StackPanel Margin="15, 15" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
-                                    <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Name, Mode=OneWay}"/>
-                                    <TextBlock Visibility="{Binding UsingEye, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="EyeTrackingActive" />
-                                    <TextBlock Visibility="{Binding UsingExpression, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="FaceTrackingActive" />
+                                    <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind Name, Mode=OneWay}"/>
+                                    <TextBlock Visibility="{x:Bind UsingEye, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="EyeTrackingActive" />
+                                    <TextBlock Visibility="{x:Bind UsingExpression, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="FaceTrackingActive" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ToggleButton Margin="15, 0, 25, 0" 
                                                       Padding="15" 
                                                       x:Uid="ToggleTracking" 
-                                                      IsChecked="{Binding Active, Mode=TwoWay}"/>
+                                                      IsChecked="{x:Bind Active, Mode=TwoWay}"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

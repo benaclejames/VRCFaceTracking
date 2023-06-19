@@ -50,18 +50,16 @@ namespace VRCFaceTracking
             _dispatcherService = dispatcherService;
             _localSettingsService = localSettingsService;
             
-            /*Enabled = true;
+            Enabled = true;
             ContinuousCalibration = true;
             CalibrationWeight = 0.2f;
-            */
-            // reeee
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
 
         private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
         {
-            if (true || !Enabled) 
+            if (!Enabled) 
                 return;
 
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
