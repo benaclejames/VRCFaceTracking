@@ -52,6 +52,19 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        
+        // Check for a "reset" file in the root of the app directory. If one is found, wipe all files from inside it
+        // and delete the file.
+        var resetFile = Path.Combine(Utils.PersistentDataDirectory, "reset");
+        if (File.Exists(resetFile))
+        {
+            // Delete everything including files and folders in Utils.PersistentDataDirectory
+            foreach (var file in Directory.EnumerateFiles(Utils.PersistentDataDirectory, "*", SearchOption.AllDirectories))
+            {
+                File.Delete(file);
+            }
+        }
+
 
         Host = Microsoft.Extensions.Hosting.Host.
         CreateDefaultBuilder().
@@ -118,17 +131,6 @@ public partial class App : Application
         }).
         Build();
         
-        // Check for a "reset" file in the root of the app directory. If one is found, wipe all files from inside it
-        // and delete the file.
-        var resetFile = Path.Combine(Utils.PersistentDataDirectory, "reset");
-        if (File.Exists(resetFile))
-        {
-            foreach (var file in Directory.GetFiles(Utils.PersistentDataDirectory))
-            {
-                File.Delete(file);
-            }
-        }
-
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
 
