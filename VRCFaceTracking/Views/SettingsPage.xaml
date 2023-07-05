@@ -71,6 +71,8 @@
                                 SmallChange="1"
                                 LargeChange="10"
                                 Margin="15, 0, 15, 0"
+                                Minimum="0"
+                                Maximum="65535"
                                 Value="{x:Bind OscViewModel.RecvPort, Mode=TwoWay}"/>
                             
                             <TextBox x:Name="Address" 
@@ -83,6 +85,8 @@
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10" 
+                                Minimum="0"
+                                Maximum="65535"
                                 Margin="15, 0, 15, 0"
                                 Value="{x:Bind OscViewModel.SendPort, Mode=TwoWay}"/>
                         </StackPanel>
