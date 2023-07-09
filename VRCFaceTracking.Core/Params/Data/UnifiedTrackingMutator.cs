@@ -14,7 +14,7 @@ namespace VRCFaceTracking
     public class UnifiedTrackingMutator : INotifyPropertyChanged
     {
         private UnifiedTrackingData trackingDataBuffer = new();
-        public UnifiedMutationConfig mutationData;
+        public UnifiedMutationConfig mutationData = new();
 
         private float _calibrationWeight;
         public float CalibrationWeight
@@ -50,10 +50,9 @@ namespace VRCFaceTracking
             _dispatcherService = dispatcherService;
             _localSettingsService = localSettingsService;
             
-            /*Enabled = true;
+            Enabled = true;
             ContinuousCalibration = true;
-            CalibrationWeight = 0.2f;*/
-            //TODO: Fix crash relating to CCD
+            CalibrationWeight = 0.2f;
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
@@ -185,7 +184,7 @@ namespace VRCFaceTracking
         {
             // Try to load config and propogate data into Unified if they exist.
             _logger.LogDebug("Reading configuration...");
-            mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
+            //mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

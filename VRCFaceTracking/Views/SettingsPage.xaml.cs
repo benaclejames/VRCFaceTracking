@@ -1,12 +1,9 @@
-﻿using System.Diagnostics;
-using Windows.Storage;
+﻿using Windows.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
 using Windows.System;
-using VRCFaceTracking.Models;
-using VRCFaceTracking.Services;
 
 namespace VRCFaceTracking.Views;
 

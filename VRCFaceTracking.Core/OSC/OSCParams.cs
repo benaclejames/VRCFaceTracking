@@ -10,7 +10,7 @@ namespace VRCFaceTracking.OSC
         private const string DefaultPrefix = "/avatar/parameters/";
         public const string CurrentVersionPrefix = "v2/";
         
-        public static readonly List<OscMessageMeta> SendQueue = new();
+        public static readonly Queue<OscMessageMeta> SendQueue = new();
         public static bool AlwaysRelevantDebug = false;
         
         public class BaseParam<T> : IParameter where T : struct
@@ -57,7 +57,7 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
-            private void Enqueue() => SendQueue.Add(OscMessage._meta);
+            private void Enqueue() => SendQueue.Enqueue(OscMessage._meta);
 
             protected readonly OscMessage OscMessage;
 

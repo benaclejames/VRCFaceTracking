@@ -197,6 +197,12 @@
   <data name="AvatarStatus.Text" xml:space="preserve">
     <value>Avatar Status</value>
   </data>
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>Local Test Avatar</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>Local Test Avatars are not supported and will cause issues</value>
+  </data>
   <data name="Copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking. All rights reserved.</value>
   </data>
@@ -242,8 +248,17 @@
   <data name="msOutgoing.Text" xml:space="preserve">
     <value>m/s Outgoing</value>
   </data>
-  <data name="NoModulesInstalled.Text" xml:space="preserve">
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
     <value>No Modules Installed</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>Install some from here!</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>OSC Settings Modified</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>We noticed your OSC was turned off in VRChat, we've just enabled it for you. If the game was open when this happened, you may need to manually enable it from your raidal menu. If not, you should be good to go!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
     <value>OSC Status</value>
@@ -284,7 +299,7 @@
   <data name="OscSettings.Description" xml:space="preserve">
     <value>Where should OSC Data be sent?</value>
   </data>
-  <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
     <value>You appear to have no modules installed.</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">

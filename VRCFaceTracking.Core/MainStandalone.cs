@@ -111,11 +111,9 @@ public class MainStandalone : IMainService
                 // Send all messages in OSCParams.SendQueue
                 if (OSCParams.SendQueue.Count <= 0) continue;
 
-                var relevantMessages = OSCParams.SendQueue.ToArray();
-                var messageIndex = 0;
-                while (messageIndex < relevantMessages.Length)
+                while (OSCParams.SendQueue.TryDequeue(out var message))
                 {
-                    var nextByteIndex = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
+                    var nextByteIndex = SROSCLib.create_osc_message(buffer, ref message);
                     if (nextByteIndex > 4096)
                     {
                         _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
@@ -126,7 +124,6 @@ public class MainStandalone : IMainService
                     //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
                     
                     OscMain.Send(buffer, nextByteIndex);
-                    messageIndex++;
                 }
 
                 OSCParams.SendQueue.Clear();

@@ -1,0 +1,31 @@
+﻿<UserControl
+    x:Class="VRCFaceTracking.Views.WarningBlock"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Border
+        Visibility="{x:Bind IsVisible, Mode=OneWay}"
+        Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;" FontSize="20"/>
+                <StackPanel Margin="20, 4" Orientation="Vertical">
+                    <TextBlock FontSize="20" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind Title}" />
+                    <!-- Ensure this text box spills onto multiple lines -->
+                    <TextBlock FontSize="17" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Description}" TextWrapping="WrapWholeWords" MaxWidth="450" />
+                    <HyperlinkButton FontSize="17" Padding="0" Content="{x:Bind ButtonText}" Click="HyperlinkButton_OnClick"/>
+                </StackPanel>
+            </StackPanel>
+            
+            <Button Grid.Column="2" Content="Dismiss" Click="DismissButton_OnClick" Margin="15, 0, 25, 0" Padding="15" />
+        </Grid>
+    </Border>
+</UserControl>
