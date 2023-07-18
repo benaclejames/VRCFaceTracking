@@ -1,10 +1,12 @@
-﻿<Page
+﻿ <Page
     x:Class="VRCFaceTracking.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:VRCFaceTracking.Helpers"
+    xmlns:models="using:VRCFaceTracking"
+    xmlns:views="using:VRCFaceTracking.Views"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -15,7 +17,7 @@
         <StackPanel Orientation="Vertical">
             <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.ModuleMetadatas}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:ModuleMetadata">
                         <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                             <Grid Margin="15, 15">
                                 <Grid.ColumnDefinitions>
@@ -24,7 +26,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ItemsControl ItemsSource="{Binding StaticImages, Converter={StaticResource ImageConverter}}" Grid.Column="0">
+                                <ItemsControl ItemsSource="{x:Bind StaticImages, Converter={StaticResource ImageConverter}}" Grid.Column="0">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -42,39 +44,24 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <StackPanel Margin="15, 15" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
-                                    <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{Binding Name, Mode=OneWay}"/>
-                                    <TextBlock Visibility="{Binding UsingEye, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="EyeTrackingActive" />
-                                    <TextBlock Visibility="{Binding UsingExpression, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="FaceTrackingActive" />
+                                    <TextBlock FontSize="30" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind Name, Mode=OneWay}"/>
+                                    <TextBlock Visibility="{x:Bind UsingEye, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="EyeTrackingActive" />
+                                    <TextBlock Visibility="{x:Bind UsingExpression, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="FaceTrackingActive" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ToggleButton Margin="15, 0, 25, 0" 
                                                       Padding="15" 
                                                       x:Uid="ToggleTracking" 
-                                                      IsChecked="{Binding Active, Mode=TwoWay}"/>
+                                                      IsChecked="{x:Bind Active, Mode=TwoWay}"/>
                                 </StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
-            <Border Visibility="{x:Bind ViewModel.NoModulesInstalled, Mode=OneWay}" Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Column="0">
-                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;" FontSize="20"/>
-                        <StackPanel Margin="20, 4" Orientation="Vertical">
-                            <TextBlock FontSize="20" Style="{ThemeResource SubtitleTextBlockStyle}" x:Uid="NoModulesInstalled" />
-                            <TextBlock FontSize="17" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="You_appear_to_have_no_modules_installed" />
-                            <HyperlinkButton FontSize="17" Padding="0" Content="Install some from here!" Click="NoModuleButton_Click"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </Border>
+            
+            <views:WarningBlock IsVisible="{x:Bind ViewModel.NoModulesInstalled, Mode=OneWay}" LinkClickHandler="NoModuleButton_Click" x:Uid="no_modules_installed_warning" />
+            <!-- views:WarningBlock IsVisible="{x:Bind ViewModel.OscWasDisabled, Mode=OneWay}" x:Uid="osc_was_disabled_warning"/-->
             
             <Border Margin="0, 20, 0, 0" Padding="15" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <Grid>
@@ -98,7 +85,7 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
                             <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.MessagesInPerSec, Mode=OneWay}"/>
                             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="msIncoming"/>
@@ -124,10 +111,17 @@
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}" x:Uid="AvatarStatus" />
                             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.Name, Mode=OneWay}"/>
                             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.Id, Mode=OneWay}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="LocalTestAvatar"/>
+                                <Ellipse Width="10" Height="10" Fill="Red" Margin="5,0,0,0"/>
+                                <ToolTipService.ToolTip>
+                                    <ToolTip x:Uid="LocalTestAvatarTooltip" />
+                                </ToolTipService.ToolTip>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
+                    <StackPanel Margin="15, 0, 25, 0" Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
                             <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParameters, Mode=OneWay}"/>
                             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Parameters"/>

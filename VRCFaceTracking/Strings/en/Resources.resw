@@ -197,10 +197,19 @@
   <data name="AvatarStatus.Text" xml:space="preserve">
     <value>Avatar Status</value>
   </data>
-  <data name="copyright.Description" xml:space="preserve">
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>Local Test Avatar</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>Local Test Avatars are not supported and will cause issues</value>
+  </data>
+  <data name="Copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking. All rights reserved.</value>
   </data>
-  <data name="Dependencies_references.Header" xml:space="preserve">
+  <data name="Credits.Description" xml:space="preserve">
+    <value>The nerds who made this all possible &#60;3</value>
+  </data>
+  <data name="Dependencies.Header" xml:space="preserve">
     <value>Dependencies &amp; references</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
@@ -218,8 +227,8 @@
   <data name="FaceTrackingActive.Text" xml:space="preserve">
     <value>Face Tracking Active</value>
   </data>
-  <data name="File_a_bug_or_request_new_sample.Header" xml:space="preserve">
-    <value>File a bug or request new sample</value>
+  <data name="BugRequestCard.Header" xml:space="preserve">
+    <value>File a bug report</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
     <value>Last Updated</value>
@@ -239,8 +248,17 @@
   <data name="msOutgoing.Text" xml:space="preserve">
     <value>m/s Outgoing</value>
   </data>
-  <data name="NoModulesInstalled.Text" xml:space="preserve">
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
     <value>No Modules Installed</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>Install some from here!</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>OSC Settings Modified</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>We noticed your OSC was turned off in VRChat, we've just enabled it for you. If the game was open when this happened, you may need to manually enable it from your raidal menu. If not, you should be good to go!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
     <value>OSC Status</value>
@@ -251,7 +269,10 @@
   <data name="Rating.Text" xml:space="preserve">
     <value>Rating</value>
   </data>
-  <data name="Select_which_app_theme_to_display.Description" xml:space="preserve">
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>App theme</value>
+  </data>
+  <data name="ThemeSettings.Description" xml:space="preserve">
     <value>Select which app theme to display</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
@@ -260,8 +281,11 @@
   <data name="ToggleTracking.Content" xml:space="preserve">
     <value>Toggle Tracking</value>
   </data>
-  <data name="To_clone_this_repository.Header" xml:space="preserve">
+  <data name="CloneRepoCard.Header" xml:space="preserve">
     <value>To clone this repository</value>
+  </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>Open Local Storage</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Usage Instructions</value>
@@ -269,10 +293,25 @@
   <data name="Version.Text" xml:space="preserve">
     <value>Version</value>
   </data>
-  <data name="Where_should_OSC_Data_be_sent.Description" xml:space="preserve">
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>OSC Address</value>
+  </data>
+  <data name="OscSettings.Description" xml:space="preserve">
     <value>Where should OSC Data be sent?</value>
   </data>
-  <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
     <value>You appear to have no modules installed.</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>Calibration Settings</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>Tweak tracking data to your heart's content</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>Risky Settings</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>Danger, danger. High voltage..</value>
   </data>
 </root>

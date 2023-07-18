@@ -5,16 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
-    xmlns:helpers1="using:VRCFaceTracking.Helpers"
+    xmlns:models="using:VRCFaceTracking.Models"
     mc:Ignorable="d">
     <Page.Resources>
-        <helpers1:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-        <!--  These styles can be referenced to create a consistent SettingsPage layout  -->
-
-        <!--  Spacing between cards  -->
         <x:Double x:Key="SettingsCardSpacing">3</x:Double>
-
-        <!--  Style (inc. the correct spacing) of a section header  -->
         <Style
             x:Key="SettingsSectionHeaderTextBlockStyle"
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
@@ -26,22 +20,19 @@
     </Page.Resources>
     <Grid>
         <ScrollViewer
-            x:Name="contentSV"
-            Grid.Row="1"
             Padding="0,0,0,0"
             IsTabStop="False"
             UseSystemFocusVisuals="False"
             VerticalScrollBarVisibility="Auto"
             VerticalScrollMode="Auto">
             <StackPanel
-                x:Name="ContentArea"
                 Spacing="{StaticResource SettingsCardSpacing}">
                 <StackPanel.ChildrenTransitions>
                     <EntranceThemeTransition FromVerticalOffset="50" />
                     <RepositionThemeTransition IsStaggeringEnabled="False" />
                 </StackPanel.ChildrenTransitions>
                 
-                <labs:SettingsCard x:Uid="Select_which_app_theme_to_display" Header="App theme">
+                <labs:SettingsCard x:Uid="ThemeSettings">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -52,7 +43,7 @@
                     </ComboBox>
                 </labs:SettingsCard>
 
-                <labs:SettingsCard x:Uid="Where_should_OSC_Data_be_sent" Header="OSC Address">
+                <labs:SettingsCard x:Uid="OscSettings">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEC05;" />
                     </labs:SettingsCard.HeaderIcon>
@@ -64,31 +55,64 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                            <NumberBox x:Name="RecvPort"
+                            <NumberBox
                                 Header="Receive Port"
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10"
                                 Margin="15, 0, 15, 0"
+                                Minimum="0"
+                                Maximum="65535"
                                 Value="{x:Bind OscViewModel.RecvPort, Mode=TwoWay}"/>
                             
-                            <TextBox x:Name="Address" 
+                            <TextBox
                                      Header="IP Address" 
                                      PlaceholderText="127.0.0.1" 
                                      Text="{x:Bind OscViewModel.Address, Mode=TwoWay}"/>
                             
-                            <NumberBox x:Name="SendPort"
+                            <NumberBox
                                 Header="Send Port"
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10" 
+                                Minimum="0"
+                                Maximum="65535"
                                 Margin="15, 0, 15, 0"
                                 Value="{x:Bind OscViewModel.SendPort, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
                 </labs:SettingsCard>
                 
-                <labs:SettingsExpander Description="Danger, danger. High voltage.." Header="Risky Settings">
+                <!-- labs:SettingsExpander x:Uid="CalibrationSettings">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xEC49;"/>
+                    </labs:SettingsExpander.HeaderIcon>
+                    
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            Header="Calibration Enabled"
+                            Description="Toggles whether or not calibration is enabled">
+                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.Enabled, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="Continuous Calibration"
+                            Description="Slowly calibrates to your facial expressions over time">
+                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.ContinuousCalibration, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="Calibrate"
+                            Description="Heighten the influence your expressions make on calibration temporarily">
+                            <Button Style="{StaticResource AccentButtonStyle}" Content="Calibrate" Click="ButtonBase_OnClick" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="Calibration Influence"
+                            Description="Controls how much of an influence your facial expressions have on overall calibration over time">
+                            <Slider Width="200" Minimum="0.00" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind CalibrationSettings.CalibrationWeight, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </-->
+                
+                <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
                     </labs:SettingsExpander.HeaderIcon>
@@ -128,27 +152,56 @@
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
-                <labs:SettingsExpander x:Uid="copyright" Header="VRCFaceTracking">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <BitmapIcon ShowAsMonochrome="true" UriSource="/Assets/Tiles/SmallTile-github.png" />
-                    </labs:SettingsExpander.HeaderIcon>
+                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard HorizontalContentAlignment="Stretch"
+                                           ContentAlignment="Vertical"
+                                           x:Uid="ContributorsCard">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:GithubContributor">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Left alligned hyperlink w/ text -->
+                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{x:Bind login}" NavigateUri="{x:Bind html_url}"/>
+                                                
+                                                <!-- Right alligned text -->
+                                                <TextBlock Grid.Column="1" Text="{x:Bind contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                                <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                    
+                <labs:SettingsExpander x:Uid="Copyright" Header="VRCFaceTracking">
                     <TextBlock
                             Margin="0,-2,0,0"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="To_clone_this_repository">
+                        <labs:SettingsCard x:Uid="OpenLocalStorageCard" IsClickEnabled="True" Click="openLocalFolder_OnClick">
+                            <labs:SettingsCard.ActionIcon>
+                                    <FontIcon FontSize="20" Glyph="&#xEC50;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard x:Uid="CloneRepoCard">
                             <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     IsTextSelectionEnabled="True"
                                     Text="git clone https://github.com/benaclejames/VRCFaceTracking" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
-                                x:Name="bugRequestCard"
-                                Click="bugRequestCard_Click"
-                                x:Uid="File_a_bug_or_request_new_sample"
-                                IsClickEnabled="True">
+                                x:Uid="BugRequestCard"
+                                IsClickEnabled="True"
+                                Click="bugRequestCard_Click">
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
@@ -156,7 +209,7 @@
                         <labs:SettingsCard
                                 HorizontalContentAlignment="Left"
                                 ContentAlignment="Vertical"
-                                x:Uid="Dependencies_references">
+                                x:Uid="Dependencies">
                             <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
                                 <HyperlinkButton Content="SimpleRustOSC" NavigateUri="https://github.com/benaclejames/SimpleRustOSC" />
                             </StackPanel>

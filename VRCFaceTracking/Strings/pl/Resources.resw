@@ -200,7 +200,7 @@
   <data name="copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
   </data>
-  <data name="Dependencies_references.Header" xml:space="preserve">
+  <data name="Dependencies.Header" xml:space="preserve">
     <value>Zależności &amp; odnośniki</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
@@ -218,7 +218,7 @@
   <data name="FaceTrackingActive.Text" xml:space="preserve">
     <value>Śledzenie twarzy aktywne</value>
   </data>
-  <data name="File_a_bug_or_request_new_sample.Header" xml:space="preserve">
+  <data name="BugRequestCard.Header" xml:space="preserve">
     <value>Zgłoś błąd</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
@@ -251,7 +251,7 @@
   <data name="Rating.Text" xml:space="preserve">
     <value>Ocena</value>
   </data>
-  <data name="Select_which_app_theme_to_display.Description" xml:space="preserve">
+  <data name="ThemeSettings.Description" xml:space="preserve">
     <value>Wybierz motyw aplikacji</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
@@ -260,7 +260,7 @@
   <data name="ToggleTracking.Content" xml:space="preserve">
     <value>Przełącz śledzenie</value>
   </data>
-  <data name="To_clone_this_repository.Header" xml:space="preserve">
+  <data name="CloneRepoCard.Header" xml:space="preserve">
     <value>Klonowanie repozytorium</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
@@ -269,7 +269,7 @@
   <data name="Version.Text" xml:space="preserve">
     <value>Wersja</value>
   </data>
-  <data name="Where_should_OSC_Data_be_sent.Description" xml:space="preserve">
+  <data name="OscSettings.Description" xml:space="preserve">
     <value>Gdzie wysyłać dane OSC?</value>
   </data>
   <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">

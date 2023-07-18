@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.OSC;
-using VRCFaceTracking.Types;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.OSC;
@@ -10,12 +9,12 @@ namespace VRCFaceTracking;
 public class MainStandalone : IMainService
 {
     public IOSCService OscMain;
-    public UnifiedConfig UnifiedConfig = new();
 
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
+    private readonly UnifiedTrackingMutator _mutator;
 
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
@@ -31,12 +30,14 @@ public class MainStandalone : IMainService
         }
     }
 
-    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager)
+    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager,
+        UnifiedTrackingMutator mutator)
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
         OscMain = oscService;
         _avatarInfo = avatarInfo;
         _libManager = libManager;
+        _mutator = mutator;
     }
 
     public void Teardown()
@@ -44,8 +45,7 @@ public class MainStandalone : IMainService
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        _logger.LogDebug("Saving configuration...");
-        UnifiedConfig.Save();
+        //_mutator.SaveCalibration();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
@@ -69,10 +69,6 @@ public class MainStandalone : IMainService
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
-        
-        // Try to load config and propogate data into Unified if they exist.
-        _logger.LogDebug("Reading configuration...");
-        UnifiedConfig.ReadConfiguration();
 
         ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
         {
@@ -95,6 +91,8 @@ public class MainStandalone : IMainService
             _avatarInfo.CurrentParameters = relevantParams.Length;
             _avatarInfo.CurrentParametersLegacy = deprecatedParams;
         };
+        
+        _mutator.LoadCalibration();
 
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
@@ -113,11 +111,9 @@ public class MainStandalone : IMainService
                 // Send all messages in OSCParams.SendQueue
                 if (OSCParams.SendQueue.Count <= 0) continue;
 
-                var relevantMessages = OSCParams.SendQueue.ToArray();
-                var messageIndex = 0;
-                while (messageIndex < relevantMessages.Length)
+                while (OSCParams.SendQueue.TryDequeue(out var message))
                 {
-                    var nextByteIndex = SROSCLib.create_osc_message(buffer, ref relevantMessages[messageIndex]);
+                    var nextByteIndex = SROSCLib.create_osc_message(buffer, ref message);
                     if (nextByteIndex > 4096)
                     {
                         _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
@@ -128,7 +124,6 @@ public class MainStandalone : IMainService
                     //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
                     
                     OscMain.Send(buffer, nextByteIndex);
-                    messageIndex++;
                 }
 
                 OSCParams.SendQueue.Clear();

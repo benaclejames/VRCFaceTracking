@@ -1,9 +1,8 @@
-using System;
-using System.Drawing.Drawing2D;
-using System.Text.Json.Serialization;
-using System.Threading;
-using System.Windows.Markup;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 
@@ -12,53 +11,55 @@ namespace VRCFaceTracking
     /// <summary>
     /// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
     /// </summary>
-    public class UnifiedTrackingMutator
+    public class UnifiedTrackingMutator : INotifyPropertyChanged
     {
-        public struct Mutation
+        private UnifiedTrackingData trackingDataBuffer = new();
+        public UnifiedMutationConfig mutationData = new();
+
+        private float _calibrationWeight;
+        public float CalibrationWeight
         {
-            public string Name;
-            public float Ceil; // The maximum that the parameter reaches.
-            public float Floor; // the minimum that the parameter reaches.
-            //public float SigmoidMult; // How much should this parameter be affected by the sigmoid function. This makes the parameter act more like a toggle.
-            //public float LogitMult; // How much should this parameter be affected by the logit (inverse of sigmoid) function. This makes the parameter act more within the normalized range.
-            public float SmoothnessMult; // How much should this parameter be affected by the smoothing function.
+            get => _calibrationWeight;
+            set => SetField(ref _calibrationWeight, value);
         }
-
-        public class MutationData
+        
+        private bool _continuousCalibration;
+        public bool ContinuousCalibration
         {
-            public Mutation[] ShapeMutations = new Mutation[(int)UnifiedExpressions.Max + 1];
-            public Mutation GazeMutations, OpennessMutations, PupilMutations = new Mutation();
+            get => _continuousCalibration;
+            set => SetField(ref _continuousCalibration, value);
         }
-
-        private UnifiedTrackingData trackingDataBuffer = new UnifiedTrackingData();
-        public MutationData mutationData = new MutationData();
-
-        public CalibratorState CalibratorMode = CalibratorState.Inactive;
-        public float CalibrationWeight;
 
         public bool SmoothingMode = false;
 
-        /// <summary>
-        /// Represents the state of calibration within the mutator.
-        /// </summary>
-        public enum CalibratorState
+        private bool _enabled;
+        public bool Enabled 
         {
-            Inactive,
-            Calibrating,
-            Calibrated
+            get => _enabled;
+            set => SetField(ref _enabled, value);
         }
 
-        private static ILogger<UnifiedTrackingMutator> _logger;
-        public static void InitializeLogger(ILoggerFactory factory)
+        private readonly ILogger<UnifiedTrackingMutator> _logger;
+        private readonly IDispatcherService _dispatcherService;
+        private readonly ILocalSettingsService _localSettingsService;
+
+        public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, IDispatcherService dispatcherService, ILocalSettingsService localSettingsService)
         {
-            _logger = factory.CreateLogger<UnifiedTrackingMutator>();
+            UnifiedTracking.Mutator = this;
+            _logger = logger;
+            _dispatcherService = dispatcherService;
+            _localSettingsService = localSettingsService;
+            
+            Enabled = true;
+            ContinuousCalibration = true;
+            CalibrationWeight = 0.2f;
         }
 
         static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
 
         private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
         {
-            if (CalibratorMode == CalibratorState.Inactive) 
+            if (!Enabled) 
                 return;
 
             for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
@@ -75,7 +76,7 @@ namespace VRCFaceTracking
         }
 
         private void ApplyCalibrator(ref UnifiedTrackingData inputData)
-            => Calibrate(ref inputData, CalibratorMode == CalibratorState.Calibrating ? CalibrationWeight : 0.0f);
+            => Calibrate(ref inputData, Enabled ? CalibrationWeight : 0.0f);
 
         private void ApplySmoothing(ref UnifiedTrackingData input)
         {
@@ -105,7 +106,7 @@ namespace VRCFaceTracking
         /// <returns> Mutated Expression Data. </returns>
         public UnifiedTrackingData MutateData(UnifiedTrackingData input)
         {
-            if (CalibratorMode == CalibratorState.Inactive && SmoothingMode == false)
+            if (SmoothingMode == false && !Enabled)
                 return input;
 
             UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
@@ -127,7 +128,7 @@ namespace VRCFaceTracking
                 UnifiedTracking.Mutator.SetCalibration();
 
                 UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
-                UnifiedTracking.Mutator.CalibratorMode = CalibratorState.Calibrating;
+                UnifiedTracking.Mutator.Enabled = true;
 
                 _logger.LogInformation("Calibrating deep normalization for 30s.");
                 Thread.Sleep(30000);
@@ -171,6 +172,32 @@ namespace VRCFaceTracking
 
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
                 mutationData.ShapeMutations[i].SmoothnessMult = setValue;
+        }
+
+        public void SaveCalibration()
+        {
+            _logger.LogDebug("Saving configuration...");
+            _localSettingsService.SaveSettingAsync("Mutation", mutationData).Wait();
+        }
+
+        public async void LoadCalibration()
+        {
+            // Try to load config and propogate data into Unified if they exist.
+            _logger.LogDebug("Reading configuration...");
+            //mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
+
+        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

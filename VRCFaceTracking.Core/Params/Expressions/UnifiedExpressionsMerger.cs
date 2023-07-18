@@ -33,10 +33,11 @@ public static class UnifiedExpressionsMerger
                         exp.Eye.Combined().Gaze.ToYaw()),
             param => 
                 IsEyeParameter(
-                param.Where(p => 
-                p.name.Contains("Eye") && 
-                (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
-                (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                    param.Where(p => 
+                    p.name.Contains("Eye") && 
+                    (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
+                    (p.name.Contains('X') || p.name.Contains('Y'))).ToArray()
+                )
                 .Length == 0,
             "/tracking/eye/CenterPitchYaw"
             ),
