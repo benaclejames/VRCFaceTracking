@@ -43,7 +43,7 @@ namespace VRCFaceTracking
         /// <summary>
         /// Version 2 (Unified Expressions) of all accessible output parameters.
         /// </summary>
-        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsMerger.ExpressionParameters;
+        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsParameters.ExpressionParameters;
 #pragma warning restore CS0618
 
         /// <summary>
@@ -54,6 +54,6 @@ namespace VRCFaceTracking
         /// <summary>
         /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.
         /// </summary>
-        public static void UpdateData() => OnUnifiedDataUpdated.Invoke(Mutator.MutateData(Data));
+        public static void UpdateData() => OnUnifiedDataUpdated.Invoke(Data);
     }
 }
