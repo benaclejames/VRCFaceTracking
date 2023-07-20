@@ -44,15 +44,17 @@ namespace VRCFaceTracking.OSC
                 }
             }
 
+            private T _lastValue;
+            
             public T ParamValue
             {
                 get => (T)OscMessage.Value;
                 set
                 {
-                    // Ensure that the value is different
-                    if (Equals(OscMessage.CachedValue, value)) return;
+                    if (value.Equals(_lastValue)) return;
                     
                     OscMessage.Value = value;
+                    _lastValue = value;
                     Enqueue();
                 }
             }

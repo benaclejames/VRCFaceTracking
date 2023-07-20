@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 
@@ -14,7 +15,7 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ConfigParser _configParser;
 
         public Action OnMessageDispatched { get; set; }
-        public Action<OscMessageMeta> OnMessageReceived { get; set; }
+        public Action<OscMessage> OnMessageReceived { get; set; }
         public Action<bool> OnConnectedDisconnected { get; set; } = b => { };
         public bool IsConnected { get; set; }
 
@@ -147,7 +148,7 @@ namespace VRCFaceTracking.Core.OSC
                 int bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
                 var newMsg = new OscMessage(buffer, bytesReceived);
                 Array.Clear(buffer, 0, bytesReceived);
-                OnMessageReceived(newMsg._meta);
+                OnMessageReceived(newMsg);
             }
             catch (Exception e)
             {
@@ -157,12 +158,12 @@ namespace VRCFaceTracking.Core.OSC
             }
         }
         
-        private void HandleNewMessage(OscMessageMeta msg)
+        private void HandleNewMessage(OscMessage msg)
         {
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value.StringValue);
+                    _configParser.ParseNewAvatar(msg.Value as string);
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":

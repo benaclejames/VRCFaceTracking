@@ -1,30 +1,58 @@
-﻿using System.Runtime.InteropServices;
-using VRCFaceTracking.Core.Types;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Core.OSC;
 
 public enum OscValueType : byte {
-    Int = 0,
-    Float = 1,
-    Bool = 2,
-    String = 3,
-    Vector2 = 4,
-    Vector3 = 5,
-    Vector4 = 6,
-    Vector6 = 7,
+    Null = 0,
+    Int = 1,
+    Float = 2,
+    Bool = 3,
+    String = 4,
 }
 
 [StructLayout(LayoutKind.Sequential)]
 public struct OscValue {
+    public OscValueType Type;
     [MarshalAs(UnmanagedType.I4)]
     public int IntValue;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
-    public float[] FloatValues;
+    [MarshalAs(UnmanagedType.R4)]
+    public float FloatValue;
     [MarshalAs(UnmanagedType.I1)]
     public bool BoolValue;
     [MarshalAs(UnmanagedType.LPStr)]
     public string StringValue; // Use IntPtr for pointer types
+
+    public object Value
+    {
+        get => Type switch
+        {
+            OscValueType.Int => IntValue,
+            OscValueType.Float => FloatValue,
+            OscValueType.Bool => BoolValue,
+            OscValueType.String => StringValue,
+            _ => null
+        };
+        set
+        {
+            switch (Type)
+            {
+                case OscValueType.Int:
+                    IntValue = (int)value;
+                    break;
+                case OscValueType.Float:
+                    FloatValue = (float)value;
+                    break;
+                case OscValueType.Bool:
+                    BoolValue = (bool)value;
+                    break;
+                case OscValueType.String:
+                    StringValue = (string)value;
+                    break;
+            }
+        }
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -32,9 +60,10 @@ public struct OscMessageMeta {
     [MarshalAs(UnmanagedType.LPStr)]
     public string Address;
     
-    public OscValueType Type;
+    [MarshalAs(UnmanagedType.I4)]
+    public int ValueLength;
     
-    public OscValue Value;
+    public IntPtr Value;
 }
 
 // Simple Rust OSC Lib wrapper
@@ -53,90 +82,74 @@ public static class SROSCLib
 
 public class OscMessage
 {
-    public OscMessageMeta _meta = new();
+    public OscMessageMeta _meta;
 
     public string Address
     {
         get => _meta.Address;
         set => _meta.Address = value;
     }
+    
+    private Action<object> _valueSetter;
 
-    public OscValueType TypeIdentifier
-    {
-        get => _meta.Type;
-        set => _meta.Type = value;
-    }
-
-    public object CachedValue
-    {
-        get;
-        private set;
-    }
     public object Value
     {
         get
         {
-            switch (TypeIdentifier)
+            var values = new OscValue[_meta.ValueLength];
+            var ptr = _meta.Value;
+            for (var i = 0; i < _meta.ValueLength; i++)
             {
-                case OscValueType.Bool:
-                    return _meta.Value.BoolValue;
-                case OscValueType.Float:
-                    return _meta.Value.FloatValues[0];
-                case OscValueType.Int:
-                    return _meta.Value.IntValue;
-                case OscValueType.String:
-                    return _meta.Value.StringValue;
-                case OscValueType.Vector2:
-                    return new Vector2(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1]);
-                case OscValueType.Vector3:
-                    return new Vector3(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1], _meta.Value.FloatValues[2]);
-                case OscValueType.Vector4:
-                    return new Vector4(_meta.Value.FloatValues[0], _meta.Value.FloatValues[1], _meta.Value.FloatValues[2], _meta.Value.FloatValues[3]);
-                default:
-                    return null;
+                values[i] = Marshal.PtrToStructure<OscValue>(ptr);
+                ptr += Marshal.SizeOf<OscValue>();
             }
+
+            return values[0].Value;
         }
-        set
-        {
-            switch (TypeIdentifier)
-            {
-                case OscValueType.Int:
-                    _meta.Value.IntValue = (int)value;
-                    break;
-                case OscValueType.Float:
-                    _meta.Value.FloatValues = new []{(float)value, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-                    break;
-                case OscValueType.Bool:
-                    _meta.Value.BoolValue = (bool)value;
-                    break;
-                case OscValueType.String:
-                    _meta.Value.StringValue = (string)value;
-                    break;
-                case OscValueType.Vector2:
-                    var val = (Vector2)value;
-                    _meta.Value.FloatValues = new []{val.x, val.y, 0.0f, 0.0f, 0.0f, 0.0f};
-                    break;
-                case OscValueType.Vector3:
-                    var val3 = (Vector3)value;
-                    _meta.Value.FloatValues = new []{val3.x, val3.y, val3.z, 0.0f, 0.0f, 0.0f};
-                    break;
-                case OscValueType.Vector4:
-                    var val4 = (Vector4)value;
-                    _meta.Value.FloatValues = new []{val4.x, val4.y, val4.z, val4.w, 0.0f, 0.0f};
-                    break;
-            }
-            
-            CachedValue = value;
-        }
+        set => _valueSetter(value);
     }
 
-    private OscMessage(string address, OscValueType typeIdentifier)
+    public OscMessage(string address, Type type)
     {
         Address = address;
-        TypeIdentifier = typeIdentifier;
+        
+        if (OscUtils.TypeConversions.TryGetValue(type, out var oscType))
+        {
+            _meta.ValueLength = 1;
+            _meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>() * _meta.ValueLength);
+            var oscValue = new OscValue
+            {
+                Type = oscType.oscType,
+            };
+            _valueSetter = value =>
+            {
+                oscValue.Value = value;
+                Marshal.StructureToPtr(oscValue, _meta.Value, false);
+            };
+        }
+        else    // If we don't have the type, we assume it's a struct and serialize it using reflection
+        {
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            _meta.ValueLength = fields.Length;
+            _meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>() * _meta.ValueLength);
+            var values = new OscValue[_meta.ValueLength];
+            for (var i = 0; i < _meta.ValueLength; i++)
+            {
+                values[i] = new OscValue
+                {
+                    Type = OscUtils.TypeConversions[fields[i].FieldType].oscType,
+                };
+            }
+            _valueSetter = value =>
+            {
+                for (var j = 0; j < _meta.ValueLength; j++)
+                {
+                    values[j].Value = fields[j].GetValue(value);
+                    Marshal.StructureToPtr(values[j], _meta.Value + Marshal.SizeOf<OscValue>() * j, false);
+                }
+            };
+        }
     }
-    
-    public OscMessage(string address, Type type) : this(address, OscUtils.TypeConversions[type].oscType) {}
 
     public OscMessage(byte[] bytes, int len) => SROSCLib.parse_osc(bytes, len, ref _meta);
 }
