@@ -50,6 +50,23 @@ namespace VRCFaceTracking
         {
             if (newId == AvatarId || string.IsNullOrEmpty(newId))
                 return;
+
+            var paramList = new List<IParameter>();
+            
+            if (newId.StartsWith("local:"))
+            {
+                foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+                    paramList.AddRange(parameter.ResetParam(Array.Empty<Parameter>()));
+
+                // This is a local test avatar, there won't be a config file for it so assume we're using no parameters and just return
+                OnConfigLoaded(paramList.ToArray(), new AvatarConfigSpec()
+                {
+                    id = newId,
+                    name = newId.Substring(10) // Remove "local:sdk_" from the name
+                });
+                AvatarId = newId;
+                return;
+            }
             
             AvatarConfigSpec avatarConfig = null;
             foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
@@ -76,7 +93,6 @@ namespace VRCFaceTracking
             //_logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
-            List<IParameter> paramList = new List<IParameter>();
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
                 paramList.AddRange(parameter.ResetParam(parameters));
 

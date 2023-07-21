@@ -9,4 +9,5 @@ public interface IAvatarInfo : INotifyPropertyChanged
     public int CurrentParameters { get; set; }
     public int CurrentParametersLegacy { get; set; }
     public bool HasAnyLegacy { get; }
+    public bool IsLocalTest { get; }
 }
