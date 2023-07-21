@@ -48,7 +48,7 @@
                 HorizontalScrollBarVisibility="Auto"
                 Height="Auto">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <ItemsControl ItemsSource="{x:Bind Log}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <ItemsControl ItemsSource="{x:Bind FilteredLog}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{Binding}"/>

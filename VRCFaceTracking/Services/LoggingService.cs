@@ -7,7 +7,8 @@ namespace VRCFaceTracking.Services;
 public class OutputPageLogger : ILogger
 {
     private readonly string _categoryName;
-    public static readonly ObservableCollection<string> Logs = new();
+    public static readonly ObservableCollection<string> FilteredLogs = new();
+    public static readonly ObservableCollection<string> AllLogs = new();
     private static DispatcherQueue? _dispatcher;
 
     public OutputPageLogger(string categoryName, DispatcherQueue? queue)
@@ -28,6 +29,14 @@ public class OutputPageLogger : ILogger
         Func<TState, Exception?, string> formatter)
     {
         // Add to the staticLog from the dispatcher thread
-        _dispatcher?.TryEnqueue(() => Logs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}"));
+        _dispatcher?.TryEnqueue(() =>
+        {
+            AllLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
+            // Filtered is what the user sees, so show Information scope
+            if (logLevel >= LogLevel.Information)
+            {
+                FilteredLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
+            }
+        });
     }
 }
