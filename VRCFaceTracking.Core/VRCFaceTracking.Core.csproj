@@ -13,9 +13,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\..\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

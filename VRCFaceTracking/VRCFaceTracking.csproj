@@ -20,7 +20,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Never</AppxBundle>
+    <AppxBundle>Auto</AppxBundle>
     <AssemblyVersion>5.0.2.3</AssemblyVersion>
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/latest/download/</AppInstallerUri>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
