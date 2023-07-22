@@ -3,7 +3,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>VRCFaceTracking.Core</RootNamespace>
     <Platforms>x64</Platforms>
-    <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyVersion>5.0.2.3</AssemblyVersion>
   </PropertyGroup>
@@ -13,7 +12,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\..\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
+    <Content Include="$(SystemRoot)\System32\vcruntime140.dll" Link="vcruntime140.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
