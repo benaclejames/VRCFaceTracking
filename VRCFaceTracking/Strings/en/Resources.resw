@@ -314,4 +314,10 @@
   <data name="RiskySettings.Description" xml:space="preserve">
     <value>Danger, danger. High voltage..</value>
   </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>Auto Start</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>Auto Start when SteamVR is launched</value>
+  </data>
 </root>

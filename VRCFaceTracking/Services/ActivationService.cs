@@ -38,7 +38,7 @@ public class ActivationService : IActivationService
         _moduleDataService = moduleDataService;
         _moduleInstaller = moduleInstaller;
         _libManager = libManager;
-        _logger = loggerFactory.CreateLogger("MainStandalone");;
+        _logger = loggerFactory.CreateLogger("MainStandalone");
     }
 
     public async Task ActivateAsync(object activationArgs)

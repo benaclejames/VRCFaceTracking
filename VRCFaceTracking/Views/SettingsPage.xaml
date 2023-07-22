@@ -112,6 +112,13 @@
                     </labs:SettingsExpander.Items>
                 </-->
                 
+                <labs:SettingsCard x:Uid="AutoStartSettings">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE840;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"/>
+                </labs:SettingsCard>
+                
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />

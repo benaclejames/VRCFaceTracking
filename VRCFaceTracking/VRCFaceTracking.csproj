@@ -37,6 +37,13 @@
     <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
     <Content Remove="Assets\StoreLogo.scale-125.png" />
     <Content Remove="Assets\StoreLogo.scale-150.png" />
+    <None Remove="OpenVR\openvr_api.dll" />
+    <Content Include="OpenVR\openvr_api.dll" Link="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OpenVR\app.vrmanifest" Link="app.vrmanifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
