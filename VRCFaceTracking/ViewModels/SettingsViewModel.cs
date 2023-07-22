@@ -47,7 +47,7 @@ public class SettingsViewModel : ObservableRecipient
     
     public bool AutoStart
     {
-        get => OpenVRService.IsInitialized;
+        get => OpenVRService.AutoStart;
         set
         {
             OpenVRService.AutoStart = value;
