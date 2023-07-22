@@ -13,7 +13,7 @@ public class OpenVRService
         _logger = loggerFactory.CreateLogger("OpenVRService");
         
         EVRInitError error = EVRInitError.None;
-        _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Overlay);
+        _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Background);
         
         if (error != EVRInitError.None)
         {
@@ -39,14 +39,14 @@ public class OpenVRService
 
     public bool AutoStart
     {
-        get => OpenVR.Applications.GetApplicationAutoLaunch("benaclejames.vrcft");
+        get => IsInitialized && OpenVR.Applications.GetApplicationAutoLaunch("benaclejames.vrcft");
         set
         {
+            if (!IsInitialized)
+                return; 
             var setAutoLaunchResult = OpenVR.Applications.SetApplicationAutoLaunch("benaclejames.vrcft", value);
             if (setAutoLaunchResult != EVRApplicationError.None)
-            {
                 _logger.LogError("Failed to set auto launch: {0}", setAutoLaunchResult);
-            }
         }
     }
 } 
