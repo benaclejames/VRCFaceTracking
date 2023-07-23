@@ -117,7 +117,7 @@ public partial class App : Application
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();
-            services.AddTransient<UnifiedTrackingMutator>();
+            services.AddSingleton<UnifiedTrackingMutator>();
             services.AddSingleton<RiskySettingsViewModel>();
             services.AddTransient<OscViewModel>();
             services.AddTransient<SettingsPage>();

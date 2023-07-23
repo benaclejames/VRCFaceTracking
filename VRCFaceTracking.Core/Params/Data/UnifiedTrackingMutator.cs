@@ -174,10 +174,10 @@ namespace VRCFaceTracking
                 mutationData.ShapeMutations[i].SmoothnessMult = setValue;
         }
 
-        public void SaveCalibration()
+        public async Task SaveCalibration()
         {
             _logger.LogDebug("Saving configuration...");
-            _localSettingsService.SaveSettingAsync("Mutation", mutationData).Wait();
+            await _localSettingsService.SaveSettingAsync("Mutation", mutationData);
         }
 
         public async void LoadCalibration()
@@ -185,6 +185,13 @@ namespace VRCFaceTracking
             // Try to load config and propogate data into Unified if they exist.
             _logger.LogDebug("Reading configuration...");
             mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
+            // If the config is null, create a new one.
+            if (mutationData.ShapeMutations == null)
+            {
+                _logger.LogDebug("Configuration not found. Creating new configuration...");
+                mutationData = new();
+            }
+            _logger.LogDebug("Configuration loaded.");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

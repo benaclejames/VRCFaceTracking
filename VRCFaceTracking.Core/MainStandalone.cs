@@ -41,12 +41,12 @@ public class MainStandalone : IMainService
         _mutator = mutator;
     }
 
-    public void Teardown()
+    public async Task Teardown()
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        _mutator.SaveCalibration();
+        await _mutator.SaveCalibration();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
