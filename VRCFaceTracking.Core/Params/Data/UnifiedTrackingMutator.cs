@@ -106,7 +106,7 @@ namespace VRCFaceTracking
         /// <returns> Mutated Expression Data. </returns>
         public UnifiedTrackingData MutateData(UnifiedTrackingData input)
         {
-            if (SmoothingMode == false && !Enabled)
+            if (!Enabled && SmoothingMode == false)
                 return input;
 
             UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
@@ -184,7 +184,7 @@ namespace VRCFaceTracking
         {
             // Try to load config and propogate data into Unified if they exist.
             _logger.LogDebug("Reading configuration...");
-            //mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
+            mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

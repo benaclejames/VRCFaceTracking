@@ -46,7 +46,7 @@ public class MainStandalone : IMainService
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        //_mutator.SaveCalibration();
+        _mutator.SaveCalibration();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");

@@ -17,7 +17,7 @@ public class OpenVRService
         
         if (error != EVRInitError.None)
         {
-            _logger.LogError("Failed to initialize OpenVR: {0}", error);
+            _logger.LogWarning("Failed to initialize OpenVR: {0}", error);
             return;
         }
         
@@ -27,7 +27,7 @@ public class OpenVRService
         var manifestRegisterResult = OpenVR.Applications.AddApplicationManifest(fullManifestPath, false);
         if (manifestRegisterResult != EVRApplicationError.None)
         {
-            _logger.LogError("Failed to register manifest: {0}", manifestRegisterResult);
+            _logger.LogWarning("Failed to register manifest: {0}", manifestRegisterResult);
             return;
         }
         
@@ -35,7 +35,7 @@ public class OpenVRService
         _logger.LogInformation("Successfully initialized OpenVR");
     }
     
-    public bool IsInitialized { get; private set; }
+    public bool IsInitialized { get; }
 
     public bool AutoStart
     {
