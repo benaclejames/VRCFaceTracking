@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Valve.VR;
 
 namespace VRCFaceTracking.Services;
@@ -21,8 +22,8 @@ public class OpenVRService
             return;
         }
         
-        // Our app.vrmanifest is next to the executable, so we can just use the current directory.
-        var currentDirectory = Directory.GetCurrentDirectory();
+        // Our app.vrmanifest is next to the executable, so we can just use the current directory of the executable
+        var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
         var fullManifestPath = Path.Combine(currentDirectory, "app.vrmanifest"); // Replace is for Linux
         var manifestRegisterResult = OpenVR.Applications.AddApplicationManifest(fullManifestPath, false);
         if (manifestRegisterResult != EVRApplicationError.None)
