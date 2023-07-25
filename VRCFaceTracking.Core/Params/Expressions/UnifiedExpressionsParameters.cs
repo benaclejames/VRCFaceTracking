@@ -1,4 +1,5 @@
 ﻿using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.DataTypes;
 using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
@@ -114,7 +115,59 @@ public static class UnifiedExpressionsParameters
             exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
                 ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
                 : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight),
+
+        #endregion
+
+        #region EyeLidExpandedSqueeze (Combined)
+
+        new EParam("v2/LeftEyeLidExpandedSqueeze", exp =>
+                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f -
+                Squeeze(exp, 0), 0.5f, true),
+            new EParam("v2/RightEyeLidExpandedSqueeze", exp =>
+                exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f -
+                Squeeze(exp, 1), 0.5f, true),
+            new EParam("v2/EyeLidExpandedSqueeze", exp =>
+                (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
+                (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
+                Squeeze(exp, 2), 0.5f, true),
+
+        #endregion
         
+        #region EyeLidExpandedSqueeze Binary (Combined)
+
+        // Still need to reforumulate these parameters with the compensation.
+        new BinaryBaseParameter("v2/LeftEyeLidExpandedSqueeze", exp =>
+            {
+                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0);
+                if (eyeLid > .8f)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight;
+                if (eyeLid >= 0)
+                    return exp.Eye.Left.Openness;
+                return Squeeze(exp, 0);
+            }),
+
+        new BinaryBaseParameter("v2/RightEyeLidExpandedSqueeze", exp =>
+            {
+                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1);
+                if (eyeLid > .8f)
+                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight;
+                if (eyeLid >= 0)
+                    return exp.Eye.Right.Openness;
+                return Squeeze(exp, 1);
+            }),
+
+        new BinaryBaseParameter("v2/CombinedEyeLidExpandedSqueeze", exp =>
+            {
+                var eyeLid = (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
+                    (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
+                    Squeeze(exp, 2);
+                if (eyeLid > .8f)
+                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f;
+                if (eyeLid >= 0)
+                    return exp.Eye.Combined().Openness;
+                return Squeeze(exp, 1);
+            }),
+            
         #endregion
 
         #region Eyebrows Compacted
@@ -276,4 +329,11 @@ public static class UnifiedExpressionsParameters
            new EParam("v2/" + simple.ToString(), exp => GetSimpleShape(exp, simple), 0.0f));
 
     private static float GetSimpleShape(UnifiedTrackingData data, UnifiedSimpleExpressions expression) => UnifiedSimplifier.ExpressionMap[expression].Invoke(data);
+
+    // eyeIndex: 0 == Left, 1 == Right, 2 == avg Both
+    private static float Squeeze(UnifiedTrackingData data, int eyeIndex) =>
+        eyeIndex == 0 ? (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
+        : eyeIndex == 1 ? (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
+        : eyeIndex == 2 ? (float)(1.0f - Math.Pow(data.Eye.Combined().Openness, .15)) * (data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f
+        : 0.0f;
 }
