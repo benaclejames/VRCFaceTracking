@@ -189,13 +189,6 @@ namespace VRCFaceTracking.Core.OSC
                     break;
                 */
             }
-
-            if (msg.Address.StartsWith("/avatar/parameters/b_"))
-            {
-                var index = int.Parse(msg.Address[21..]);
-                var boolValue = (bool)msg.Value;
-                _logger.LogInformation("Received bool parameter {0} with value {1}", index, boolValue);
-            }
         }
 
         public void Send(byte[] data, int length)
