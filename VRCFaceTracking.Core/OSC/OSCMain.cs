@@ -145,8 +145,9 @@ namespace VRCFaceTracking.Core.OSC
         {
             try
             {
-                int bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
-                var newMsg = new OscMessage(buffer, bytesReceived);
+                var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                var offset = 0;
+                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
                 Array.Clear(buffer, 0, bytesReceived);
                 OnMessageReceived(newMsg);
             }
@@ -164,6 +165,9 @@ namespace VRCFaceTracking.Core.OSC
             {
                 case "/avatar/change":
                     _configParser.ParseNewAvatar(msg.Value as string);
+                    break;
+                case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
+                    //_mainService.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":
@@ -184,6 +188,13 @@ namespace VRCFaceTracking.Core.OSC
                     }
                     break;
                 */
+            }
+
+            if (msg.Address.StartsWith("/avatar/parameters/b_"))
+            {
+                var index = int.Parse(msg.Address[21..]);
+                var boolValue = (bool)msg.Value;
+                _logger.LogInformation("Received bool parameter {0} with value {1}", index, boolValue);
             }
         }
 

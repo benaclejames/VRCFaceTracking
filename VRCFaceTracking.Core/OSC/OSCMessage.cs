@@ -70,7 +70,7 @@ public struct OscMessageMeta {
 public static class SROSCLib
 {
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool parse_osc(byte[] buffer, int bufferLength, ref OscMessageMeta message);
+    public static extern bool parse_osc(byte[] buffer, int bufferLength, ref int messageIndex, ref OscMessageMeta message);
     
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_message([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, ref OscMessageMeta osc_template);
@@ -151,5 +151,5 @@ public class OscMessage
         }
     }
 
-    public OscMessage(byte[] bytes, int len) => SROSCLib.parse_osc(bytes, len, ref _meta);
+    public OscMessage(byte[] bytes, int len, ref int messageIndex) => SROSCLib.parse_osc(bytes, len, ref messageIndex, ref _meta);
 }
