@@ -10,6 +10,8 @@ namespace VRCFaceTracking.Core.OSC.DataTypes;
 public class ParamSupervisor : IParamSupervisor
 {
     public static readonly Queue<OscMessageMeta> SendQueue = new();
+ 
+    private readonly IDispatcherService _dispatcherService;
     
     public static bool AllParametersRelevantStatic { get; set; }
 
@@ -30,7 +32,7 @@ public class ParamSupervisor : IParamSupervisor
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
     }
 
     protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
@@ -39,6 +41,11 @@ public class ParamSupervisor : IParamSupervisor
         field = value;
         OnPropertyChanged(propertyName);
         return true;
+    }
+    
+    public ParamSupervisor(IDispatcherService dispatcherService)
+    {
+        _dispatcherService = dispatcherService;
     }
 }
 
