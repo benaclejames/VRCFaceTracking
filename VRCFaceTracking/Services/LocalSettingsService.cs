@@ -48,7 +48,7 @@ public class LocalSettingsService : ILocalSettingsService
         }
     }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
+    public async Task<T?> ReadSettingAsync<T>(string key, T? defaultValue = default)
     {
         if (RuntimeHelper.IsMSIX)
         {
@@ -67,7 +67,7 @@ public class LocalSettingsService : ILocalSettingsService
             }
         }
 
-        return default;
+        return defaultValue;
     }
 
     public async Task SaveSettingAsync<T>(string key, T value)
