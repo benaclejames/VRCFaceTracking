@@ -1,13 +1,45 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
 
-public static class QueueController
+public class ParamSupervisor : IParamSupervisor
 {
-    public static Queue<OscMessageMeta> SendQueue = new();
-    public static bool AlwaysRelevantDebug = false;
+    public static readonly Queue<OscMessageMeta> SendQueue = new();
+    
+    public static bool AllParametersRelevantStatic { get; set; }
+
+    public bool AllParametersRelevant
+    {
+        get => AllParametersRelevantStatic;
+        set
+        {
+            if (AllParametersRelevantStatic == value) return;
+            AllParametersRelevantStatic = value;
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+                parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
+            OnPropertyChanged();
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }
 
 public class BaseParam<T> : IParameter where T : struct
@@ -59,7 +91,7 @@ public class BaseParam<T> : IParameter where T : struct
         }
     }
 
-    private void Enqueue() => QueueController.SendQueue.Enqueue(OscMessage._meta);
+    private void Enqueue() => ParamSupervisor.SendQueue.Enqueue(OscMessage._meta);
 
     protected readonly OscMessage OscMessage;
 
@@ -74,7 +106,7 @@ public class BaseParam<T> : IParameter where T : struct
 
     public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
     {
-        if (QueueController.AlwaysRelevantDebug)
+        if (ParamSupervisor.AllParametersRelevantStatic)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;

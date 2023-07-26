@@ -86,6 +86,10 @@ public static class UnifiedExpressionsParameters
         new EParam("v2/EyeOpenLeft" , exp => exp.Eye.Left.Openness),
         new EParam("v2/EyeOpenRight", exp => exp.Eye.Right.Openness),
         new EParam("v2/EyeOpen", exp => (exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f),
+        
+        new EParam("v2/EyeClosedLeft" , exp => 1 - exp.Eye.Left.Openness),
+        new EParam("v2/EyeClosedRight", exp => 1 - exp.Eye.Right.Openness),
+        new EParam("v2/EyeClosed", exp => 1 - (exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f),
 
         #endregion
 

@@ -130,7 +130,7 @@
                             Header="Force Relevancy"
                             IsEnabled="False"
                             Description="Forces sending of all parameters every frame by forcing relevancy">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllParametersRelevant, Mode=TwoWay}" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="forceReInit"

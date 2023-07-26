@@ -12,6 +12,7 @@ using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Notifications;
@@ -126,6 +127,7 @@ public partial class App : Application
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
             services.AddSingleton<IAvatarInfo, AvatarViewModel>();
+            services.AddSingleton<IParamSupervisor, ParamSupervisor>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
