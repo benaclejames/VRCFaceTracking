@@ -2,7 +2,7 @@
 
 public interface ILocalSettingsService
 {
-    Task<T> ReadSettingAsync<T>(string key, T? defaultValue = default);
+    Task<T> ReadSettingAsync<T>(string key, T? defaultValue = default, bool forceLocal = false);
 
-    Task SaveSettingAsync<T>(string key, T value);
+    Task SaveSettingAsync<T>(string key, T value, bool forceLocal = false);
 }

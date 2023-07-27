@@ -180,7 +180,7 @@ namespace VRCFaceTracking
             await _localSettingsService.SaveSettingAsync("CalibrationEnabled", Enabled);
             await _localSettingsService.SaveSettingAsync("CalibrationWeight", CalibrationWeight);
             await _localSettingsService.SaveSettingAsync("ContinuousCalibrationEnabled", ContinuousCalibration);
-            await _localSettingsService.SaveSettingAsync("Mutations", mutationData);
+            await _localSettingsService.SaveSettingAsync("Mutations", mutationData, true);
         }
 
         public async void LoadCalibration()
