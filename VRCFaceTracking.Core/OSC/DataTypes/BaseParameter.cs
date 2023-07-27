@@ -22,6 +22,7 @@ public class ParamSupervisor : IParamSupervisor
         {
             if (AllParametersRelevantStatic == value) return;
             AllParametersRelevantStatic = value;
+            SendQueue.Clear();
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
                 parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
             OnPropertyChanged();
