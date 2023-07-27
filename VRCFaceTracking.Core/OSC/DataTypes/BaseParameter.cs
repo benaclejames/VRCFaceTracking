@@ -83,7 +83,7 @@ public class BaseParam<T> : IParameter where T : struct
         }
     }
 
-    private T _lastValue;
+    private T? _lastValue;
 
     public T ParamValue
     {
