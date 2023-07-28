@@ -8,7 +8,6 @@
   xmlns:genTemplate="http://schemas.microsoft.com/appx/developer/templatestudio"
   xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
-    xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
@@ -22,8 +21,6 @@
     <DisplayName>VRCFaceTracking</DisplayName>
     <PublisherDisplayName>benaclejames</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
-    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
-    <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
   </Properties>
 
   <Dependencies>
@@ -70,7 +67,6 @@
   </Applications>
 
   <Capabilities>
-    <rescap:Capability Name="unvirtualizedResources" />
     <rescap:Capability Name="runFullTrust" />
     <Capability Name="internetClientServer"/>
   </Capabilities>
