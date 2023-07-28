@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using VRCFaceTracking.OSC;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking;
 
@@ -18,18 +18,6 @@ public class MainStandalone : IMainService
 
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
-    public bool AllParametersRelevant
-    {
-        get => OSCParams.AlwaysRelevantDebug;
-        set
-        {
-            OSCParams.AlwaysRelevantDebug = value;
-            
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
-        }
-    }
-
     public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager,
         UnifiedTrackingMutator mutator)
     {
@@ -40,12 +28,12 @@ public class MainStandalone : IMainService
         _mutator = mutator;
     }
 
-    public void Teardown()
+    public async Task Teardown()
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        //_mutator.SaveCalibration();
+        await _mutator.SaveCalibration();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
@@ -109,9 +97,9 @@ public class MainStandalone : IMainService
                 UnifiedTracking.UpdateData();
 
                 // Send all messages in OSCParams.SendQueue
-                if (OSCParams.SendQueue.Count <= 0) continue;
+                if (ParamSupervisor.SendQueue.Count <= 0) continue;
 
-                while (OSCParams.SendQueue.TryDequeue(out var message))
+                while (ParamSupervisor.SendQueue.TryDequeue(out var message))
                 {
                     var nextByteIndex = SROSCLib.create_osc_message(buffer, ref message);
                     if (nextByteIndex > 4096)
@@ -126,7 +114,7 @@ public class MainStandalone : IMainService
                     OscMain.Send(buffer, nextByteIndex);
                 }
 
-                OSCParams.SendQueue.Clear();
+                ParamSupervisor.SendQueue.Clear();
             }
         }, MasterCancellationTokenSource.Token);
 

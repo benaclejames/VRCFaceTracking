@@ -111,9 +111,9 @@
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}" x:Uid="AvatarStatus" />
                             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.Name, Mode=OneWay}"/>
                             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.Id, Mode=OneWay}"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
-                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="LocalTestAvatar"/>
-                                <Ellipse Width="10" Height="10" Fill="Red" Margin="5,0,0,0"/>
+                            <StackPanel Visibility="{x:Bind ViewModel.AvatarInfo.IsLocalTest, Mode=OneWay}" Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
+                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="LocalTestAvatar" VerticalAlignment="Center"/>
+                                <Ellipse Width="10" Height="10" Fill="Red" Margin="5,0,0,0" VerticalAlignment="Center"/>
                                 <ToolTipService.ToolTip>
                                     <ToolTip x:Uid="LocalTestAvatarTooltip" />
                                 </ToolTipService.ToolTip>
@@ -127,8 +127,8 @@
                             <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Parameters"/>
                         </StackPanel> 
                         <StackPanel Visibility="{x:Bind ViewModel.AvatarInfo.HasAnyLegacy, Mode=OneWay}" Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
-                            <Ellipse Width="10" Height="10" Fill="Orange" Margin="0,0,5,0"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3">
+                            <Ellipse Width="10" Height="10" Fill="Orange" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="3" VerticalAlignment="Center">
                                 <TextBlock HorizontalTextAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind ViewModel.AvatarInfo.CurrentParametersLegacy, Mode=OneWay}"/>
                                 <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="LegacyParameters"/>
                             </StackPanel> 

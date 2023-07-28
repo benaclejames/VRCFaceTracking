@@ -10,8 +10,24 @@ public struct UnifiedMutationConfig
     public UnifiedMutationConfig()
     {
         ShapeMutations = new UnifiedMutation[(int)UnifiedExpressions.Max + 1];
-        GazeMutations = default;
-        OpennessMutations = default;
-        PupilMutations = default;
+        for (int i = 0; i < ShapeMutations.Length; i++)
+        {
+            ShapeMutations[i] = new UnifiedMutation()
+            {
+                Name = ((UnifiedExpressions)i).ToString()
+            };
+        }
+        GazeMutations = new UnifiedMutation()
+        {
+            Name = "GazeMutations"
+        };
+        OpennessMutations = new UnifiedMutation()
+        {
+            Name = "OpennessMutations"
+        };
+        PupilMutations = new UnifiedMutation()
+        {
+            Name = "PupilMutations"
+        };
     }
 }

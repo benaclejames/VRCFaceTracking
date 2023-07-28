@@ -20,7 +20,11 @@ public class AvatarViewModel : ObservableRecipient, IAvatarInfo
     public string Id
     {
         get => _id;
-        set => App.MainWindow.DispatcherQueue.TryEnqueue(() => SetProperty(ref _id, value));    // Literally suck on my penis windows
+        set => App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            SetProperty(ref _id, value);
+            OnPropertyChanged(nameof(IsLocalTest));
+        });
     }
     
     public int CurrentParameters
@@ -39,6 +43,7 @@ public class AvatarViewModel : ObservableRecipient, IAvatarInfo
         });
     }
     public bool HasAnyLegacy => CurrentParametersLegacy > 0;
+    public bool IsLocalTest => Id.StartsWith("local:");
     
     public AvatarViewModel()
     {

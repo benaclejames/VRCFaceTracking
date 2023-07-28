@@ -43,7 +43,7 @@ namespace VRCFaceTracking
         /// <summary>
         /// Version 2 (Unified Expressions) of all accessible output parameters.
         /// </summary>
-        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsMerger.ExpressionParameters;
+        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsParameters.ExpressionParameters;
 #pragma warning restore CS0618
 
         /// <summary>

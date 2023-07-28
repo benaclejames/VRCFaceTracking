@@ -22,13 +22,13 @@ public class ActivationService : IActivationService
     private readonly IModuleDataService _moduleDataService;
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
-    private readonly ILogger<ActivationService> _logger;
+    private readonly ILogger _logger;
     private UIElement? _shell = null;
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
         IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
         IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
-        ILogger<ActivationService> logger)
+        ILoggerFactory loggerFactory)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -38,7 +38,7 @@ public class ActivationService : IActivationService
         _moduleDataService = moduleDataService;
         _moduleInstaller = moduleInstaller;
         _libManager = libManager;
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("MainStandalone");
     }
 
     public async Task ActivateAsync(object activationArgs)

@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -12,14 +14,16 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
+        private readonly IParamSupervisor _paramSupervisor;
 
         public Action OnMessageDispatched { get; set; }
-        public Action<OscMessageMeta> OnMessageReceived { get; set; }
+        public Action<OscMessage> OnMessageReceived { get; set; }
         public Action<bool> OnConnectedDisconnected { get; set; } = b => { };
         public bool IsConnected { get; set; }
 
 
-        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
+        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory,
+            ConfigParser configParser, IParamSupervisor paramSupervisor)
         {
             _localSettingsService = localSettingsService;
             _configParser = configParser;
@@ -27,6 +31,7 @@ namespace VRCFaceTracking.Core.OSC
             OnMessageDispatched = () => { };
             OnMessageReceived = HandleNewMessage;
             OnConnectedDisconnected = b => {IsConnected = b;};
+            _paramSupervisor = paramSupervisor;
         }
 
         public int InPort { get; set; }
@@ -144,10 +149,11 @@ namespace VRCFaceTracking.Core.OSC
         {
             try
             {
-                int bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
-                var newMsg = new OscMessage(buffer, bytesReceived);
+                var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                var offset = 0;
+                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
                 Array.Clear(buffer, 0, bytesReceived);
-                OnMessageReceived(newMsg._meta);
+                OnMessageReceived(newMsg);
             }
             catch (Exception e)
             {
@@ -157,12 +163,15 @@ namespace VRCFaceTracking.Core.OSC
             }
         }
         
-        private void HandleNewMessage(OscMessageMeta msg)
+        private void HandleNewMessage(OscMessage msg)
         {
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value.StringValue);
+                    _configParser.ParseNewAvatar(msg.Value as string);
+                    break;
+                case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
+                    _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":

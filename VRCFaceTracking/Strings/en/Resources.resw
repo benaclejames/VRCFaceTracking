@@ -198,7 +198,7 @@
     <value>Avatar Status</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Local Test Avatar</value>
+    <value>Local Test Avatar Detected</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
     <value>Local Test Avatars are not supported and will cause issues</value>
@@ -313,5 +313,11 @@
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
     <value>Danger, danger. High voltage..</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>Auto Start</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>Auto Start when SteamVR is launched</value>
   </data>
 </root>

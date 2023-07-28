@@ -83,7 +83,7 @@
                     </Grid>
                 </labs:SettingsCard>
                 
-                <!-- labs:SettingsExpander x:Uid="CalibrationSettings">
+                <labs:SettingsExpander x:Uid="CalibrationSettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xEC49;"/>
                     </labs:SettingsExpander.HeaderIcon>
@@ -110,7 +110,14 @@
                             <Slider Width="200" Minimum="0.00" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind CalibrationSettings.CalibrationWeight, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
-                </-->
+                </labs:SettingsExpander>
+                
+                <labs:SettingsCard x:Uid="AutoStartSettings" IsEnabled="{x:Bind ViewModel.IsOpenVREnabled, Mode=OneWay}">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE840;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"/>
+                </labs:SettingsCard>
                 
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
@@ -123,7 +130,7 @@
                             Header="Force Relevancy"
                             IsEnabled="False"
                             Description="Forces sending of all parameters every frame by forcing relevancy">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllParametersRelevant, Mode=TwoWay}" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="forceReInit"

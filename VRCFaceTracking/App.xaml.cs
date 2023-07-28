@@ -12,6 +12,7 @@ using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Notifications;
@@ -106,6 +107,7 @@ public partial class App : Application
             services.AddSingleton<ConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
+            services.AddTransient<OpenVRService>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();
@@ -116,7 +118,7 @@ public partial class App : Application
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();
-            services.AddTransient<UnifiedTrackingMutator>();
+            services.AddSingleton<UnifiedTrackingMutator>();
             services.AddSingleton<RiskySettingsViewModel>();
             services.AddTransient<OscViewModel>();
             services.AddTransient<SettingsPage>();
@@ -125,6 +127,7 @@ public partial class App : Application
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
             services.AddSingleton<IAvatarInfo, AvatarViewModel>();
+            services.AddSingleton<IParamSupervisor, ParamSupervisor>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
