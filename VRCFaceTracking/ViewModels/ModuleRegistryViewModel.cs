@@ -51,6 +51,8 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
                 if (remoteModule.Version != installedModule.Version)
                     remoteModule.InstallationState = InstallState.Outdated;
+                else
+                    remoteModule.InstallationState = InstallState.Installed;
             }
         }
 
