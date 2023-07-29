@@ -4,6 +4,7 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.ViewModels;
+using Windows.ApplicationModel.Resources;
 
 namespace VRCFaceTracking.Views;
 
@@ -19,6 +20,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly MainViewModel _mainViewModel;
+    private static readonly ResourceLoader _loader = ResourceLoader.GetForViewIndependentUse("Resources");
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(TrackingModuleMetadata), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -44,16 +46,16 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         switch (control.ListDetailsMenuItem!.InstallationState)
         {
             case InstallState.NotInstalled:
-                control.InstallButton.Content = "Install";
+                control.InstallButton.Content = _loader.GetString("install");
                 break;
             case InstallState.Installed:
-                control.InstallButton.Content = "Uninstall";
+                control.InstallButton.Content = _loader.GetString("Uninstall");
                 break;
             case InstallState.Outdated:
-                control.InstallButton.Content = "Update";
+                control.InstallButton.Content = _loader.GetString("Update");
                 break;
             case InstallState.AwaitingRestart:
-                control.InstallButton.Content = "Please Restart VRCFT";
+                control.InstallButton.Content = _loader.GetString("PleaseRestartVRCFT");
                 control.InstallButton.IsEnabled = false;
                 break;
         }
@@ -64,7 +66,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
         {
             control.RatingControl.PlaceholderValue = rating;
             control.RatingControl.Value = rating;
-            control.RatingControl.Caption = "Your Rating";
+            control.RatingControl.Caption = _loader.GetString("YourRating");
         }
         else // Otherwise, set the rating control to the average rating.
         {
@@ -92,7 +94,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
                     await _moduleDataService.IncrementDownloadsAsync(ListDetailsMenuItem!);
                     ListDetailsMenuItem!.Downloads++;
                     _libManager.Initialize();
-                    InstallButton.Content = "Uninstall";
+                    InstallButton.Content = _loader.GetString("Uninstall");
                     InstallButton.IsEnabled = true;
                     _mainViewModel.NoModulesInstalled = false;
                 }
@@ -100,7 +102,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
             }
             case InstallState.Installed:
             {
-                InstallButton.Content = "Please Restart VRCFT";
+                InstallButton.Content = _loader.GetString("PleaseRestartVRCFT");
                 InstallButton.IsEnabled = false;
                 _libManager.TeardownAllAndResetAsync();
                 _moduleInstaller.MarkModuleForDeletion(ListDetailsMenuItem!);
@@ -113,7 +115,7 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
 
     private async void RatingControl_OnValueChanged(RatingControl sender, object args)
     {
-        RatingControl.Caption = "Your Rating";
+        RatingControl.Caption = _loader.GetString("YourRating");
         
         await _moduleDataService.SetMyRatingAsync(ListDetailsMenuItem!, (int)RatingControl.Value);
     }

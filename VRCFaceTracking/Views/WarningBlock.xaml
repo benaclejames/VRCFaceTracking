@@ -25,7 +25,7 @@
                 </StackPanel>
             </StackPanel>
             
-            <Button Grid.Column="2" Content="Dismiss" Click="DismissButton_OnClick" Margin="15, 0, 25, 0" Padding="15" />
+            <Button Grid.Column="2" x:Uid="Dismiss" Click="DismissButton_OnClick" Margin="15, 0, 25, 0" Padding="15" />
         </Grid>
     </Border>
 </UserControl>

@@ -320,4 +320,145 @@
   <data name="AutoStartSettings.Description" xml:space="preserve">
     <value>Auto Start when SteamVR is launched</value>
   </data>
+  <data name="Calibrate.Description" xml:space="preserve">
+    <value>Heighten the influence your expressions make on calibration temporarily</value>
+  </data>
+  <data name="Calibrate.Header" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="Calibration_Enabled.Description" xml:space="preserve">
+    <value>Toggles whether or not calibration is enabled</value>
+  </data>
+  <data name="Calibration_Enabled.Header" xml:space="preserve">
+    <value>Calibration Enabled</value>
+  </data>
+  <data name="Calibration_Influence.Description" xml:space="preserve">
+    <value>Controls how much of an influence your facial expressions have on overall calibration over time</value>
+  </data>
+  <data name="Calibration_Influence.Header" xml:space="preserve">
+    <value>Calibration Influence</value>
+  </data>
+  <data name="CheckingForDeletionRequests" xml:space="preserve">
+    <value>Checking for deletion requests for installed modules...</value>
+  </data>
+  <data name="CheckingForUpdates" xml:space="preserve">
+    <value>Checking for updates for installed modules...</value>
+  </data>
+  <data name="Continuous_Calibration.Description" xml:space="preserve">
+    <value>Slowly calibrates to your facial expressions over time</value>
+  </data>
+  <data name="Continuous_Calibration.Header" xml:space="preserve">
+    <value>Continuous Calibration</value>
+  </data>
+  <data name="Contributions.Text" xml:space="preserve">
+    <value>Contributions</value>
+  </data>
+  <data name="Credits.Header" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="Dismiss.Content" xml:space="preserve">
+    <value>Dismiss</value>
+  </data>
+  <data name="FailedInitializeOpenVR" xml:space="preserve">
+    <value>Failed to initialize OpenVR: {0}</value>
+  </data>
+  <data name="FailedRegisterManifest" xml:space="preserve">
+    <value>Failed to register manifest: {0}</value>
+  </data>
+  <data name="FailedSetAutoLaunch" xml:space="preserve">
+    <value>Failed to set auto launch: {0}</value>
+  </data>
+  <data name="Force_Re-Initialize.Description" xml:space="preserve">
+    <value>Force VRCFT to unload and reinitialize all modules</value>
+  </data>
+  <data name="Force_Re-Initialize.Header" xml:space="preserve">
+    <value>Force Re-Initialize</value>
+  </data>
+  <data name="Force_Relevancy.Description" xml:space="preserve">
+    <value>Forces sending of all parameters every frame by forcing relevancy</value>
+  </data>
+  <data name="Force_Relevancy.Header" xml:space="preserve">
+    <value>Force Relevancy</value>
+  </data>
+  <data name="Gremlin_Mode.OnContent" xml:space="preserve">
+    <value>Gremlin Mode</value>
+  </data>
+  <data name="InitializingMainService" xml:space="preserve">
+    <value>Initializing main service...</value>
+  </data>
+  <data name="InitializingModules" xml:space="preserve">
+    <value>Initializing modules...</value>
+  </data>
+  <data name="InitializingOSC" xml:space="preserve">
+    <value>Initializing OSC...</value>
+  </data>
+  <data name="install" xml:space="preserve">
+    <value>install</value>
+  </data>
+  <data name="Install_Module_from_zip.Text" xml:space="preserve">
+    <value>Install Module from *.zip</value>
+  </data>
+  <data name="IP_Address.Description" xml:space="preserve">
+    <value>No changes required to run VRChat localhost</value>
+  </data>
+  <data name="IP_Address.Header" xml:space="preserve">
+    <value>IP Address</value>
+  </data>
+  <data name="OpenVRService" xml:space="preserve">
+    <value>OpenVRService</value>
+  </data>
+  <data name="PleaseRestartVRCFT" xml:space="preserve">
+    <value>Please Restart VRCFT</value>
+  </data>
+  <data name="Re-Initialize.Content" xml:space="preserve">
+    <value>Re-Initialize</value>
+  </data>
+  <data name="Receive_Port.Description" xml:space="preserve">
+    <value>This port is used to receive OSC data from VRChat</value>
+  </data>
+  <data name="Receive_Port.Header" xml:space="preserve">
+    <value>Receive Port</value>
+  </data>
+  <data name="Reset.Content" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Reset_VRCFT.Description" xml:space="preserve">
+    <value>Reset all data stored by VRCFT in your AppData folder</value>
+  </data>
+  <data name="Reset_VRCFT.Header" xml:space="preserve">
+    <value>Reset VRCFT</value>
+  </data>
+  <data name="Reset_VRChat_Configs.Description" xml:space="preserve">
+    <value>Reset all VRChat OSC config data (will be regenerated when avatar is reloaded)</value>
+  </data>
+  <data name="Reset_VRChat_Configs.Header" xml:space="preserve">
+    <value>Reset VRChat Configs</value>
+  </data>
+  <data name="Send_Port.Description" xml:space="preserve">
+    <value>⚠no other program occupying the port</value>
+  </data>
+  <data name="Send_Port.Header" xml:space="preserve">
+    <value>Send Port</value>
+  </data>
+  <data name="SuccessfullyInitializedOpenVR" xml:space="preserve">
+    <value>Successfully initialized OpenVR</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="UpdatingModule" xml:space="preserve">
+    <value>Updating {moduleName} from {oldVersion} to {newVersion}</value>
+  </data>
+  <data name="VRCFTVersion" xml:space="preserve">
+    <value>VRCFT Version {version} initializing...</value>
+  </data>
+  <data name="YourRating" xml:space="preserve">
+    <value>Your Rating</value>
+  </data>
 </root>

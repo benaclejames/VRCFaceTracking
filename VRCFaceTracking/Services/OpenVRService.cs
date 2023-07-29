@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Valve.VR;
+using Windows.ApplicationModel.Resources;
 
 namespace VRCFaceTracking.Services;
 
@@ -8,17 +9,18 @@ public class OpenVRService
 {
     private CVRSystem _system;
     private ILogger _logger;
-    
+    private readonly ResourceLoader _loader = ResourceLoader.GetForViewIndependentUse("Resources");
+
     public OpenVRService(ILoggerFactory loggerFactory)
     {
-        _logger = loggerFactory.CreateLogger("OpenVRService");
+        _logger = loggerFactory.CreateLogger(_loader.GetString("OpenVRService"));
         
         EVRInitError error = EVRInitError.None;
         _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Background);
         
         if (error != EVRInitError.None)
         {
-            _logger.LogWarning("Failed to initialize OpenVR: {0}", error);
+            _logger.LogWarning(_loader.GetString("FailedInitializeOpenVR"), error);
             return;
         }
         
@@ -28,12 +30,12 @@ public class OpenVRService
         var manifestRegisterResult = OpenVR.Applications.AddApplicationManifest(fullManifestPath, false);
         if (manifestRegisterResult != EVRApplicationError.None)
         {
-            _logger.LogWarning("Failed to register manifest: {0}", manifestRegisterResult);
+            _logger.LogWarning(_loader.GetString("FailedRegisterManifest"), manifestRegisterResult);
             return;
         }
         
         IsInitialized = true;
-        _logger.LogInformation("Successfully initialized OpenVR");
+        _logger.LogInformation(_loader.GetString("SuccessfullyInitializedOpenVR"));
     }
     
     public bool IsInitialized { get; }
@@ -47,7 +49,7 @@ public class OpenVRService
                 return; 
             var setAutoLaunchResult = OpenVR.Applications.SetApplicationAutoLaunch("benaclejames.vrcft", value);
             if (setAutoLaunchResult != EVRApplicationError.None)
-                _logger.LogError("Failed to set auto launch: {0}", setAutoLaunchResult);
+                _logger.LogError(_loader.GetString("FailedSetAutoLaunch"), setAutoLaunchResult);
         }
     }
 } 
