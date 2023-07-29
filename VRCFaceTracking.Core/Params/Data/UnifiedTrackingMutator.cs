@@ -50,7 +50,7 @@ namespace VRCFaceTracking
             _dispatcherService = dispatcherService;
             _localSettingsService = localSettingsService;
             
-            Enabled = true;
+            Enabled = false;
             ContinuousCalibration = true;
             CalibrationWeight = 0.2f;
         }
@@ -177,20 +177,20 @@ namespace VRCFaceTracking
         public async Task SaveCalibration()
         {
             _logger.LogDebug("Saving configuration...");
-            await _localSettingsService.SaveSettingAsync("Mutation", mutationData);
+            await _localSettingsService.SaveSettingAsync("CalibrationEnabled", Enabled);
+            await _localSettingsService.SaveSettingAsync("CalibrationWeight", CalibrationWeight);
+            await _localSettingsService.SaveSettingAsync("ContinuousCalibrationEnabled", ContinuousCalibration);
+            await _localSettingsService.SaveSettingAsync("Mutations", mutationData, true);
         }
 
         public async void LoadCalibration()
         {
             // Try to load config and propogate data into Unified if they exist.
             _logger.LogDebug("Reading configuration...");
-            mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation");
-            // If the config is null, create a new one.
-            if (mutationData.ShapeMutations == null)
-            {
-                _logger.LogDebug("Configuration not found. Creating new configuration...");
-                mutationData = new();
-            }
+            Enabled = await _localSettingsService.ReadSettingAsync<bool>("CalibrationEnabled");
+            CalibrationWeight = await _localSettingsService.ReadSettingAsync<float>("CalibrationWeight", 0.2f);
+            ContinuousCalibration = await _localSettingsService.ReadSettingAsync<bool>("ContinuousCalibrationEnabled", true);
+            mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation", new());
             _logger.LogDebug("Configuration loaded.");
         }
 

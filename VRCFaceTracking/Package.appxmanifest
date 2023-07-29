@@ -8,13 +8,12 @@
   xmlns:genTemplate="http://schemas.microsoft.com/appx/developer/templatestudio"
   xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
-    xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
     Name="96ba052f-0948-44d8-86c4-a0212e4ae047"
     Publisher="CN=E=benaclejames@gmail.com, &quot;Open Source Developer, Benjamin Thomas&quot;, O=Open Source Developer, L=Gloucester, S=Gloucestershire, C=GB"
-    Version="5.0.2.3" />
+    Version="5.1.1.0" />
     
   <mp:PhoneIdentity PhoneProductId="96ba052f-0948-44d8-86c4-a0212e4ae047" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
@@ -22,8 +21,6 @@
     <DisplayName>VRCFaceTracking</DisplayName>
     <PublisherDisplayName>benaclejames</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
-    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
-    <desktop6:RegistryWriteVirtualization>disabled</desktop6:RegistryWriteVirtualization>
   </Properties>
 
   <Dependencies>
@@ -70,7 +67,6 @@
   </Applications>
 
   <Capabilities>
-    <rescap:Capability Name="unvirtualizedResources" />
     <rescap:Capability Name="runFullTrust" />
     <Capability Name="internetClientServer"/>
   </Capabilities>

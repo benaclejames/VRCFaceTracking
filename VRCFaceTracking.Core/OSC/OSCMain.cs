@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -13,6 +14,7 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
+        private readonly IParamSupervisor _paramSupervisor;
 
         public Action OnMessageDispatched { get; set; }
         public Action<OscMessage> OnMessageReceived { get; set; }
@@ -20,7 +22,8 @@ namespace VRCFaceTracking.Core.OSC
         public bool IsConnected { get; set; }
 
 
-        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
+        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory,
+            ConfigParser configParser, IParamSupervisor paramSupervisor)
         {
             _localSettingsService = localSettingsService;
             _configParser = configParser;
@@ -28,6 +31,7 @@ namespace VRCFaceTracking.Core.OSC
             OnMessageDispatched = () => { };
             OnMessageReceived = HandleNewMessage;
             OnConnectedDisconnected = b => {IsConnected = b;};
+            _paramSupervisor = paramSupervisor;
         }
 
         public int InPort { get; set; }
@@ -167,7 +171,7 @@ namespace VRCFaceTracking.Core.OSC
                     _configParser.ParseNewAvatar(msg.Value as string);
                     break;
                 case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
-                    //_mainService.AllParametersRelevant = (bool)msg.Value;
+                    _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":

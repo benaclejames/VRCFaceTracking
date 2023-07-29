@@ -130,7 +130,7 @@
                             Header="Force Relevancy"
                             IsEnabled="False"
                             Description="Forces sending of all parameters every frame by forcing relevancy">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllParametersRelevant, Mode=TwoWay}" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="forceReInit"
@@ -194,11 +194,6 @@
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="OpenLocalStorageCard" IsClickEnabled="True" Click="openLocalFolder_OnClick">
-                            <labs:SettingsCard.ActionIcon>
-                                    <FontIcon FontSize="20" Glyph="&#xEC50;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="CloneRepoCard">
                             <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

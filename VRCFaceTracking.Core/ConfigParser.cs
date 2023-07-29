@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.OSC;
 
@@ -90,7 +87,8 @@ namespace VRCFaceTracking
                 return;
             }
 
-            //_logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
+            _logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
+            ParamSupervisor.SendQueue.Clear();
             var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
 
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
