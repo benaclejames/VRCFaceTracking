@@ -25,7 +25,7 @@ public class ActivationService : IActivationService
     private readonly ILogger _logger;
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
         IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
         IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
         ILoggerFactory loggerFactory)
@@ -88,9 +88,9 @@ public class ActivationService : IActivationService
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
-
+        
         _logger.LogInformation("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
-
+        
         _logger.LogInformation("Initializing OSC...");
         await _oscService.InitializeAsync().ConfigureAwait(false);
 
@@ -103,7 +103,7 @@ public class ActivationService : IActivationService
             .Where(m => m.InstallationState == InstallState.AwaitingRestart);
         foreach (var deleteModule in needsDeleting)
             _moduleInstaller.UninstallModule(deleteModule);
-
+        
         _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
         var remoteModules = await _moduleDataService.GetRemoteModules();
@@ -113,10 +113,10 @@ public class ActivationService : IActivationService
             _logger.LogInformation($"Updating {outdatedModule.ModuleName} from {localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version} to {outdatedModule.Version}");
             await _moduleInstaller.InstallRemoteModule(outdatedModule);
         }
-
+        
         _logger.LogInformation("Initializing modules...");
         App.MainWindow.DispatcherQueue.TryEnqueue(() => _libManager.Initialize());
-
+        
         await Task.CompletedTask;
     }
 }
