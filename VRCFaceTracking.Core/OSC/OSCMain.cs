@@ -1,9 +1,8 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -122,6 +121,30 @@ namespace VRCFaceTracking.Core.OSC
             catch
             {
                 _logger.LogError("Failed to bind to port {0}", InPort);
+                // Now we find the app that's bound to the port and log it
+                var p = new Process();
+                p.StartInfo.FileName = "netstat.exe";
+                p.StartInfo.Arguments = "-a -n -o";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+                
+                var output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+                
+                // Find the line with the port we're trying to bind to
+                var lines = output.Split('\n');
+                foreach (var line in lines)
+                {
+                    if (!line.Contains(InPort.ToString())) continue;
+                    // Get the PID
+                    var pid = line.Split(' ').Last().Trim();
+                    // Get the process
+                    var proc = Process.GetProcessById(int.Parse(pid));
+                    _logger.LogError("Port {0} is already bound by {1}", InPort, proc.ProcessName);
+                    break;
+                }
+                
                 OnConnectedDisconnected(false);
                 return false;
             }
