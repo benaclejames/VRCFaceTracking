@@ -120,6 +120,7 @@ public class ModuleInstaller
         // First we need to create the directory for the module. If it already exists, we'll delete it and start fresh.
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         UninstallModule(moduleMetadata);
+        Directory.CreateDirectory(moduleDirectory);
         
         // Time to download the main files
         var downloadExtension = Path.GetExtension(moduleMetadata.DownloadUrl);
@@ -137,8 +138,6 @@ public class ModuleInstaller
             
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
-            if (Directory.Exists(moduleDirectory))
-                Directory.Delete(moduleDirectory, true);
             Directory.Move(tempDirectory, moduleDirectory);
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
