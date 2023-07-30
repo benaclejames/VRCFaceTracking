@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.ApplicationModel.Resources;
 
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
@@ -24,10 +23,9 @@ public class ActivationService : IActivationService
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly ILogger _logger;
-    private readonly ResourceLoader _loader = ResourceLoader.GetForViewIndependentUse("Resources");
     private UIElement? _shell = null;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
+    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
         IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
         IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
         ILoggerFactory loggerFactory)
@@ -40,7 +38,7 @@ public class ActivationService : IActivationService
         _moduleDataService = moduleDataService;
         _moduleInstaller = moduleInstaller;
         _libManager = libManager;
-        _logger = loggerFactory.CreateLogger(_loader.GetString("MainStandalone"));
+        _logger = loggerFactory.CreateLogger("MainStandalone");
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -90,35 +88,35 @@ public class ActivationService : IActivationService
     private async Task StartupAsync()
     {
         await _themeSelectorService.SetRequestedThemeAsync();
-        
-        _logger.LogInformation(_loader.GetString("VRCFTVersion"), Assembly.GetExecutingAssembly().GetName().Version);
-        
-        _logger.LogInformation(_loader.GetString("InitializingOSC"));
+
+        _logger.LogInformation("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
+
+        _logger.LogInformation("Initializing OSC...");
         await _oscService.InitializeAsync().ConfigureAwait(false);
 
-        _logger.LogInformation(_loader.GetString("InitializingMainService"));
+        _logger.LogInformation("Initializing main service...");
         await _mainService.InitializeAsync().ConfigureAwait(false);
 
         // Before we initialize, we need to delete pending restart modules and check for updates for all our installed modules
-        _logger.LogDebug(_loader.GetString("CheckingForDeletionRequests"));
+        _logger.LogDebug("Checking for deletion requests for installed modules...");
         var needsDeleting = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules())
             .Where(m => m.InstallationState == InstallState.AwaitingRestart);
         foreach (var deleteModule in needsDeleting)
             _moduleInstaller.UninstallModule(deleteModule);
-        
-        _logger.LogInformation(_loader.GetString("CheckingForUpdates"));
+
+        _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
         var remoteModules = await _moduleDataService.GetRemoteModules();
         var outdatedModules = remoteModules.Where(rm => localModules.Any(lm => rm.ModuleId == lm.ModuleId && rm.Version != lm.Version));
         foreach (var outdatedModule in outdatedModules)
         {
-            _logger.LogInformation(string.Format(_loader.GetString("UpdatingModule"), outdatedModule.ModuleName, localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version, outdatedModule.Version));
+            _logger.LogInformation($"Updating {outdatedModule.ModuleName} from {localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version} to {outdatedModule.Version}");
             await _moduleInstaller.InstallRemoteModule(outdatedModule);
         }
-        
-        _logger.LogInformation(_loader.GetString("InitializingModules"));
+
+        _logger.LogInformation("Initializing modules...");
         App.MainWindow.DispatcherQueue.TryEnqueue(() => _libManager.Initialize());
-        
+
         await Task.CompletedTask;
     }
 }

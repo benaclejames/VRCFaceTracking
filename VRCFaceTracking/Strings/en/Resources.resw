@@ -341,12 +341,6 @@
   <data name="Calibration_Influence.Header" xml:space="preserve">
     <value>Calibration Influence</value>
   </data>
-  <data name="CheckingForDeletionRequests" xml:space="preserve">
-    <value>Checking for deletion requests for installed modules...</value>
-  </data>
-  <data name="CheckingForUpdates" xml:space="preserve">
-    <value>Checking for updates for installed modules...</value>
-  </data>
   <data name="Continuous_Calibration.Description" xml:space="preserve">
     <value>Slowly calibrates to your facial expressions over time</value>
   </data>
@@ -361,15 +355,6 @@
   </data>
   <data name="Dismiss.Content" xml:space="preserve">
     <value>Dismiss</value>
-  </data>
-  <data name="FailedInitializeOpenVR" xml:space="preserve">
-    <value>Failed to initialize OpenVR: {0}</value>
-  </data>
-  <data name="FailedRegisterManifest" xml:space="preserve">
-    <value>Failed to register manifest: {0}</value>
-  </data>
-  <data name="FailedSetAutoLaunch" xml:space="preserve">
-    <value>Failed to set auto launch: {0}</value>
   </data>
   <data name="Force_Re-Initialize.Description" xml:space="preserve">
     <value>Force VRCFT to unload and reinitialize all modules</value>
@@ -386,17 +371,8 @@
   <data name="Gremlin_Mode.OnContent" xml:space="preserve">
     <value>Gremlin Mode</value>
   </data>
-  <data name="InitializingMainService" xml:space="preserve">
-    <value>Initializing main service...</value>
-  </data>
-  <data name="InitializingModules" xml:space="preserve">
-    <value>Initializing modules...</value>
-  </data>
-  <data name="InitializingOSC" xml:space="preserve">
-    <value>Initializing OSC...</value>
-  </data>
   <data name="install" xml:space="preserve">
-    <value>install</value>
+    <value>Install</value>
   </data>
   <data name="Install_Module_from_zip.Text" xml:space="preserve">
     <value>Install Module from *.zip</value>
@@ -406,9 +382,6 @@
   </data>
   <data name="IP_Address.Header" xml:space="preserve">
     <value>IP Address</value>
-  </data>
-  <data name="OpenVRService" xml:space="preserve">
-    <value>OpenVRService</value>
   </data>
   <data name="PleaseRestartVRCFT" xml:space="preserve">
     <value>Please Restart VRCFT</value>
@@ -443,20 +416,11 @@
   <data name="Send_Port.Header" xml:space="preserve">
     <value>Send Port</value>
   </data>
-  <data name="SuccessfullyInitializedOpenVR" xml:space="preserve">
-    <value>Successfully initialized OpenVR</value>
-  </data>
   <data name="Uninstall" xml:space="preserve">
     <value>Uninstall</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
-  </data>
-  <data name="UpdatingModule" xml:space="preserve">
-    <value>Updating {moduleName} from {oldVersion} to {newVersion}</value>
-  </data>
-  <data name="VRCFTVersion" xml:space="preserve">
-    <value>VRCFT Version {version} initializing...</value>
   </data>
   <data name="YourRating" xml:space="preserve">
     <value>Your Rating</value>

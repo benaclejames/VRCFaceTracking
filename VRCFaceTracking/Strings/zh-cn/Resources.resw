@@ -305,12 +305,6 @@
   <data name="Calibration_Influence.Header" xml:space="preserve">
     <value>校准影响强度</value>
   </data>
-  <data name="CheckingForDeletionRequests" xml:space="preserve">
-    <value>检查已安装模块的删除请求…</value>
-  </data>
-  <data name="CheckingForUpdates" xml:space="preserve">
-    <value>检查已安装模块的更新…</value>
-  </data>
   <data name="Continuous_Calibration.Description" xml:space="preserve">
     <value>随着时间的推移，它会慢慢适应你的面部表情</value>
   </data>
@@ -329,15 +323,6 @@
   <data name="Dismiss.Content" xml:space="preserve">
     <value>忽略</value>
   </data>
-  <data name="FailedInitializeOpenVR" xml:space="preserve">
-    <value>无法初始化OpenVR：{0}</value>
-  </data>
-  <data name="FailedRegisterManifest" xml:space="preserve">
-    <value>注册Manifest失败：{0}</value>
-  </data>
-  <data name="FailedSetAutoLaunch" xml:space="preserve">
-    <value>无法设置自动启动：{0}</value>
-  </data>
   <data name="Force_Re-Initialize.Description" xml:space="preserve">
     <value>强制 VRCFT 卸载并重新初始化所有模块</value>
   </data>
@@ -352,15 +337,6 @@
   </data>
   <data name="Gremlin_Mode.OnContent" xml:space="preserve">
     <value>高危模式</value>
-  </data>
-  <data name="InitializingMainService" xml:space="preserve">
-    <value>初始化主服务…</value>
-  </data>
-  <data name="InitializingModules" xml:space="preserve">
-    <value>初始化模块…</value>
-  </data>
-  <data name="InitializingOSC" xml:space="preserve">
-    <value>初始化OSC…</value>
   </data>
   <data name="install" xml:space="preserve">
     <value>安装</value>
@@ -380,9 +356,6 @@
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
     <value>OSC并不支持本地测试Avatar，可能会出大问题...</value>
   </data>
-  <data name="MainStandalone" xml:space="preserve">
-    <value>主线程</value>
-  </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
     <value>在这里安装一些模块！</value>
   </data>
@@ -391,9 +364,6 @@
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
     <value>打开本地模块位置</value>
-  </data>
-  <data name="OpenVRService" xml:space="preserve">
-    <value>OpenVR服务</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
     <value>OSC地址</value>
@@ -443,9 +413,6 @@
   <data name="Send_Port.Header" xml:space="preserve">
     <value>发送端口</value>
   </data>
-  <data name="SuccessfullyInitializedOpenVR" xml:space="preserve">
-    <value>成功初始化OpenVR</value>
-  </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
     <value>主题设置</value>
   </data>
@@ -454,12 +421,6 @@
   </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>
-  </data>
-  <data name="UpdatingModule" xml:space="preserve">
-    <value>正在将{moduleName}从{oldVersion}更新到{newVersion}</value>
-  </data>
-  <data name="VRCFTVersion" xml:space="preserve">
-    <value>v{version}版的VRCFT正在初始化…</value>
   </data>
   <data name="YourRating" xml:space="preserve">
     <value>你给予的星星</value>
