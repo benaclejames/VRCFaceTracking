@@ -21,7 +21,7 @@
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
-    <AssemblyVersion>5.1.1.0</AssemblyVersion>
+    <AssemblyVersion>5.1.1.1</AssemblyVersion>
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/latest/download/</AppInstallerUri>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
   </PropertyGroup>

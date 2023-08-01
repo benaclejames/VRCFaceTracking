@@ -8,14 +8,17 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleInstaller
 {
-    private readonly ILogger<ModuleInstaller> _logger;
+    private readonly ILogger _logger;
 
-    public ModuleInstaller(ILogger<ModuleInstaller> logger)
+    public ModuleInstaller(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("ModuleInstaller");
+        
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
     }
 
-    private async Task DownloadToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
@@ -109,9 +112,6 @@ public class ModuleInstaller
 
     public async Task<string> InstallRemoteModule(TrackingModuleMetadata moduleMetadata)
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
-        
         // If our download type is not a .dll, we'll download to a temp directory and then extract to the modules directory
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as
@@ -132,7 +132,7 @@ public class ModuleInstaller
             }
             Directory.CreateDirectory(tempDirectory);
             var tempZipPath = Path.Combine(tempDirectory, "module.zip");
-            await DownloadToFile(moduleMetadata, tempZipPath);
+            await DownloadModuleToFile(moduleMetadata, tempZipPath);
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
             
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
@@ -153,7 +153,7 @@ public class ModuleInstaller
             var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
             
             Directory.CreateDirectory(moduleDirectory);
-            await DownloadToFile(moduleMetadata, dllPath);
+            await DownloadModuleToFile(moduleMetadata, dllPath);
             
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);
         }
