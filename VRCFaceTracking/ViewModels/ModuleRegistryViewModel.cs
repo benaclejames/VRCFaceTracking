@@ -39,6 +39,7 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
         var localModules = new List<InstallableTrackingModule>();    // dw about it
         foreach (var installedModule in installedModules)
         {
+            installedModule.InstallationState = InstallState.Installed;
             var remoteModule = data.FirstOrDefault(x => x.ModuleId == installedModule.ModuleId);
             if (remoteModule == null)   // If this module is completely missing from the remote list, then we need to add it to the list.
             {
@@ -48,7 +49,10 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
             else
             {
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
-                remoteModule.InstallationState = remoteModule.Version != installedModule.Version ? InstallState.Outdated : InstallState.Installed;
+                if (remoteModule.Version != installedModule.Version)
+                    remoteModule.InstallationState = InstallState.Outdated;
+                else
+                    remoteModule.InstallationState = InstallState.Installed;
             }
         }
 

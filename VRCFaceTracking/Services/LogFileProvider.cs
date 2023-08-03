@@ -11,10 +11,10 @@ public class LogFileProvider : ILoggerProvider
     
     public LogFileProvider()
     {
-        if (!Directory.Exists(Utils.PersistentDataDirectory))   // Eat my ass windows
-            Directory.CreateDirectory(Utils.PersistentDataDirectory);
+        if (!Directory.Exists(Utils.UserAccessibleDataDirectory))   // Eat my ass windows
+            Directory.CreateDirectory(Utils.UserAccessibleDataDirectory);
     
-        var logPath = Path.Combine(Utils.PersistentDataDirectory, "latest" + ".log");
+        var logPath = Path.Combine(Utils.UserAccessibleDataDirectory, "latest.log");
         _file = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough);
         _writer = new StreamWriter(_file);
     }

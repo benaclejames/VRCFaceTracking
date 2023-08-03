@@ -8,14 +8,17 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleInstaller
 {
-    private readonly ILogger<ModuleInstaller> _logger;
+    private readonly ILogger _logger;
 
-    public ModuleInstaller(ILogger<ModuleInstaller> logger)
+    public ModuleInstaller(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("ModuleInstaller");
+        
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
     }
 
-    private async Task DownloadToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
@@ -51,12 +54,64 @@ public class ModuleInstaller
             moduleMetadata.ModuleId, dllFile.FileName, dllFile.Distance);
         return Path.GetFileName(dllFile.FileName);
     }
-    
+
+    public async Task<string> InstallLocalModule(string zipPath)
+    {
+        // First, we copy the zip to our custom libs directory
+        var fileName = Path.GetFileName(zipPath);
+        var newZipPath = Path.Combine(Utils.CustomLibsDirectory, fileName);
+        File.Copy(zipPath, newZipPath, true);
+        
+        // Second, we unzip it 
+        var tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipPath));
+        if (Directory.Exists(tempDirectory))
+        {
+            Directory.Delete(tempDirectory, true);
+        }
+        Directory.CreateDirectory(tempDirectory);
+        ZipFile.ExtractToDirectory(newZipPath, tempDirectory);
+        File.Delete(newZipPath);
+
+        // Now, we need to find the module.json file and deserialize it
+        var moduleJsonPath = Path.Combine(tempDirectory, "module.json");
+        if (!File.Exists(moduleJsonPath))
+        {
+            _logger.LogError("Module {module} does not contain a module.json file", fileName);
+            Directory.Delete(tempDirectory, true);
+            return null;
+        }
+        
+        var moduleMetadata = JsonConvert.DeserializeObject<TrackingModuleMetadata>(await File.ReadAllTextAsync(moduleJsonPath));
+        if (moduleMetadata == null)
+        {
+            _logger.LogError("Module {module} contains an invalid module.json file", fileName);
+            Directory.Delete(tempDirectory, true);
+            return null;
+        }
+        
+        // Now we move to a directory named after the module id and delete the temp directory
+        var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
+        if (Directory.Exists(moduleDirectory))
+            Directory.Delete(moduleDirectory, true);
+        Directory.Move(tempDirectory, moduleDirectory);
+        
+        // Now we need to find the module's dll
+        moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
+        if (moduleMetadata.DllFileName == null)
+        {
+            _logger.LogError("Module {module} has no .dll file name specified and no .dll files were found in the extracted zip", moduleMetadata.ModuleId);
+            return null;
+        }
+        
+        // Now we write the module.json file to the module directory
+        await File.WriteAllTextAsync(Path.Combine(moduleDirectory, "module.json"), JsonConvert.SerializeObject(moduleMetadata, Formatting.Indented));
+        
+        // Finally, we return the module's dll file name
+        return Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
+    }
+
     public async Task<string> InstallRemoteModule(TrackingModuleMetadata moduleMetadata)
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
-        
         // If our download type is not a .dll, we'll download to a temp directory and then extract to the modules directory
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as
@@ -65,8 +120,7 @@ public class ModuleInstaller
         // First we need to create the directory for the module. If it already exists, we'll delete it and start fresh.
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         UninstallModule(moduleMetadata);
-        Directory.CreateDirectory(moduleDirectory);
-        
+
         // Time to download the main files
         var downloadExtension = Path.GetExtension(moduleMetadata.DownloadUrl);
         if (downloadExtension != ".dll")
@@ -78,22 +132,12 @@ public class ModuleInstaller
             }
             Directory.CreateDirectory(tempDirectory);
             var tempZipPath = Path.Combine(tempDirectory, "module.zip");
-            await DownloadToFile(moduleMetadata, tempZipPath);
+            await DownloadModuleToFile(moduleMetadata, tempZipPath);
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
             
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
-            foreach (var file in Directory.GetFiles(tempDirectory, "*", SearchOption.AllDirectories))
-            {
-                var path = Path.GetDirectoryName(file);
-                var newPath = path?.Replace(tempDirectory, moduleDirectory);
-                if (newPath != null)
-                {
-                    Directory.CreateDirectory(newPath);
-                    File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
-                }
-            }
-            Directory.Delete(tempDirectory, true);
+            Directory.Move(tempDirectory, moduleDirectory);
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
             moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
@@ -108,7 +152,8 @@ public class ModuleInstaller
             moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
             var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
             
-            await DownloadToFile(moduleMetadata, dllPath);
+            Directory.CreateDirectory(moduleDirectory);
+            await DownloadModuleToFile(moduleMetadata, dllPath);
             
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);
         }

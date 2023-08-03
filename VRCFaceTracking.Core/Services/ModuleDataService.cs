@@ -169,4 +169,5 @@ public class ModuleDataService : IModuleDataService
         }
 
         return installedModules;
-    } }
+    } 
+}
