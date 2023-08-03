@@ -19,7 +19,7 @@ public class LocalSettingsService : ILocalSettingsService
     private readonly IFileService _fileService;
     private readonly LocalSettingsOptions _options;
 
-    private readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private readonly string _localApplicationData = Utils.PersistentDataDirectory;
     private readonly string _applicationDataFolder;
     private readonly string _localsettingsFile;
 
@@ -48,9 +48,9 @@ public class LocalSettingsService : ILocalSettingsService
         }
     }
 
-    public async Task<T?> ReadSettingAsync<T>(string key)
+    public async Task<T?> ReadSettingAsync<T>(string key, T? defaultValue = default, bool forceLocal = false)
     {
-        if (RuntimeHelper.IsMSIX)
+        if (RuntimeHelper.IsMSIX && !forceLocal)
         {
             if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
             {
@@ -67,12 +67,12 @@ public class LocalSettingsService : ILocalSettingsService
             }
         }
 
-        return default;
+        return defaultValue;
     }
 
-    public async Task SaveSettingAsync<T>(string key, T value)
+    public async Task SaveSettingAsync<T>(string key, T value, bool forceLocal = false)
     {
-        if (RuntimeHelper.IsMSIX)
+        if (RuntimeHelper.IsMSIX && !forceLocal)
         {
             ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value);
         }

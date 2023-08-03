@@ -27,6 +27,8 @@ public class ModuleDataService : IModuleDataService
         // and get the list of modules.
         var client = new HttpClient();
         var response = client.GetAsync("https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/modules").Result;
+        if (!response.IsSuccessStatusCode)
+            return new List<InstallableTrackingModule>();
         var content = response.Content.ReadAsStringAsync().Result;
         return JsonConvert.DeserializeObject<List<InstallableTrackingModule>>(content);
     }
@@ -167,4 +169,5 @@ public class ModuleDataService : IModuleDataService
         }
 
         return installedModules;
-    } }
+    } 
+}

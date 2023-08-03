@@ -44,6 +44,13 @@ public class MainViewModel : ObservableRecipient
         set => SetProperty(ref _noModulesInstalled, value);
     }
     
+    private bool _oscWasDisabled;
+    public bool OscWasDisabled
+    {
+        get => true;
+        set => SetProperty(ref _oscWasDisabled, value);
+    }
+    
     private bool _isRecvConnected;
     public bool IsRecvConnected
     {

@@ -11,7 +11,7 @@
               Uri="{MainPackageUri}"/>
 
   <UpdateSettings>
-    <OnLaunch HoursBetweenUpdateChecks="12" ShowPrompt="true" UpdateBlocksActivation="false" />
+    <OnLaunch HoursBetweenUpdateChecks="12" ShowPrompt="false" UpdateBlocksActivation="false" />
   </UpdateSettings>
 
 </AppInstaller>

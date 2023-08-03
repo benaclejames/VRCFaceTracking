@@ -9,7 +9,8 @@
         Name="ForegroundElement"
         HorizontalAlignment="Stretch"
         VerticalScrollMode="Enabled"
-        IsTabStop="True">
+        IsTabStop="True"
+        Margin="10, 0, 0, 0">
         <StackPanel HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <TextBlock
@@ -19,6 +20,10 @@
                     Style="{ThemeResource TitleTextBlockStyle}" />
             </StackPanel>
             <StackPanel Padding="0,15,0,0">
+                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
+
+                <AppBarSeparator/>
+                
                 <TextBlock x:Uid="Author" Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.AuthorName, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
 
@@ -65,10 +70,6 @@
                     x:Uid="UsageInstructions"
                     Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.UsageInstructions, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
-                
-                <AppBarSeparator/>
-                
-                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
                 
             </StackPanel>
         </StackPanel>

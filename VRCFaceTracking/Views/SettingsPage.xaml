@@ -5,16 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
-    xmlns:helpers1="using:VRCFaceTracking.Helpers"
+    xmlns:models="using:VRCFaceTracking.Models"
     mc:Ignorable="d">
     <Page.Resources>
-        <helpers1:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-        <!--  These styles can be referenced to create a consistent SettingsPage layout  -->
-
-        <!--  Spacing between cards  -->
         <x:Double x:Key="SettingsCardSpacing">3</x:Double>
-
-        <!--  Style (inc. the correct spacing) of a section header  -->
         <Style
             x:Key="SettingsSectionHeaderTextBlockStyle"
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
@@ -26,15 +20,12 @@
     </Page.Resources>
     <Grid>
         <ScrollViewer
-            x:Name="contentSV"
-            Grid.Row="1"
             Padding="0,0,0,0"
             IsTabStop="False"
             UseSystemFocusVisuals="False"
             VerticalScrollBarVisibility="Auto"
             VerticalScrollMode="Auto">
             <StackPanel
-                x:Name="ContentArea"
                 Spacing="{StaticResource SettingsCardSpacing}">
                 <StackPanel.ChildrenTransitions>
                     <EntranceThemeTransition FromVerticalOffset="50" />
@@ -64,24 +55,28 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                            <NumberBox x:Name="RecvPort"
+                            <NumberBox
                                 Header="Receive Port"
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10"
                                 Margin="15, 0, 15, 0"
+                                Minimum="0"
+                                Maximum="65535"
                                 Value="{x:Bind OscViewModel.RecvPort, Mode=TwoWay}"/>
                             
-                            <TextBox x:Name="Address" 
+                            <TextBox
                                      Header="IP Address" 
                                      PlaceholderText="127.0.0.1" 
                                      Text="{x:Bind OscViewModel.Address, Mode=TwoWay}"/>
                             
-                            <NumberBox x:Name="SendPort"
+                            <NumberBox
                                 Header="Send Port"
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10" 
+                                Minimum="0"
+                                Maximum="65535"
                                 Margin="15, 0, 15, 0"
                                 Value="{x:Bind OscViewModel.SendPort, Mode=TwoWay}"/>
                         </StackPanel>
@@ -117,6 +112,13 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 
+                <labs:SettingsCard x:Uid="AutoStartSettings" IsEnabled="{x:Bind ViewModel.IsOpenVREnabled, Mode=OneWay}">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE840;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"/>
+                </labs:SettingsCard>
+                
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
@@ -128,7 +130,7 @@
                             Header="Force Relevancy"
                             IsEnabled="False"
                             Description="Forces sending of all parameters every frame by forcing relevancy">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllParametersRelevant, Mode=TwoWay}" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="forceReInit"
@@ -157,21 +159,41 @@
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
+                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard HorizontalContentAlignment="Stretch"
+                                           ContentAlignment="Vertical"
+                                           x:Uid="ContributorsCard">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:GithubContributor">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Left alligned hyperlink w/ text -->
+                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{x:Bind login}" NavigateUri="{x:Bind html_url}"/>
+                                                
+                                                <!-- Right alligned text -->
+                                                <TextBlock Grid.Column="1" Text="{x:Bind contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                                <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                    
                 <labs:SettingsExpander x:Uid="Copyright" Header="VRCFaceTracking">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <BitmapIcon UriSource="/Assets/Square44x44Logo.png" />
-                    </labs:SettingsExpander.HeaderIcon>
                     <TextBlock
                             Margin="0,-2,0,0"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="OpenLocalStorageCard" IsClickEnabled="True">
-                            <labs:SettingsCard.ActionIcon>
-                                    <FontIcon FontSize="20" Glyph="&#xEC50;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="CloneRepoCard">
                             <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -179,9 +201,9 @@
                                     Text="git clone https://github.com/benaclejames/VRCFaceTracking" />
                         </labs:SettingsCard>
                         <labs:SettingsCard
-                                x:Name="bugRequestCard"
                                 x:Uid="BugRequestCard"
-                                IsClickEnabled="True">
+                                IsClickEnabled="True"
+                                Click="bugRequestCard_Click">
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>

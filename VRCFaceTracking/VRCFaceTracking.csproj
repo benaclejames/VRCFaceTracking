@@ -21,7 +21,7 @@
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
-    <AssemblyVersion>5.0.2.0</AssemblyVersion>
+    <AssemblyVersion>5.1.1.1</AssemblyVersion>
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/latest/download/</AppInstallerUri>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
   </PropertyGroup>
@@ -37,6 +37,13 @@
     <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
     <Content Remove="Assets\StoreLogo.scale-125.png" />
     <Content Remove="Assets\StoreLogo.scale-150.png" />
+    <None Remove="OpenVR\openvr_api.dll" />
+    <Content Include="OpenVR\openvr_api.dll" Link="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OpenVR\app.vrmanifest" Link="app.vrmanifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

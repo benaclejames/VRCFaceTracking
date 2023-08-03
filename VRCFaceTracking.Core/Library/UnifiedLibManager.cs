@@ -303,7 +303,6 @@ public class UnifiedLibManager : ILibManager
             }
 
             modulePair.module.Teardown();
-            modulePair.alc.Unload();    //TODO: Ensure this doesn't cause a crash
             ModuleMetadatas.Remove(modulePair.module.ModuleInformation);
         }
 

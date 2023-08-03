@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
@@ -12,14 +13,16 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
+        private readonly IParamSupervisor _paramSupervisor;
 
         public Action OnMessageDispatched { get; set; }
-        public Action<OscMessageMeta> OnMessageReceived { get; set; }
+        public Action<OscMessage> OnMessageReceived { get; set; }
         public Action<bool> OnConnectedDisconnected { get; set; } = b => { };
         public bool IsConnected { get; set; }
 
 
-        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory, ConfigParser configParser)
+        public OscMain(ILocalSettingsService localSettingsService, ILoggerFactory loggerFactory,
+            ConfigParser configParser, IParamSupervisor paramSupervisor)
         {
             _localSettingsService = localSettingsService;
             _configParser = configParser;
@@ -27,6 +30,7 @@ namespace VRCFaceTracking.Core.OSC
             OnMessageDispatched = () => { };
             OnMessageReceived = HandleNewMessage;
             OnConnectedDisconnected = b => {IsConnected = b;};
+            _paramSupervisor = paramSupervisor;
         }
 
         public int InPort { get; set; }
@@ -117,6 +121,30 @@ namespace VRCFaceTracking.Core.OSC
             catch
             {
                 _logger.LogError("Failed to bind to port {0}", InPort);
+                // Now we find the app that's bound to the port and log it
+                var p = new Process();
+                p.StartInfo.FileName = "netstat.exe";
+                p.StartInfo.Arguments = "-a -n -o";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+                
+                var output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+                
+                // Find the line with the port we're trying to bind to
+                var lines = output.Split('\n');
+                foreach (var line in lines)
+                {
+                    if (!line.Contains(InPort.ToString())) continue;
+                    // Get the PID
+                    var pid = line.Split(' ').Last().Trim();
+                    // Get the process
+                    var proc = Process.GetProcessById(int.Parse(pid));
+                    _logger.LogError("Port {0} is already bound by {1}", InPort, proc.ProcessName);
+                    break;
+                }
+                
                 OnConnectedDisconnected(false);
                 return false;
             }
@@ -144,10 +172,11 @@ namespace VRCFaceTracking.Core.OSC
         {
             try
             {
-                int bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
-                var newMsg = new OscMessage(buffer, bytesReceived);
+                var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                var offset = 0;
+                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
                 Array.Clear(buffer, 0, bytesReceived);
-                OnMessageReceived(newMsg._meta);
+                OnMessageReceived(newMsg);
             }
             catch (Exception e)
             {
@@ -157,12 +186,15 @@ namespace VRCFaceTracking.Core.OSC
             }
         }
         
-        private void HandleNewMessage(OscMessageMeta msg)
+        private void HandleNewMessage(OscMessage msg)
         {
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value.StringValue);
+                    _configParser.ParseNewAvatar(msg.Value as string);
+                    break;
+                case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
+                    _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":

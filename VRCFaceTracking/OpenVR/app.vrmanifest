@@ -1,0 +1,18 @@
+{
+	"source": "builtin",
+	"applications": [
+		{
+			"app_key": "benaclejames.vrcft",
+			"launch_type": "binary",
+			"binary_path_windows": "VRCFaceTracking.exe",
+			"is_dashboard_overlay": true,
+
+			"strings": {
+				"en_us": {
+					"name": "VRCFaceTracking",
+					"description": "VRCFaceTracking provides a bridge between facial tracking hardware and VRChat."
+				}
+			}
+		}
+	]
+}

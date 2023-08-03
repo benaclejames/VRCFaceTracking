@@ -9,9 +9,11 @@ public sealed partial class MainWindow : WindowEx
     {
         InitializeComponent();
         
-        AppWindow.Closing += (window, args) =>
+        AppWindow.Closing += async (window, args) =>
         {
-            App.GetService<IMainService>().Teardown();
+            args.Cancel = true;
+            await App.GetService<IMainService>().Teardown();
+            Close();
         };
 
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets/WindowIcon.ico"));
