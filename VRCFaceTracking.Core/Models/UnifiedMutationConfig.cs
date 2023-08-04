@@ -1,33 +1,20 @@
-﻿using VRCFaceTracking.Core.Params.Expressions;
+﻿using System.Linq;
+using VRCFaceTracking.Core.Params.Expressions;
+using VRCFaceTracking.Mutators;
 
 namespace VRCFaceTracking.Core.Models;
 
+public struct UnifiedMutationInfo
+{
+    public string MutationName { get; set; }
+    public UnifiedMutationProperty[] Properties { get; set; }
+}
+
 public struct UnifiedMutationConfig
 {
-    public UnifiedMutation[] ShapeMutations;
-    public UnifiedMutation GazeMutations, OpennessMutations, PupilMutations;
+    public List<UnifiedMutationInfo> MutationInfo = new();
 
     public UnifiedMutationConfig()
     {
-        ShapeMutations = new UnifiedMutation[(int)UnifiedExpressions.Max + 1];
-        for (int i = 0; i < ShapeMutations.Length; i++)
-        {
-            ShapeMutations[i] = new UnifiedMutation()
-            {
-                Name = ((UnifiedExpressions)i).ToString()
-            };
-        }
-        GazeMutations = new UnifiedMutation()
-        {
-            Name = "GazeMutations"
-        };
-        OpennessMutations = new UnifiedMutation()
-        {
-            Name = "OpennessMutations"
-        };
-        PupilMutations = new UnifiedMutation()
-        {
-            Name = "PupilMutations"
-        };
     }
 }
