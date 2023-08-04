@@ -112,12 +112,10 @@ public class CalibrationMutator : IUnifiedMutation
 
     public void SetProperties(UnifiedMutationProperty[] props)
     {
-        if (props != null &&
-            props[0].Value.GetType() == typeof(float) &&
-            (float)props[0].Value <= 1.0f &&
-            (float)props[0].Value >= 0.0f)
+        foreach (UnifiedMutationProperty prop in props)
         {
-            calibrationWeight = (float)props[0].Value;
+            if (prop.Name == "CalibrationWeight")
+                calibrationWeight = Convert.ToSingle(prop.Value);
         }
     }
 }
