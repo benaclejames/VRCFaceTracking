@@ -50,6 +50,6 @@ public class SmoothingMutator : IUnifiedMutation
     }
     public object GetProperties() => smoothingData;
 
-    public void SetProperties(object data) => 
-        smoothingData = (SmoothingData)data;
+    public void SetProperties(object data) =>
+        smoothingData = data as SmoothingData;
 }
