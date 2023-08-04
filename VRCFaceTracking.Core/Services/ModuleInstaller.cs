@@ -18,6 +18,28 @@ public class ModuleInstaller
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
     }
 
+    // Move a directory using just Copy and Remove as MoveDirectory is unreliable across drives
+    private void MoveDirectory(string source, string dest)
+    {
+        if (!Directory.Exists(dest))
+            Directory.CreateDirectory(dest);
+        
+        // Get files recursively and preserve directory structure
+        foreach (var file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var path = Path.GetDirectoryName(file);
+            var newPath = path?.Replace(source, dest);
+            if (newPath != null)
+            {
+                Directory.CreateDirectory(newPath);
+                File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
+            }
+        }
+        
+        // Now we delete the source directory
+        Directory.Delete(source, true);
+    }
+
     private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
@@ -93,7 +115,7 @@ public class ModuleInstaller
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         if (Directory.Exists(moduleDirectory))
             Directory.Delete(moduleDirectory, true);
-        Directory.Move(tempDirectory, moduleDirectory);
+        MoveDirectory(tempDirectory, moduleDirectory);
         
         // Now we need to find the module's dll
         moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
@@ -137,7 +159,7 @@ public class ModuleInstaller
             
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
-            Directory.Move(tempDirectory, moduleDirectory);
+            MoveDirectory(tempDirectory, moduleDirectory);
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
             moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
