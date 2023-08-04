@@ -11,18 +11,15 @@ public class SmoothingMutator : IUnifiedMutation
     public bool Mutable { get; set; }
     public int Order => 100;
     public float[] smoothingData = new float[(int)UnifiedExpressions.Max];
+    public float gazeSmoothness, pupilSmoothness, opennessSmoothness;
     private const float SMOOTH_INIT = .9f;
 
-    static float SimpleLerp(float input, float previousInput, float value) => input * (1.0f - value) + previousInput * value;
+    static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
 
     public void Mutate(ref UnifiedTrackingData data, UnifiedTrackingData buffer, ILogger<UnifiedTrackingMutator> _logger)
     {
         for (int i = 0; i < data.Shapes.Length; i++)
         {
-            //data.Shapes[i].Weight = 1f;
-            //buffer.Shapes[i].Weight = 1f;
-            //data.Shapes[i].Weight = smoothingData[i];
-
             data.Shapes[i].Weight =
                 SimpleLerp(
                     data.Shapes[i].Weight,
@@ -31,15 +28,13 @@ public class SmoothingMutator : IUnifiedMutation
                 );
         }
         
-        /*
-        data.Eye.Left.Openness = SimpleLerp(data.Eye.Left.Openness, buffer.Eye.Left.Openness, smoothingData[]);
-        input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, mutationData.PupilMutations.SmoothnessMult);
-        input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, mutationData.GazeMutations.SmoothnessMult);
+        data.Eye.Left.Openness = SimpleLerp(data.Eye.Left.Openness, buffer.Eye.Left.Openness, opennessSmoothness);
+        data.Eye.Left.PupilDiameter_MM = SimpleLerp(data.Eye.Left.PupilDiameter_MM, buffer.Eye.Left.PupilDiameter_MM, pupilSmoothness);
+        data.Eye.Left.Gaze = SimpleLerp(data.Eye.Left.Gaze, buffer.Eye.Left.Gaze, pupilSmoothness);
 
-        input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, mutationData.OpennessMutations.SmoothnessMult);
-        input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, mutationData.PupilMutations.SmoothnessMult);
-        input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, mutationData.GazeMutations.SmoothnessMult);
-        */
+        data.Eye.Right.Openness = SimpleLerp(data.Eye.Right.Openness, buffer.Eye.Right.Openness, pupilSmoothness);
+        data.Eye.Right.PupilDiameter_MM = SimpleLerp(data.Eye.Right.PupilDiameter_MM, buffer.Eye.Right.PupilDiameter_MM, pupilSmoothness);
+        data.Eye.Right.Gaze = SimpleLerp(data.Eye.Right.Gaze, buffer.Eye.Right.Gaze, pupilSmoothness);
     }
 
     public void Initialize() => Reset();
@@ -51,13 +46,13 @@ public class SmoothingMutator : IUnifiedMutation
     }
     public UnifiedMutationProperty[] GetProperties()
     {
-        List<UnifiedMutationProperty> props = new List<UnifiedMutationProperty>();
-        int i = 0;
-        foreach (float f in smoothingData)
+        List<UnifiedMutationProperty> props = new List<UnifiedMutationProperty>
         {
-            props.Add(new UnifiedMutationProperty { Name = ((UnifiedExpressions)i).ToString(), Value = f});
-            i++;
-        }
+            new UnifiedMutationProperty { Name = "SmoothArray", Value = smoothingData },
+            new UnifiedMutationProperty { Name = "Gaze", Value = gazeSmoothness },
+            new UnifiedMutationProperty { Name = "Pupil", Value = pupilSmoothness },
+            new UnifiedMutationProperty { Name = "Openness", Value = opennessSmoothness }
+        };
         return props.ToArray();
     }
 
@@ -68,8 +63,23 @@ public class SmoothingMutator : IUnifiedMutation
             (float)props[0].Value <= 1.0f &&
             (float)props[0].Value >= 0.0f)
         {
-            for (int i = 0; i < smoothingData.Length; i++)
-                smoothingData[i] = (float)props[i].Value;
+            foreach (UnifiedMutationProperty prop in props)
+                switch (prop.Name)
+                {
+                    case "SmoothingArray":
+                        smoothingData = (float[])prop.Value;
+                        break;
+                    case "Gaze":
+                        gazeSmoothness = (float)prop.Value;
+                        break;
+                    case "Pupil":
+                        pupilSmoothness = (float)prop.Value;
+                        break;
+                    case "Openness":
+                        opennessSmoothness = (float)prop.Value;
+                        break;
+                    default: break;
+                }
         }
     }
 }

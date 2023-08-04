@@ -54,6 +54,7 @@ public class CalibrationMutator : IUnifiedMutation
                 cal[i].ceil = data.Shapes[i].Weight;
                 cal[i].lifeTime *= (LIFETIME_MULT + (LIFETIME_CONF_INFL * cal[i].confidence));
                
+                /*
                 _logger.LogInformation("\n" + ((UnifiedExpressions)i).ToString() +
                                        "\nRaw: " + data.Shapes[i].Weight +
                                        "\nCalibrated: " + data.Shapes[i].Weight / cal[i].ceilBuffer + " Clamp Error: " + (1f - (data.Shapes[i].Weight / cal[i].ceilBuffer)) +
@@ -63,6 +64,7 @@ public class CalibrationMutator : IUnifiedMutation
                                        "\nCeilBuffer: " + cal[i].ceilBuffer +
                                        "\nConfidenceApplied: " + (1f/(1f+(float)Math.Pow(Math.E, (-60 * cal[i].confidence)+52f))) +
                                        "\nLifeTime: " + cal[i].lifeTime);
+                */
             }
 
             var confidenceApplied = 1f / (1f + (float)Math.Pow(Math.E, (-60 * cal[i].confidence) + 52f));
