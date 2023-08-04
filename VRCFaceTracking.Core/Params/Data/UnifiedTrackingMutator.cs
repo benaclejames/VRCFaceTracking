@@ -135,13 +135,17 @@ namespace VRCFaceTracking
 
         public void InitializeCalibration()
         {
-            foreach (var item in mutations)
+            List<Task> _tasks = new List<Task>();
+            foreach (var mut in mutations)
             {
-                _logger.LogInformation("Activating mutation: {mut}.", item.Name);
-                item.Mutable = true;
+                _tasks.Add(Task.Run(() =>
+                {
+                    _logger.LogInformation("Activating mutation: {mut}.", mut.Name);
+                    mut.Mutable = true;
+                    mut.Reset();
+                }));
             }
-            //foreach(IUnifiedMutation mutation in mutatorConfig.Mutations)
-            //    mutation.Reset();
+            Task.WaitAll(_tasks.ToArray());
         }
     }
 }

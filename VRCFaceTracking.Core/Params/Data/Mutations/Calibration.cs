@@ -89,18 +89,8 @@ public class CalibrationMutator : IUnifiedMutation
     }
 
     public void Initialize() => Reset();
-
-    public void Reset()
-    {
-        Thread _thread = new Thread(() =>
-        {
-            ResetCalibration();
-        });
-        _thread.Start();
-    }
-
+    public void Reset() => ResetCalibration();
     public object GetProperties() => calibrationWeight;
-
     public void SetProperties(object data) => 
         calibrationWeight = Convert.ToSingle(data);
 }
