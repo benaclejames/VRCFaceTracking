@@ -51,7 +51,7 @@ namespace VRCFaceTracking
             trackingDataBuffer.CopyPropertiesOf(UnifiedTracking.Data);
 
             mutations.Add(new CalibrationMutator());
-            //mutations.Add(new SmoothingMutator());
+            mutations.Add(new SmoothingMutator());
 
             foreach (var item in mutations)
                 item.Initialize();
@@ -91,7 +91,7 @@ namespace VRCFaceTracking
                 mutatorConfig.MutationInfo.Add(new UnifiedMutationInfo 
                 { 
                     MutationName = mut.Name,
-                    Properties = mut.GetProperties()
+                    Data = mut.GetProperties()
                 });
 
             await _localSettingsService.SaveSettingAsync("CalibrationEnabled", Enabled);
@@ -113,7 +113,7 @@ namespace VRCFaceTracking
                 foreach (UnifiedMutationInfo info in mutatorConfig.MutationInfo)
                     if (info.MutationName == mut.Name)
                     {
-                        mut.SetProperties(info.Properties);
+                        mut.SetProperties(info.Data);
                         _logger.LogDebug("Successfully applied config to mutation {mut}", mut.Name);
                     }
 
