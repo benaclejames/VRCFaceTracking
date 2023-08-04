@@ -16,7 +16,6 @@ namespace VRCFaceTracking
     {
         public UnifiedTrackingData trackingDataPrevious = new();
         public UnifiedTrackingData trackingDataBuffer = new();
-        public UnifiedMutationConfig mutatorConfig = new();
         public List<IUnifiedMutation> mutations = new();
 
         private float _calibrationWeight;
@@ -87,8 +86,9 @@ namespace VRCFaceTracking
         {
             _logger.LogDebug("Saving mutation data.");
 
+            UnifiedMutationConfig _config = new();
             foreach (IUnifiedMutation mut in mutations)
-                mutatorConfig.MutationInfo.Add(new UnifiedMutationInfo 
+                _config.MutationInfo.Add(new UnifiedMutationInfo 
                 { 
                     MutationName = mut.Name,
                     Data = mut.GetProperties()
@@ -97,7 +97,7 @@ namespace VRCFaceTracking
             await _localSettingsService.SaveSettingAsync("CalibrationEnabled", Enabled);
             //await _localSettingsService.SaveSettingAsync("CalibrationWeight", CalibrationWeight);
             //await _localSettingsService.SaveSettingAsync("ContinuousCalibrationEnabled", ContinuousCalibration);
-            await _localSettingsService.SaveSettingAsync("MutationConfig", mutatorConfig, true);
+            await _localSettingsService.SaveSettingAsync("MutationConfig", _config, true);
         }
 
         public async void LoadMutations()
@@ -107,10 +107,10 @@ namespace VRCFaceTracking
             Enabled = await _localSettingsService.ReadSettingAsync<bool>("CalibrationEnabled");
             //CalibrationWeight = await _localSettingsService.ReadSettingAsync<float>("CalibrationWeight", 0.2f);
             //ContinuousCalibration = await _localSettingsService.ReadSettingAsync<bool>("ContinuousCalibrationEnabled", true);
-            mutatorConfig = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("MutationConfig", new());
+            UnifiedMutationConfig _config = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("MutationConfig", new());
 
             foreach (IUnifiedMutation mut in mutations)
-                foreach (UnifiedMutationInfo info in mutatorConfig.MutationInfo)
+                foreach (UnifiedMutationInfo info in _config.MutationInfo)
                     if (info.MutationName == mut.Name)
                     {
                         mut.SetProperties(info.Data);
