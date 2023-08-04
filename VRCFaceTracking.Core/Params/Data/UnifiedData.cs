@@ -90,7 +90,7 @@ namespace VRCFaceTracking.Core.Params.Data
         /// Shapes[(int)UnifiedExpression.JawOpen].Weight = JawOpen;
         /// </code>
         /// </remarks>
-        public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
+        public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max];
 
         public void CopyPropertiesOf(UnifiedTrackingData data)
         {

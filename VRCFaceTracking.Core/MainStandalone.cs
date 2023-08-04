@@ -33,7 +33,7 @@ public class MainStandalone : IMainService
         _logger.LogInformation("VRCFT Standalone Exiting!");
         _libManager.TeardownAllAndResetAsync();
 
-        await _mutator.SaveCalibration();
+        await _mutator.SaveMutations();
 
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
@@ -80,7 +80,7 @@ public class MainStandalone : IMainService
             _avatarInfo.CurrentParametersLegacy = deprecatedParams;
         };
         
-        _mutator.LoadCalibration();
+        _mutator.LoadMutations();
 
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
