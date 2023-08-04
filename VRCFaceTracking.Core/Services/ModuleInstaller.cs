@@ -13,7 +13,7 @@ public class ModuleInstaller
     public ModuleInstaller(ILoggerFactory loggerFactory)
     {
         _logger = loggerFactory.CreateLogger("ModuleInstaller");
-        
+
         if (!Directory.Exists(Utils.CustomLibsDirectory))
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
     }
@@ -31,13 +31,13 @@ public class ModuleInstaller
     {
         // Attempt to find the first DLL. If there's more than one, try find the one with the same name as the module
         var dllFiles = Directory.GetFiles(moduleDirectory, "*.dll");
-        
+
         if (dllFiles.Length == 0)
             return null;
 
         if (dllFiles.Length == 1)   // If there's only one, just return it
             return Path.GetFileName(dllFiles[0]);
-        
+
         // Else we'll try find the one with the closest name to the module using Levenshtein distance
         var targetFileName = Path.GetFileNameWithoutExtension(moduleMetadata.DownloadUrl);
         var dllFile = dllFiles.Select(x => new { FileName = Path.GetFileNameWithoutExtension(x), Distance = LevenshteinDistance.Calculate(targetFileName, Path.GetFileNameWithoutExtension(x)) }).MinBy(x => x.Distance);
@@ -49,7 +49,7 @@ public class ModuleInstaller
                 moduleMetadata.ModuleId);
             return null;
         }
-        
+
         _logger.LogDebug("Module {module} didn't specify a target dll, and contained multiple. Using {dll} as its distance of {distance} was closest to the module name",
             moduleMetadata.ModuleId, dllFile.FileName, dllFile.Distance);
         return Path.GetFileName(dllFile.FileName);
@@ -61,7 +61,7 @@ public class ModuleInstaller
         var fileName = Path.GetFileName(zipPath);
         var newZipPath = Path.Combine(Utils.CustomLibsDirectory, fileName);
         File.Copy(zipPath, newZipPath, true);
-        
+
         // Second, we unzip it 
         var tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(zipPath));
         if (Directory.Exists(tempDirectory))
@@ -80,7 +80,7 @@ public class ModuleInstaller
             Directory.Delete(tempDirectory, true);
             return null;
         }
-        
+
         var moduleMetadata = JsonConvert.DeserializeObject<TrackingModuleMetadata>(await File.ReadAllTextAsync(moduleJsonPath));
         if (moduleMetadata == null)
         {
@@ -88,13 +88,13 @@ public class ModuleInstaller
             Directory.Delete(tempDirectory, true);
             return null;
         }
-        
+
         // Now we move to a directory named after the module id and delete the temp directory
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         if (Directory.Exists(moduleDirectory))
             Directory.Delete(moduleDirectory, true);
-        Directory.Move(tempDirectory, moduleDirectory);
-        
+        MoveDirectory(tempDirectory, moduleDirectory);
+
         // Now we need to find the module's dll
         moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
         if (moduleMetadata.DllFileName == null)
@@ -102,10 +102,10 @@ public class ModuleInstaller
             _logger.LogError("Module {module} has no .dll file name specified and no .dll files were found in the extracted zip", moduleMetadata.ModuleId);
             return null;
         }
-        
+
         // Now we write the module.json file to the module directory
         await File.WriteAllTextAsync(Path.Combine(moduleDirectory, "module.json"), JsonConvert.SerializeObject(moduleMetadata, Formatting.Indented));
-        
+
         // Finally, we return the module's dll file name
         return Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
     }
@@ -116,7 +116,7 @@ public class ModuleInstaller
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as
         // still support unofficial modules.
-        
+
         // First we need to create the directory for the module. If it already exists, we'll delete it and start fresh.
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         UninstallModule(moduleMetadata);
@@ -134,11 +134,11 @@ public class ModuleInstaller
             var tempZipPath = Path.Combine(tempDirectory, "module.zip");
             await DownloadModuleToFile(moduleMetadata, tempZipPath);
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
-            
+
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
-            Directory.Move(tempDirectory, moduleDirectory);
-            
+            MoveDirectory(tempDirectory, moduleDirectory);
+
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
             moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
             if (moduleMetadata.DllFileName == null)
@@ -151,19 +151,19 @@ public class ModuleInstaller
         {
             moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
             var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
-            
+
             Directory.CreateDirectory(moduleDirectory);
             await DownloadModuleToFile(moduleMetadata, dllPath);
-            
+
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);
         }
-        
+
         // Now we can overwrite the module.json file with the latest metadata
         var moduleJsonPath = Path.Combine(moduleDirectory, "module.json");
         await File.WriteAllTextAsync(moduleJsonPath, JsonConvert.SerializeObject(moduleMetadata, Formatting.Indented));
-        
+
         _logger.LogInformation("Installed module {module} to {moduleDirectory}", moduleMetadata.ModuleId, moduleDirectory);
-        
+
         return Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
     }
 
@@ -174,7 +174,7 @@ public class ModuleInstaller
         File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
         _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
     }
-    
+
     public void UninstallModule(TrackingModuleMetadata moduleMetadata)
     {
         _logger.LogDebug("Uninstalling module {module}", moduleMetadata.ModuleId);
@@ -195,5 +195,47 @@ public class ModuleInstaller
         {
             _logger.LogWarning("Module {module} could not be found where it was expected in {moduleDirectory}", moduleMetadata.ModuleId, moduleDirectory);
         }
+    }
+
+    // Appropriated from https://stackoverflow.com/a/48825433
+    public static void MoveDirectory(string source, string target)
+    {
+        if (!Directory.Exists(source))
+        {
+            throw new System.IO.DirectoryNotFoundException("Source directory couldn't be found.");
+        }
+
+        DirectoryInfo sourceInfo = Directory.CreateDirectory(source);
+        DirectoryInfo targetInfo = Directory.CreateDirectory(target);
+
+        if (sourceInfo.FullName == targetInfo.FullName)
+        {
+            throw new System.IO.IOException("Source and target directories are the same.");
+        }
+
+        Stack<DirectoryInfo> sourceDirectories = new Stack<DirectoryInfo>();
+        sourceDirectories.Push(sourceInfo);
+
+        Stack<DirectoryInfo> targetDirectories = new Stack<DirectoryInfo>();
+        targetDirectories.Push(targetInfo);
+
+        while (sourceDirectories.Count > 0)
+        {
+            DirectoryInfo sourceDirectory = sourceDirectories.Pop();
+            DirectoryInfo targetDirectory = targetDirectories.Pop();
+
+            foreach (FileInfo file in sourceDirectory.GetFiles())
+            {
+                file.CopyTo(Path.Combine(targetDirectory.FullName, file.Name), overwrite: true);
+            }
+
+            foreach (DirectoryInfo subDirectory in sourceDirectory.GetDirectories())
+            {
+                sourceDirectories.Push(subDirectory);
+                targetDirectories.Push(targetDirectory.CreateSubdirectory(subDirectory.Name));
+            }
+        }
+
+        sourceInfo.Delete(true);
     }
 }
