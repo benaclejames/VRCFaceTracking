@@ -1,11 +1,23 @@
-﻿namespace VRCFaceTracking.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.Params.Data;
 
-public struct UnifiedMutation
+namespace VRCFaceTracking.Core.Models;
+
+public class UnifiedMutationProperty
 {
-    public string Name;
-    public float Ceil; // The maximum that the parameter reaches.
-    public float Floor; // the minimum that the parameter reaches.
-    //public float SigmoidMult; // How much should this parameter be affected by the sigmoid function. This makes the parameter act more like a toggle.
-    //public float LogitMult; // How much should this parameter be affected by the logit (inverse of sigmoid) function. This makes the parameter act more within the normalized range.
-    public float SmoothnessMult; // How much should this parameter be affected by the smoothing function.
+    public string Name { get; set; }
+    public object Value { get; set; }
+}
+
+public interface IUnifiedMutation
+{
+    string Name { get; }
+    int Order { get; }
+    bool Mutable { get; set; }
+    void Mutate(ref UnifiedTrackingData data, UnifiedTrackingData buffer, ILogger<UnifiedTrackingMutator> _logger);
+    UnifiedMutationProperty[] GetProperties();
+    void SetProperties(UnifiedMutationProperty[] props);
+    void Initialize();
+    void Reset();
 }
