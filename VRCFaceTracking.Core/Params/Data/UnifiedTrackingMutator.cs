@@ -51,7 +51,7 @@ namespace VRCFaceTracking
             trackingDataBuffer.CopyPropertiesOf(UnifiedTracking.Data);
 
             mutations.Add(new CalibrationMutator());
-            mutations.Add(new SmoothingMutator());
+            //mutations.Add(new SmoothingMutator());
 
             foreach (var item in mutations)
                 item.Initialize();
