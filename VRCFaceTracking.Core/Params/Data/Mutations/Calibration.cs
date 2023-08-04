@@ -88,10 +88,7 @@ public class CalibrationMutator : IUnifiedMutation
         }
     }
 
-    public void Initialize()
-    {
-        Reset();
-    }
+    public void Initialize() => Reset();
 
     public void Reset()
     {
@@ -102,20 +99,8 @@ public class CalibrationMutator : IUnifiedMutation
         _thread.Start();
     }
 
-    public UnifiedMutationProperty[] GetProperties()
-    {
-        return new UnifiedMutationProperty[] 
-        {
-            new UnifiedMutationProperty{ Name = "CalibrationWeight", Value = calibrationWeight }
-        };
-    }
+    public object GetProperties() => calibrationWeight;
 
-    public void SetProperties(UnifiedMutationProperty[] props)
-    {
-        foreach (UnifiedMutationProperty prop in props)
-        {
-            if (prop.Name == "CalibrationWeight")
-                calibrationWeight = Convert.ToSingle(prop.Value);
-        }
-    }
+    public void SetProperties(object data) => 
+        calibrationWeight = Convert.ToSingle(data);
 }
