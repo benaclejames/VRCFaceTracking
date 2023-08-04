@@ -42,14 +42,12 @@ public class SmoothingMutator : IUnifiedMutation
     }
 
     public void Initialize() => Reset();
-
     public void Reset() 
     {
         for (int i = 0; i < smoothingData.expressions.Length ; i++)
             smoothingData.expressions[i] = SMOOTH_INIT;
     }
     public object GetProperties() => smoothingData;
-
     public void SetProperties(object data) =>
         smoothingData = data as SmoothingData;
 }
