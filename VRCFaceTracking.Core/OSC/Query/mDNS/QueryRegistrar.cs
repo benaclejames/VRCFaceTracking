@@ -7,11 +7,12 @@ namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 public class QueryRegistrar
 {
     private static readonly IPAddress MulticastIp = IPAddress.Parse("224.0.0.251");
-    private static readonly IPEndPoint MdnsEndpointIp4 = new IPEndPoint(MulticastIp, 5353);
+    private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, 5353);
 
-    private static readonly Dictionary<IPAddress, UdpClient> Senders = new Dictionary<IPAddress, UdpClient>();
-    private static readonly List<UdpClient> Receivers = new List<UdpClient>();
-
+    private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
+    private static readonly List<UdpClient> Receivers = new();
+    public static IPEndPoint VrchatClientEndpoint;
+        
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
             net.OperationalStatus == OperationalStatus.Up &&
@@ -24,8 +25,7 @@ public class QueryRegistrar
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
 
-    private static readonly Dictionary<string, (string serviceName, int port, string ipAddress)[]> services =
-        new Dictionary<string, (string serviceName, int port, string ipAddress)[]>();
+    private static readonly Dictionary<string, (string serviceName, int port, string ipAddress)[]> services = new();
         
     public QueryRegistrar()
     {
@@ -181,6 +181,31 @@ public class QueryRegistrar
             }
         }
     }
+
+    private async void ResolveVRChatClient(DNSPacket packet, IPEndPoint remoteEndpoint)
+    {
+        if (!packet.QUERYRESPONSE || packet.answers[0].Type != 12)
+            return;
+
+        var ptrRecord = packet.answers[0].Data as PTRRecord;
+        if (ptrRecord.DomainLabels.Count != 4 || !ptrRecord.DomainLabels[0].StartsWith("VRChat-Client"))
+            return;
+            
+        if (packet.answers[0].Labels.Count != 3 || packet.answers[0].Labels[0] != "_oscjson" ||
+            packet.answers[0].Labels[1] != "_tcp" || packet.answers[0].Labels[2] != "local")
+            return;
+            
+        // Now we find the first arecord in the additional records
+        var aRecord = packet.additionals.FirstOrDefault(r => r.Type == 1);
+        var srvRecord = packet.additionals.FirstOrDefault(r => r.Type == 33);
+        if (aRecord == null || srvRecord == null)
+            return;
+            
+        var vrchatClientIp = aRecord.Data as ARecord;
+        var vrchatClientPort = srvRecord.Data as SRVRecord;
+            
+        VrchatClientEndpoint = new IPEndPoint(vrchatClientIp.Address, vrchatClientPort.Port);
+    }
         
     private void Listen(UdpClient client)
     {
@@ -191,14 +216,14 @@ public class QueryRegistrar
                 var result = await client.ReceiveAsync();
                 var reader = new BigReader(result.Buffer);
                 var packet = new DNSPacket(reader);
-                    
+
+                // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
+                ResolveVRChatClient(packet, result.RemoteEndPoint);
                 ResolveDnsQueries(packet, result.RemoteEndPoint);
             }
         }).Start();
     }
         
-    public void Advertise(string instanceName, string serviceName, int port, IPAddress address)
-    {
+    public void Advertise(string instanceName, string serviceName, int port, IPAddress address) => 
         services.Add(serviceName, new[] { (instanceName, port, address.ToString()) });
-    }
 }

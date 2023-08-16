@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.Query.mDNS;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -14,6 +15,7 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ILogger _logger;
         private readonly ConfigParser _configParser;
         private readonly IParamSupervisor _paramSupervisor;
+        private readonly QueryRegistrar _queryRegistrar;
 
         public Action OnMessageDispatched { get; set; }
         public Action<OscMessage> OnMessageReceived { get; set; }
@@ -31,6 +33,7 @@ namespace VRCFaceTracking.Core.OSC
             OnMessageReceived = HandleNewMessage;
             OnConnectedDisconnected = b => {IsConnected = b;};
             _paramSupervisor = paramSupervisor;
+            _queryRegistrar = new QueryRegistrar();
         }
 
         public int InPort { get; set; }
