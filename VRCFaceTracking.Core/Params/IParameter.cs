@@ -2,7 +2,7 @@
 {
     public interface IParameter
     {
-        IParameter[] ResetParam(ConfigParser.Parameter[] newParams);
+        IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams);
         (string paramName, IParameter paramLiteral)[] GetParamNames();
         bool Deprecated { get; }
     }

@@ -8,14 +8,14 @@ namespace VRCFaceTracking.Core.Params.Expressions;
 
 public static class UnifiedExpressionsParameters
 {
-    private static (string paramName, IParameter paramLiteral)[] IsEyeParameter(ConfigParser.Parameter[] param)
+    private static (string paramName, IParameter paramLiteral)[] IsEyeParameter((string paramName, string paramAddress, Type paramType)[] param)
     {
         // Get all the names of all parameters in both the unified tracking list and the old legacy eye list
         var allParams = UnifiedTracking.AllParameters_v2.Concat(EyeTrackingParams.ParameterList).ToList()
             .SelectMany(p => p.GetParamNames());
                 
         // Now we match parameters to the literals as a sort of sanity check
-        return allParams.Where(p => param.Any(p2 => p.paramName == p2.name)).ToArray();
+        return allParams.Where(p => param.Any(p2 => p.paramName == p2.paramName)).ToArray();
     }
     
     public static readonly IParameter[] UnifiedCombinedShapes =
@@ -35,9 +35,9 @@ public static class UnifiedExpressionsParameters
             param => 
                 IsEyeParameter(
                     param.Where(p => 
-                    p.name.Contains("Eye") && 
-                    (p.name.Contains("Left") || p.name.Contains("Right") || p.name.Contains("Eyes")) && 
-                    (p.name.Contains('X') || p.name.Contains('Y'))).ToArray()
+                    p.paramName.Contains("Eye") && 
+                    (p.paramName.Contains("Left") || p.paramName.Contains("Right") || p.paramName.Contains("Eyes")) && 
+                    (p.paramName.Contains('X') || p.paramName.Contains('Y'))).ToArray()
                 )
                 .Length == 0,
             "/tracking/eye/CenterPitchYaw"
@@ -63,8 +63,8 @@ public static class UnifiedExpressionsParameters
             exp => 1 - exp.Eye.Combined().Openness,
             param => IsEyeParameter(
                     param.Where(p =>
-                        p.name.Contains("Eye") &&
-                (p.name.Contains("Open") || p.name.Contains("Lid"))).ToArray())
+                        p.paramName.Contains("Eye") &&
+                (p.paramName.Contains("Open") || p.paramName.Contains("Lid"))).ToArray())
                 .Length == 0,
             "/tracking/eye/EyesClosedAmount"
         ),

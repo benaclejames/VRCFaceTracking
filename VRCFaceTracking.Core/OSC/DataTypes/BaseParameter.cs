@@ -24,7 +24,7 @@ public class ParamSupervisor : IParamSupervisor
             AllParametersRelevantStatic = value;
             SendQueue.Clear();
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
+                parameter.ResetParam(Array.Empty<(string paramName, string paramAddress, Type paramType)>());
             OnPropertyChanged();
         }
     }
@@ -112,7 +112,7 @@ public class BaseParam<T> : IParameter where T : struct
         _sendOnLoad = sendOnLoad;
     }
 
-    public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+    public virtual IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams)
     {
         if (ParamSupervisor.AllParametersRelevantStatic)
         {
@@ -123,13 +123,13 @@ public class BaseParam<T> : IParameter where T : struct
         }
 
         var compatibleParam = newParams.FirstOrDefault(param =>
-            _regex.IsMatch(param.name)
-            && param.input.Type == typeof(T));
+            _regex.IsMatch(param.paramName)
+            && param.paramType == typeof(T));
 
-        if (compatibleParam != null)
+        if (compatibleParam != default)
         {
             Relevant = true;
-            OscMessage.Address = compatibleParam.input.address;
+            OscMessage.Address = compatibleParam.paramAddress;
         }
         else
         {

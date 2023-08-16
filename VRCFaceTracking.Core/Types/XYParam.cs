@@ -22,7 +22,7 @@ namespace VRCFaceTracking.Core.Types
             Y = y;
         }
 
-        protected void ResetParams(ConfigParser.Parameter[] newParams)
+        protected void ResetParams((string paramName, string paramAddress, Type paramType)[] newParams)
         {
             X.ResetParam(newParams);
             Y.ResetParam(newParams);

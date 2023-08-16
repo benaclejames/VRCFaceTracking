@@ -17,7 +17,7 @@ namespace VRCFaceTracking.Core.Params.DataTypes
 
         public new (string, IParameter)[] GetParamNames() => new[] { (OscMessage.Address, (IParameter)this) };
         
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        public override IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams)
         {
             Relevant = true;
             return new IParameter[] { this };
@@ -26,14 +26,14 @@ namespace VRCFaceTracking.Core.Params.DataTypes
 
     public class NativeParameter<T> : AlwaysRelevantParameter<T>, IParameter where T : struct
     {
-        private readonly Func<ConfigParser.Parameter[], bool> _condition;
+        private readonly Func<(string paramName, string paramAddress, Type paramType)[], bool> _condition;
         
-        public NativeParameter(Func<UnifiedTrackingData, T> getValueFunc, Func<ConfigParser.Parameter[], bool> condition, string paramAddress) : base(getValueFunc, paramAddress)
+        public NativeParameter(Func<UnifiedTrackingData, T> getValueFunc, Func<(string paramName, string paramAddress, Type paramType)[], bool> condition, string paramAddress) : base(getValueFunc, paramAddress)
         {
             _condition = condition;
         }
         
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        public override IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams)
         {
             if (!_condition.Invoke(newParams))
             {
@@ -105,7 +105,7 @@ namespace VRCFaceTracking.Core.Params.DataTypes
             };
         }
 
-        public IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
+        public IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
 
         public (string, IParameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
         

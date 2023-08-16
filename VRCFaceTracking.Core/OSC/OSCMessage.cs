@@ -112,8 +112,9 @@ public class OscMessage
     public OscMessage(string address, Type type)
     {
         Address = address;
+        var oscType = OscUtils.TypeConversions.FirstOrDefault(conv => conv.Key.Item1 == type).Value;
         
-        if (OscUtils.TypeConversions.TryGetValue(type, out var oscType))
+        if (oscType != default)
         {
             _meta.ValueLength = 1;
             _meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>() * _meta.ValueLength);
@@ -137,7 +138,7 @@ public class OscMessage
             {
                 values[i] = new OscValue
                 {
-                    Type = OscUtils.TypeConversions[fields[i].FieldType].oscType,
+                    Type = OscUtils.TypeConversions.First(conv => conv.Key.Item1 == fields[i].FieldType).Value.oscType,
                 };
             }
             _valueSetter = value =>

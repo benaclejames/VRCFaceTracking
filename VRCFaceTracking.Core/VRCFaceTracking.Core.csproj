@@ -17,8 +17,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="OSC\Query\mDNS\" />
-  </ItemGroup>
 </Project>

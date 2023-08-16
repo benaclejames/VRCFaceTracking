@@ -41,18 +41,18 @@ public class BinaryBaseParameter : IParameter
      * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
      * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
      */
-    public IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+    public IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams)
     {
         _params.Clear();
         var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
         var boolParams = newParams.Where(p =>
-            p.input.Type == typeof(bool) && _regex.IsMatch(p.name));
+            p.paramType == typeof(bool) && _regex.IsMatch(p.paramName));
 
         var paramsToCreate = new Dictionary<string, int>();
         foreach (var param in boolParams)
         {
-            var tempName = param.name;
+            var tempName = param.paramName;
             if (!int.TryParse(
                     String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber)
                         .Reverse()), out var index)) continue;

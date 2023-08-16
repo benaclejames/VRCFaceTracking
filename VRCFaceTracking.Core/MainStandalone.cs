@@ -58,7 +58,7 @@ public class MainStandalone : IMainService
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
 
-        ConfigParser.OnConfigLoaded += (relevantParams, configRaw) =>
+        ConfigParser.OnConfigLoaded += (relevantParams, id, name) =>
         {
             _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
             var hasLoadedNative = relevantParams.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
@@ -74,8 +74,8 @@ public class MainStandalone : IMainService
                     "Please consider updating the avatar to use the latest documented parameters.");
 
             _logger.LogDebug("Updating avatar info...");
-            _avatarInfo.Id = configRaw.id;
-            _avatarInfo.Name = configRaw.name;
+            _avatarInfo.Id = id;
+            _avatarInfo.Name = name;
             _avatarInfo.CurrentParameters = relevantParams.Length;
             _avatarInfo.CurrentParametersLegacy = deprecatedParams;
         };

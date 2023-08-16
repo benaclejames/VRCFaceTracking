@@ -16,6 +16,7 @@ namespace VRCFaceTracking.Core.OSC
         private readonly ConfigParser _configParser;
         private readonly IParamSupervisor _paramSupervisor;
         private readonly QueryRegistrar _queryRegistrar;
+        private HttpHandler _httpHandler;
 
         public Action OnMessageDispatched { get; set; }
         public Action<OscMessage> OnMessageReceived { get; set; }
@@ -74,6 +75,8 @@ namespace VRCFaceTracking.Core.OSC
             if (string.IsNullOrWhiteSpace(Address))
                 return result;  // Return both false as we cant bind to anything without an address
 
+            InitOscQuery();
+            
             result.Item1 = BindListener();
             result.Item2 = BindSender();
             
@@ -108,6 +111,15 @@ namespace VRCFaceTracking.Core.OSC
             }
 
             return true;
+        }
+
+        private void InitOscQuery()
+        {
+            _queryRegistrar.Advertise("VRCFT", "_oscjson._tcp", 6970, IPAddress.Loopback);
+            _queryRegistrar.Advertise("VRCFT", "_osc._udp", 6969, IPAddress.Loopback);
+
+            _httpHandler?.Dispose();
+            _httpHandler = new HttpHandler(6970);
         }
 
         private bool BindListener()
@@ -194,7 +206,11 @@ namespace VRCFaceTracking.Core.OSC
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value as string);
+                    // If oscquery has cached the ip of the vrchat client, we'll use that
+                    if (QueryRegistrar.VrchatClientEndpoint != null)
+                        _configParser.ParseFromOscQuery(QueryRegistrar.VrchatClientEndpoint);
+                    else
+                        _configParser.ParseFromFile(msg.Value as string);
                     break;
                 case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                     _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
