@@ -195,7 +195,7 @@
     <value>作者</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>模型状态</value>
+    <value>Avatar状态</value>
   </data>
   <data name="copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking。版权所有。</value>
@@ -239,7 +239,7 @@
   <data name="msOutgoing.Text" xml:space="preserve">
     <value>m/s 传出</value>
   </data>
-  <data name="NoModulesInstalled.Text" xml:space="preserve">
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
     <value>没有安装模块</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
@@ -272,7 +272,157 @@
   <data name="OscSettings.Description" xml:space="preserve">
     <value>OSC 数据应该发送到哪里？</value>
   </data>
-  <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>当SteamVR启动时自动启动</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>自动启动</value>
+  </data>
+  <data name="Calibrate.Description" xml:space="preserve">
+    <value>一键提高你的表情对表达式的强度</value>
+  </data>
+  <data name="Calibrate.Header" xml:space="preserve">
+    <value>校准</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>提升！</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>微调追踪数据</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>校准设置</value>
+  </data>
+  <data name="Calibration_Enabled.Description" xml:space="preserve">
+    <value>用于切换是否启用校准</value>
+  </data>
+  <data name="Calibration_Enabled.Header" xml:space="preserve">
+    <value>开启校准</value>
+  </data>
+  <data name="Calibration_Influence.Description" xml:space="preserve">
+    <value>调整至合适你的强度</value>
+  </data>
+  <data name="Calibration_Influence.Header" xml:space="preserve">
+    <value>校准影响强度</value>
+  </data>
+  <data name="Continuous_Calibration.Description" xml:space="preserve">
+    <value>随着时间的推移，它会慢慢适应你的面部表情</value>
+  </data>
+  <data name="Continuous_Calibration.Header" xml:space="preserve">
+    <value>连续校准</value>
+  </data>
+  <data name="Contributions.Text" xml:space="preserve">
+    <value>次贡献</value>
+  </data>
+  <data name="Credits.Description" xml:space="preserve">
+    <value>是他们让这一切变成可能😘</value>
+  </data>
+  <data name="Credits.Header" xml:space="preserve">
+    <value>贡献者</value>
+  </data>
+  <data name="Dismiss.Content" xml:space="preserve">
+    <value>忽略</value>
+  </data>
+  <data name="Force_Re-Initialize.Description" xml:space="preserve">
+    <value>强制 VRCFT 卸载并重新初始化所有模块</value>
+  </data>
+  <data name="Force_Re-Initialize.Header" xml:space="preserve">
+    <value>强制重新初始化</value>
+  </data>
+  <data name="Force_Relevancy.Description" xml:space="preserve">
+    <value>通过强制相关性，强制每帧发送所有参数</value>
+  </data>
+  <data name="Force_Relevancy.Header" xml:space="preserve">
+    <value>强制关联</value>
+  </data>
+  <data name="Gremlin_Mode.OnContent" xml:space="preserve">
+    <value>高危模式</value>
+  </data>
+  <data name="install" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="Install_Module_from_zip.Text" xml:space="preserve">
+    <value>从*.zip压缩包安装模块</value>
+  </data>
+  <data name="IP_Address.Description" xml:space="preserve">
+    <value>在本地运行VRChat无需更改</value>
+  </data>
+  <data name="IP_Address.Header" xml:space="preserve">
+    <value>IP地址</value>
+  </data>
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>已检测到本地测试Avatar</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>OSC并不支持本地测试Avatar，可能会出大问题...</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>在这里安装一些模块！</value>
+  </data>
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
     <value>您似乎没有安装任何模块。</value>
+  </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>打开本地模块位置</value>
+  </data>
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>OSC地址</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>我们注意到您在VRChat中的OSC设置是关闭状态，我们已帮你打开啦。如果此时游戏处于打开状态，您可能需要在菜单中手动启用它。如果没有打开游戏，那么您应该可以正常使用了！</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>自定义OSC设置</value>
+  </data>
+  <data name="PleaseRestartVRCFT" xml:space="preserve">
+    <value>请重启VRCFT</value>
+  </data>
+  <data name="Re-Initialize.Content" xml:space="preserve">
+    <value>重新初始化</value>
+  </data>
+  <data name="Receive_Port.Description" xml:space="preserve">
+    <value>该端口用于接收VRChat发送的OSC数据</value>
+  </data>
+  <data name="Receive_Port.Header" xml:space="preserve">
+    <value>接收端口</value>
+  </data>
+  <data name="Reset.Content" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="Reset_VRCFT.Description" xml:space="preserve">
+    <value>重置 VRCFT 在 %AppData% 文件夹中存储的所有文件</value>
+  </data>
+  <data name="Reset_VRCFT.Header" xml:space="preserve">
+    <value>重置 VRCFT 的所有配置</value>
+  </data>
+  <data name="Reset_VRChat_Configs.Description" xml:space="preserve">
+    <value>重置所有 VRChat Avatar 的 OSC 配置文件（重新加载Avatar时将自动生成新的，不删除不会更新）</value>
+  </data>
+  <data name="Reset_VRChat_Configs.Header" xml:space="preserve">
+    <value>删除 VRChat 的OSC配置文件</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>这是一堆非常危险的设置，不到万不得已不建议动它...</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>高危设置</value>
+  </data>
+  <data name="Send_Port.Description" xml:space="preserve">
+    <value>请确保没有其他程序占用该端口</value>
+  </data>
+  <data name="Send_Port.Header" xml:space="preserve">
+    <value>发送端口</value>
+  </data>
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>主题设置</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>卸载</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="YourRating" xml:space="preserve">
+    <value>你给予的星星</value>
   </data>
 </root>

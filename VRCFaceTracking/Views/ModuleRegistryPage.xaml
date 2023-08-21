@@ -87,7 +87,7 @@
                             <FontIcon FontSize="20" Glyph="&#xF8AA;" />
                         </Button.Content>
                     </Button>
-                    <TextBlock x:Name="CustomInstallStatus" TextWrapping="Wrap" VerticalAlignment="Center" Style="{ThemeResource DetailBodyBaseMediumStyle}" Padding="20, 0, 0, 0" Text="Install Module from .zip"/>
+                    <TextBlock x:Name="CustomInstallStatus" TextWrapping="Wrap" VerticalAlignment="Center" Style="{ThemeResource DetailBodyBaseMediumStyle}" Padding="20, 0, 0, 0" x:Uid="Install_Module_from_zip"/>
                 </StackPanel>
             </Grid>
         </Border>
