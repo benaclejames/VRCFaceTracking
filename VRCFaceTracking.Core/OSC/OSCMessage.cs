@@ -151,5 +151,12 @@ public class OscMessage
         }
     }
 
+    public static OscMessage TryParseOsc(byte[] bytes, int len, ref int messageIndex)
+    {
+        var meta = new OscMessageMeta();
+        return SROSCLib.parse_osc(bytes, len, ref messageIndex, ref meta) ? new OscMessage(meta) : null;
+    }
+    
     public OscMessage(byte[] bytes, int len, ref int messageIndex) => SROSCLib.parse_osc(bytes, len, ref messageIndex, ref _meta);
+    public OscMessage(OscMessageMeta meta) => _meta = meta;
 }
