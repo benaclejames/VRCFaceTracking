@@ -5,7 +5,8 @@ public partial class BabbleOSC
 {
     public TwoKeyDictionary<UnifiedExpressions, string, float> BabbleExpressionMap = new()
     {
-        { UnifiedExpressions.JawOpen, "/cheekPuff", 0f },
+        { UnifiedExpressions.CheekPuffLeft, "/cheekPuffLeft", 0f },
+        { UnifiedExpressions.CheekPuffRight, "/cheekPuffRight", 0f },
         { UnifiedExpressions.NoseSneerLeft, "/noseSneerLeft", 0f },
         { UnifiedExpressions.NoseSneerRight, "/noseSneerRight", 0f },
         { UnifiedExpressions.JawOpen, "/jawOpen", 0f },
