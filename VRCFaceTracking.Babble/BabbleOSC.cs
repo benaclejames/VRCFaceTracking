@@ -36,7 +36,7 @@ public partial class BabbleOSC
 
     private void ListenLoop()
     {
-        OscMessageMeta oscMeta = new OscMessageMeta();
+        var offset = 0;
         var buffer = new byte[4096];
 
         while (_loop)
@@ -46,15 +46,14 @@ public partial class BabbleOSC
                 if (_receiver.IsBound)
                 {
                     var length = _receiver.Receive(buffer);
-                    if (SROSCLib.parse_osc(buffer, length, ref oscMeta))
+                    var oscMessage = OscMessage.TryParseOsc(buffer, length, ref offset);
+                    if (oscMessage == null) continue;
+                    if (oscMessage._meta.ValueLength <= 0 || oscMessage.Value is not OscValueType.Float) continue;
+
+                    // if (string.IsNullOrEmpty(oscMessage.Address)) continue; // Should NEVER be null...
+                    if (BabbleExpressionMap.ContainsKey2(oscMessage.Address))
                     {
-                        if (BabbleExpressionMap.ContainsKey(oscMeta.Address))
-                        {
-                            if (oscMeta.Type == OscValueType.Float) // Possibly redundant
-                            {
-                                BabbleExpressionMap[oscMeta.Address] = oscMeta.Value.FloatValues[0];
-                            }
-                        }
+                        BabbleExpressionMap.SetByKey2(oscMessage.Address, (float) oscMessage.Value);
                     }
                 }
                 else
