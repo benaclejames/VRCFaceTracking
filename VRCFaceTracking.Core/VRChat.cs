@@ -16,7 +16,7 @@ namespace VRCFaceTracking.Core
             if (regKey == null)
                 return true;    // Assume we already have osc enabled
             
-            var keys = regKey.GetValueNames().Where(x => x.ToLower().Contains("osc"));
+            var keys = regKey.GetValueNames().Where(x => x.StartsWith("VRC_INPUT_OSC") || x.StartsWith("UI.Settings.Osc"));
 
             var wasOscForced = false;
             foreach (var key in keys)

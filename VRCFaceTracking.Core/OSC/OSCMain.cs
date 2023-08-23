@@ -174,7 +174,9 @@ namespace VRCFaceTracking.Core.OSC
             {
                 var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
                 var offset = 0;
-                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
+                var newMsg = OscMessage.TryParseOsc(buffer, bytesReceived, ref offset);
+                if (newMsg == null) 
+                    return;
                 Array.Clear(buffer, 0, bytesReceived);
                 OnMessageReceived(newMsg);
             }
@@ -191,10 +193,12 @@ namespace VRCFaceTracking.Core.OSC
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value as string);
+                    if (msg._meta.ValueLength > 0 && msg.Value is string)
+                        _configParser.ParseNewAvatar(msg.Value as string);
                     break;
                 case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
-                    _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
+                    if (msg._meta.ValueLength > 0 && msg.Value is bool)
+                        _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":
