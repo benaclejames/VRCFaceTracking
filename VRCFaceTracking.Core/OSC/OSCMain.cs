@@ -1,9 +1,8 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.OSC
 {
@@ -122,6 +121,30 @@ namespace VRCFaceTracking.Core.OSC
             catch
             {
                 _logger.LogError("Failed to bind to port {0}", InPort);
+                // Now we find the app that's bound to the port and log it
+                var p = new Process();
+                p.StartInfo.FileName = "netstat.exe";
+                p.StartInfo.Arguments = "-a -n -o";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+                
+                var output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+                
+                // Find the line with the port we're trying to bind to
+                var lines = output.Split('\n');
+                foreach (var line in lines)
+                {
+                    if (!line.Contains(InPort.ToString())) continue;
+                    // Get the PID
+                    var pid = line.Split(' ').Last().Trim();
+                    // Get the process
+                    var proc = Process.GetProcessById(int.Parse(pid));
+                    _logger.LogError("Port {0} is already bound by {1}", InPort, proc.ProcessName);
+                    break;
+                }
+                
                 OnConnectedDisconnected(false);
                 return false;
             }
@@ -151,7 +174,9 @@ namespace VRCFaceTracking.Core.OSC
             {
                 var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
                 var offset = 0;
-                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
+                var newMsg = OscMessage.TryParseOsc(buffer, bytesReceived, ref offset);
+                if (newMsg == null) 
+                    return;
                 Array.Clear(buffer, 0, bytesReceived);
                 OnMessageReceived(newMsg);
             }
@@ -168,10 +193,12 @@ namespace VRCFaceTracking.Core.OSC
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    _configParser.ParseNewAvatar(msg.Value as string);
+                    if (msg._meta.ValueLength > 0 && msg.Value is string)
+                        _configParser.ParseNewAvatar(msg.Value as string);
                     break;
                 case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
-                    _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
+                    if (msg._meta.ValueLength > 0 && msg.Value is bool)
+                        _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
                 /*
                 case "/avatar/parameters/EyeTrackingActive":

@@ -8,14 +8,39 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleInstaller
 {
-    private readonly ILogger<ModuleInstaller> _logger;
+    private readonly ILogger _logger;
 
-    public ModuleInstaller(ILogger<ModuleInstaller> logger)
+    public ModuleInstaller(ILoggerFactory loggerFactory)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger("ModuleInstaller");
+        
+        if (!Directory.Exists(Utils.CustomLibsDirectory))
+            Directory.CreateDirectory(Utils.CustomLibsDirectory);
     }
 
-    private async Task DownloadToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    // Move a directory using just Copy and Remove as MoveDirectory is unreliable across drives
+    private void MoveDirectory(string source, string dest)
+    {
+        if (!Directory.Exists(dest))
+            Directory.CreateDirectory(dest);
+        
+        // Get files recursively and preserve directory structure
+        foreach (var file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var path = Path.GetDirectoryName(file);
+            var newPath = path?.Replace(source, dest);
+            if (newPath != null)
+            {
+                Directory.CreateDirectory(newPath);
+                File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
+            }
+        }
+        
+        // Now we delete the source directory
+        Directory.Delete(source, true);
+    }
+
+    private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
@@ -90,7 +115,7 @@ public class ModuleInstaller
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         if (Directory.Exists(moduleDirectory))
             Directory.Delete(moduleDirectory, true);
-        Directory.Move(tempDirectory, moduleDirectory);
+        MoveDirectory(tempDirectory, moduleDirectory);
         
         // Now we need to find the module's dll
         moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
@@ -109,9 +134,6 @@ public class ModuleInstaller
 
     public async Task<string> InstallRemoteModule(TrackingModuleMetadata moduleMetadata)
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
-        
         // If our download type is not a .dll, we'll download to a temp directory and then extract to the modules directory
         // The module will be contained within a directory corresponding to the module's id which will contain the root of the zip, or the .dll directly
         // as well as a module.json file containing the metadata for the module so we can identify the currently installed version, as well as
@@ -120,7 +142,7 @@ public class ModuleInstaller
         // First we need to create the directory for the module. If it already exists, we'll delete it and start fresh.
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         UninstallModule(moduleMetadata);
-        
+
         // Time to download the main files
         var downloadExtension = Path.GetExtension(moduleMetadata.DownloadUrl);
         if (downloadExtension != ".dll")
@@ -132,14 +154,12 @@ public class ModuleInstaller
             }
             Directory.CreateDirectory(tempDirectory);
             var tempZipPath = Path.Combine(tempDirectory, "module.zip");
-            await DownloadToFile(moduleMetadata, tempZipPath);
+            await DownloadModuleToFile(moduleMetadata, tempZipPath);
             ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
             
             // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
             File.Delete(tempZipPath);
-            if (Directory.Exists(moduleDirectory))
-                Directory.Delete(moduleDirectory, true);
-            Directory.Move(tempDirectory, moduleDirectory);
+            MoveDirectory(tempDirectory, moduleDirectory);
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
             moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
@@ -154,7 +174,8 @@ public class ModuleInstaller
             moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
             var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
             
-            await DownloadToFile(moduleMetadata, dllPath);
+            Directory.CreateDirectory(moduleDirectory);
+            await DownloadModuleToFile(moduleMetadata, dllPath);
             
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);
         }
