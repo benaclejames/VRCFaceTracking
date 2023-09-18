@@ -122,58 +122,6 @@ public static class UnifiedExpressionsParameters
 
         #endregion
 
-        #region EyeLidExpandedSqueeze (Combined)
-
-        new EParam("v2/LeftEyeLidExpandedSqueeze", exp =>
-                exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f -
-                Squeeze(exp, 0), 0.5f, true),
-            new EParam("v2/RightEyeLidExpandedSqueeze", exp =>
-                exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f -
-                Squeeze(exp, 1), 0.5f, true),
-            new EParam("v2/EyeLidExpandedSqueeze", exp =>
-                (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
-                (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                Squeeze(exp, 2), 0.5f, true),
-
-        #endregion
-        
-        #region EyeLidExpandedSqueeze Binary (Combined)
-
-        // Still need to reforumulate these parameters with the compensation.
-        new BinaryBaseParameter("v2/LeftEyeLidExpandedSqueeze", exp =>
-            {
-                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f - Squeeze(exp, 0);
-                if (eyeLid > .8f)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight;
-                if (eyeLid >= 0)
-                    return exp.Eye.Left.Openness;
-                return Squeeze(exp, 0);
-            }),
-
-        new BinaryBaseParameter("v2/RightEyeLidExpandedSqueeze", exp =>
-            {
-                var eyeLid = exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f - Squeeze(exp, 1);
-                if (eyeLid > .8f)
-                    return exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight;
-                if (eyeLid >= 0)
-                    return exp.Eye.Right.Openness;
-                return Squeeze(exp, 1);
-            }),
-
-        new BinaryBaseParameter("v2/CombinedEyeLidExpandedSqueeze", exp =>
-            {
-                var eyeLid = (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
-                    (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                    Squeeze(exp, 2);
-                if (eyeLid > .8f)
-                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f;
-                if (eyeLid >= 0)
-                    return exp.Eye.Combined().Openness;
-                return Squeeze(exp, 1);
-            }),
-            
-        #endregion
-
         #region Eyebrows Compacted
 
         new EParam("v2/BrowDown", exp => 
@@ -253,6 +201,18 @@ public static class UnifiedExpressionsParameters
             (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight +
              exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 4.0f),
 
+        new EParam("v2/LipSuckFunnelUpper", exp => 
+            (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight) / 2.0f - 
+            (exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight) / 2.0f),
+
+        new EParam("v2/LipSuckFunnelLower", exp =>
+            (exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight) / 2.0f -
+            (exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight) / 2.0f),
+
+        new EParam("v2/LipSuckFunnelLowerLeft", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight),
+        new EParam("v2/LipSuckFunnelLowerRight", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight),
+        new EParam("v2/LipSuckFunnelUpperLeft", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight),
+        new EParam("v2/LipSuckFunnelUpperRight", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight),
         #endregion
 
         #region Mouth Combined
@@ -269,6 +229,13 @@ public static class UnifiedExpressionsParameters
         new EParam("v2/MouthDimple", exp => (exp.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight) / 2.0f),
 
         new EParam("v2/NoseSneer", exp => (exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight + exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight) / 2.0f),
+
+        new EParam("v2/MouthTightenStretch", exp =>
+            (exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight) / 2.0f -
+            (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight) / 2.0f),
+
+        new EParam("v2/MouthTightenStretchLeft", exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight - exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight),
+        new EParam("v2/MouthTightenStretchRight", exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight),
 
         #endregion
 
