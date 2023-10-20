@@ -15,10 +15,10 @@ public class BabbleVRC : ExtTrackingModule
         Assembly a = Assembly.GetExecutingAssembly();
         var hmdStream = a.GetManifestResourceStream
             ("VRCFaceTracking.Babble.BabbleLogo.png");
-        streams.Add(hmdStream);
+        streams.Add(hmdStream!);
         ModuleInformation = new ModuleMetadata()
         {
-            Name = "Project Babble Face Tracking\nInference Model v2.0.0",
+            Name = "Project Babble Face Tracking\nInference Model v2.0.4",
             StaticImages = streams
         };
 
@@ -26,11 +26,12 @@ public class BabbleVRC : ExtTrackingModule
     }
 
     public override void Teardown() => babbleOSC.Teardown();
+    
     public override void Update()
     {
-        foreach (var exp in babbleOSC.BabbleExpressionMap)
+        foreach (var exp in BabbleExpressions.BabbleExpressionMap)
         {
-            UnifiedTracking.Data.Shapes[(int)exp.Key].Weight = babbleOSC.BabbleExpressionMap.GetByKey1(exp.Key);
+            UnifiedTracking.Data.Shapes[(int)exp].Weight = BabbleExpressions.BabbleExpressionMap.GetByKey1(exp);
         }
     }
 }

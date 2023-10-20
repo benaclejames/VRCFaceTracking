@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 
 namespace VRCFaceTracking.Babble;
 
@@ -13,25 +14,10 @@ namespace VRCFaceTracking.Babble;
 /// <typeparam name="TKey1"></typeparam>
 /// <typeparam name="TKey2"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-public class TwoKeyDictionary<TKey1, TKey2, TValue> : IEnumerable<KeyValuePair<TKey1, TKey2>> //, IEnumerable<KeyValuePair<TKey2, TValue>>, IEnumerable<KeyValuePair<TKey1, TValue>>
+public class TwoKeyDictionary<TKey1, TKey2, TValue> : IEnumerable
 {
     private Dictionary<TKey1, TKey2> m_dic1 = new Dictionary<TKey1, TKey2>();
     private Dictionary<TKey2, TValue> m_dic2 = new Dictionary<TKey2, TValue>();
-
-    public Dictionary<TKey1, TKey2> OuterKeys
-    {
-        get
-        {
-            return m_dic1;
-        }
-    }
-    public Dictionary<TKey2, TValue> InnerKeys
-    {
-        get
-        {
-            return m_dic2;
-        }
-    }
 
     /// <summary>
     ///   Adds the specified key and value to the dictionary.
@@ -138,13 +124,13 @@ public class TwoKeyDictionary<TKey1, TKey2, TValue> : IEnumerable<KeyValuePair<T
     {
         if (!ContainsKey1(key1))
         {
-            value = default;
+            value = default(TValue);
             return false;
         }
 
         if (!ContainsKey2(m_dic1[key1]))
         {
-            value = default;
+            value = default(TValue);
             return false;
         }
 
@@ -243,6 +229,15 @@ public class TwoKeyDictionary<TKey1, TKey2, TValue> : IEnumerable<KeyValuePair<T
         return m_dic2.ContainsValue(value);
     }
 
+    public (TKey1, TKey2, TValue) ElementAt(int index)
+    {
+        if (index < 0 || index >= Count)
+        {
+            throw new IndexOutOfRangeException();
+        }
+        return (m_dic1.ElementAt(index).Key, m_dic1.ElementAt(index).Value, m_dic2[m_dic1.ElementAt(index).Value]);
+    }
+
     /// <summary>
     /// Clears the two-key dictionary.
     /// </summary>
@@ -252,26 +247,27 @@ public class TwoKeyDictionary<TKey1, TKey2, TValue> : IEnumerable<KeyValuePair<T
         m_dic2.Clear();
     }
 
-    public IEnumerator<KeyValuePair<TKey1, TKey2>> GetEnumerator()
+    public override string ToString()
     {
-        return m_dic1.GetEnumerator();
+        StringBuilder sb = new StringBuilder();
+        foreach (KeyValuePair<TKey1, TKey2> kvp in m_dic1)
+        {
+            sb.AppendLine($"Key1: {kvp.Key}, Key2: {kvp.Value}, Value: {m_dic2[kvp.Value]}");
+        }
+        return sb.ToString();
     }
 
-    //public IEnumerator<KeyValuePair<TKey2, TValue>> GetEnumerator()
-    //{
-    //    return m_dic2.GetEnumerator();
-    //}
+    public IEnumerable<TKey1> OuterKeys => m_dic1.Keys;
 
-    //public IEnumerator<KeyValuePair<TKey1, TValue>> GetEnumerator()
-    //{
-    //    foreach (var kvp in m_dic1)
-    //    {
-    //        TKey1 key1 = kvp.Key;
-    //        TKey2 key2 = kvp.Value;
-    //        TValue value = m_dic2[key2];
-    //        yield return new KeyValuePair<TKey1, TValue>(key1, value);
-    //    }
-    //}
+    public IEnumerable<TKey2> InnerKeys => m_dic2.Keys;
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public IEnumerator<TKey1> GetEnumerator()
+    {
+        return m_dic1.Keys.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }

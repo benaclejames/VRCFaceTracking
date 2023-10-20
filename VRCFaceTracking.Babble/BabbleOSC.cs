@@ -45,15 +45,21 @@ public partial class BabbleOSC
                 if (_receiver.IsBound)
                 {
                     var length = _receiver.Receive(buffer);
-                    var offset = 0;
-                    var oscMessage = new OscMessage(buffer, length, ref offset);
-                    if (oscMessage == null) continue;
-                    if (oscMessage._meta.ValueLength <= 0) continue;
-
-                    // if (string.IsNullOrEmpty(oscMessage.Address)) continue; // Should NEVER be null, should ALWAYS be a float...
-                    if (BabbleExpressionMap.ContainsKey2(oscMessage.Address))
+                    var messageIndex = 0;
+                    
+                    OscMessage msg;
+                    try
                     {
-                        BabbleExpressionMap.SetByKey2(oscMessage.Address, (float) oscMessage.Value);
+                        msg = new OscMessage(buffer, length, ref messageIndex);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                    if (msg.Value is float && BabbleExpressions.BabbleExpressionMap.ContainsKey2(msg.Address))
+                    {
+                        BabbleExpressions.BabbleExpressionMap.SetByKey2(msg.Address, (float)msg.Value);
                     }
                 }
                 else
