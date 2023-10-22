@@ -57,7 +57,13 @@ public partial class BabbleOSC
                         continue;
                     }
 
-                    if (msg.Value is float && BabbleExpressions.BabbleExpressionMap.ContainsKey2(msg.Address))
+                    if (msg.Value is not float) continue;
+
+                    if (msg.Address == "/mouthFunnel" || msg.Address == "/mouthPucker")
+                    {
+                        BabbleExpressions.BabbleExpressionMap.SetByKey2(msg.Address, (float)msg.Value * 4);
+                    }
+                    else if (BabbleExpressions.BabbleExpressionMap.ContainsKey2(msg.Address))
                     {
                         BabbleExpressions.BabbleExpressionMap.SetByKey2(msg.Address, (float)msg.Value);
                     }
