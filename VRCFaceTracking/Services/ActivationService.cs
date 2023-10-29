@@ -23,7 +23,7 @@ public class ActivationService : IActivationService
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly ILogger _logger;
-    private UIElement? _shell = null;
+    private UIElement? _shell;
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
         IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
@@ -102,8 +102,10 @@ public class ActivationService : IActivationService
         var needsDeleting = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules())
             .Where(m => m.InstallationState == InstallState.AwaitingRestart);
         foreach (var deleteModule in needsDeleting)
+        {
             _moduleInstaller.UninstallModule(deleteModule);
-        
+        }
+
         _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
         var remoteModules = await _moduleDataService.GetRemoteModules();

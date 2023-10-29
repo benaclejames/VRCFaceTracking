@@ -1,14 +1,13 @@
 ﻿using Windows.Storage.Pickers;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
 
-public sealed partial class ModuleRegistryPage : Page
+public sealed partial class ModuleRegistryPage
 {
     public ModuleRegistryViewModel ViewModel
     {
@@ -46,7 +45,7 @@ public sealed partial class ModuleRegistryPage : Page
         CustomInstallStatus.Text = "";
 
         // Create a file picker
-        var openPicker = new Windows.Storage.Pickers.FileOpenPicker();
+        var openPicker = new FileOpenPicker();
 
         // Retrieve the window handle (HWND) of the current WinUI 3 window.
         var window = App.MainWindow;

@@ -7,7 +7,7 @@ using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
 
-public sealed partial class ModuleRegistryDetailControl : UserControl
+public sealed partial class ModuleRegistryDetailControl
 {
     public InstallableTrackingModule? ListDetailsMenuItem
     {
@@ -56,14 +56,16 @@ public sealed partial class ModuleRegistryDetailControl : UserControl
                 control.InstallButton.Content = "Please Restart VRCFT";
                 control.InstallButton.IsEnabled = false;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
             
         // Attempt to get our rating from the API.
         var rating = await control._moduleDataService.GetMyRatingAsync(control.ListDetailsMenuItem!);
-        if (rating > 0) // If we already rated this module, set the rating control to that value.
+        if (rating.HasValue) // If we already rated this module, set the rating control to that value.
         {
-            control.RatingControl.PlaceholderValue = rating;
-            control.RatingControl.Value = rating;
+            control.RatingControl.PlaceholderValue = rating.Value;
+            control.RatingControl.Value = rating.Value;
             control.RatingControl.Caption = "Your Rating";
         }
         else // Otherwise, set the rating control to the average rating.
