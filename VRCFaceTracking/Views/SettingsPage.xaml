@@ -89,24 +89,16 @@
                     </labs:SettingsExpander.HeaderIcon>
                     
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
-                            Header="Calibration Enabled"
-                            Description="Toggles whether or not calibration is enabled">
+                        <labs:SettingsCard x:Uid="CalibrationEnabledToggle">
                             <ToggleSwitch IsOn="{x:Bind CalibrationSettings.Enabled, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Header="Continuous Calibration"
-                            Description="Slowly calibrates to your facial expressions over time">
+                        <labs:SettingsCard x:Uid="ContCalibrationToggle">
                             <ToggleSwitch IsOn="{x:Bind CalibrationSettings.ContinuousCalibration, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Header="Calibrate"
-                            Description="Heighten the influence your expressions make on calibration temporarily">
-                            <Button Style="{StaticResource AccentButtonStyle}" Content="Calibrate" Click="ButtonBase_OnClick" />
+                        <labs:SettingsCard x:Uid="TrackingCalibrateButton">
+                            <Button Style="{StaticResource AccentButtonStyle}" Click="ButtonBase_OnClick" x:Uid="CalibrateButton" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                            Header="Calibration Influence"
-                            Description="Controls how much of an influence your facial expressions have on overall calibration over time">
+                        <labs:SettingsCard x:Uid="CalibrationInfluenceSlider">
                             <Slider Width="200" Minimum="0.00" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind CalibrationSettings.CalibrationWeight, Mode=TwoWay}" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
@@ -125,33 +117,25 @@
                     </labs:SettingsExpander.HeaderIcon>
                     <ToggleSwitch x:Name="dangerAcceptToggle" Toggled="AcceptToggle_OnToggled" OnContent="Gremlin Mode" IsOn="{x:Bind RiskySettingsViewModel.Enabled, Mode=OneWay}"/>
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
+                        <labs:SettingsCard x:Uid="ForceRelevancyToggle"
                             x:Name="allParamsRelevant"
-                            Header="Force Relevancy"
-                            IsEnabled="False"
-                            Description="Forces sending of all parameters every frame by forcing relevancy">
+                            IsEnabled="False">
                             <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
+                        <labs:SettingsCard x:Uid="ForceReInitButton"
                             x:Name="forceReInit"
-                            Header="Force Re-Initialize"
-                            IsEnabled="False"
-                            Description="Force VRCFT to unload and reinitialize all modules">
-                            <Button x:Name="forceReInitButton" Click="forceReInitButton_OnClick" Content="Re-Initialize" />
+                            IsEnabled="False">
+                            <Button x:Name="forceReInitButton" Click="forceReInitButton_OnClick" x:Uid="ReInitButton" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
+                        <labs:SettingsCard x:Uid="ResetVRCFTButton"
                             x:Name="resetVRCFT"
-                            Header="Reset VRCFT"
-                            IsEnabled="False"
-                            Description="Reset all data stored by VRCFT in your AppData folder">
-                            <Button x:Name="resetVRCFTButton" Click="resetVRCFTButton_OnClick" Content="Reset" />
+                            IsEnabled="False">
+                            <Button x:Name="resetVRCFTButton" Click="resetVRCFTButton_OnClick" x:Uid="ResetButton" />
                         </labs:SettingsCard>
-                        <labs:SettingsCard
+                        <labs:SettingsCard x:Uid="ResetAvatarConfButton"
                             x:Name="resetAvatarConfig"
-                            Header="Reset VRChat Configs"
-                            IsEnabled="False"
-                            Description="Reset all VRChat OSC config data (will be regenerated when avatar is reloaded)">
-                            <Button x:Name="resetVRCAvatarConf" Click="resetVRCAvatarConf_OnClick" Content="Reset"/>
+                            IsEnabled="False">
+                            <Button x:Name="resetVRCAvatarConf" Click="resetVRCAvatarConf_OnClick" x:Uid="ResetButton" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
