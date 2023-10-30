@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="tobii_stream_engine.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="VRCFaceTracking">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\VRCFaceTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="VRCFaceTracking.Core">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\VRCFaceTracking.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="tobii_stream_engine.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

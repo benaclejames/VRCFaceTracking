@@ -16,8 +16,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
-    <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj" />
+    <Reference Include="Microsoft.Extensions.Logging">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Configuration">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Console">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.Console.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Debug">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.Debug.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.EventLog">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.EventLog.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.EventSource">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\Microsoft.Extensions.Logging.EventSource.dll</HintPath>
+    </Reference>
+    <Reference Include="VRCFaceTracking">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\VRCFaceTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="VRCFaceTracking.Core">
+      <HintPath>..\..\..\..\..\..\Program Files\WindowsApps\96ba052f-0948-44d8-86c4-a0212e4ae047_5.1.1.0_x64__d7rcq4vxghz0r\VRCFaceTracking.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
 
