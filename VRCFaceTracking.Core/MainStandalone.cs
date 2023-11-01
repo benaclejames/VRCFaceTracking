@@ -63,7 +63,7 @@ public class MainStandalone : IMainService
             _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
             var hasLoadedNative = relevantParams.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
             if (hasLoadedNative)
-                _logger.LogWarning("Native tracking parameters detected.");
+                _logger.LogInformation("Native tracking parameters detected.");
             var deprecatedParams = relevantParams.Count(p => p.Deprecated);
 
             _logger.LogInformation(relevantParams.Length + " parameters loaded.");

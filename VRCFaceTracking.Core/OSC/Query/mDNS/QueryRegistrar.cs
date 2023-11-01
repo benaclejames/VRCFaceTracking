@@ -11,7 +11,19 @@ public class QueryRegistrar
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
     private static readonly List<UdpClient> Receivers = new();
-    public static IPEndPoint VrchatClientEndpoint;
+
+    public static Action OnVRCClientDiscovered = () => { };
+
+    private static IPEndPoint _vrchatClientEndpoint;
+    public static IPEndPoint VrchatClientEndpoint
+    {
+        get => _vrchatClientEndpoint;
+        set
+        {
+            _vrchatClientEndpoint = value;
+            OnVRCClientDiscovered.Invoke();
+        }
+    }
         
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>

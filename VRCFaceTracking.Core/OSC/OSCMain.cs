@@ -9,7 +9,7 @@ namespace VRCFaceTracking.Core.OSC
 {
     public class OscMain : IOSCService
     {
-        private static Socket _senderClient, _receiverClient;
+        private Socket _senderClient, _receiverClient;
         private static CancellationTokenSource _recvThreadCts;
         private readonly ILocalSettingsService _localSettingsService;
         private readonly ILogger _logger;
@@ -17,10 +17,11 @@ namespace VRCFaceTracking.Core.OSC
         private readonly IParamSupervisor _paramSupervisor;
         private readonly QueryRegistrar _queryRegistrar;
         private HttpHandler _httpHandler;
-
+        private readonly byte[] _oscBuffer = new byte[4096];
+        
         public Action OnMessageDispatched { get; set; }
         public Action<OscMessage> OnMessageReceived { get; set; }
-        public Action<bool> OnConnectedDisconnected { get; set; } = b => { };
+        public Action<bool> OnConnectedDisconnected { get; set; }
         public bool IsConnected { get; set; }
 
 
@@ -45,7 +46,7 @@ namespace VRCFaceTracking.Core.OSC
         public async Task LoadSettings()
         {
             var address = await _localSettingsService.ReadSettingAsync<string>("OSCAddress");
-            Address = address == default ? "127.0.0.1" : address;
+            Address = address ?? "127.0.0.1";
 
             var inPort = await _localSettingsService.ReadSettingAsync<int>("OSCInPort");
             InPort = inPort == default ? 9001 : inPort;
@@ -70,15 +71,30 @@ namespace VRCFaceTracking.Core.OSC
             _logger.LogDebug("OSC Service Initializing");
             
             await LoadSettings();
-            var result = (false, false);
+            (bool listenerSuccess, bool senderSuccess) result = (false, false);
 
             if (string.IsNullOrWhiteSpace(Address))
+            {
                 return result;  // Return both false as we cant bind to anything without an address
+            }
 
             InitOscQuery();
             
-            result.Item1 = BindListener();
-            result.Item2 = BindSender();
+            result = (BindListener(), BindSender());
+
+            var isParsingAvatar = false;
+            void FirstClientDiscovered()
+            {
+                QueryRegistrar.OnVRCClientDiscovered -= FirstClientDiscovered;
+                
+                if (!isParsingAvatar && string.IsNullOrEmpty(ConfigParser.AvatarId))
+                {
+                    isParsingAvatar = true;
+                    _configParser.ParseCurrentAvatar(QueryRegistrar.VrchatClientEndpoint);
+                }
+            }
+
+            QueryRegistrar.OnVRCClientDiscovered += FirstClientDiscovered;
             
             _logger.LogDebug("OSC Service Initialized with result {0}", result);
             await Task.CompletedTask;
@@ -115,6 +131,7 @@ namespace VRCFaceTracking.Core.OSC
 
         private void InitOscQuery()
         {
+            // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
             _queryRegistrar.Advertise("VRCFT", "_oscjson._tcp", 6970, IPAddress.Loopback);
             _queryRegistrar.Advertise("VRCFT", "_osc._udp", 6969, IPAddress.Loopback);
 
@@ -129,7 +146,8 @@ namespace VRCFaceTracking.Core.OSC
 
             try
             {
-                _receiverClient.Bind(new IPEndPoint(IPAddress.Parse(Address), InPort));
+                // Eventually change this to be random port.
+                _receiverClient.Bind(new IPEndPoint(IPAddress.Parse(Address), 6969));
 
                 StartListenerThread();
             }
@@ -151,7 +169,11 @@ namespace VRCFaceTracking.Core.OSC
                 var lines = output.Split('\n');
                 foreach (var line in lines)
                 {
-                    if (!line.Contains(InPort.ToString())) continue;
+                    if (!line.Contains(InPort.ToString()))
+                    {
+                        continue;
+                    }
+
                     // Get the PID
                     var pid = line.Split(' ').Last().Trim();
                     // Get the process
@@ -173,31 +195,34 @@ namespace VRCFaceTracking.Core.OSC
             _recvThreadCts?.Cancel();    // In theory, the closure of the client should have already cancelled the token, but just in case
 
             var newToken = new CancellationTokenSource();
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ct =>
+            ThreadPool.QueueUserWorkItem(ct =>
             {
-                var token = (CancellationToken)ct;
-                while (!token.IsCancellationRequested)
-                    Recv();
-            }), newToken.Token);
+                if (ct != null)
+                {
+                    var token = (CancellationToken)ct;
+                    while (!token.IsCancellationRequested)
+                    {
+                        Receive();
+                    }
+                }
+            }, newToken.Token);
             _recvThreadCts = newToken;
         }
-
-        private static byte[] buffer = new byte[2048];
-        private void Recv()
+        
+        private void Receive()
         {
             try
             {
-                var bytesReceived = _receiverClient.Receive(buffer, buffer.Length, SocketFlags.None);
+                var bytesReceived = _receiverClient.Receive(_oscBuffer, _oscBuffer.Length, SocketFlags.None);
                 var offset = 0;
-                var newMsg = new OscMessage(buffer, bytesReceived, ref offset);
-                Array.Clear(buffer, 0, bytesReceived);
+                var newMsg = new OscMessage(_oscBuffer, bytesReceived, ref offset);
+                Array.Clear(_oscBuffer, 0, bytesReceived);
                 OnMessageReceived(newMsg);
             }
             catch (Exception e)
             {
                 // Ignore as this is most likely a timeout exception
                 _logger.LogTrace("Failed to receive message: {0}", e.Message);
-                return;
             }
         }
         
@@ -206,15 +231,22 @@ namespace VRCFaceTracking.Core.OSC
             switch (msg.Address)
             {
                 case "/avatar/change":
-                    // If oscquery has cached the ip of the vrchat client, we'll use that
+                    // If OSCQuery has cached the ip of the VRChat client, we'll use that
                     if (QueryRegistrar.VrchatClientEndpoint != null)
-                        _configParser.ParseFromOscQuery(QueryRegistrar.VrchatClientEndpoint);
+                    {
+                        _configParser.ParseCurrentAvatar(QueryRegistrar.VrchatClientEndpoint);
+                    }
                     else
+                    {
                         _configParser.ParseFromFile(msg.Value as string);
+                    }
+
                     break;
-                case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
+                case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force VRCFT to send all parameters
                     _paramSupervisor.AllParametersRelevant = (bool)msg.Value;
                     break;
+                
+                //TODO: Re-think how we handle toggling (if we want to handle it at all at this point)
                 /*
                 case "/avatar/parameters/EyeTrackingActive":
                     if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)
