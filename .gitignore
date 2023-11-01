@@ -52,3 +52,4 @@ obj/
 # Ignore files in the VRCFaceTracking-Next.Core folder
 /VRCFaceTracking.Core/bin/
 /VRCFaceTracking.Core/obj/
+/VRCFaceTracking.WCFace/websocket-sharp

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="VSF.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="VSF.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
+    <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(TargetDir)\$(TargetFileName)&quot; &quot;$(APPDATA)\VRCFaceTracking\CustomLibs\$(TargetFileName)&quot;" />
+  </Target>
+
+</Project>
