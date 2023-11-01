@@ -377,4 +377,10 @@
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
     <value>Reset VRCFT</value>
   </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>Hardware Debug</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>Stare at your tongue I guess?</value>
+  </data>
 </root>

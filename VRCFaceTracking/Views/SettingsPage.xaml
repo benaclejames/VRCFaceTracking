@@ -140,6 +140,22 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
 
+                <!-- Debug Hardware -->
+                <labs:SettingsCard x:Uid="HardwareDebug" ContentAlignment="Vertical">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEBE8;"/>
+                    </labs:SettingsCard.HeaderIcon>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" /> <!-- Separator Column -->
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Source="{x:Bind UpperImageSource}" Stretch="Uniform" />
+                        <AppBarSeparator Grid.Column="1" />
+                        <Image Grid.Column="2" Source="{x:Bind LowerImageSource}" Stretch="Uniform" />
+                    </Grid>
+                </labs:SettingsCard>
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
