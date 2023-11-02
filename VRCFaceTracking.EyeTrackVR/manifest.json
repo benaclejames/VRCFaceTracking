@@ -1,0 +1,16 @@
+{
+ "ModuleId": "d6041ddb-aa1f-45c6-b3d3-c6a284eb3e6d",
+ "AuthorName": "dfgHiatus",
+ "DllFileName": "",
+ "Downloads": 0,
+ "DownloadUrl": "https://github.com/dfgHiatus/VRCFaceTracking/releases/download/v1.0.0/VRCFaceTracking.EyeTrackVR.dll",
+ "LastUpdated": "2023-11-02T01:08:01Z",
+ "ModuleDescription": "EyeTrackVR eye tracking for VRCFaceTracking v5.",
+ "ModuleName": "VRCFaceTracking-EyeTrackVR",
+ "ModulePageUrl": "https://github.com/dfgHiatus/VRCFaceTracking", 
+ "Rating": 0, 
+ "Ratings": 0,
+ "RatingSum": 0,
+ "UsageInstructions": "For complete instructions, please refer to the project page.",
+ "Version": "1.0" 
+}
