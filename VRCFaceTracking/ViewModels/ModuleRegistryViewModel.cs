@@ -19,7 +19,7 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
         set => SetProperty(ref _selected, value);
     }
 
-    public ObservableCollection<InstallableTrackingModule> ModuleInfos { get; private set; } = new ObservableCollection<InstallableTrackingModule>();
+    public ObservableCollection<InstallableTrackingModule> ModuleInfos { get; } = new();
     
     public ModuleRegistryViewModel(IModuleDataService moduleDataService)
     {
@@ -49,16 +49,14 @@ public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
             else
             {
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
-                if (remoteModule.Version != installedModule.Version)
-                    remoteModule.InstallationState = InstallState.Outdated;
-                else
-                    remoteModule.InstallationState = InstallState.Installed;
+                remoteModule.InstallationState = remoteModule.Version != installedModule.Version ? InstallState.Outdated : InstallState.Installed;
             }
         }
 
         // Sort our data by name, then place any modules with the author name VRCFT Team at the top of the list. (unbiased)
-        data = data.OrderBy(x => x.ModuleName);
-        data = data.OrderBy(x => x.AuthorName != "VRCFT Team");
+        data = data.OrderByDescending(x => x.InstallationState == InstallState.Installed)
+            .ThenByDescending(x => x.AuthorName == "VRCFT Team")
+            .ThenBy(x => x.ModuleName);
         
         // Then prepend the local modules to the list.
         data = localModules.Concat(data);
