@@ -2,68 +2,14 @@
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Types;
 
 namespace VRCFaceTracking.MediaPipe;
 
-public class MediaPipeOSC
+public partial class MediaPipeOSC
 {
-    public readonly Dictionary<string, float> Expressions = new()
-    {
-        { "/_neutral", 0f }, //Unused
-        { "/browDownLeft", 0f },
-        { "/browDownRight", 0f },
-        { "/browInnerUp", 0f },
-        { "/browOuterUpLeft", 0f},
-        { "/browOuterUpRight", 0f },
-        { "/cheekPuff", 0f },
-        { "/cheekSquintLeft", 0f },
-        { "/cheekSquintRight",0f },
-        { "/eyeBlinkLeft", 0f },
-        { "/eyeBlinkRight",0f },
-        { "/eyeLookDownLeft",0f },
-        { "/eyeLookDownRight",0f },
-        { "/eyeLookInLeft",0f },
-        { "/eyeLookInRight",0f },
-        { "/eyeLookOutLeft", 0f },
-        { "/eyeLookOutRight", 0f },
-        { "/eyeLookUpLeft", 0f },
-        { "/eyeLookUpRight", 0f },
-        { "/eyeSquintLeft",0f },
-        { "/eyeSquintRight", 0f },
-        { "/eyeWideLeft" ,0f},
-        { "/eyeWideRight", 0f },
-        { "/jawForward", 0f },
-        { "/jawLeft", 0f },
-        { "/jawOpen", 0f},
-        { "/jawRight", 0f },
-        { "/mouthClose", 0f },
-        { "/mouthDimpleLeft", 0f },
-        { "/mouthDimpleRight", 0f},
-        { "/mouthFrownLeft",0f },
-        { "/mouthFrownRight", 0f },
-        { "/mouthFunnel", 0f },
-        { "/mouthLeft", 0f },
-        { "/mouthLowerDownLeft", 0f },
-        { "/mouthLowerDownRight", 0f },
-        { "/mouthPressLeft", 0f },
-        { "/mouthPressRight",0f },
-        { "/mouthPucker", 0f } ,
-        { "/mouthRight", 0f },
-        { "/mouthRollLower", 0f }, //Unused
-        { "/mouthRollUpper", 0f }, //Unused
-        { "/mouthShrugLower", 0f },
-        { "/mouthShrugUpper", 0f },
-        { "/mouthSmileLeft", 0f },
-        { "/mouthSmileRight", 0f },
-        { "/mouthStretchLeft", 0f },
-        { "/mouthStretchRight",0f },
-        { "/mouthUpperUpLeft", 0f },
-        { "/mouthUpperUpRight", 0f },
-        { "/noseSneerLeft", 0f },
-        { "/noseSneerRight", 0f },
-        { "/tongueOut", 0f },
-    };
-
+    // Expressions defined in MediaPipeExpressions.cs
     private Socket _receiver;
     private bool _loop = true;
     private readonly Thread _thread;
@@ -71,6 +17,7 @@ public class MediaPipeOSC
     private readonly int _resolvedPort;
     private const int DEFAULT_PORT = 8888;
     private const int TIMEOUT_MS = 10_000;
+    private const string DEFAULT_IP = "127.0.0.1";
 
     public MediaPipeOSC(ILogger iLogger, int? port = null)
     {
@@ -84,7 +31,7 @@ public class MediaPipeOSC
 
         _receiver = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         _resolvedPort = port ?? DEFAULT_PORT;
-        _receiver.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), _resolvedPort));
+        _receiver.Bind(new IPEndPoint(IPAddress.Parse(DEFAULT_IP), _resolvedPort));
         _receiver.ReceiveTimeout = TIMEOUT_MS;
 
         _loop = true;
@@ -105,7 +52,7 @@ public class MediaPipeOSC
                     _receiver.Close();
                     _receiver.Dispose();
                     _receiver = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    _receiver.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), _resolvedPort));
+                    _receiver.Bind(new IPEndPoint(IPAddress.Parse(DEFAULT_IP), _resolvedPort));
                     _receiver.ReceiveTimeout = TIMEOUT_MS;
                     continue;
                 }
@@ -115,13 +62,38 @@ public class MediaPipeOSC
                 var oscMessage = new OscMessage(buffer, length, ref offset);
                 if (oscMessage == null || oscMessage._meta.ValueLength <= 0) continue;
 
-                if (Expressions.ContainsKey(oscMessage.Address))
+                if (Expressions.ContainsKey1(oscMessage.Address))
                 {
-                    Expressions[oscMessage.Address] = (float)oscMessage.Value;
+                    Expressions.SetByKey1(oscMessage.Address, (float)oscMessage.Value);
                 }
             }
             catch (Exception)  { }
         }
+    }
+
+    public void Update(ref UnifiedTrackingData data)
+    {
+        // Map known expressions
+        foreach (var address in Expressions.OuterKeys)
+        {
+            var weight = Expressions.GetByKey1(address);
+            foreach (var exp in Expressions.GetInnerKey(address))
+            {
+                data.Shapes[(int)exp].Weight = weight;
+            }
+        }
+
+        // Map eye/unknown expressions
+        UnifiedTracking.Data.Eye.Left.Openness =
+            1f - Expressions.GetByKey1("/eyeBlinkLeft");
+        UnifiedTracking.Data.Eye.Right.Openness =
+            1f - Expressions.GetByKey1("/eyeBlinkRight");
+        UnifiedTracking.Data.Eye.Left.Gaze = new Vector2(
+            -Expressions.GetByKey1("/eyeLookOutLeft") + Expressions.GetByKey1("/eyeLookInLeft"),
+            -Expressions.GetByKey1("/eyeLookDownLeft") + Expressions.GetByKey1("/eyeLookUpLeft"));
+        UnifiedTracking.Data.Eye.Right.Gaze = new Vector2(
+            -Expressions.GetByKey1("/eyeLookInRight") + Expressions.GetByKey1("/eyeLookOutRight"),
+            -Expressions.GetByKey1("/eyeLookDownRight") + Expressions.GetByKey1("/eyeLookUpRight"));
     }
 
     public void Teardown()

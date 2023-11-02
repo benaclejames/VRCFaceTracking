@@ -2,7 +2,6 @@
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using VRCFaceTracking.Core.Params.Expressions;
 
 namespace VRCFaceTracking.MediaPipe;
 
@@ -77,121 +76,7 @@ public class MediaPipeVRCFT : ExtTrackingModule
         return (true, true);
     }
 
-    public override void Update()
-    {
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.TongueOut].Weight = 
-            _mp.Expressions["/tongueOut"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawOpen].Weight = 
-            _mp.Expressions["/jawOpen"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawLeft].Weight = 
-            _mp.Expressions["/jawLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawRight].Weight = 
-            _mp.Expressions["/jawRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawForward].Weight = 
-            _mp.Expressions["/jawForward"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight = 
-            _mp.Expressions["/noseSneerLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight = 
-            _mp.Expressions["/noseSneerRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthClosed].Weight = 
-            _mp.Expressions["/mouthClose"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight = 
-            _mp.Expressions["/mouthPucker"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight = 
-            _mp.Expressions["/mouthPucker"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight = 
-            _mp.Expressions["/mouthPucker"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight = 
-            _mp.Expressions["/mouthPucker"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight = 
-            _mp.Expressions["/mouthFunnel"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight = 
-            _mp.Expressions["/mouthFunnel"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight = 
-            _mp.Expressions["/mouthFunnel"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight = 
-            _mp.Expressions["/mouthFunnel"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft].Weight = 
-            _mp.Expressions["/mouthUpperUpLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthUpperUpRight].Weight = 
-            _mp.Expressions["/mouthUpperUpRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft].Weight = 
-            _mp.Expressions["/mouthLowerDownLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthLowerDownRight].Weight = 
-            _mp.Expressions["/mouthLowerDownRight"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthPressLeft].Weight = 
-            _mp.Expressions["/mouthPressLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthPressRight].Weight = 
-            _mp.Expressions["/mouthPressRight"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight = 
-            _mp.Expressions["/mouthStretchLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight = 
-            _mp.Expressions["/mouthStretchRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthDimpleLeft].Weight = 
-            _mp.Expressions["/mouthDimpleLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthDimpleRight].Weight = 
-            _mp.Expressions["/mouthDimpleRight"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthCornerPullLeft].Weight = 
-            _mp.Expressions["/mouthSmileLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthCornerPullRight].Weight = 
-            _mp.Expressions["/mouthSmileRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthFrownLeft].Weight = 
-            _mp.Expressions["/mouthFrownLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight = 
-            _mp.Expressions["/mouthFrownRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.CheekPuffLeft].Weight = 
-            _mp.Expressions["/cheekPuff"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.CheekPuffRight].Weight = 
-            _mp.Expressions["/cheekPuff"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight = 
-            _mp.Expressions["/browInnerUp"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight = 
-            _mp.Expressions["/browInnerUp"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight = 
-            _mp.Expressions["/browDownLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight = 
-            _mp.Expressions["/browDownRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = 
-            _mp.Expressions["/browOuterUpLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight = 
-            _mp.Expressions["/browOuterUpRight"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight = 
-            _mp.Expressions["/eyeSquintLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight = 
-            _mp.Expressions["/eyeSquintRight"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight = 
-            -_mp.Expressions["/eyeWideLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight = 
-            _mp.Expressions["/eyeWideRight"];
-
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.CheekSquintLeft].Weight =
-            _mp.Expressions["/cheekSquintLeft"];
-        UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.CheekSquintRight].Weight = 
-            _mp.Expressions["/cheekSquintRight"];
-
-        UnifiedTracking.Data.Eye.Left.Openness = 
-            1 - _mp.Expressions["/eyeBlinkLeft"];
-        UnifiedTracking.Data.Eye.Right.Openness = 
-            1 - _mp.Expressions["/eyeBlinkRight"];
-        UnifiedTracking.Data.Eye.Left.Gaze.x = 
-            -_mp.Expressions["/eyeLookOutLeft"] + _mp.Expressions["/eyeLookInLeft"];
-        UnifiedTracking.Data.Eye.Left.Gaze.y = 
-            -_mp.Expressions["/eyeLookDownLeft"] + _mp.Expressions["/eyeLookUpLeft"];
-        UnifiedTracking.Data.Eye.Right.Gaze.x = 
-            -_mp.Expressions["/eyeLookInRight"] + _mp.Expressions["/eyeLookOutRight"];
-        UnifiedTracking.Data.Eye.Right.Gaze.y = 
-            -_mp.Expressions["/eyeLookDownRight"] + _mp.Expressions["/eyeLookUpRight"];
-    }
+    public override void Update() => _mp.Update(ref UnifiedTracking.Data);
 
     public override void Teardown()
     {

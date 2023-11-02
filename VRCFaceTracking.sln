@@ -11,17 +11,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.Babble", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking.Crystal", "VRCFaceTracking.Crystal\VRCFaceTracking.Crystal.csproj", "{4510B75A-E555-4061-B680-983C6A5E9C9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking.Tobii", "VRCFaceTracking.Tobii\VRCFaceTracking.Tobii.csproj", "{41A99D94-A5F1-44D7-B356-0BA4CEF36E5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.Tobii", "VRCFaceTracking.Tobii\VRCFaceTracking.Tobii.csproj", "{41A99D94-A5F1-44D7-B356-0BA4CEF36E5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.WCFace", "VRCFaceTracking.WCFace\VRCFaceTracking.WCFace.csproj", "{1D645638-B801-454D-A7F8-0BA55A786DE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking.EyeTrackVR", "VRCFaceTracking.EyeTrackVR\VRCFaceTracking.EyeTrackVR.csproj", "{605D1314-77BB-4C30-9557-0AD5B6128478}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.EyeTrackVR", "VRCFaceTracking.EyeTrackVR\VRCFaceTracking.EyeTrackVR.csproj", "{605D1314-77BB-4C30-9557-0AD5B6128478}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking.iFacialMocap", "VRCFaceTracking.iFacialMocap\VRCFaceTracking.iFacialMocap.csproj", "{19CAE82B-6274-45EA-A2BE-95967E4E0091}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.VSeeFace", "VRCFaceTracking.VSeeFace\VRCFaceTracking.VSeeFace.csproj", "{27D83458-2DA2-48EA-BA5F-DD1675534F63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VRCFaceTracking.MediaPipe", "VRCFaceTracking.MediaPipe\VRCFaceTracking.MediaPipe.csproj", "{BFE33FEF-F76B-42DB-BE2A-37F6329B5EDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VRCFaceTracking.MediaPipe", "VRCFaceTracking.MediaPipe\VRCFaceTracking.MediaPipe.csproj", "{BFE33FEF-F76B-42DB-BE2A-37F6329B5EDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,8 +143,8 @@ Global
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|arm64.ActiveCfg = Debug|Any CPU
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|arm64.Build.0 = Debug|Any CPU
-		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x64.Build.0 = Debug|Any CPU
+		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x64.ActiveCfg = Debug|x64
+		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x64.Build.0 = Debug|x64
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Debug|x86.Build.0 = Debug|Any CPU
 		{605D1314-77BB-4C30-9557-0AD5B6128478}.Release|Any CPU.ActiveCfg = Release|Any CPU
