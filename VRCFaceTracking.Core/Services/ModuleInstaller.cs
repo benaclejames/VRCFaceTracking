@@ -15,25 +15,36 @@ public class ModuleInstaller
         _logger = loggerFactory.CreateLogger("ModuleInstaller");
         
         if (!Directory.Exists(Utils.CustomLibsDirectory))
+        {
             Directory.CreateDirectory(Utils.CustomLibsDirectory);
+        }
     }
 
-    // Move a directory using just Copy and Remove as MoveDirectory is unreliable across drives
+    // Move a directory using just Copy and Remove as MoveDirectory is not usable across drives
     private void MoveDirectory(string source, string dest)
     {
-        if (!Directory.Exists(dest))
-            Directory.CreateDirectory(dest);
+        if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(dest))
+        {
+            return;
+        }
         
+        if (!Directory.Exists(dest))
+        {
+            Directory.CreateDirectory(dest);
+        }
+
         // Get files recursively and preserve directory structure
         foreach (var file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
         {
             var path = Path.GetDirectoryName(file);
             var newPath = path?.Replace(source, dest);
-            if (newPath != null)
+            if (newPath == null)
             {
-                Directory.CreateDirectory(newPath);
-                File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
+                continue;
             }
+
+            Directory.CreateDirectory(newPath);
+            File.Copy(file, Path.Combine(newPath, Path.GetFileName(file)), true);
         }
         
         // Now we delete the source directory
@@ -54,12 +65,15 @@ public class ModuleInstaller
         // Attempt to find the first DLL. If there's more than one, try find the one with the same name as the module
         var dllFiles = Directory.GetFiles(moduleDirectory, "*.dll");
         
-        if (dllFiles.Length == 0)
-            return null;
+        switch (dllFiles.Length)
+        {
+            case 0:
+                return null;
+            // If there's only one, just return it
+            case 1:
+                return Path.GetFileName(dllFiles[0]);
+        }
 
-        if (dllFiles.Length == 1)   // If there's only one, just return it
-            return Path.GetFileName(dllFiles[0]);
-        
         // Else we'll try find the one with the closest name to the module using Levenshtein distance
         var targetFileName = Path.GetFileNameWithoutExtension(moduleMetadata.DownloadUrl);
         var dllFile = dllFiles.Select(x => new { FileName = Path.GetFileNameWithoutExtension(x), Distance = LevenshteinDistance.Calculate(targetFileName, Path.GetFileNameWithoutExtension(x)) }).MinBy(x => x.Distance);
@@ -114,7 +128,10 @@ public class ModuleInstaller
         // Now we move to a directory named after the module id and delete the temp directory
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
         if (Directory.Exists(moduleDirectory))
+        {
             Directory.Delete(moduleDirectory, true);
+        }
+
         MoveDirectory(tempDirectory, moduleDirectory);
         
         // Now we need to find the module's dll

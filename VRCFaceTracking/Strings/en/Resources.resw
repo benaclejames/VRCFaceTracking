@@ -207,7 +207,7 @@
     <value>© 2023 VRCFaceTracking. All rights reserved.</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>The nerds who made this all possible &#60;3</value>
+    <value>The nerds who made this all possible &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
     <value>Dependencies &amp; references</value>
@@ -319,5 +319,68 @@
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
     <value>Auto Start when SteamVR is launched</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+    <value>Calibration Enabled</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+    <value>Toggles whether or not calibration is enabled</value>
+  </data>
+  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+    <value>Continuous Calibration</value>
+  </data>
+  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+    <value>Slowly calibrates to your facial expressions over time</value>
+  </data>
+  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+    <value>Heighten the influence your expressions make on calibration temporarily</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+    <value>Calibration Influence</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+    <value>Controls how much of an influence your facial expressions have on overall calibration over time</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="ForceReInitButton.Description" xml:space="preserve">
+    <value>Force VRCFT to unload and reinitialize all modules</value>
+  </data>
+  <data name="ForceReInitButton.Header" xml:space="preserve">
+    <value>Force Re-Initialize</value>
+  </data>
+  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+    <value>Forces sending of all parameters every frame by forcing relevancy</value>
+  </data>
+  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+    <value>Force Relevancy</value>
+  </data>
+  <data name="ReInitButton.Content" xml:space="preserve">
+    <value>Re-Initialize</value>
+  </data>
+  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+    <value>Reset all VRChat OSC config data (will be regenerated when avatar is reloaded)</value>
+  </data>
+  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+    <value>Reset VRChat Configs</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+    <value>Reset all data stored by VRCFT in your AppData folder</value>
+  </data>
+  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+    <value>Reset VRCFT</value>
+  </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>Hardware Debug</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>Stare at your tongue I guess?</value>
   </data>
 </root>
