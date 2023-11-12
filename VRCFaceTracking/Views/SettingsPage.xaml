@@ -120,7 +120,7 @@
                         <labs:SettingsCard x:Uid="ForceRelevancyToggle"
                             x:Name="allParamsRelevant"
                             IsEnabled="False">
-                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.ParamSupervisor.AllParametersRelevant, Mode=TwoWay}" />
+                            <ToggleSwitch x:Name="allParamsRelevantToggle" IsOn="{x:Bind RiskySettingsViewModel.AllRelevantDebug, Mode=TwoWay}" />
                         </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="ForceReInitButton"
                             x:Name="forceReInit"

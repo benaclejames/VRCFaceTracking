@@ -8,9 +8,9 @@ namespace VRCFaceTracking;
 
 public class MainStandalone : IMainService
 {
-    public IOSCService OscMain;
-
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
+    
+    private readonly IOSCService _oscService;
     private readonly ILogger _logger;
     private readonly IAvatarInfo _avatarInfo;
     private readonly ILibManager _libManager;
@@ -18,11 +18,16 @@ public class MainStandalone : IMainService
 
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
-    public MainStandalone(ILoggerFactory loggerFactory, IOSCService oscService, IAvatarInfo avatarInfo, ILibManager libManager,
-        UnifiedTrackingMutator mutator)
+    public MainStandalone(
+        ILoggerFactory loggerFactory, 
+        IOSCService oscService, 
+        IAvatarInfo avatarInfo, 
+        ILibManager libManager,
+        UnifiedTrackingMutator mutator
+        )
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
-        OscMain = oscService;
+        _oscService = oscService;
         _avatarInfo = avatarInfo;
         _libManager = libManager;
         _mutator = mutator;
@@ -111,7 +116,7 @@ public class MainStandalone : IMainService
                     //if (relevantMessages[messageIndex].Type == OscValueType.Float)  // Little update function for debug parameter tab.
                     //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
                     
-                    OscMain.Send(buffer, nextByteIndex);
+                    _oscService.Send(buffer, nextByteIndex);
                 }
 
                 ParamSupervisor.SendQueue.Clear();

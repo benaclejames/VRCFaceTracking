@@ -4,28 +4,28 @@ namespace VRCFaceTracking.Core.Models;
 
 public struct UnifiedMutationConfig
 {
-    public UnifiedMutation[] ShapeMutations;
-    public UnifiedMutation GazeMutations, OpennessMutations, PupilMutations;
+    public MutationConfig[] ShapeMutations;
+    public MutationConfig GazeMutationsConfig, OpennessMutationsConfig, PupilMutationsConfig;
 
     public UnifiedMutationConfig()
     {
-        ShapeMutations = new UnifiedMutation[(int)UnifiedExpressions.Max + 1];
+        ShapeMutations = new MutationConfig[(int)UnifiedExpressions.Max + 1];
         for (int i = 0; i < ShapeMutations.Length; i++)
         {
-            ShapeMutations[i] = new UnifiedMutation()
+            ShapeMutations[i] = new MutationConfig()
             {
                 Name = ((UnifiedExpressions)i).ToString()
             };
         }
-        GazeMutations = new UnifiedMutation()
+        GazeMutationsConfig = new MutationConfig()
         {
             Name = "GazeMutations"
         };
-        OpennessMutations = new UnifiedMutation()
+        OpennessMutationsConfig = new MutationConfig()
         {
             Name = "OpennessMutations"
         };
-        PupilMutations = new UnifiedMutation()
+        PupilMutationsConfig = new MutationConfig()
         {
             Name = "PupilMutations"
         };
