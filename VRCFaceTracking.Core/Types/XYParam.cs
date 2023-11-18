@@ -1,4 +1,5 @@
-﻿using VRCFaceTracking.Core.OSC.DataTypes;
+﻿using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.Types
 {
@@ -22,7 +23,7 @@ namespace VRCFaceTracking.Core.Types
             Y = y;
         }
 
-        protected void ResetParams(ConfigParser.Parameter[] newParams)
+        protected void ResetParams(IParameterDefinition[] newParams)
         {
             X.ResetParam(newParams);
             Y.ResetParam(newParams);

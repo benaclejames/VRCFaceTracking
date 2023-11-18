@@ -102,7 +102,7 @@ public partial class App : Application
             services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<IOSCService, OscMain>();
+            services.AddSingleton<ParameterOutputService, OscService>();
             services.AddSingleton<IMainService, MainStandalone>();
             services.AddSingleton<ConfigParser>();
             services.AddSingleton<UnifiedTracking>();
@@ -126,7 +126,6 @@ public partial class App : Application
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<IAvatarInfo, AvatarViewModel>();
             services.AddSingleton<IParamSupervisor, ParamSupervisor>();
 
             // Configuration

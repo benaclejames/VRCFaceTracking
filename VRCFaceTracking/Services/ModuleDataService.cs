@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Core.Models;
 
 namespace VRCFaceTracking.Core.Services;
@@ -36,7 +37,7 @@ public class ModuleDataService : IModuleDataService
         }
 
         var content = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<List<InstallableTrackingModule>>(content);
+        return await Json.ToObjectAsync<List<InstallableTrackingModule>>(content);
     }
 
     public async Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules()
@@ -109,7 +110,7 @@ public class ModuleDataService : IModuleDataService
             return null;
         }
 
-        var ratingResponse = JsonConvert.DeserializeObject<RatingObject>(await response.Content.ReadAsStringAsync());
+        var ratingResponse = await Json.ToObjectAsync<RatingObject>(await response.Content.ReadAsStringAsync());
         
         _logger.LogDebug("Rating for {ModuleId} was {Rating}. Caching...", moduleMetadata.ModuleId, ratingResponse.Rating);
         _ratingCache[moduleMetadata.ModuleId] = ratingResponse.Rating;
