@@ -98,7 +98,9 @@
                 </Grid>
             </Border>
 
-            <views:AvatarInfoControl x:Name="AvatarInfo"/>
+            <views:AvatarInfoControl 
+                AvatarInfo="{x:Bind ViewModel.CurrentlyLoadedAvatar, Mode=OneWay}" 
+                AvatarParameters="{x:Bind ViewModel.CurrentParameters, Mode=OneWay}"/>
         </StackPanel>
     </Grid>
 </Page>

@@ -13,8 +13,8 @@
                         <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEE57;" FontSize="20"/>
                         <StackPanel Margin="20, 4" Orientation="Vertical">
                             <TextBlock FontSize="15" Style="{ThemeResource SubtitleTextBlockStyle}" x:Uid="AvatarStatus" />
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Name="AvatarName" Text="Loading..."/>
-                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Name="AvatarId" Text="Loading..."/>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Name="AvatarName" Text="{x:Bind AvatarInfo.Name, Mode=OneWay}"/>
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Name="AvatarId" Text="{x:Bind AvatarInfo.Id, Mode=OneWay}"/>
                             <StackPanel x:Name="LocalTestWarning" Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center" Visibility="Collapsed">
                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="LocalTestAvatar" VerticalAlignment="Center"/>
                                 <Ellipse Width="10" Height="10" Fill="Red" Margin="5,0,0,0" VerticalAlignment="Center"/>
