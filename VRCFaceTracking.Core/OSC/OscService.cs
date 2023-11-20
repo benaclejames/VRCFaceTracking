@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC;
