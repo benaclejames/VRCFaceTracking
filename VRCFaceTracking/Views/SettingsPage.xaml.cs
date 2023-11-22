@@ -1,9 +1,10 @@
-﻿using Windows.Storage;
+﻿using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 using VRCFaceTracking.ViewModels;
 using Windows.System;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace VRCFaceTracking.Views;
 
@@ -37,6 +38,18 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
+        
+    public WriteableBitmap UpperImageSource
+    {
+        get;
+    }
+    
+    public WriteableBitmap LowerImageSource
+    {
+        get;
+    }
+
+    private readonly Stream _upperStream, _lowerStream;
     
     public SettingsPage()
     {
@@ -45,11 +58,49 @@ public sealed partial class SettingsPage : Page
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
 
+        var upperSize = UnifiedTracking.EyeImageData.ImageSize;
+        var lowerSize = UnifiedTracking.LipImageData.ImageSize;
+
+        if (upperSize is { x: > 0, y: > 0 })
+        {
+            UpperImageSource = new WriteableBitmap(upperSize.x, upperSize.y);
+            _upperStream = UpperImageSource.PixelBuffer.AsStream();
+        }
+
+        if (upperSize is { x: > 0, y: > 0 })
+        {
+            LowerImageSource = new WriteableBitmap(lowerSize.x, lowerSize.y);
+            _lowerStream = LowerImageSource.PixelBuffer.AsStream();
+        }
+        
         Loaded += OnPageLoaded;
+        
+        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
-    private async void OnPageLoaded(object sender, RoutedEventArgs e)
+    private async void OnTrackingDataUpdated()
+    {
+        var upperData = UnifiedTracking.EyeImageData.ImageData;
+        if (upperData != null && _lowerStream.CanWrite)
+        {
+            _upperStream.Position = 0;
+            await _upperStream.WriteAsync(upperData, 0, upperData.Length);
+
+            UpperImageSource.Invalidate();
+        }
+        
+        var lowerData = UnifiedTracking.LipImageData.ImageData;
+        if (lowerData != null && _upperStream.CanWrite)
+        {
+            _lowerStream.Position = 0;
+            await _lowerStream.WriteAsync(lowerData, 0, lowerData.Length);
+
+            LowerImageSource.Invalidate();
+        }
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         var currentTheme = ViewModel.ElementTheme;
         switch (currentTheme)
@@ -120,7 +171,7 @@ public sealed partial class SettingsPage : Page
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
 
-    private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCAvatarConf();
+    private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetAvatarOscManifests();
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => CalibrationSettings.InitializeCalibration();
 }

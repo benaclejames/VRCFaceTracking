@@ -1,13 +1,10 @@
-﻿using System.ComponentModel;
+﻿using VRCFaceTracking.Core.Models.Osc.FileBased;
 
 namespace VRCFaceTracking.Core.Contracts.Services;
 
-public interface IAvatarInfo : INotifyPropertyChanged
+public interface IAvatarInfo
 {
-    public string Name { get; set; }
-    public string Id { get; set; }
-    public int CurrentParameters { get; set; }
-    public int CurrentParametersLegacy { get; set; }
-    public bool HasAnyLegacy { get; }
-    public bool IsLocalTest { get; }
+    public string Name { get; }
+    public string Id { get; }
+    public AvatarConfigFileParameter[] Parameters { get; }
 }

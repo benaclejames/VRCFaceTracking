@@ -134,7 +134,7 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Lip
             };
 
         // Make a list called LipParameters containing the results from both GetOptimizedLipParameters and GetAllLipParameters, and add GetLipActivatedStatus
-        public static readonly IParameter[] AllLipParameters =
+        public static readonly Parameter[] AllLipParameters =
             GetAllLipShapes().Union(GetOptimizedLipParameters()).ToArray();
 
         private static IEnumerable<EParam> GetOptimizedLipParameters() => MergedShapes

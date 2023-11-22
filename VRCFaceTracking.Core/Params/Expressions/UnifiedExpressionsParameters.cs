@@ -1,4 +1,5 @@
-﻿using VRCFaceTracking.Core.Library;
+﻿using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.DataTypes;
 using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
@@ -8,17 +9,17 @@ namespace VRCFaceTracking.Core.Params.Expressions;
 
 public static class UnifiedExpressionsParameters
 {
-    private static (string paramName, IParameter paramLiteral)[] IsEyeParameter((string paramName, string paramAddress, Type paramType)[] param)
+    private static (string paramName, Parameter paramLiteral)[] IsEyeParameter(IParameterDefinition[] param)
     {
         // Get all the names of all parameters in both the unified tracking list and the old legacy eye list
         var allParams = UnifiedTracking.AllParameters_v2.Concat(EyeTrackingParams.ParameterList).ToList()
             .SelectMany(p => p.GetParamNames());
                 
         // Now we match parameters to the literals as a sort of sanity check
-        return allParams.Where(p => param.Any(p2 => p.paramName == p2.paramName)).ToArray();
+        return allParams.Where(p => param.Any(p2 => p.paramName == p2.Name)).ToArray();
     }
     
-    public static readonly IParameter[] UnifiedCombinedShapes =
+    public static readonly Parameter[] UnifiedCombinedShapes =
     {    
         // Unified Eye Definitions
         
@@ -35,9 +36,9 @@ public static class UnifiedExpressionsParameters
             param => 
                 IsEyeParameter(
                     param.Where(p => 
-                    p.paramName.Contains("Eye") && 
-                    (p.paramName.Contains("Left") || p.paramName.Contains("Right") || p.paramName.Contains("Eyes")) && 
-                    (p.paramName.Contains('X') || p.paramName.Contains('Y'))).ToArray()
+                    p.Name.Contains("Eye") && 
+                    (p.Name.Contains("Left") || p.Name.Contains("Right") || p.Name.Contains("Eyes")) && 
+                    (p.Name.Contains('X') || p.Name.Contains('Y'))).ToArray()
                 )
                 .Length == 0,
             "/tracking/eye/CenterPitchYaw"
@@ -63,8 +64,8 @@ public static class UnifiedExpressionsParameters
             exp => 1 - exp.Eye.Combined().Openness,
             param => IsEyeParameter(
                     param.Where(p =>
-                        p.paramName.Contains("Eye") &&
-                (p.paramName.Contains("Open") || p.paramName.Contains("Lid"))).ToArray())
+                        p.Name.Contains("Eye") &&
+                (p.Name.Contains("Open") || p.Name.Contains("Lid"))).ToArray())
                 .Length == 0,
             "/tracking/eye/EyesClosedAmount"
         ),
@@ -269,7 +270,7 @@ public static class UnifiedExpressionsParameters
 
     };
 
-    public static readonly IParameter[] ExpressionParameters =
+    public static readonly Parameter[] ExpressionParameters =
         GetAllBaseExpressions().Union(GetAllBaseSimpleExpressions()).Union(UnifiedCombinedShapes).ToArray();
 
     private static IEnumerable<EParam> GetAllBaseExpressions() =>

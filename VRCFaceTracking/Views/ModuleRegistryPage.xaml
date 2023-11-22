@@ -69,7 +69,7 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid x:Name="ContentArea">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -108,7 +108,6 @@
             </VisualStateManager.VisualStateGroups>
             <controls:ListDetailsView
                 x:Uid="ModuleRegistry"
-                x:Name="ListDetailsViewControl"
                 BackButtonBehavior="Manual"
                 Background="Transparent"
                 BorderBrush="Transparent"

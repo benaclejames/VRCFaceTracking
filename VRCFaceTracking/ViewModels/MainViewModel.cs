@@ -1,24 +1,37 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models.ParameterDefinition;
+using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
 public class MainViewModel : ObservableRecipient
 {
-    public IAvatarInfo AvatarInfo
-    {
-        get;
-    }
-
     public ILibManager LibManager
     {
         get;
     }
     
-    public IOSCService OscService
+    public ParameterOutputService ParameterOutputService
     {
         get;
+    }
+
+    private IAvatarInfo _currentlyLoadedAvatar;
+    public IAvatarInfo CurrentlyLoadedAvatar
+    {
+        get => _currentlyLoadedAvatar;
+        private set => SetProperty(ref _currentlyLoadedAvatar, value);
+    }
+
+    private List<Parameter> _currentParameters;
+
+    public List<Parameter> CurrentParameters
+    {
+        get => _currentParameters;
+        private set => SetProperty(ref _currentParameters, value);
     }
 
     private int _messagesRecvd;
@@ -50,48 +63,41 @@ public class MainViewModel : ObservableRecipient
         get => true;
         set => SetProperty(ref _oscWasDisabled, value);
     }
-    
-    private bool _isRecvConnected;
-    public bool IsRecvConnected
-    {
-        get => _isRecvConnected;
-        set => SetProperty(ref _isRecvConnected, value);
-    }
 
     public MainViewModel()
     {
-        AvatarInfo = App.GetService<IAvatarInfo>();
+        //Services
         LibManager = App.GetService<ILibManager>();
-        OscService = App.GetService<IOSCService>();
+        ParameterOutputService = App.GetService<ParameterOutputService>();
         var moduleDataService = App.GetService<IModuleDataService>();
+        var dispatcherService = App.GetService<IDispatcherService>();
+        
+        // Modules
         var installedNewModules = moduleDataService.GetInstalledModules();
         var installedLegacyModules = moduleDataService.GetLegacyModules().Count();
-        NoModulesInstalled = installedNewModules.Count() == 0 && installedLegacyModules == 0;
+        NoModulesInstalled = !installedNewModules.Any() && installedLegacyModules == 0;
         
-        // We now start 2 new threads to count both the send rate and recv rate of the osc service over 1 second intervals at a time
-        // This is done in a separate thread to not block the UI thread
-        // We also use a timer to update the UI every 1 second
-        OscService.OnMessageReceived += _ => { _messagesRecvd++; };
-        var inTimer = new DispatcherTimer();
-        inTimer.Interval = TimeSpan.FromSeconds(1);
-        inTimer.Tick += (sender, args) =>
+        // Avatar Info
+        CurrentlyLoadedAvatar = new NullAvatarDef("Loading...", "Loading...");
+        ParameterOutputService.OnAvatarLoaded += (info, list) => dispatcherService.Run(() =>
+        {
+            CurrentlyLoadedAvatar = info;
+            CurrentParameters = list;
+        });
+        
+        // Message Timer
+        ParameterOutputService.OnMessageReceived += _ => { _messagesRecvd++; };
+        ParameterOutputService.OnMessageDispatched += () => { _messagesSent++; };
+        var messageTimer = new DispatcherTimer();
+        messageTimer.Interval = TimeSpan.FromSeconds(1);
+        messageTimer.Tick += (sender, args) =>
         {
             MessagesInPerSec = _messagesRecvd;
             _messagesRecvd = 0;
-        };
-        inTimer.Start();
-        
-        OscService.OnMessageDispatched += () => { _messagesSent++; };
-        var outTimer = new DispatcherTimer();
-        outTimer.Interval = TimeSpan.FromSeconds(1);
-        outTimer.Tick += (sender, args) =>
-        {
+            
             MessagesOutPerSec = _messagesSent;
             _messagesSent = 0;
         };
-        outTimer.Start();
-        
-        IsRecvConnected = OscService.IsConnected;
-        OscService.OnConnectedDisconnected += b => { IsRecvConnected = b; };
+        messageTimer.Start();
     }
 }

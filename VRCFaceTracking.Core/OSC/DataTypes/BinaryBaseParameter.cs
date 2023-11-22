@@ -1,10 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
 
-public class BinaryBaseParameter : IParameter
+public class BinaryBaseParameter : Parameter
 {
     private readonly List<BaseParam<bool>> _params = new(); // Int represents binary steps
 
@@ -41,18 +42,18 @@ public class BinaryBaseParameter : IParameter
      * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
      * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
      */
-    public IParameter[] ResetParam((string paramName, string paramAddress, Type paramType)[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
         _params.Clear();
         var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
         var boolParams = newParams.Where(p =>
-            p.paramType == typeof(bool) && _regex.IsMatch(p.paramName));
+            p.Type == typeof(bool) && _regex.IsMatch(p.Name));
 
         var paramsToCreate = new Dictionary<string, int>();
         foreach (var param in boolParams)
         {
-            var tempName = param.paramName;
+            var tempName = param.Name;
             if (!int.TryParse(
                     String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber)
                         .Reverse()), out var index)) continue;
@@ -67,7 +68,7 @@ public class BinaryBaseParameter : IParameter
 
         // Calculate the highest possible binary number
         _maxPossibleBinaryInt = (int)Math.Pow(2, paramsToCreate.Values.Count);
-        var parameters = new List<IParameter>(negativeRelevancy);
+        var parameters = new List<Parameter>(negativeRelevancy);
         foreach (var newBool in paramsToCreate
                      .Select(param =>
                          new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value), true)))
@@ -79,10 +80,10 @@ public class BinaryBaseParameter : IParameter
         return parameters.ToArray();
     }
 
-    public (string, IParameter)[] GetParamNames() =>
+    public override (string, Parameter)[] GetParamNames() =>
         _params.SelectMany(p => p.GetParamNames()).Concat(_negativeParam.GetParamNames()).ToArray();
 
-    public bool Deprecated => false; // Handled by our children
+    public new bool Deprecated => false; // Handled by our children
 
     // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it
     private static int? GetBinarySteps(int index)

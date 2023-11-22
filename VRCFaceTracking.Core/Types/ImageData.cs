@@ -9,7 +9,7 @@
         public (int x, int y) ImageSize;
 
         /// <summary>
-        /// Byte that contains the raw image data.
+        /// Byte that contains the raw image data in RGBA. Length MUST be equal to x * y * 4
         /// </summary>
         /// <remarks> ImageSize will be used to unwrap the image properly. </remarks>
         public byte[] ImageData;
