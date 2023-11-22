@@ -104,7 +104,7 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<ParameterOutputService, OscService>();
             services.AddSingleton<IMainService, MainStandalone>();
-            services.AddSingleton<ConfigParser>();
+            services.AddSingleton<AvatarConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
             services.AddTransient<OpenVRService>();

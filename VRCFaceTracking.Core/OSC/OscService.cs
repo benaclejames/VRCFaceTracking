@@ -13,19 +13,19 @@ public class OscService : ParameterOutputService
     private static CancellationTokenSource _recvThreadCts;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
-    private readonly ConfigParser _configParser;
+    private readonly AvatarConfigParser _avatarConfigParser;
     private readonly IParamSupervisor _paramSupervisor;
     private readonly byte[] _recvBuffer = new byte[4096], _sendBuffer = new byte[4096];
     
     public OscService(
         ILocalSettingsService localSettingsService, 
         ILoggerFactory loggerFactory,
-        ConfigParser configParser,
+        AvatarConfigParser avatarConfigParser,
         IParamSupervisor paramSupervisor
     )
     {
         _localSettingsService = localSettingsService;
-        _configParser = configParser;
+        _avatarConfigParser = avatarConfigParser;
         _logger = loggerFactory.CreateLogger("OSC");
         OnMessageDispatched = () => { };
         OnAvatarLoaded = (_, _) => { };
@@ -181,7 +181,7 @@ public class OscService : ParameterOutputService
             case "/avatar/change":
                 if (msg._meta.ValueLength > 0 && msg.Value is string avatarId)
                 {
-                    var newAvatar = _configParser.ParseNewAvatar(avatarId);
+                    var newAvatar = _avatarConfigParser.ParseNewAvatar(avatarId);
                     if (newAvatar.HasValue)
                     {
                         OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
