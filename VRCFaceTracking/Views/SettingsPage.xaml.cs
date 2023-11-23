@@ -67,7 +67,7 @@ public sealed partial class SettingsPage : Page
             _upperStream = UpperImageSource.PixelBuffer.AsStream();
         }
 
-        if (upperSize is { x: > 0, y: > 0 })
+        if (lowerSize is { x: > 0, y: > 0 })
         {
             LowerImageSource = new WriteableBitmap(lowerSize.x, lowerSize.y);
             _lowerStream = LowerImageSource.PixelBuffer.AsStream();
@@ -82,7 +82,7 @@ public sealed partial class SettingsPage : Page
     private async void OnTrackingDataUpdated()
     {
         var upperData = UnifiedTracking.EyeImageData.ImageData;
-        if (upperData != null && _lowerStream.CanWrite)
+        if (upperData != null && _upperStream.CanWrite)
         {
             _upperStream.Position = 0;
             await _upperStream.WriteAsync(upperData, 0, upperData.Length);
@@ -91,7 +91,7 @@ public sealed partial class SettingsPage : Page
         }
         
         var lowerData = UnifiedTracking.LipImageData.ImageData;
-        if (lowerData != null && _upperStream.CanWrite)
+        if (lowerData != null && _lowerStream.CanWrite)
         {
             _lowerStream.Position = 0;
             await _lowerStream.WriteAsync(lowerData, 0, lowerData.Length);
