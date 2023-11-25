@@ -238,7 +238,8 @@ public class UnifiedLibManager : ILibManager
         module.ModuleInformation.UsingEye = eyeSuccess;
         module.ModuleInformation.UsingExpression = expressionSuccess;
         _dispatcherService.Run(() => { if (!ModuleMetadatas.Contains(module.ModuleInformation)) ModuleMetadatas.Add(module.ModuleInformation); });
-        EnsureModuleThreadStarted(module);
+        if (module.UseUpdateThread)
+            EnsureModuleThreadStarted(module);
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)

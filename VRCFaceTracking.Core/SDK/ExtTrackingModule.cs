@@ -20,5 +20,7 @@ namespace VRCFaceTracking
         public abstract void Update();
 
         public abstract void Teardown();
+
+        public virtual bool UseUpdateThread => true;
     }
 }
