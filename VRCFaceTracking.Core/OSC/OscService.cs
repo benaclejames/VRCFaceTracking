@@ -1,40 +1,101 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.Query.mDNS;
+using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscService : ParameterOutputService
+public class OscService : IParameterOutputService
 {
     private static Socket _senderClient, _receiverClient;
     private static CancellationTokenSource _recvThreadCts;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
-    private readonly AvatarConfigParser _avatarConfigParser;
+    private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly IParamSupervisor _paramSupervisor;
+    private readonly QueryRegistrar _queryRegistrar;
+    private HttpHandler _httpHandler;
     private readonly byte[] _recvBuffer = new byte[4096], _sendBuffer = new byte[4096];
     
     public OscService(
         ILocalSettingsService localSettingsService, 
         ILoggerFactory loggerFactory,
-        AvatarConfigParser avatarConfigParser,
+        OscQueryConfigParser oscQueryConfigParser,
         IParamSupervisor paramSupervisor
     )
     {
         _localSettingsService = localSettingsService;
-        _avatarConfigParser = avatarConfigParser;
+        _oscQueryConfigParser = oscQueryConfigParser;
         _logger = loggerFactory.CreateLogger("OSC");
         OnMessageDispatched = () => { };
         OnAvatarLoaded = (_, _) => { };
         OnMessageReceived = HandleNewMessage;
         _paramSupervisor = paramSupervisor;
+        _queryRegistrar = new QueryRegistrar();
     }
 
+    private int _inPort;
+    public int InPort
+    {
+        get => _inPort;
+        set => SetField(ref _inPort, value);
+    }
 
-    public async override Task LoadSettings()
+    private int _outPort;
+    public int OutPort
+    {
+        get => _outPort;
+        set => SetField(ref _outPort, value);
+    }
+
+    private string _destinationAddress;
+    public string DestinationAddress
+    {
+        get => _destinationAddress;
+        set => SetField(ref _destinationAddress, value);
+    }
+
+    private bool _isConnected;
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set => SetField(ref _isConnected, value);
+    }
+
+    public Action OnMessageDispatched
+    {
+        get;
+        set;
+    }
+
+    public Action<OscMessage> OnMessageReceived
+    {
+        get;
+        set;
+    }
+
+    public Action<IAvatarInfo, List<Parameter>> OnAvatarLoaded
+    {
+        get;
+        set;
+    }
+
+    public async Task SaveSettings()
+    {
+        await _localSettingsService.SaveSettingAsync("OSCAddress", DestinationAddress);
+        await _localSettingsService.SaveSettingAsync("OSCInPort", InPort);
+        await _localSettingsService.SaveSettingAsync("OSCOutPort", OutPort);
+
+        await Task.CompletedTask;
+    }
+    
+    public async Task LoadSettings()
     {
         DestinationAddress = await _localSettingsService.ReadSettingAsync("OSCAddress", "127.0.0.1");
         InPort = await _localSettingsService.ReadSettingAsync("OSCInPort", 9001);
@@ -43,33 +104,53 @@ public class OscService : ParameterOutputService
         await Task.CompletedTask;
     }
 
-    public async override  Task SaveSettings()
-    {
-        await _localSettingsService.SaveSettingAsync("OSCAddress", DestinationAddress);
-        await _localSettingsService.SaveSettingAsync("OSCInPort", InPort);
-        await _localSettingsService.SaveSettingAsync("OSCOutPort", OutPort);
-
-        await Task.CompletedTask;
-    }
-
-    public async override Task<(bool, bool)> InitializeAsync()
+    public async Task<(bool, bool)> InitializeAsync()
     {
         _logger.LogDebug("OSC Service Initializing");
             
         await LoadSettings();
-        var result = (false, false);
+        (bool listenerSuccess, bool senderSuccess) result = (false, false);
 
         if (string.IsNullOrWhiteSpace(DestinationAddress))
         {
             return result;  // Return both false as we cant bind to anything without an address
         }
 
-        result.Item1 = BindListener();
-        result.Item2 = BindSender();
+        InitOscQuery();
+            
+        result = (BindListener(), BindSender());
+
+        var isParsingAvatar = false;
+        async void FirstClientDiscovered()
+        {
+            QueryRegistrar.OnVRCClientDiscovered -= FirstClientDiscovered;
+                
+            if (!isParsingAvatar && string.IsNullOrEmpty(OscQueryConfigParser.AvatarId))
+            {
+                isParsingAvatar = true;
+                var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
+                if (newAvatar.HasValue)
+                {
+                    OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
+                }
+            }
+        }
+
+        QueryRegistrar.OnVRCClientDiscovered += FirstClientDiscovered;
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
         return result;
+    }
+    
+    private void InitOscQuery()
+    {
+        // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
+        _queryRegistrar.Advertise("VRCFT", "_oscjson._tcp", 6970, IPAddress.Loopback);
+        _queryRegistrar.Advertise("VRCFT", "_osc._udp", 6969, IPAddress.Loopback);
+
+        _httpHandler?.Dispose();
+        _httpHandler = new HttpHandler(6970);
     }
 
     private bool BindSender()
@@ -131,7 +212,7 @@ public class OscService : ParameterOutputService
             return false;
         }
 
-        SetField(ref IsConnected, true);
+        IsConnected = true;
         return true;
     }
 
@@ -174,14 +255,14 @@ public class OscService : ParameterOutputService
         }
     }
         
-    private void HandleNewMessage(OscMessage msg)
+    private async void HandleNewMessage(OscMessage msg)
     {
         switch (msg.Address)
         {
             case "/avatar/change":
                 if (msg._meta.ValueLength > 0 && msg.Value is string avatarId)
                 {
-                    var newAvatar = _avatarConfigParser.ParseNewAvatar(avatarId);
+                    var newAvatar  = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
                     if (newAvatar.HasValue)
                     {
                         OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
@@ -218,7 +299,7 @@ public class OscService : ParameterOutputService
         }
     }
 
-    public override void Send(OscMessage message)
+    public void Send(OscMessage message)
     {
         var nextByteIndex = SROSCLib.create_osc_message(_sendBuffer, ref message._meta);
         if (nextByteIndex > 4096)
@@ -231,7 +312,7 @@ public class OscService : ParameterOutputService
         OnMessageDispatched();
     }
         
-    public override void Teardown()
+    public void Teardown()
     {
         // We just need to cancel our listener thread and close the sockets
         _logger.LogDebug("OSC Service Teardown");
@@ -239,5 +320,18 @@ public class OscService : ParameterOutputService
             
         _senderClient?.Close();
         _receiverClient?.Close();
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }

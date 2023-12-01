@@ -14,5 +14,5 @@ public class AvatarConfigFile : IAvatarInfo
 
     [JsonIgnore] public string Id => id;
 
-    [JsonIgnore] public AvatarConfigFileParameter[] Parameters => parameters;
+    [JsonIgnore] public IParameterDefinition[] Parameters => parameters;
 }

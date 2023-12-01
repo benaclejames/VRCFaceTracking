@@ -6,7 +6,7 @@ namespace VRCFaceTracking.ViewModels;
 
 public class OscViewModel : ObservableRecipient
 {
-    private readonly ParameterOutputService _parameterOutputService;
+    private readonly IParameterOutputService _parameterOutputService;
     
     private int _inPort, _outPort;
     private string _address;
@@ -53,7 +53,7 @@ public class OscViewModel : ObservableRecipient
         }
     }
     
-    public OscViewModel(ParameterOutputService parameterOutput)
+    public OscViewModel(IParameterOutputService parameterOutput)
     {
         _parameterOutputService = parameterOutput;
         

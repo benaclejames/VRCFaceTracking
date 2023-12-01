@@ -21,8 +21,5 @@ public class NullAvatarDef : IAvatarInfo
 
     public string Id => _id;
 
-    public AvatarConfigFileParameter[] Parameters
-    {
-        get;
-    }
+    public IParameterDefinition[] Parameters { get; }
 }

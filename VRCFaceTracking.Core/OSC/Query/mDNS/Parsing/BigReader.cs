@@ -11,7 +11,7 @@ public class BigReader : BinaryReader
         
     public override uint ReadUInt32() => (uint)((base.ReadByte() << 24) | (base.ReadByte() << 16) | (base.ReadByte() << 8) | base.ReadByte());
 
-    public string ReadString()
+    public override string ReadString()
     {
         var length = ReadByte();
         var data = ReadBytes(length);

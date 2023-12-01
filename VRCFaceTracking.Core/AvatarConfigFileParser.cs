@@ -48,7 +48,7 @@ public class AvatarConfigParser
                      .Where(folder => Directory.Exists(Path.Combine(folder, "Avatars"))))
         {
             foreach (var avatarFile in Directory.GetFiles(userFolder + "\\Avatars"))
-            {
+            {    
                 var configText = File.ReadAllText(avatarFile);
                 var tempConfig = JsonSerializer.Deserialize<AvatarConfigFile>(configText);
                 if (tempConfig == null || tempConfig.id != newId)
