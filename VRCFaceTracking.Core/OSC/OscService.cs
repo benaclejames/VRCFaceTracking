@@ -13,15 +13,48 @@ namespace VRCFaceTracking.Core.OSC;
 
 public class OscService : IParameterOutputService
 {
-    private static Socket _senderClient, _receiverClient;
-    private static CancellationTokenSource _recvThreadCts;
+    // Services
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly IParamSupervisor _paramSupervisor;
     private readonly QueryRegistrar _queryRegistrar;
-    private HttpHandler _httpHandler;
+    
+    // Recv and send buffers
     private readonly byte[] _recvBuffer = new byte[4096], _sendBuffer = new byte[4096];
+ 
+    // Local vars
+    private Socket _senderClient, _receiverClient;
+    private CancellationTokenSource _recvThreadCts;
+    private HttpHandler _httpHandler;
+    private int _inPort, _outPort;
+    private string _destinationAddress;
+    private bool _isConnected;
+    
+    // Custom getters and setters for winui observables
+    public int InPort
+    {
+        get => _inPort;
+        set => SetField(ref _inPort, value);
+    }
+
+    public int OutPort
+    {
+        get => _outPort;
+        set => SetField(ref _outPort, value);
+    }
+    
+    public string DestinationAddress
+    {
+        get => _destinationAddress;
+        set => SetField(ref _destinationAddress, value);
+    }
+    
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set => SetField(ref _isConnected, value);
+    }
     
     public OscService(
         ILocalSettingsService localSettingsService, 
@@ -39,34 +72,8 @@ public class OscService : IParameterOutputService
         _paramSupervisor = paramSupervisor;
         _queryRegistrar = new QueryRegistrar();
     }
-
-    private int _inPort;
-    public int InPort
-    {
-        get => _inPort;
-        set => SetField(ref _inPort, value);
-    }
-
-    private int _outPort;
-    public int OutPort
-    {
-        get => _outPort;
-        set => SetField(ref _outPort, value);
-    }
-
-    private string _destinationAddress;
-    public string DestinationAddress
-    {
-        get => _destinationAddress;
-        set => SetField(ref _destinationAddress, value);
-    }
-
-    private bool _isConnected;
-    public bool IsConnected
-    {
-        get => _isConnected;
-        set => SetField(ref _isConnected, value);
-    }
+    
+    
 
     public Action OnMessageDispatched
     {
@@ -120,27 +127,18 @@ public class OscService : IParameterOutputService
             
         result = (BindListener(), BindSender());
 
-        var isParsingAvatar = false;
-        async void FirstClientDiscovered()
-        {
-            QueryRegistrar.OnVRCClientDiscovered -= FirstClientDiscovered;
-                
-            if (!isParsingAvatar && string.IsNullOrEmpty(OscQueryConfigParser.AvatarId))
-            {
-                isParsingAvatar = true;
-                var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
-                if (newAvatar.HasValue)
-                {
-                    OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
-                }
-            }
-        }
-
         QueryRegistrar.OnVRCClientDiscovered += FirstClientDiscovered;
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
         return result;
+
+        void FirstClientDiscovered()
+        {
+            QueryRegistrar.OnVRCClientDiscovered -= FirstClientDiscovered;
+                
+            HandleNewAvatar();
+        }
     }
     
     private void InitOscQuery()
@@ -254,24 +252,25 @@ public class OscService : IParameterOutputService
             _logger.LogTrace("Failed to receive message: {0}", e.Message);
         }
     }
+
+    private async void HandleNewAvatar()
+    {
+        var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
+        if (newAvatar.HasValue)
+        {
+            OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
+        }
+    }
         
-    private async void HandleNewMessage(OscMessage msg)
+    private void HandleNewMessage(OscMessage msg)
     {
         switch (msg.Address)
         {
             case "/avatar/change":
-                if (msg._meta.ValueLength > 0 && msg.Value is string avatarId)
-                {
-                    var newAvatar  = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
-                    if (newAvatar.HasValue)
-                    {
-                        OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
-                    }
-                }
-
+                HandleNewAvatar();
                 break;
             case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
-                if (msg._meta.ValueLength > 0 && msg.Value is bool relevancy)
+                if (msg.Value is bool relevancy)
                 {
                     _paramSupervisor.AllParametersRelevant = relevancy;
                 }
@@ -301,7 +300,7 @@ public class OscService : IParameterOutputService
 
     public void Send(OscMessage message)
     {
-        var nextByteIndex = SROSCLib.create_osc_message(_sendBuffer, ref message._meta);
+        var nextByteIndex = message.Encode(_sendBuffer);
         if (nextByteIndex > 4096)
         {
             _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
@@ -327,7 +326,7 @@ public class OscService : IParameterOutputService
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;

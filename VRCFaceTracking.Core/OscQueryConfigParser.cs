@@ -1,13 +1,9 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
 using VRCFaceTracking.Core.Params;
-using VRCFaceTracking.OSC;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace VRCFaceTracking
 {
@@ -20,7 +16,6 @@ namespace VRCFaceTracking
             _logger = parserLogger;
         }
 
-        public static string AvatarId = "";
         private readonly HttpClient _httpClient = new();
 
         public async Task<(IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?> ParseNewAvatar(IPEndPoint oscQueryEndpoint)
@@ -40,8 +35,6 @@ namespace VRCFaceTracking
             {
                 paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters));
             }
-
-            AvatarId = avatarInfo.Id;
 
             return (avatarInfo, paramList);
         }

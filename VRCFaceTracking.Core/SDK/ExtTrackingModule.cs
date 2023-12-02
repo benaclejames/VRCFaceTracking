@@ -1,24 +1,22 @@
 ﻿using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Library;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking;
+
+public abstract class ExtTrackingModule
 {
-    public abstract class ExtTrackingModule
-    {
-        // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
-        public virtual (bool SupportsEye, bool SupportsExpression) Supported => (false, false);
+    // Should UnifiedLibManager try to initialize this module if it's looking for a module that supports eye or lip.
+    public virtual (bool SupportsEye, bool SupportsExpression) Supported => (false, false);
 
-        public ModuleState Status = ModuleState.Uninitialized;
+    public ModuleState Status = ModuleState.Uninitialized;
 
-        public ILogger Logger;
+    public ILogger Logger;
 
-        public ModuleMetadata ModuleInformation;
+    public ModuleMetadata ModuleInformation;
 
-        public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
+    public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
 
-        public abstract void Update();
+    public abstract void Update();
 
-        public abstract void Teardown();
-    }
+    public abstract void Teardown();
 }

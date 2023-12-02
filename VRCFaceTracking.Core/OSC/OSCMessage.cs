@@ -4,91 +4,10 @@ using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public enum OscValueType : byte {
-    Null = 0,
-    Int = 1,
-    Float = 2,
-    Bool = 3,
-    String = 4,
-    ArrayBegin = 5,
-    ArrayEnd = 6,
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct OscValue {
-    public OscValueType Type;
-    [MarshalAs(UnmanagedType.I4)]
-    public int IntValue;
-    [MarshalAs(UnmanagedType.R4)]
-    public float FloatValue;
-    [MarshalAs(UnmanagedType.I1)]
-    public bool BoolValue;
-    [MarshalAs(UnmanagedType.LPStr)]
-    public string StringValue; // Use IntPtr for pointer types
-
-    public object Value
-    {
-        get => Type switch
-        {
-            OscValueType.Int => IntValue,
-            OscValueType.Float => FloatValue,
-            OscValueType.Bool => BoolValue,
-            OscValueType.String => StringValue,
-            _ => null
-        };
-        set
-        {
-            switch (Type)
-            {
-                case OscValueType.Int:
-                    IntValue = (int)value;
-                    break;
-                case OscValueType.Float:
-                    FloatValue = (float)value;
-                    break;
-                case OscValueType.Bool:
-                    BoolValue = (bool)value;
-                    break;
-                case OscValueType.String:
-                    StringValue = (string)value;
-                    break;
-            }
-        }
-    }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct OscMessageMeta {
-    [MarshalAs(UnmanagedType.LPStr)]
-    public string Address;
-    
-    [MarshalAs(UnmanagedType.I4)]
-    public int ValueLength;
-    
-    public IntPtr Value;
-}
-
-// Simple Rust OSC Lib wrapper
-public static class SROSCLib
-{
-    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr parse_osc(byte[] buffer, int bufferLength, ref int messageIndex);
-    
-    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int create_osc_message([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, ref OscMessageMeta osc_template);
-
-    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int create_osc_bundle([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, 
-        [MarshalAs(UnmanagedType.LPArray)]  OscMessageMeta[] messages, int len, ref int messageIndex);
-
-    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void free_osc_message(IntPtr oscMessage);
-}
-
 public class OscMessage
 {
-    public OscMessageMeta _meta;
-    protected IntPtr _metaPtr;
+    private OscMessageMeta _meta;
+    private IntPtr _metaPtr;
 
     public string Address
     {
@@ -96,12 +15,17 @@ public class OscMessage
         set => _meta.Address = value;
     }
     
-    private Action<object> _valueSetter;
+    private readonly Action<object> _valueSetter;
 
     public object Value
     {
         get
         {
+            if (_meta.ValueLength == 0)
+            {
+                return null;
+            }
+            
             var values = new OscValue[_meta.ValueLength];
             var ptr = _meta.Value;
             for (var i = 0; i < _meta.ValueLength; i++)
@@ -131,7 +55,7 @@ public class OscMessage
             _valueSetter = value =>
             {
                 oscValue.Value = value;
-                Marshal.StructureToPtr(oscValue, _meta.Value, false);
+                Marshal.StructureToPtr(oscValue, _meta.Value, true);
             };
         }
         else    // If we don't have the type, we assume it's a struct and serialize it using reflection
@@ -171,17 +95,24 @@ public class OscMessage
     
     public OscMessage(byte[] bytes, int len, ref int messageIndex)
     {
-        _metaPtr = SROSCLib.parse_osc(bytes, len, ref messageIndex);
+        _metaPtr = fti_osc.parse_osc(bytes, len, ref messageIndex);
         if (_metaPtr != IntPtr.Zero)
         {
             _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
         }
     }
 
+    /// <summary>
+    /// Encodes stored osc meta into raw bytes using fti_osc lib
+    /// </summary>
+    /// <param name="buffer">Target byte buffer to serialize to, starting from index 0</param>
+    /// <returns>Length of serialized data</returns>
+    public int Encode(byte[] buffer) => fti_osc.create_osc_message(buffer, ref _meta);
+    
     public OscMessage(OscMessageMeta meta) => _meta = meta;
     
     ~OscMessage()
     {
-        SROSCLib.free_osc_message(_metaPtr);
+        fti_osc.free_osc_message(_metaPtr);
     }
 }
