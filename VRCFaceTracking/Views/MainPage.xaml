@@ -15,7 +15,7 @@
 
     <Grid>
         <StackPanel Orientation="Vertical">
-            <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.ModuleMetadatas}">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.LibManager.LoadedModulesMetadata}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:ModuleMetadata">
                         <Border CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}">

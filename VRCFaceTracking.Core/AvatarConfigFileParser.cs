@@ -52,7 +52,9 @@ public class AvatarConfigParser
                 var configText = File.ReadAllText(avatarFile);
                 var tempConfig = JsonSerializer.Deserialize<AvatarConfigFile>(configText);
                 if (tempConfig == null || tempConfig.id != newId)
+                {
                     continue;
+                }
 
                 avatarConfig = tempConfig;
                 break;
@@ -61,13 +63,13 @@ public class AvatarConfigParser
 
         if (avatarConfig == null)
         {
-            _logger.LogError("Avatar config file for " + newId + " not found");
+            _logger.LogError("Avatar config file for {avatarId} not found", newId);
             return null;
         }
 
-        _logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
+        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
         ParamSupervisor.SendQueue.Clear();
-        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
+        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
         foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
         {
