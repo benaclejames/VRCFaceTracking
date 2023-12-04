@@ -24,9 +24,13 @@ namespace VRCFaceTracking
             var httpEndpoint = "http://" + oscQueryEndpoint + "/avatar";
             
             // Get the response
-            var response = await _httpClient.GetStringAsync(httpEndpoint);
+            var response = await _httpClient.GetAsync(httpEndpoint);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
             
-            var avatarConfig = JsonConvert.DeserializeObject<OSCQueryNode>(response);
+            var avatarConfig = JsonConvert.DeserializeObject<OSCQueryNode>(await response.Content.ReadAsStringAsync());
             var avatarInfo = new OscQueryAvatarInfo(avatarConfig);
             
             // Reset all parameters
