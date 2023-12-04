@@ -7,11 +7,10 @@ using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
-using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscService : IParameterOutputService
+public class OscQueryService : IParameterOutputService
 {
     // Services
     private readonly ILocalSettingsService _localSettingsService;
@@ -56,7 +55,7 @@ public class OscService : IParameterOutputService
         set => SetField(ref _isConnected, value);
     }
     
-    public OscService(
+    public OscQueryService(
         ILocalSettingsService localSettingsService, 
         ILoggerFactory loggerFactory,
         OscQueryConfigParser oscQueryConfigParser,
@@ -72,8 +71,6 @@ public class OscService : IParameterOutputService
         _paramSupervisor = paramSupervisor;
         _queryRegistrar = new QueryRegistrar();
     }
-    
-    
 
     public Action OnMessageDispatched
     {

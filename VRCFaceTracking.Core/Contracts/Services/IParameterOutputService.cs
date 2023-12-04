@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Params;
 
-namespace VRCFaceTracking.Core.Services;
+namespace VRCFaceTracking.Core.Contracts.Services;
 
 public interface IParameterOutputService : INotifyPropertyChanged
 {

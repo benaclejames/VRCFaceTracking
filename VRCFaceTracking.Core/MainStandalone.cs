@@ -77,7 +77,7 @@ public class MainStandalone : IMainService
         };
         
         _mutator.LoadCalibration();
-
+        
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
         Utils.TimeBeginPeriod(1);

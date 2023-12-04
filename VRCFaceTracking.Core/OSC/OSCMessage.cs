@@ -55,7 +55,7 @@ public class OscMessage
             _valueSetter = value =>
             {
                 oscValue.Value = value;
-                Marshal.StructureToPtr(oscValue, _meta.Value, true);
+                Marshal.StructureToPtr(oscValue, _meta.Value, false);
             };
         }
         else    // If we don't have the type, we assume it's a struct and serialize it using reflection
