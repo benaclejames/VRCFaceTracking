@@ -6,7 +6,7 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
 {
     public static class EyeTrackingParams
     {
-        public static readonly IParameter[] ParameterList = {
+        public static readonly Parameter[] ParameterList = {
             #region XYParams
             
             new EParam("Eyes", exp => exp.Eye.Combined().Gaze),

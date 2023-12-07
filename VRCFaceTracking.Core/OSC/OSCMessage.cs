@@ -10,6 +10,8 @@ public enum OscValueType : byte {
     Float = 2,
     Bool = 3,
     String = 4,
+    ArrayBegin = 5,
+    ArrayEnd = 6,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -70,7 +72,7 @@ public struct OscMessageMeta {
 public static class SROSCLib
 {
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool parse_osc(byte[] buffer, int bufferLength, ref int messageIndex, ref OscMessageMeta message);
+    public static extern IntPtr parse_osc(byte[] buffer, int bufferLength, ref int messageIndex);
     
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_message([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, ref OscMessageMeta osc_template);
@@ -78,11 +80,15 @@ public static class SROSCLib
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern int create_osc_bundle([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, 
         [MarshalAs(UnmanagedType.LPArray)]  OscMessageMeta[] messages, int len, ref int messageIndex);
+
+    [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void free_osc_message(IntPtr oscMessage);
 }
 
 public class OscMessage
 {
     public OscMessageMeta _meta;
+    protected IntPtr _metaPtr;
 
     public string Address
     {
@@ -153,10 +159,28 @@ public class OscMessage
 
     public static OscMessage TryParseOsc(byte[] bytes, int len, ref int messageIndex)
     {
-        var meta = new OscMessageMeta();
-        return SROSCLib.parse_osc(bytes, len, ref messageIndex, ref meta) ? new OscMessage(meta) : null;
+        var msg = new OscMessage(bytes, len, ref messageIndex);
+        if (msg._metaPtr == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        return msg;
     }
     
-    public OscMessage(byte[] bytes, int len, ref int messageIndex) => SROSCLib.parse_osc(bytes, len, ref messageIndex, ref _meta);
+    public OscMessage(byte[] bytes, int len, ref int messageIndex)
+    {
+        _metaPtr = SROSCLib.parse_osc(bytes, len, ref messageIndex);
+        if (_metaPtr != IntPtr.Zero)
+        {
+            _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
+        }
+    }
+
     public OscMessage(OscMessageMeta meta) => _meta = meta;
+    
+    ~OscMessage()
+    {
+        SROSCLib.free_osc_message(_metaPtr);
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.Models;
 
-public struct UnifiedMutation
+public struct MutationConfig
 {
     public string Name;
     public float Ceil; // The maximum that the parameter reaches.

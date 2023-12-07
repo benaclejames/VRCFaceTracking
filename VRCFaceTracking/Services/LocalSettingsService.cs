@@ -21,7 +21,7 @@ public class LocalSettingsService : ILocalSettingsService
 
     private readonly string _localApplicationData = Utils.PersistentDataDirectory;
     private readonly string _applicationDataFolder;
-    private readonly string _localsettingsFile;
+    private readonly string _localSettingsFile;
 
     private IDictionary<string, object> _settings;
 
@@ -33,7 +33,7 @@ public class LocalSettingsService : ILocalSettingsService
         _options = options.Value;
 
         _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
-        _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
+        _localSettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
 
         _settings = new Dictionary<string, object>();
     }
@@ -42,7 +42,7 @@ public class LocalSettingsService : ILocalSettingsService
     {
         if (!_isInitialized)
         {
-            _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? new Dictionary<string, object>();
+            _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localSettingsFile)) ?? new Dictionary<string, object>();
 
             _isInitialized = true;
         }
@@ -82,7 +82,7 @@ public class LocalSettingsService : ILocalSettingsService
 
             _settings[key] = await Json.StringifyAsync(value);
 
-            await Task.Run(() => _fileService.Save(_applicationDataFolder, _localsettingsFile, _settings));
+            await Task.Run(() => _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings));
         }
     }
 }

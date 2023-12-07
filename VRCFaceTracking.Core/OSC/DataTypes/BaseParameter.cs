@@ -9,7 +9,7 @@ namespace VRCFaceTracking.Core.OSC.DataTypes;
 
 public class ParamSupervisor : IParamSupervisor
 {
-    public static readonly Queue<OscMessageMeta> SendQueue = new();
+    public static readonly Queue<OscMessage> SendQueue = new();
  
     private readonly IDispatcherService _dispatcherService;
     
@@ -24,7 +24,7 @@ public class ParamSupervisor : IParamSupervisor
             AllParametersRelevantStatic = value;
             SendQueue.Clear();
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(Array.Empty<ConfigParser.Parameter>());
+                parameter.ResetParam(Array.Empty<IParameterDefinition>());
             OnPropertyChanged();
         }
     }
@@ -50,7 +50,7 @@ public class ParamSupervisor : IParamSupervisor
     }
 }
 
-public class BaseParam<T> : IParameter where T : struct
+public class BaseParam<T> : Parameter where T : struct
 {
     private const string DefaultPrefix = "/avatar/parameters/";
     protected const string CurrentVersionPrefix = "v2/";
@@ -99,7 +99,7 @@ public class BaseParam<T> : IParameter where T : struct
         }
     }
 
-    private void Enqueue() => ParamSupervisor.SendQueue.Enqueue(OscMessage._meta);
+    private void Enqueue() => ParamSupervisor.SendQueue.Enqueue(OscMessage);
 
     protected readonly OscMessage OscMessage;
 
@@ -112,24 +112,24 @@ public class BaseParam<T> : IParameter where T : struct
         _sendOnLoad = sendOnLoad;
     }
 
-    public virtual IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
         if (ParamSupervisor.AllParametersRelevantStatic)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;
 
-            return new IParameter[] { this };
+            return new Parameter[] { this };
         }
 
         var compatibleParam = newParams.FirstOrDefault(param =>
-            _regex.IsMatch(param.name)
-            && param.input.Type == typeof(T));
+            _regex.IsMatch(param.Name)
+            && param.Type == typeof(T));
 
         if (compatibleParam != null)
         {
             Relevant = true;
-            OscMessage.Address = compatibleParam.input.address;
+            OscMessage.Address = compatibleParam.Address;
         }
         else
         {
@@ -137,12 +137,12 @@ public class BaseParam<T> : IParameter where T : struct
             OscMessage.Address = DefaultPrefix + _paramName;
         }
 
-        return Relevant ? new IParameter[] { this } : Array.Empty<IParameter>();
+        return Relevant ? new Parameter[] { this } : Array.Empty<Parameter>();
     }
 
-    public (string, IParameter)[] GetParamNames() => new[] { (_paramName, (IParameter)this) };
+    public override (string, Parameter)[] GetParamNames() => new[] { (_paramName, (Parameter)this) };
 
-    public bool Deprecated => !_paramName.StartsWith(CurrentVersionPrefix);
+    public override bool Deprecated => !_paramName.StartsWith(CurrentVersionPrefix);
 
     protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
 

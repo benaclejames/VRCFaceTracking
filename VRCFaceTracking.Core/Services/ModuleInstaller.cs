@@ -117,7 +117,7 @@ public class ModuleInstaller
             return null;
         }
         
-        var moduleMetadata = JsonConvert.DeserializeObject<TrackingModuleMetadata>(await File.ReadAllTextAsync(moduleJsonPath));
+        var moduleMetadata = await Json.ToObjectAsync<TrackingModuleMetadata>(await File.ReadAllTextAsync(moduleJsonPath));
         if (moduleMetadata == null)
         {
             _logger.LogError("Module {module} contains an invalid module.json file", fileName);
@@ -191,7 +191,11 @@ public class ModuleInstaller
             moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
             var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
             
-            Directory.CreateDirectory(moduleDirectory);
+            if (!Directory.Exists(moduleDirectory))
+            {
+                Directory.CreateDirectory(moduleDirectory);
+            }
+
             await DownloadModuleToFile(moduleMetadata, dllPath);
             
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);

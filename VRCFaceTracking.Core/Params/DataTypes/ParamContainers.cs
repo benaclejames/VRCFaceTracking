@@ -1,11 +1,11 @@
-﻿using VRCFaceTracking.Core.OSC.DataTypes;
+﻿using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Types;
-using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Core.Params.DataTypes
 {
-    public class AlwaysRelevantParameter<T> : BaseParam<T>, IParameter where T : struct
+    public class AlwaysRelevantParameter<T> : BaseParam<T> where T : struct
     {
         public AlwaysRelevantParameter(Func<UnifiedTrackingData, T> getValueFunc,
             string paramAddress)
@@ -15,36 +15,36 @@ namespace VRCFaceTracking.Core.Params.DataTypes
             Relevant = true;
         }
 
-        public new (string, IParameter)[] GetParamNames() => new[] { (OscMessage.Address, (IParameter)this) };
+        public new (string, Parameter)[] GetParamNames() => new[] { (OscMessage.Address, (Parameter)this) };
         
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        public override Parameter[] ResetParam(IParameterDefinition[] newParams)
         {
             Relevant = true;
-            return new IParameter[] { this };
+            return new Parameter[] { this };
         }
     }
 
-    public class NativeParameter<T> : AlwaysRelevantParameter<T>, IParameter where T : struct
+    public class NativeParameter<T> : AlwaysRelevantParameter<T> where T : struct
     {
-        private readonly Func<ConfigParser.Parameter[], bool> _condition;
+        private readonly Func<IParameterDefinition[], bool> _condition;
         
-        public NativeParameter(Func<UnifiedTrackingData, T> getValueFunc, Func<ConfigParser.Parameter[], bool> condition, string paramAddress) : base(getValueFunc, paramAddress)
+        public NativeParameter(Func<UnifiedTrackingData, T> getValueFunc, Func<IParameterDefinition[], bool> condition, string paramAddress) : base(getValueFunc, paramAddress)
         {
             _condition = condition;
         }
         
-        public override IParameter[] ResetParam(ConfigParser.Parameter[] newParams)
+        public override Parameter[] ResetParam(IParameterDefinition[] newParams)
         {
             if (!_condition.Invoke(newParams))
             {
                 Relevant = false;
-                return Array.Empty<IParameter>();
+                return Array.Empty<Parameter>();
             }
             
             return base.ResetParam(newParams);
         }
         
-        public new (string, IParameter)[] GetParamNames() => new (string, IParameter)[] { (OscMessage.Address, this) };
+        public new (string, Parameter)[] GetParamNames() => new (string, Parameter)[] { (OscMessage.Address, this) };
     }
 
     // This parameter type will only update parameter 1 if parameter 2 is true
@@ -65,16 +65,16 @@ namespace VRCFaceTracking.Core.Params.DataTypes
 
     // EverythingParam, or EpicParam. You choose!
     // Contains a bool, float and binary parameter, all in one class with IParameter implemented.
-    public class EParam : IParameter
+    public class EParam : Parameter
     {
-        private readonly IParameter[] _parameter;
+        private readonly Parameter[] _parameter;
 
         public EParam(string paramName, Func<UnifiedTrackingData, float> getValueFunc, float minBoolThreshold = 0.5f,
             bool skipBinaryParamCreation = false)
         {
             if (skipBinaryParamCreation)
             {
-                _parameter = new IParameter[]
+                _parameter = new Parameter[]
                 {
                     new BaseParam<bool>(paramName, exp => getValueFunc.Invoke(exp) < minBoolThreshold),
                     new BaseParam<float>(paramName, getValueFunc),
@@ -82,7 +82,7 @@ namespace VRCFaceTracking.Core.Params.DataTypes
             }
             else
             {
-                _parameter = new IParameter[]
+                _parameter = new Parameter[]
                 {
                     new BaseParam<bool>(paramName, exp => getValueFunc.Invoke(exp) < minBoolThreshold),
                     new BaseParam<float>(paramName, getValueFunc),
@@ -93,7 +93,7 @@ namespace VRCFaceTracking.Core.Params.DataTypes
 
         public EParam(string paramName, Func<UnifiedTrackingData, Vector2> getValueFunc, float minBoolThreshold = 0.5f)
         {
-            _parameter = new IParameter[]
+            _parameter = new Parameter[]
             {
                 new BaseParam<bool>(paramName + "X", exp => getValueFunc.Invoke(exp).x < minBoolThreshold),
                 new BaseParam<float>(paramName + "X", exp => getValueFunc.Invoke(exp).x),
@@ -105,10 +105,8 @@ namespace VRCFaceTracking.Core.Params.DataTypes
             };
         }
 
-        public IParameter[] ResetParam(ConfigParser.Parameter[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
+        public override Parameter[] ResetParam(IParameterDefinition[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
 
-        public (string, IParameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
-        
-        public bool Deprecated => false;    // False as our children will handle this
+        public override (string, Parameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
     }
 }
