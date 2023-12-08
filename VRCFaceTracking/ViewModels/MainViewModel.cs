@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.Params;
@@ -32,6 +33,11 @@ public class MainViewModel : ObservableRecipient
     {
         get => _currentParameters;
         private set => SetProperty(ref _currentParameters, value);
+    }
+
+    public IFilterService FilterService
+    {
+        get; 
     }
 
     private int _messagesRecvd;
@@ -69,6 +75,7 @@ public class MainViewModel : ObservableRecipient
         //Services
         LibManager = App.GetService<ILibManager>();
         ParameterOutputService = App.GetService<ParameterOutputService>();
+        FilterService = App.GetService<IFilterService>();
         var moduleDataService = App.GetService<IModuleDataService>();
         var dispatcherService = App.GetService<IDispatcherService>();
         

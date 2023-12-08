@@ -308,6 +308,12 @@
   <data name="CalibrationSettings.Description" xml:space="preserve">
     <value>Tweak tracking data to your heart's content</value>
   </data>
+  <data name="OneEuroFilterSettings.Header" xml:space="preserve">
+    <value>One-Euro Filter Settings</value>
+  </data>
+  <data name="OneEuroFilterSettings.Description" xml:space="preserve">
+    <value>Settings for a nifty little (data!) filter</value>
+  </data>
   <data name="RiskySettings.Header" xml:space="preserve">
     <value>Risky Settings</value>
   </data>

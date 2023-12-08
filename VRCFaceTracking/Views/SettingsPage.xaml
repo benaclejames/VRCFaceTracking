@@ -103,7 +103,50 @@
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                
+
+                <labs:SettingsExpander x:Uid="OneEuroFilterSettings">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE71C;"/>
+                    </labs:SettingsExpander.HeaderIcon>
+                    
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard>
+                            <TextBlock
+                                Width="1000"
+                                HorizontalTextAlignment="Left"
+                                TextWrapping="WrapWholeWords"
+                                IsTextSelectionEnabled="true"
+                                Text="The One-Euro Filter is useful for filtering noisy data in real-time. It may improve overall tracking quality and/or reduce jitter.">
+                            </TextBlock>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="One-Euro Filter Enabled"
+                            Description="Toggles whether or not the One-Euro Filter is enabled">
+                            <ToggleSwitch IsOn="{x:Bind FilterSettings.Enabled, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="One-Euro Filter Alpha"
+                            Description="Exponential smoothing factor for the raw signal">
+                            <Slider Width="200" Minimum="0.001" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind FilterSettings.Alpha, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="One-Euro Filter Beta"
+                            Description="Exponential smoothing factor for the filtered signal">
+                            <Slider Width="200" Minimum="0.001" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind FilterSettings.Beta, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="One-Euro Filter Frequency"
+                            Description="Cutoff frequency for filtering">
+                            <Slider Width="200" Minimum="1.000" Maximum="3.000" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind FilterSettings.Frequency, Mode=TwoWay}" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                            Header="One-Euro Filter Help"
+                            Description="Want to learn what all these controls mean and do?">
+                            <HyperlinkButton Content="Click here!" NavigateUri="https://jaantollander.com/post/noise-filtering-using-one-euro-filter/"/>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+
                 <labs:SettingsCard x:Uid="AutoStartSettings" IsEnabled="{x:Bind ViewModel.IsOpenVREnabled, Mode=OneWay}">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE840;" />

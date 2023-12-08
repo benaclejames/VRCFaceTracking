@@ -9,8 +9,11 @@ using Microsoft.UI.Xaml;
 
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Services;
@@ -102,6 +105,7 @@ public partial class App : Application
             services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IFilterService, OneEuroFilter>();
             services.AddSingleton<ParameterOutputService, OscService>();
             services.AddSingleton<IMainService, MainStandalone>();
             services.AddSingleton<AvatarConfigParser>();
@@ -126,6 +130,7 @@ public partial class App : Application
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
+            services.AddSingleton<FilterSettingsViewModel>();
             services.AddSingleton<IParamSupervisor, ParamSupervisor>();
 
             // Configuration
