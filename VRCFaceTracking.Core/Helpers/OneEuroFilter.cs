@@ -58,7 +58,6 @@ public class OneEuroFilter : IFilterService
         await Task.CompletedTask;
     }
 
-    // TODO Add Loading?
     public async Task LoadCalibration()
     {
         Enabled = await _localSettingsService.ReadSettingAsync("FilterEnabled", false);
