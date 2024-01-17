@@ -85,4 +85,48 @@ public class LocalSettingsService : ILocalSettingsService
             await Task.Run(() => _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings));
         }
     }
+
+    public async Task Load(object instance)
+    {
+        var type = instance.GetType();
+        var properties = type.GetProperties();
+
+        foreach (var property in properties)
+        {
+            var attributes = property.GetCustomAttributes(typeof(SavedSettingAttribute), false);
+
+            if (attributes.Length <= 0)
+            {
+                continue;
+            }
+
+            var savedSettingAttribute = (SavedSettingAttribute)attributes[0];
+            var settingName = savedSettingAttribute.GetName();
+            var defaultValue = savedSettingAttribute.Default();
+
+            var setting = await ReadSettingAsync(settingName, defaultValue);
+            property.SetValue(instance, setting);
+        }
+    }
+
+    public async Task Save(object instance)
+    {
+        var type = instance.GetType();
+        var properties = type.GetProperties();
+
+        foreach (var property in properties)
+        {
+            var attributes = property.GetCustomAttributes(typeof(SavedSettingAttribute), false);
+
+            if (attributes.Length <= 0)
+            {
+                continue;
+            }
+
+            var savedSettingAttribute = (SavedSettingAttribute)attributes[0];
+            var settingName = savedSettingAttribute.GetName();
+
+            await SaveSettingAsync(settingName, property.GetValue(instance));
+        }
+    }
 }

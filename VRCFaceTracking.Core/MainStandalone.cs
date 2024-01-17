@@ -10,7 +10,7 @@ public class MainStandalone : IMainService
 {
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     
-    private readonly IParameterOutputService _parameterOutputService;
+    private readonly ParameterOutputService _parameterOutputService;
     private readonly ILogger _logger;
     private readonly ILibManager _libManager;
     private readonly UnifiedTrackingMutator _mutator;
@@ -19,7 +19,7 @@ public class MainStandalone : IMainService
 
     public MainStandalone(
         ILoggerFactory loggerFactory, 
-        IParameterOutputService parameterOutputService,
+        ParameterOutputService parameterOutputService,
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )

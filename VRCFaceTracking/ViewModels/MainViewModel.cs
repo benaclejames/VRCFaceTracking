@@ -14,7 +14,7 @@ public class MainViewModel : ObservableRecipient
         get;
     }
     
-    public IParameterOutputService ParameterOutputService
+    public ParameterOutputService ParameterOutputService
     {
         get;
     }
@@ -68,7 +68,7 @@ public class MainViewModel : ObservableRecipient
     {
         //Services
         LibManager = App.GetService<ILibManager>();
-        ParameterOutputService = App.GetService<IParameterOutputService>();
+        ParameterOutputService = App.GetService<ParameterOutputService>();
         var moduleDataService = App.GetService<IModuleDataService>();
         var dispatcherService = App.GetService<IDispatcherService>();
         

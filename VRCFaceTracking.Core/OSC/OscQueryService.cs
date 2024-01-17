@@ -6,11 +6,10 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
-using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscQueryService : IParameterOutputService
+public class OscQueryService : ParameterOutputService
 {
     // Services
     private readonly ILocalSettingsService _localSettingsService;
@@ -26,34 +25,6 @@ public class OscQueryService : IParameterOutputService
     private Socket _senderClient, _receiverClient;
     private CancellationTokenSource _recvThreadCts;
     private HttpHandler _httpHandler;
-    private int _inPort, _outPort;
-    private string _destinationAddress;
-    private bool _isConnected;
-    
-    // Custom getters and setters for winui observables
-    public int InPort
-    {
-        get => _inPort;
-        set => SetField(ref _inPort, value);
-    }
-
-    public int OutPort
-    {
-        get => _outPort;
-        set => SetField(ref _outPort, value);
-    }
-    
-    public string DestinationAddress
-    {
-        get => _destinationAddress;
-        set => SetField(ref _destinationAddress, value);
-    }
-    
-    public bool IsConnected
-    {
-        get => _isConnected;
-        set => SetField(ref _isConnected, value);
-    }
     
     public OscQueryService(
         ILocalSettingsService localSettingsService, 
@@ -72,43 +43,21 @@ public class OscQueryService : IParameterOutputService
         _queryRegistrar = new QueryRegistrar();
     }
 
-    public Action OnMessageDispatched
+    public async override Task SaveSettings()
     {
-        get;
-        set;
-    }
-
-    public Action<OscMessage> OnMessageReceived
-    {
-        get;
-        set;
-    }
-
-    public Action<IAvatarInfo, List<Parameter>> OnAvatarLoaded
-    {
-        get;
-        set;
-    }
-
-    public async Task SaveSettings()
-    {
-        await _localSettingsService.SaveSettingAsync("OSCAddress", DestinationAddress);
-        await _localSettingsService.SaveSettingAsync("OSCInPort", InPort);
-        await _localSettingsService.SaveSettingAsync("OSCOutPort", OutPort);
+        await _localSettingsService.Save(this);
 
         await Task.CompletedTask;
     }
     
     public async Task LoadSettings()
     {
-        DestinationAddress = await _localSettingsService.ReadSettingAsync("OSCAddress", "127.0.0.1");
-        InPort = await _localSettingsService.ReadSettingAsync("OSCInPort", 9001);
-        OutPort = await _localSettingsService.ReadSettingAsync("OSCOutPort", 9000);
+        await _localSettingsService.Load(this);
 
         await Task.CompletedTask;
     }
 
-    public async Task<(bool, bool)> InitializeAsync()
+    public async override Task<(bool, bool)> InitializeAsync()
     {
         _logger.LogDebug("OSC Service Initializing");
             
@@ -295,7 +244,7 @@ public class OscQueryService : IParameterOutputService
         }
     }
 
-    public void Send(OscMessage message)
+    public override void Send(OscMessage message)
     {
         var nextByteIndex = message.Encode(_sendBuffer);
         if (nextByteIndex > 4096)
@@ -308,7 +257,7 @@ public class OscQueryService : IParameterOutputService
         OnMessageDispatched();
     }
         
-    public void Teardown()
+    public override void Teardown()
     {
         // We just need to cancel our listener thread and close the sockets
         _logger.LogDebug("OSC Service Teardown");
