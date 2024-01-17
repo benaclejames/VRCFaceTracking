@@ -1,18 +1,21 @@
 ﻿namespace VRCFaceTracking.Core.Contracts.Services;
 
-public class SavedSettingAttribute : System.Attribute
+public class SavedSettingAttribute : Attribute
 {
     private readonly string _settingName;
     private readonly object? _defaultValue;
-    
-    public SavedSettingAttribute(string settingName, object? defaultValue)
+    private readonly bool _forceLocal;
+
+    public SavedSettingAttribute(string settingName, object? defaultValue = default, bool forceLocal = true)
     {
         _settingName = settingName;
         _defaultValue = defaultValue;
+        _forceLocal = forceLocal;
     }
 
     public string GetName() => _settingName;
     public object? Default() => _defaultValue;
+    public bool ForceLocal() => _forceLocal;
 }
  
 public interface ILocalSettingsService

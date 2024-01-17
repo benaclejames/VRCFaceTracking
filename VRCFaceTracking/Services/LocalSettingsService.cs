@@ -105,7 +105,8 @@ public class LocalSettingsService : ILocalSettingsService
             var defaultValue = savedSettingAttribute.Default();
 
             var setting = await ReadSettingAsync(settingName, defaultValue);
-            property.SetValue(instance, setting);
+            var convertedSetting = Convert.ChangeType(setting, property.PropertyType);
+            property.SetValue(instance, convertedSetting);
         }
     }
 
