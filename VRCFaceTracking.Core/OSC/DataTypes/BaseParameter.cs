@@ -123,7 +123,7 @@ public class BaseParam<T> : Parameter where T : struct
         }
 
         var compatibleParam = newParams.FirstOrDefault(param =>
-            _regex.IsMatch(param.Name)
+            _regex.IsMatch(param.Address)
             && param.Type == typeof(T));
 
         if (compatibleParam != null)

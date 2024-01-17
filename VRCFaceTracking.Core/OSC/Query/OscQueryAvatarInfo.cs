@@ -14,7 +14,20 @@ public class OscQueryAvatarInfo : IAvatarInfo
     {
         Id = rootNode.Contents["change"].Value[0] as string;
         
-        Parameters = rootNode.Contents["parameters"].Contents.Where(p => (int)p.Value.Access > 1)
-            .Select(entry => new OscQueryParameterDef(entry.Key, entry.Value)).ToArray<IParameterDefinition>();
+        
+        //TODO: Figure out a way to reconstruct the traditional address pattern instead of the whole thing.
+        IEnumerable<IParameterDefinition> ConstructParameterArray(Dictionary<string, OSCQueryNode> entries)
+        {
+            return entries
+                .SelectMany(entry =>
+                    entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) }
+                );
+        }
+        
+        Parameters = rootNode.Contents["parameters"].Contents
+            .SelectMany(entry => 
+                entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) }
+            )
+            .ToArray();
     }
 }
