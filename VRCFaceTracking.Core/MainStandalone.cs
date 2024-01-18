@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.OSC;
 using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
 
 namespace VRCFaceTracking;
@@ -9,7 +10,7 @@ public class MainStandalone : IMainService
 {
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     
-    private readonly ParameterOutputService _parameterOutputService;
+    private readonly OscQueryService _parameterOutputService;
     private readonly ILogger _logger;
     private readonly ILibManager _libManager;
     private readonly UnifiedTrackingMutator _mutator;
@@ -18,7 +19,7 @@ public class MainStandalone : IMainService
 
     public MainStandalone(
         ILoggerFactory loggerFactory, 
-        ParameterOutputService parameterOutputService,
+        OscQueryService parameterOutputService,
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )

@@ -102,7 +102,7 @@ public partial class App : Application
             services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<ParameterOutputService, OscQueryService>();
+            services.AddSingleton<OscQueryService>();
             services.AddSingleton<IMainService, MainStandalone>();
             services.AddSingleton<AvatarConfigParser>();
             services.AddSingleton<OscQueryConfigParser>();

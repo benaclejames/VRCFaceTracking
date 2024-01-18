@@ -2,25 +2,19 @@
 using Microsoft.UI.Xaml;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
+using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.ViewModels;
 
 public partial class MainViewModel : ObservableRecipient
 {
-    public ILibManager LibManager
-    {
-        get;
-    }
-    
-    public ParameterOutputService ParameterOutputService
-    {
-        get;
-    }
+    public ILibManager LibManager { get; }
+    public OscQueryService ParameterOutputService { get; }
 
     [ObservableProperty] private IAvatarInfo _currentlyLoadedAvatar;
 
-    [ObservableProperty] private List<Parameter> _currentParameters;
+    [ObservableProperty] private List<Parameter>? _currentParameters;
 
     private int _messagesRecvd;
     [ObservableProperty] private int _messagesInPerSec;
@@ -36,7 +30,7 @@ public partial class MainViewModel : ObservableRecipient
     {
         //Services
         LibManager = App.GetService<ILibManager>();
-        ParameterOutputService = App.GetService<ParameterOutputService>();
+        ParameterOutputService = App.GetService<OscQueryService>();
         var moduleDataService = App.GetService<IModuleDataService>();
         var dispatcherService = App.GetService<IDispatcherService>();
         
@@ -56,9 +50,11 @@ public partial class MainViewModel : ObservableRecipient
         // Message Timer
         ParameterOutputService.OnMessageReceived += _ => { _messagesRecvd++; };
         ParameterOutputService.OnMessageDispatched += () => { _messagesSent++; };
-        var messageTimer = new DispatcherTimer();
-        messageTimer.Interval = TimeSpan.FromSeconds(1);
-        messageTimer.Tick += (sender, args) =>
+        var messageTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        messageTimer.Tick += (_, _) =>
         {
             MessagesInPerSec = _messagesRecvd;
             _messagesRecvd = 0;

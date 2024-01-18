@@ -1,14 +1,17 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
+using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscQueryService : ParameterOutputService
+public partial class OscQueryService : ObservableObject
 {
     // Services
     private readonly ILocalSettingsService _localSettingsService;
@@ -16,6 +19,25 @@ public class OscQueryService : ParameterOutputService
     private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly ParamSupervisor _paramSupervisor;
     private readonly QueryRegistrar _queryRegistrar;
+    
+    // Delegates
+    public Action OnMessageDispatched;
+    public Action<OscMessage> OnMessageReceived;
+    public Action<IAvatarInfo, List<Parameter>> OnAvatarLoaded;
+    
+    [ObservableProperty] private bool _isConnected;
+    
+    [ObservableProperty]
+    [property: SavedSetting("OSCInPort", 9001)] 
+    private int _inPort;
+
+    [ObservableProperty]
+    [property: SavedSetting("OSCOutPort", 9000)]
+    private int _outPort;
+
+    [ObservableProperty]
+    [property: SavedSetting("OSCAddress", "127.0.0.1")]
+    private string _destinationAddress;
     
     // Recv and send buffers
     private readonly byte[] _recvBuffer = new byte[4096], _sendBuffer = new byte[4096];
@@ -42,7 +64,7 @@ public class OscQueryService : ParameterOutputService
         _queryRegistrar = new QueryRegistrar();
     }
 
-    public async override Task SaveSettings()
+    public async Task SaveSettings()
     {
         await _localSettingsService.Save(this);
 
@@ -56,7 +78,7 @@ public class OscQueryService : ParameterOutputService
         await Task.CompletedTask;
     }
 
-    public async override Task<(bool, bool)> InitializeAsync()
+    public async Task<(bool, bool)> InitializeAsync()
     {
         _logger.LogDebug("OSC Service Initializing");
             
@@ -243,7 +265,7 @@ public class OscQueryService : ParameterOutputService
         }
     }
 
-    public override void Send(OscMessage message)
+    public void Send(OscMessage message)
     {
         var nextByteIndex = message.Encode(_sendBuffer);
         if (nextByteIndex > 4096)
@@ -256,7 +278,7 @@ public class OscQueryService : ParameterOutputService
         OnMessageDispatched();
     }
         
-    public override void Teardown()
+    public void Teardown()
     {
         // We just need to cancel our listener thread and close the sockets
         _logger.LogDebug("OSC Service Teardown");

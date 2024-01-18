@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking.ViewModels;
 
 public class OscViewModel : ObservableRecipient
 {
-    private readonly ParameterOutputService _parameterOutputService;
+    private readonly OscQueryService _parameterOutputService;
     
     private int _inPort, _outPort;
     private string _address;
@@ -52,7 +52,7 @@ public class OscViewModel : ObservableRecipient
         }
     }
     
-    public OscViewModel(ParameterOutputService parameterOutput)
+    public OscViewModel(OscQueryService parameterOutput)
     {
         _parameterOutputService = parameterOutput;
         
