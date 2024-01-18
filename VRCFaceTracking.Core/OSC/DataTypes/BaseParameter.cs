@@ -1,13 +1,12 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.ComponentModel;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
 
-public class ParamSupervisor : IParamSupervisor
+public class ParamSupervisor : ObservableObject
 {
     public static readonly Queue<OscMessage> SendQueue = new();
  
@@ -27,21 +26,6 @@ public class ParamSupervisor : IParamSupervisor
                 parameter.ResetParam(Array.Empty<IParameterDefinition>());
             OnPropertyChanged();
         }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-    }
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
     
     public ParamSupervisor(IDispatcherService dispatcherService)

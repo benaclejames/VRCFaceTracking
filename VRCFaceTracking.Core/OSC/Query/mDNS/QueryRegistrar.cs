@@ -37,7 +37,7 @@ public class QueryRegistrar
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
 
-    private static readonly Dictionary<string, (string serviceName, int port, string ipAddress)[]> services = new();
+    private static readonly Dictionary<string, (string serviceName, int port, string ipAddress)> services = new();
         
     public QueryRegistrar()
     {
@@ -121,10 +121,10 @@ public class QueryRegistrar
                 continue;
                         
             // Ensure the question is for the _osc._udp service
-            if (!services.TryGetValue($"{question.Labels[0]}.{question.Labels[1]}", out var storedServices))
+            if (!services.TryGetValue($"{question.Labels[0]}.{question.Labels[1]}", out var service))
                 continue;
 
-            foreach (var service in storedServices)
+            //foreach (var service in storedServices)
             {
                 var qualifiedServiceName = new List<string>
                 {
@@ -235,7 +235,18 @@ public class QueryRegistrar
             }
         }).Start();
     }
-        
-    public void Advertise(string instanceName, string serviceName, int port, IPAddress address) => 
-        services.Add(serviceName, new[] { (instanceName, port, address.ToString()) });
+
+    public void Advertise(string instanceName, string serviceName, int port, IPAddress address)
+    {
+        if (services.TryGetValue(serviceName, out var service))
+        {
+            service.serviceName = serviceName;
+            service.ipAddress = address.ToString();
+            service.port = port;
+        }
+        else
+        {
+            services.Add(serviceName, (instanceName, port, address.ToString()));
+        }
+    }
 }

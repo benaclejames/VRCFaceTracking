@@ -127,7 +127,7 @@ public partial class App : Application
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<IParamSupervisor, ParamSupervisor>();
+            services.AddSingleton<ParamSupervisor, ParamSupervisor>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

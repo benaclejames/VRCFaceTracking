@@ -2,21 +2,17 @@
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.ViewModels;
 
-public class RiskySettingsViewModel : ObservableObject
+public partial class RiskySettingsViewModel : ObservableObject
 {
     private readonly IMainService _mainService;
-    private readonly IParamSupervisor _paramSupervisor;
+    private readonly ParamSupervisor _paramSupervisor;
     private readonly ILogger<RiskySettingsViewModel> _logger;
 
-    private bool _enabled;
-    public bool Enabled
-    {
-        get => _enabled;
-        set => SetProperty(ref _enabled, value);
-    }
+    [ObservableProperty] private bool _enabled;
 
     public bool AllRelevantDebug
     {
@@ -26,7 +22,7 @@ public class RiskySettingsViewModel : ObservableObject
 
     public RiskySettingsViewModel(
         IMainService mainService, 
-        IParamSupervisor paramSupervisor, 
+        ParamSupervisor paramSupervisor, 
         ILogger<RiskySettingsViewModel> logger
         )
     {

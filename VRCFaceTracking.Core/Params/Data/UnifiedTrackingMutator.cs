@@ -1,5 +1,4 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
@@ -11,37 +10,25 @@ namespace VRCFaceTracking;
 /// <summary>
 /// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
 /// </summary>
-public class UnifiedTrackingMutator : INotifyPropertyChanged
+public partial class UnifiedTrackingMutator : ObservableObject
 {
     private UnifiedTrackingData trackingDataBuffer = new();
     [SavedSetting("Mutations", default, false)]
     public UnifiedMutationConfig mutationData = new();
 
+    [ObservableProperty]
+    [property: SavedSetting("CalibrationWeight", 0.2f)]
     private float _calibrationWeight;
-    [SavedSetting("CalibrationWeight", 0.2f)]
-    public float CalibrationWeight
-    {
-        get => _calibrationWeight;
-        set => SetField(ref _calibrationWeight, value);
-    }
         
+    [ObservableProperty]
+    [property: SavedSetting("ContinuousCalibrationEnabled")]
     private bool _continuousCalibration;
-    [SavedSetting("ContinuousCalibrationEnabled")]
-    public bool ContinuousCalibration
-    {
-        get => _continuousCalibration;
-        set => SetField(ref _continuousCalibration, value);
-    }
 
     public bool SmoothingMode = false;
 
+    [ObservableProperty]
+    [property: SavedSetting("CalibrationEnabled")]
     private bool _enabled;
-    [SavedSetting("CalibrationEnabled")]
-    public bool Enabled 
-    {
-        get => _enabled;
-        set => SetField(ref _enabled, value);
-    }
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;
     private readonly IDispatcherService _dispatcherService;
@@ -190,18 +177,5 @@ public class UnifiedTrackingMutator : INotifyPropertyChanged
         _logger.LogDebug("Reading configuration...");
         await _localSettingsService.Load(this);
         _logger.LogDebug("Configuration loaded.");
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-        _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 }

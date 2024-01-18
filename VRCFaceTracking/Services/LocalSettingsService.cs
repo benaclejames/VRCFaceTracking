@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-
-using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace VRCFaceTracking.Services;
@@ -90,7 +86,7 @@ public class LocalSettingsService : ILocalSettingsService
     {
         var type = instance.GetType();
         var properties = type.GetProperties();
-
+        
         foreach (var property in properties)
         {
             var attributes = property.GetCustomAttributes(typeof(SavedSettingAttribute), false);

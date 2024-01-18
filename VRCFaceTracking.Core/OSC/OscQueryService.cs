@@ -1,10 +1,9 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 
 namespace VRCFaceTracking.Core.OSC;
@@ -15,7 +14,7 @@ public class OscQueryService : ParameterOutputService
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
-    private readonly IParamSupervisor _paramSupervisor;
+    private readonly ParamSupervisor _paramSupervisor;
     private readonly QueryRegistrar _queryRegistrar;
     
     // Recv and send buffers
@@ -30,7 +29,7 @@ public class OscQueryService : ParameterOutputService
         ILocalSettingsService localSettingsService, 
         ILoggerFactory loggerFactory,
         OscQueryConfigParser oscQueryConfigParser,
-        IParamSupervisor paramSupervisor
+        ParamSupervisor paramSupervisor
     )
     {
         _localSettingsService = localSettingsService;
@@ -253,7 +252,7 @@ public class OscQueryService : ParameterOutputService
             return;
         }
         
-        _senderClient.Send(_sendBuffer, nextByteIndex, SocketFlags.None);
+        _senderClient?.Send(_sendBuffer, nextByteIndex, SocketFlags.None);
         OnMessageDispatched();
     }
         
@@ -265,18 +264,5 @@ public class OscQueryService : ParameterOutputService
             
         _senderClient?.Close();
         _receiverClient?.Close();
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
     }
 }

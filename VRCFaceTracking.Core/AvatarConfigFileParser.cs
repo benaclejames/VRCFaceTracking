@@ -4,8 +4,8 @@ using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.Osc.FileBased;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
-using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params;
+using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
 
 namespace VRCFaceTracking;
 

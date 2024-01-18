@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
-using VRCFaceTracking.Core.OSC.DataTypes;
-using VRCFaceTracking.Core.Services;
+using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
 
 namespace VRCFaceTracking;
 

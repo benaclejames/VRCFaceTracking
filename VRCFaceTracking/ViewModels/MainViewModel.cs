@@ -3,11 +3,10 @@ using Microsoft.UI.Xaml;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.Params;
-using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
-public class MainViewModel : ObservableRecipient
+public partial class MainViewModel : ObservableRecipient
 {
     public ILibManager LibManager
     {
@@ -19,50 +18,19 @@ public class MainViewModel : ObservableRecipient
         get;
     }
 
-    private IAvatarInfo _currentlyLoadedAvatar;
-    public IAvatarInfo CurrentlyLoadedAvatar
-    {
-        get => _currentlyLoadedAvatar;
-        private set => SetProperty(ref _currentlyLoadedAvatar, value);
-    }
+    [ObservableProperty] private IAvatarInfo _currentlyLoadedAvatar;
 
-    private List<Parameter> _currentParameters;
-
-    public List<Parameter> CurrentParameters
-    {
-        get => _currentParameters;
-        private set => SetProperty(ref _currentParameters, value);
-    }
+    [ObservableProperty] private List<Parameter> _currentParameters;
 
     private int _messagesRecvd;
-    private int _messagesInPerSec;
-    public int MessagesInPerSec
-    {
-        get => _messagesInPerSec;
-        set => SetProperty(ref _messagesInPerSec, value);
-    }
+    [ObservableProperty] private int _messagesInPerSec;
 
     private int _messagesSent;
-    private int _messagesOutPerSec;
-    public int MessagesOutPerSec
-    {
-        get => _messagesOutPerSec;
-        set => SetProperty(ref _messagesOutPerSec, value);
-    }
+    [ObservableProperty] private int _messagesOutPerSec;
 
-    private bool _noModulesInstalled;
-    public bool NoModulesInstalled
-    {
-        get => _noModulesInstalled;
-        set => SetProperty(ref _noModulesInstalled, value);
-    }
+    [ObservableProperty] private bool _noModulesInstalled;
     
-    private bool _oscWasDisabled;
-    public bool OscWasDisabled
-    {
-        get => true;
-        set => SetProperty(ref _oscWasDisabled, value);
-    }
+    [ObservableProperty] private bool _oscWasDisabled;
 
     public MainViewModel()
     {
