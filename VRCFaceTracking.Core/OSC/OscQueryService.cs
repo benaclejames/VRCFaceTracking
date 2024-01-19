@@ -94,7 +94,7 @@ public partial class OscQueryService : ObservableObject
             
         result = (BindListener(), BindSender());
 
-        QueryRegistrar.OnVRCClientDiscovered += FirstClientDiscovered;
+        QueryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
@@ -102,7 +102,7 @@ public partial class OscQueryService : ObservableObject
 
         void FirstClientDiscovered()
         {
-            QueryRegistrar.OnVRCClientDiscovered -= FirstClientDiscovered;
+            QueryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
                 
             HandleNewAvatar();
         }
@@ -111,8 +111,8 @@ public partial class OscQueryService : ObservableObject
     private void InitOscQuery()
     {
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
-        _queryRegistrar.Advertise("VRCFT", "_oscjson._tcp", 6970, IPAddress.Loopback);
-        _queryRegistrar.Advertise("VRCFT", "_osc._udp", 6969, IPAddress.Loopback);
+        QueryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
+        QueryRegistrar.Advertise("_osc._udp", "VRCFT", 6969, IPAddress.Loopback);
 
         _httpHandler?.Dispose();
         _httpHandler = new HttpHandler(6970);
@@ -222,7 +222,7 @@ public partial class OscQueryService : ObservableObject
 
     private async void HandleNewAvatar()
     {
-        var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(QueryRegistrar.VrchatClientEndpoint);
+        var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(_queryRegistrar.VrchatClientEndpoint);
         if (newAvatar.HasValue)
         {
             OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);

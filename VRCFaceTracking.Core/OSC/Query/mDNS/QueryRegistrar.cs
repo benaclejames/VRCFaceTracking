@@ -1,29 +1,38 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class QueryRegistrar
+public partial class QueryRegistrar : ObservableObject
 {
+    private struct AdvertisedService
+    {
+        public readonly string ServiceName;
+        public readonly int Port;
+        public readonly IPAddress Address;
+
+        public AdvertisedService(string serviceName, int port, IPAddress address)
+        {
+            ServiceName = serviceName;
+            Port = port;
+            Address = address;
+        }
+    }
+    
     private static readonly IPAddress MulticastIp = IPAddress.Parse("224.0.0.251");
     private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, 5353);
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
-    private static readonly List<UdpClient> Receivers = new();
+    private static readonly Dictionary<UdpClient, CancellationToken> Receivers = new();
+    private static readonly Dictionary<string, AdvertisedService> Services = new();
 
-    public static Action OnVRCClientDiscovered = () => { };
+    public static Action OnVrcClientDiscovered = () => { };
 
-    private static IPEndPoint _vrchatClientEndpoint;
-    public static IPEndPoint VrchatClientEndpoint
-    {
-        get => _vrchatClientEndpoint;
-        set
-        {
-            _vrchatClientEndpoint = value;
-            OnVRCClientDiscovered.Invoke();
-        }
-    }
+    [ObservableProperty] private static IPEndPoint _vrchatClientEndpoint;
+
+    partial void OnVrchatClientEndpointChanged(IPEndPoint? value) => OnVrcClientDiscovered();
         
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
@@ -36,26 +45,25 @@ public class QueryRegistrar
         .UnicastAddresses
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
-
-    private static readonly Dictionary<string, (string serviceName, int port, string ipAddress)> services = new();
         
     public QueryRegistrar()
     {
         // Create listeners for all interfaces
-        UdpClient receiver = new UdpClient(AddressFamily.InterNetwork);
+        var receiver = new UdpClient(AddressFamily.InterNetwork);
         receiver.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         receiver.Client.Bind(new IPEndPoint(IPAddress.Any, 5353));
-        Receivers.Add(receiver);
+        Receivers.Add(receiver, new CancellationToken());
 
-        // For each ip address, create a sender udpclient to respond to multicast requests
+        // For each ip address, create a sender udp client to respond to multicast requests
         var interfaces = GetIpv4NetInterfaces();
-        var ipAddresses = interfaces.SelectMany(GetIpv4Addresses)
+        var ipAddresses = interfaces
+            .SelectMany(GetIpv4Addresses)
             .Where(addr => addr.AddressFamily == AddressFamily.InterNetwork);
             
-        // For every ipv4 address discovered in the network interfaces, create a sender udpclient set up grouping
-        foreach (IPAddress ipAddress in ipAddresses)
+        // For every ipv4 address discovered in the network interfaces, create a sender udp client set up grouping
+        foreach (var ipAddress in ipAddresses)
         {
-            UdpClient sender = new UdpClient(ipAddress.AddressFamily);
+            var sender = new UdpClient(ipAddress.AddressFamily);
                 
             // Add the local ip address to our multicast group
             receiver.JoinMulticastGroup(MulticastIp, ipAddress);
@@ -65,70 +73,40 @@ public class QueryRegistrar
             sender.JoinMulticastGroup(MulticastIp);                           // Join the multicast group
             sender.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
                 
-            Receivers.Add(sender);
-        }
-
-        var addresses = interfaces
-            .SelectMany(GetIpv4Addresses)
-            .Where(a => a.AddressFamily == AddressFamily.InterNetwork);
-
-        foreach (var address in addresses)
-        {
-            if (Senders.Keys.Contains(address))
-            {
-                continue;
-            }
-
-            var localEndpoint = new IPEndPoint(address, 5353);
-            var sender = new UdpClient(address.AddressFamily);
-            try
-            {
-                //receiver.JoinMulticastGroup(MulticastIP, address);
-                sender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                sender.Client.Bind(localEndpoint);
-                sender.JoinMulticastGroup(MulticastIp);
-                sender.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
-
-                Receivers.Add(sender);
-
-                Senders.Add(address, sender);
-            }
-            catch (Exception e)
-            {
-                sender.Dispose();
-            }
+            Receivers.Add(sender, new CancellationToken());
+            Senders.Add(ipAddress, sender);
         }
 
         foreach (var sender in Receivers)
         {
-            Listen(sender);
+            Listen(sender.Key, sender.Value);
         }
     }
 
-    private async void ResolveDnsQueries(DNSPacket packet, IPEndPoint remoteEndpoint)
+    private static async void ResolveDnsQueries(DNSPacket packet, IPEndPoint remoteEndpoint)
     {
-        if (packet.OPCODE != 0) 
+        if (packet.OPCODE != 0)
+        {
             return;
+        }
 
         foreach (var question in packet.questions)
         {
             // Ensure the question has three labels. First for service name, second for protocol, third for domain
-            if (question.Labels.Count != 3)
-                continue;
-                        
             // Ensure the question is for local domain
-            if (question.Labels[2] != "local")
-                continue;
-                        
             // Ensure the question is for the _osc._udp service
-            if (!services.TryGetValue($"{question.Labels[0]}.{question.Labels[1]}", out var service))
+            if (question.Labels.Count != 3 
+                || question.Labels[2] != "local"
+                || !Services.TryGetValue($"{question.Labels[0]}.{question.Labels[1]}", out var service))
+            {
                 continue;
+            }
 
             //foreach (var service in storedServices)
             {
                 var qualifiedServiceName = new List<string>
                 {
-                    service.serviceName,
+                    service.ServiceName,
                     question.Labels[0],
                     question.Labels[1],
                     question.Labels[2]
@@ -136,17 +114,17 @@ public class QueryRegistrar
 
                 var serviceName = new List<string>
                 {
-                    service.serviceName,
+                    service.ServiceName,
                     question.Labels[0].Trim('_'),
                     question.Labels[1].Trim('_')
                 };
                             
                 var txt = new TXTRecord { Text = new List<string> { "txtvers=1" } };
                 var srv = new SRVRecord { 
-                    Port = (ushort)service.port, 
+                    Port = (ushort)service.Port, 
                     Target = serviceName
                 };
-                var aRecord = new ARecord { Address = IPAddress.Parse(service.ipAddress) };
+                var aRecord = new ARecord { Address = service.Address };
                 var ptrRecord = new PTRRecord
                 {
                     DomainLabels = qualifiedServiceName
@@ -154,12 +132,12 @@ public class QueryRegistrar
                             
                 var additionalRecords = new List<DNSResource>
                 {
-                    new DNSResource(txt, qualifiedServiceName),
-                    new DNSResource(srv, qualifiedServiceName),
-                    new DNSResource(aRecord, serviceName)
+                    new (txt, qualifiedServiceName),
+                    new (srv, qualifiedServiceName),
+                    new (aRecord, serviceName)
                 };
 
-                var answers = new List<DNSResource> { new DNSResource(ptrRecord, question.Labels) };
+                var answers = new List<DNSResource> { new (ptrRecord, question.Labels) };
 
                 var response = new DNSPacket
                 {
@@ -188,65 +166,69 @@ public class QueryRegistrar
                     continue;
                 }
 
-                UdpClient unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
+                var unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
                 await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
             }
         }
     }
 
-    private async void ResolveVRChatClient(DNSPacket packet, IPEndPoint remoteEndpoint)
+    private void ResolveVrChatClient(DNSPacket packet, IPEndPoint remoteEndpoint)
     {
         if (!packet.QUERYRESPONSE || packet.answers[0].Type != 12)
+        {
             return;
+        }
 
         var ptrRecord = packet.answers[0].Data as PTRRecord;
         if (ptrRecord.DomainLabels.Count != 4 || !ptrRecord.DomainLabels[0].StartsWith("VRChat-Client"))
+        {
             return;
-            
+        }
+
         if (packet.answers[0].Labels.Count != 3 || packet.answers[0].Labels[0] != "_oscjson" ||
             packet.answers[0].Labels[1] != "_tcp" || packet.answers[0].Labels[2] != "local")
+        {
             return;
-            
-        // Now we find the first arecord in the additional records
+        }
+
+        // Now we find the first A record in the additional records
         var aRecord = packet.additionals.FirstOrDefault(r => r.Type == 1);
         var srvRecord = packet.additionals.FirstOrDefault(r => r.Type == 33);
         if (aRecord == null || srvRecord == null)
+        {
             return;
+        }
+
+        var vrChatClientIp = aRecord.Data as ARecord;
+        var vrChatClientPort = srvRecord.Data as SRVRecord;
             
-        var vrchatClientIp = aRecord.Data as ARecord;
-        var vrchatClientPort = srvRecord.Data as SRVRecord;
-            
-        VrchatClientEndpoint = new IPEndPoint(vrchatClientIp.Address, vrchatClientPort.Port);
+        VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
     }
         
-    private void Listen(UdpClient client)
+    private async void Listen(UdpClient client, CancellationToken ct)
     {
-        new Thread(async () =>
+        while (!ct.IsCancellationRequested)
         {
-            while (true)
-            {
-                var result = await client.ReceiveAsync();
-                var reader = new BigReader(result.Buffer);
-                var packet = new DNSPacket(reader);
+            var result = await client.ReceiveAsync(ct);
+            var reader = new BigReader(result.Buffer);
+            var packet = new DNSPacket(reader);
 
-                // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
-                ResolveVRChatClient(packet, result.RemoteEndPoint);
-                ResolveDnsQueries(packet, result.RemoteEndPoint);
-            }
-        }).Start();
+            // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
+            ResolveVrChatClient(packet, result.RemoteEndPoint);
+            ResolveDnsQueries(packet, result.RemoteEndPoint);
+        }
     }
 
-    public void Advertise(string instanceName, string serviceName, int port, IPAddress address)
+    public static void Advertise(string serviceName, string instanceName, int port, IPAddress address)
     {
-        if (services.TryGetValue(serviceName, out var service))
+        // If we're already advertising on this service, we can just update it
+        if (Services.ContainsKey(serviceName))
         {
-            service.serviceName = serviceName;
-            service.ipAddress = address.ToString();
-            service.port = port;
+            Services[serviceName] = new AdvertisedService(instanceName, port, address);
         }
         else
         {
-            services.Add(serviceName, (instanceName, port, address.ToString()));
+            Services.Add(serviceName, new AdvertisedService(instanceName, port, address));
         }
     }
 }
