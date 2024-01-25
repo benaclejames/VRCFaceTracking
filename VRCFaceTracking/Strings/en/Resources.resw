@@ -243,10 +243,10 @@
     <value>Module Page</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>m/s Incoming</value>
+    <value>msgs/sec Incoming</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>m/s Outgoing</value>
+    <value>msgs/sec Outgoing</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
     <value>No Modules Installed</value>
