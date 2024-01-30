@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.ViewModels;
 using Windows.System;
 using Microsoft.UI.Xaml.Media.Imaging;
+using VrcftImage = VRCFaceTracking.Core.Types.Image;
 
 namespace VRCFaceTracking.Views;
 
@@ -38,18 +39,12 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
-        
-    public WriteableBitmap UpperImageSource
-    {
-        get;
-    }
-    
-    public WriteableBitmap LowerImageSource
-    {
-        get;
-    }
 
-    private readonly Stream _upperStream, _lowerStream;
+    public WriteableBitmap UpperImageSource => _upperImageStream;
+    public WriteableBitmap LowerImageSource => _lowerImageStream;
+
+    private WriteableBitmap _upperImageStream, _lowerImageStream;
+    private Stream _upperStream, _lowerStream;
     
     public SettingsPage()
     {
@@ -58,45 +53,89 @@ public sealed partial class SettingsPage : Page
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
 
-        var upperSize = UnifiedTracking.EyeImageData.ImageSize;
-        var lowerSize = UnifiedTracking.LipImageData.ImageSize;
+        // Initialize hardware debug streams for upper and lower face tracking
+        InitializeHardwareDebugStream(UnifiedTracking.EyeImageData, ref _upperImageStream, ref _upperStream);
+        InitializeHardwareDebugStream(UnifiedTracking.LipImageData, ref _lowerImageStream, ref _lowerStream);
 
-        if (upperSize is { x: > 0, y: > 0 })
-        {
-            UpperImageSource = new WriteableBitmap(upperSize.x, upperSize.y);
-            _upperStream = UpperImageSource.PixelBuffer.AsStream();
-        }
-
-        if (upperSize is { x: > 0, y: > 0 })
-        {
-            LowerImageSource = new WriteableBitmap(lowerSize.x, lowerSize.y);
-            _lowerStream = LowerImageSource.PixelBuffer.AsStream();
-        }
-        
         Loaded += OnPageLoaded;
         
         UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
+    private void InitializeHardwareDebugStream(VrcftImage image, ref WriteableBitmap bitmap, ref Stream targetStream)
+    {
+        var imageSize = image.ImageSize;
+
+        if ( imageSize is { x: > 0, y: > 0 } )
+        {
+            bitmap = new WriteableBitmap(imageSize.x, imageSize.y);
+            targetStream = bitmap.PixelBuffer.AsStream();
+        }
+    }
+
     private async void OnTrackingDataUpdated()
     {
-        var upperData = UnifiedTracking.EyeImageData?.ImageData;
-        if (upperData != null && _lowerStream.CanWrite)
-        {
-            _upperStream.Position = 0;
-            await _upperStream.WriteAsync(upperData, 0, upperData.Length);
+        // Handle eye tracking
 
-            UpperImageSource.Invalidate();
+        var upperData = UnifiedTracking.EyeImageData.ImageData;
+        if ( upperData != null )
+        {
+            // Handle device connected
+            if ( _upperStream == null )
+            {
+                InitializeHardwareDebugStream(UnifiedTracking.EyeImageData, ref _upperImageStream, ref _upperStream);
+            }
+            // Handle device is valid and is providing data
+            if ( _upperStream.CanWrite )
+            {
+                _upperStream.Position = 0;
+                await _upperStream.WriteAsync(upperData, 0, upperData.Length);
+
+                _upperImageStream.Invalidate();
+            }
         }
-        
-        var lowerData = UnifiedTracking.LipImageData?.ImageData;
-        if (lowerData != null && _upperStream.CanWrite)
+        else
         {
-            _lowerStream.Position = 0;
-            await _lowerStream.WriteAsync(lowerData, 0, lowerData.Length);
+            // Handle device getting unplugged / destroyed / disabled
+            // Device is connected
+            if ( _upperStream != null || _upperImageStream != null )
+            {
+                await _upperStream.DisposeAsync();
+                _upperImageStream = null;
+                _upperStream = null;
+            }
+        }
 
-            LowerImageSource.Invalidate();
+        // Handle lip tracking
+
+        var lowerData = UnifiedTracking.LipImageData.ImageData;
+        if ( lowerData != null )
+        {
+            // Handle device connected
+            if ( _lowerStream == null )
+            {
+                InitializeHardwareDebugStream(UnifiedTracking.LipImageData, ref _lowerImageStream, ref _lowerStream);
+            }
+            // Handle device is valid and is providing data
+            if ( _lowerStream.CanWrite )
+            {
+                _lowerStream.Position = 0;
+                await _lowerStream.WriteAsync(lowerData, 0, lowerData.Length);
+
+                _lowerImageStream.Invalidate();
+            }
+        }
+        else
+        {
+            // Handle device getting unplugged / destroyed / disabled
+            // Device is connected
+            if ( _lowerStream != null || _lowerImageStream != null )
+            {
+                await _lowerStream.DisposeAsync();
+                _lowerImageStream = null;
+                _lowerStream = null;
+            }
         }
     }
 
