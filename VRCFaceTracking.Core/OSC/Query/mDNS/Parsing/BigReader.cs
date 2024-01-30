@@ -23,7 +23,7 @@ public class BigReader : BinaryReader
     {
         var streamPos = (int)BaseStream.Position;
         var length = ReadByte();
-        if ((length & 0b11000000) == 0b11000000)
+        if ((length & 0xC0) == 0xC0)
         {
             var ptr = (length ^ 0b11000000) << 0b1000 | ReadByte();
             var cname = nameCache[ptr];
@@ -31,7 +31,7 @@ public class BigReader : BinaryReader
             return cname;
         }
             
-        List<string> labels = new List<string>();
+        var labels = new List<string>();
         if (length == 0)
             return labels;
             

@@ -57,6 +57,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
+    <PackageReference Include="Sentry" Version="4.0.0-beta.9" />
     <PackageReference Include="WinUIEx" Version="2.1" />
   </ItemGroup>
 

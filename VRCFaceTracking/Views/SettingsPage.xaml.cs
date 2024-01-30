@@ -81,7 +81,7 @@ public sealed partial class SettingsPage : Page
 
     private async void OnTrackingDataUpdated()
     {
-        var upperData = UnifiedTracking.EyeImageData.ImageData;
+        var upperData = UnifiedTracking.EyeImageData?.ImageData;
         if (upperData != null && _lowerStream.CanWrite)
         {
             _upperStream.Position = 0;
@@ -90,7 +90,7 @@ public sealed partial class SettingsPage : Page
             UpperImageSource.Invalidate();
         }
         
-        var lowerData = UnifiedTracking.LipImageData.ImageData;
+        var lowerData = UnifiedTracking.LipImageData?.ImageData;
         if (lowerData != null && _upperStream.CanWrite)
         {
             _lowerStream.Position = 0;
