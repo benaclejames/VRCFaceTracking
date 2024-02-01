@@ -17,17 +17,17 @@ public class BigReader : BinaryReader
         var data = ReadBytes(length);
         return System.Text.Encoding.ASCII.GetString(data);
     }
-        
+
     // Referenced from https://github.com/meamod/MeaMod.DNS/blob/master/src/Model/WireReader.cs#L189
     public List<string> ReadDomainLabels()
     {
-        var streamPos = (int)BaseStream.Position;
+        var pointer = (int)BaseStream.Position;
         var length = ReadByte();
         if ((length & 0xC0) == 0xC0)
         {
-            var ptr = (length ^ 0b11000000) << 0b1000 | ReadByte();
+            var ptr = (length ^ 0xC0) << 8 | ReadByte();
             var cname = nameCache[ptr];
-            nameCache[streamPos] = cname;
+            nameCache[pointer] = cname;
             return cname;
         }
             
@@ -36,9 +36,9 @@ public class BigReader : BinaryReader
             return labels;
             
         var data = ReadBytes(length);
-        labels.Add(System.Text.Encoding.UTF8.GetString(data));
+        labels.Add(System.Text.Encoding.UTF8.GetString(data, 0, length));
         labels.AddRange(ReadDomainLabels());
-        nameCache[streamPos] = labels;
+        nameCache[pointer] = labels;
             
         return labels;
     }

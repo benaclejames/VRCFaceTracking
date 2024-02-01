@@ -5,6 +5,7 @@ public class DNSResource : DNSQuestion
     private static readonly Dictionary<ushort, Type> _typeMap = new Dictionary<ushort, Type>
     {
         {1, typeof(ARecord)},
+        {2, typeof(NSRecord)},
         {12, typeof(PTRRecord)},
         {16, typeof(TXTRecord)},
         {33, typeof(SRVRecord)},

@@ -210,21 +210,20 @@ public partial class QueryRegistrar : ObservableObject
     {
         while (!ct.IsCancellationRequested)
         {
-            
-                var result = await client.ReceiveAsync(ct);
-              try
-              {  
-                  var reader = new BigReader(result.Buffer);
-                  var packet = new DNSPacket(reader);
+            var result = await client.ReceiveAsync(ct);
+            try
+            {
+                var reader = new BigReader(result.Buffer);
+                var packet = new DNSPacket(reader);
 
-                  // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
-                  ResolveVrChatClient(packet, result.RemoteEndPoint);
-                  ResolveDnsQueries(packet, result.RemoteEndPoint);
-              }
-              catch (Exception e)
-              {
-                  SentrySdk.CaptureException(e, scope => scope.SetExtra("bytes", result.Buffer));
-              }
+                // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
+                ResolveVrChatClient(packet, result.RemoteEndPoint);
+                ResolveDnsQueries(packet, result.RemoteEndPoint);
+            }
+            catch (Exception e)
+            {
+                SentrySdk.CaptureException(e, scope => scope.SetExtra("bytes", result.Buffer));
+            }
         }
     }
 
