@@ -91,13 +91,13 @@ namespace VRCFaceTracking
                         mutationData.ShapeMutations[i].SmoothnessMult
                     );
 
-            input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, trackingDataBuffer.Eye.Left.Openness, mutationData.OpennessMutations.SmoothnessMult);
-            input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, mutationData.PupilMutations.SmoothnessMult);
-            input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, mutationData.GazeMutations.SmoothnessMult);
+            input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, trackingDataBuffer.Eye.Left.Openness, mutationData.OpennessMutationsConfig.SmoothnessMult);
+            input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, mutationData.PupilMutationsConfig.SmoothnessMult);
+            input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, mutationData.GazeMutationsConfig.SmoothnessMult);
 
-            input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, mutationData.OpennessMutations.SmoothnessMult);
-            input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, mutationData.PupilMutations.SmoothnessMult);
-            input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, mutationData.GazeMutations.SmoothnessMult);
+            input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, mutationData.OpennessMutationsConfig.SmoothnessMult);
+            input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, mutationData.PupilMutationsConfig.SmoothnessMult);
+            input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, mutationData.GazeMutationsConfig.SmoothnessMult);
         }
 
         /// <summary>
@@ -143,17 +143,17 @@ namespace VRCFaceTracking
         public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
         {
             // Currently eye data does not get parsed by calibration.
-            mutationData.PupilMutations.Ceil = ceiling;
-            mutationData.GazeMutations.Ceil = ceiling;
-            mutationData.OpennessMutations.Ceil = ceiling;
+            mutationData.PupilMutationsConfig.Ceil = ceiling;
+            mutationData.GazeMutationsConfig.Ceil = ceiling;
+            mutationData.OpennessMutationsConfig.Ceil = ceiling;
             
-            mutationData.PupilMutations.Floor = floor;
-            mutationData.GazeMutations.Floor = floor;
-            mutationData.OpennessMutations.Floor = floor;
+            mutationData.PupilMutationsConfig.Floor = floor;
+            mutationData.GazeMutationsConfig.Floor = floor;
+            mutationData.OpennessMutationsConfig.Floor = floor;
 
-            mutationData.PupilMutations.Name = "Pupil";
-            mutationData.GazeMutations.Name = "Gaze";
-            mutationData.OpennessMutations.Name = "Openness";
+            mutationData.PupilMutationsConfig.Name = "Pupil";
+            mutationData.GazeMutationsConfig.Name = "Gaze";
+            mutationData.OpennessMutationsConfig.Name = "Openness";
 
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
             {
@@ -166,9 +166,9 @@ namespace VRCFaceTracking
         public void SetSmoothness(float setValue = 0.0f)
         {
             // Currently eye data does not get parsed by calibration.
-            mutationData.PupilMutations.SmoothnessMult = setValue;
-            mutationData.GazeMutations.SmoothnessMult = setValue;
-            mutationData.OpennessMutations.SmoothnessMult = setValue;
+            mutationData.PupilMutationsConfig.SmoothnessMult = setValue;
+            mutationData.GazeMutationsConfig.SmoothnessMult = setValue;
+            mutationData.OpennessMutationsConfig.SmoothnessMult = setValue;
 
             for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
                 mutationData.ShapeMutations[i].SmoothnessMult = setValue;

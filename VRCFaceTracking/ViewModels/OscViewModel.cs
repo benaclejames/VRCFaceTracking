@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
 public class OscViewModel : ObservableRecipient
 {
-    private readonly IOSCService _oscService;
+    private readonly ParameterOutputService _parameterOutputService;
     
     private int _inPort, _outPort;
     private string _address;
@@ -22,7 +23,7 @@ public class OscViewModel : ObservableRecipient
                 value = 9001;
             }
 
-            _oscService.InPort = value;
+            _parameterOutputService.InPort = value;
             SetProperty(ref _inPort, value);
         }
     }
@@ -37,7 +38,7 @@ public class OscViewModel : ObservableRecipient
                 value = 9000;
             }
             
-            _oscService.OutPort = value;
+            _parameterOutputService.OutPort = value;
             SetProperty(ref _outPort, value);
         }
     }
@@ -47,18 +48,18 @@ public class OscViewModel : ObservableRecipient
         get => _address;
         set
         {
-            _oscService.Address = value;
+            _parameterOutputService.DestinationAddress = value;
             SetProperty(ref _address, value);
         }
     }
     
-    public OscViewModel(IOSCService osc)
+    public OscViewModel(ParameterOutputService parameterOutput)
     {
-        _oscService = osc;
+        _parameterOutputService = parameterOutput;
         
-        _inPort = _oscService.InPort;
-        _outPort = _oscService.OutPort;
-        _address = _oscService.Address;
+        _inPort = _parameterOutputService.InPort;
+        _outPort = _parameterOutputService.OutPort;
+        _address = _parameterOutputService.DestinationAddress;
         
         PropertyChanged += async (sender, args) =>
         {
@@ -66,8 +67,8 @@ public class OscViewModel : ObservableRecipient
             if (args.PropertyName is not (nameof(RecvPort) or nameof(SendPort) or nameof(Address)))
                 return;
 
-            await _oscService.SaveSettings();
-            await _oscService.InitializeAsync();
+            await _parameterOutputService.SaveSettings();
+            await _parameterOutputService.InitializeAsync();
         };
     }
 }

@@ -17,7 +17,7 @@ public class ActivationService : IActivationService
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
-    private readonly IOSCService _oscService;
+    private readonly ParameterOutputService _parameterOutputService;
     private readonly IMainService _mainService;
     private readonly IModuleDataService _moduleDataService;
     private readonly ModuleInstaller _moduleInstaller;
@@ -26,14 +26,14 @@ public class ActivationService : IActivationService
     private UIElement? _shell;
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
-        IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, IOSCService oscService,
+        IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, ParameterOutputService parameterOutputService,
         IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
         ILoggerFactory loggerFactory)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
         _themeSelectorService = themeSelectorService;
-        _oscService = oscService;
+        _parameterOutputService = parameterOutputService;
         _mainService = mainService;
         _moduleDataService = moduleDataService;
         _moduleInstaller = moduleInstaller;
@@ -92,7 +92,7 @@ public class ActivationService : IActivationService
         _logger.LogInformation("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
         
         _logger.LogInformation("Initializing OSC...");
-        await _oscService.InitializeAsync().ConfigureAwait(false);
+        await _parameterOutputService.InitializeAsync().ConfigureAwait(false);
 
         _logger.LogInformation("Initializing main service...");
         await _mainService.InitializeAsync().ConfigureAwait(false);

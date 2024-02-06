@@ -38,12 +38,12 @@ namespace VRCFaceTracking
         /// Version 1 (VRCFaceTracking SRanipal) of all accessible output parameters.
         /// </summary>
         /// <remarks> These parameters are going to be undocumented in the near future and are directly emulated by Version 2 (Unified Expressions) parameters. </remarks>
-        public static readonly IParameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters.Union(EyeTrackingParams.ParameterList).ToArray();
+        public static readonly Parameter[] AllParameters_v1 = LipShapeMerger.AllLipParameters.Union(EyeTrackingParams.ParameterList).ToArray();
 
         /// <summary>
         /// Version 2 (Unified Expressions) of all accessible output parameters.
         /// </summary>
-        public static readonly IParameter[] AllParameters_v2 = UnifiedExpressionsParameters.ExpressionParameters;
+        public static readonly Parameter[] AllParameters_v2 = UnifiedExpressionsParameters.ExpressionParameters;
 #pragma warning restore CS0618
 
         /// <summary>
