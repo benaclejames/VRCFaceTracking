@@ -201,6 +201,21 @@ public static class UnifiedExpressionsParameters
             (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight +
              exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 4.0f),
 
+        // Compacted paramaters
+
+        new EParam("v2/LipSuckFunnelUpper", exp =>
+            (exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight) / 2.0f -
+            (exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight) / 2.0f),
+
+        new EParam("v2/LipSuckFunnelLower", exp =>
+            (exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight) / 2.0f -
+            (exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight) / 2.0f),
+
+        new EParam("v2/LipSuckFunnelLowerLeft", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight),
+        new EParam("v2/LipSuckFunnelLowerRight", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight),
+        new EParam("v2/LipSuckFunnelUpperLeft", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight),
+        new EParam("v2/LipSuckFunnelUpperRight", exp => exp.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight - exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight),
+
         #endregion
 
         #region Mouth Combined
@@ -218,6 +233,14 @@ public static class UnifiedExpressionsParameters
 
         new EParam("v2/NoseSneer", exp => (exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight + exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight) / 2.0f),
 
+        // Compacted paramamters
+
+        new EParam("v2/MouthTightenStretch", exp =>
+            (exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight) / 2.0f -
+            (exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight + exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight) / 2.0f),
+
+        new EParam("v2/MouthTightenStretchLeft", exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerLeft].Weight - exp.Shapes[(int)UnifiedExpressions.MouthStretchLeft].Weight),
+        new EParam("v2/MouthTightenStretchRight", exp => exp.Shapes[(int)UnifiedExpressions.MouthTightenerRight].Weight - exp.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight),
         #endregion
 
         #region Lip Corners Combined
