@@ -24,6 +24,7 @@ public partial class QueryRegistrar : ObservableObject
     
     private static readonly IPAddress MulticastIp = IPAddress.Parse("224.0.0.251");
     private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, 5353);
+    private readonly List<IPAddress> _localIpAddresses;
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
     private static readonly Dictionary<UdpClient, CancellationToken> Receivers = new();
@@ -57,12 +58,12 @@ public partial class QueryRegistrar : ObservableObject
 
         // For each ip address, create a sender udp client to respond to multicast requests
         var interfaces = GetIpv4NetInterfaces();
-        var ipAddresses = interfaces
+        _localIpAddresses = interfaces
             .SelectMany(GetIpv4Addresses)
-            .Where(addr => addr.AddressFamily == AddressFamily.InterNetwork);
+            .Where(addr => addr.AddressFamily == AddressFamily.InterNetwork).ToList();
             
         // For every ipv4 address discovered in the network interfaces, create a sender udp client set up grouping
-        foreach (var ipAddress in ipAddresses)
+        foreach (var ipAddress in _localIpAddresses)
         {
             var sender = new UdpClient(ipAddress.AddressFamily);
                 
@@ -74,7 +75,7 @@ public partial class QueryRegistrar : ObservableObject
             sender.JoinMulticastGroup(MulticastIp);                           // Join the multicast group
             sender.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
                 
-            Receivers.Add(sender, new CancellationToken());
+            //Receivers.Add(sender, new CancellationToken());
             Senders.Add(ipAddress, sender);
         }
 
@@ -211,6 +212,14 @@ public partial class QueryRegistrar : ObservableObject
         while (!ct.IsCancellationRequested)
         {
             var result = await client.ReceiveAsync(ct);
+
+            if (!_localIpAddresses.Any(i => i.Equals(result.RemoteEndPoint.Address)))
+            {
+                // Wouldn't want to steal control of other people's faces on LAN now, would we!
+                // (On second thought, that'd be pretty funny)
+                continue;
+            }
+            
             try
             {
                 var reader = new BigReader(result.Buffer);
