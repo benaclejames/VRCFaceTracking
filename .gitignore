@@ -23,7 +23,6 @@ obj/
 *.cache
 *.sln.docstates
 *.sln.ide-shadows
-*.sln
 [Tt]humbs.db
 *.dbmdl
 *.dbproj*
