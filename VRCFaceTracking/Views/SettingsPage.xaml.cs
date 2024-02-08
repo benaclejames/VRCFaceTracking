@@ -1,7 +1,6 @@
 ﻿using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
 using VRCFaceTracking.ViewModels;
 using Windows.System;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -38,6 +37,12 @@ public sealed partial class SettingsPage : Page
     {
         get;
     }
+
+    public FilterSettingsViewModel FilterSettings
+    {
+        get;
+    }
+    
         
     public WriteableBitmap UpperImageSource
     {
@@ -57,6 +62,7 @@ public sealed partial class SettingsPage : Page
         OscViewModel = App.GetService<OscViewModel>();
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
+        FilterSettings = App.GetService<FilterSettingsViewModel>();
 
         var upperSize = UnifiedTracking.EyeImageData.ImageSize;
         var lowerSize = UnifiedTracking.LipImageData.ImageSize;
