@@ -100,7 +100,7 @@ public class LocalSettingsService : ILocalSettingsService
             var settingName = savedSettingAttribute.GetName();
             var defaultValue = savedSettingAttribute.Default();
 
-            var setting = await ReadSettingAsync(settingName, defaultValue);
+            var setting = await ReadSettingAsync(settingName, defaultValue, savedSettingAttribute.ForceLocal());
             var convertedSetting = Convert.ChangeType(setting, property.PropertyType);
             property.SetValue(instance, convertedSetting);
         }
@@ -123,7 +123,7 @@ public class LocalSettingsService : ILocalSettingsService
             var savedSettingAttribute = (SavedSettingAttribute)attributes[0];
             var settingName = savedSettingAttribute.GetName();
 
-            await SaveSettingAsync(settingName, property.GetValue(instance));
+            await SaveSettingAsync(settingName, property.GetValue(instance), savedSettingAttribute.ForceLocal());
         }
     }
 }

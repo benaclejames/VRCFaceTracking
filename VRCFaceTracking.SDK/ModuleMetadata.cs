@@ -26,12 +26,12 @@ public struct ModuleMetadata
     public bool UsingEye
     {
         get => _usingEye;
-        internal set => _usingEye = value;
+        set => _usingEye = value;
     }
     
     public bool UsingExpression
     {
         get => _usingExpression;
-        internal set => _usingExpression = value;
+        set => _usingExpression = value;
     }
 }

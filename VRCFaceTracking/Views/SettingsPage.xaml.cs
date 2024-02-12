@@ -206,5 +206,5 @@ public sealed partial class SettingsPage : Page
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
 
-    private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => CalibrationSettings.InitializeCalibration();
+    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.InitializeCalibration();
 }

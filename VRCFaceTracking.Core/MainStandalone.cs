@@ -1,8 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
 using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
+
+[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
+[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
+[assembly:TypeForwardedTo(typeof(ModuleState))]
 
 namespace VRCFaceTracking;
 

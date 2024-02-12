@@ -6,7 +6,7 @@ public class SavedSettingAttribute : Attribute
     private readonly object? _defaultValue;
     private readonly bool _forceLocal;
 
-    public SavedSettingAttribute(string settingName, object? defaultValue = default, bool forceLocal = true)
+    public SavedSettingAttribute(string settingName, object? defaultValue = default, bool forceLocal = false)
     {
         _settingName = settingName;
         _defaultValue = defaultValue;

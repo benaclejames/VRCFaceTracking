@@ -13,7 +13,7 @@ namespace VRCFaceTracking;
 public partial class UnifiedTrackingMutator : ObservableObject
 {
     private UnifiedTrackingData trackingDataBuffer = new();
-    [SavedSetting("Mutations", default, false)]
+    [SavedSetting("Mutations", default, true)]
     public UnifiedMutationConfig mutationData = new();
 
     [ObservableProperty]
@@ -110,25 +110,20 @@ public partial class UnifiedTrackingMutator : ObservableObject
         return inputBuffer;
     }
 
-    public void InitializeCalibration()
+    public async Task InitializeCalibration(int durationMs = 30000)
     {
-        Thread _thread = new Thread(() =>
-        {
-            _logger.LogInformation("Initialized calibration.");
+        _logger.LogInformation("Initialized calibration.");
 
-            UnifiedTracking.Mutator.SetCalibration();
+        UnifiedTracking.Mutator.SetCalibration();
 
-            UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
-            UnifiedTracking.Mutator.Enabled = true;
+        UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
+        UnifiedTracking.Mutator.Enabled = true;
 
-            _logger.LogInformation("Calibrating deep normalization for 30s.");
-            Thread.Sleep(30000);
+        _logger.LogInformation("Calibrating deep normalization for {durationSec}s.", durationMs / 100);
+        await Task.Delay(durationMs);
 
-            UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
-            _logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
-
-        });
-        _thread.Start();
+        UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
+        _logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
     }
 
     public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
