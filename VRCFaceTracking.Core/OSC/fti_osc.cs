@@ -60,9 +60,10 @@ public struct OscMessageMeta {
     [MarshalAs(UnmanagedType.LPStr)]
     public string Address;
     
-    [MarshalAs(UnmanagedType.I4)]
+    [MarshalAs(UnmanagedType.U4)]
     public int ValueLength;
     
+    [MarshalAs(UnmanagedType.SysUInt)]
     public IntPtr Value;
 }
 
@@ -98,8 +99,11 @@ public static class fti_osc
     /// <param name="messageIndex">Index of the last message written to <paramref name="buf"/> before it was filled</param>
     /// <returns></returns>
     [DllImport("fti_osc.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int create_osc_bundle([MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, 
-        [MarshalAs(UnmanagedType.LPArray)]  OscMessageMeta[] messages, int len, ref int messageIndex);
+    public static extern int create_osc_bundle(
+        [MarshalAs(UnmanagedType.LPArray, SizeConst = 4096)] byte[] buf, 
+        [MarshalAs(UnmanagedType.LPArray)] OscMessageMeta[] messages, 
+        int len, 
+        ref int messageIndex);
 
     /// <summary>
     /// Free memory allocated to OscMessageMeta by fti_osc lib
