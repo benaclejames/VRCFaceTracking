@@ -4,7 +4,6 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
-using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
 
 [assembly:TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
 [assembly:TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
@@ -53,7 +52,7 @@ public class MainStandalone : IMainService
         _logger.LogDebug("Teardown successful. Awaiting exit...");
     }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
@@ -87,33 +86,6 @@ public class MainStandalone : IMainService
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
         Utils.TimeBeginPeriod(1);
-        ThreadPool.QueueUserWorkItem(ct =>
-        {
-            var token = (CancellationToken)ct;
-            
-            while (!token.IsCancellationRequested)
-            {
-                Thread.Sleep(10);
-
-                UnifiedTracking.UpdateData();
-
-                // Send all messages in OSCParams.SendQueue
-                if (ParamSupervisor.SendQueue.Count <= 0) continue;
-
-                while (ParamSupervisor.SendQueue.TryDequeue(out var message))
-                {
-                    
-                    
-                    //if (relevantMessages[messageIndex].Type == OscValueType.Float)  // Little update function for debug parameter tab.
-                    //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
-                    
-                    _parameterOutputService.Send(message);
-                }
-
-                ParamSupervisor.SendQueue.Clear();
-            }
-        }, MasterCancellationTokenSource.Token);
-
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }

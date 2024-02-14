@@ -7,14 +7,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Sentry;
 using Sentry.Protocol;
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.OSC;
-using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Notifications;
@@ -130,7 +128,9 @@ public partial class App : Application
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<ParamSupervisor, ParamSupervisor>();
+            services.AddSingleton<ParameterSenderService>();
+            
+            services.AddHostedService<ParameterSenderService>();
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
@@ -174,8 +174,9 @@ public partial class App : Application
         });
         Current.UnhandledException += ExceptionHandler;
         //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
-        
+
         await App.GetService<IActivationService>().ActivateAsync(args);
+        await Host.StartAsync();
     }
     
     [HandleProcessCorruptedStateExceptions, SecurityCritical]

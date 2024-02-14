@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
 
@@ -17,7 +15,6 @@ public partial class OscQueryService : ObservableObject
     private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
-    private readonly ParamSupervisor _paramSupervisor;
     private readonly QueryRegistrar _queryRegistrar;
     
     // Delegates
@@ -50,8 +47,7 @@ public partial class OscQueryService : ObservableObject
     public OscQueryService(
         ILocalSettingsService localSettingsService, 
         ILoggerFactory loggerFactory,
-        OscQueryConfigParser oscQueryConfigParser,
-        ParamSupervisor paramSupervisor
+        OscQueryConfigParser oscQueryConfigParser
     )
     {
         _localSettingsService = localSettingsService;
@@ -60,7 +56,6 @@ public partial class OscQueryService : ObservableObject
         OnMessageDispatched = () => { };
         OnAvatarLoaded = (_, _) => { };
         OnMessageReceived = HandleNewMessage;
-        _paramSupervisor = paramSupervisor;
         _queryRegistrar = new QueryRegistrar();
     }
 
@@ -239,7 +234,7 @@ public partial class OscQueryService : ObservableObject
             case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                 if (msg.Value is bool relevancy)
                 {
-                    _paramSupervisor.AllParametersRelevant = relevancy;
+                    //_paramSupervisor.AllParametersRelevant = relevancy;
                 }
 
                 break;
@@ -265,7 +260,7 @@ public partial class OscQueryService : ObservableObject
         }
     }
 
-    public void Send(OscMessage message)
+    public async Task Send(OscMessage message)
     {
         var nextByteIndex = message.Encode(_sendBuffer);
         if (nextByteIndex > 4096)
@@ -273,9 +268,20 @@ public partial class OscQueryService : ObservableObject
             _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
             return;
         }
-        
-        _senderClient?.Send(_sendBuffer, nextByteIndex, SocketFlags.None);
+
+        await _senderClient?.SendAsync(_sendBuffer[..nextByteIndex])!;
         OnMessageDispatched();
+    }
+
+    public async Task Send(OscMessage[] messages)
+    {
+        var cbt = messages.Select(m => m._meta).ToArray();
+        var index = 0;
+        while (index < cbt.Length)
+        {
+            var length = fti_osc.create_osc_bundle(_sendBuffer, cbt, messages.Length, ref index);
+            await _senderClient?.SendAsync(_sendBuffer[..length])!;
+        }
     }
         
     public void Teardown()

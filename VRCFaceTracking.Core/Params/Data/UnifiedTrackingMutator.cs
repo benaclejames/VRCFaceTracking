@@ -31,14 +31,12 @@ public partial class UnifiedTrackingMutator : ObservableObject
     private bool _enabled;
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;
-    private readonly IDispatcherService _dispatcherService;
     private readonly ILocalSettingsService _localSettingsService;
 
-    public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, IDispatcherService dispatcherService, ILocalSettingsService localSettingsService)
+    public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, ILocalSettingsService localSettingsService)
     {
         UnifiedTracking.Mutator = this;
         _logger = logger;
-        _dispatcherService = dispatcherService;
         _localSettingsService = localSettingsService;
             
         Enabled = false;

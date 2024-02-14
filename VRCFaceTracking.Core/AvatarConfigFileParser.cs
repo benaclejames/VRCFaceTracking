@@ -5,7 +5,7 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.Osc.FileBased;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.Params;
-using ParamSupervisor = VRCFaceTracking.Core.OSC.DataTypes.ParamSupervisor;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking;
 
@@ -68,7 +68,7 @@ public class AvatarConfigParser
         }
 
         _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
-        ParamSupervisor.SendQueue.Clear();
+        ParameterSenderService.Clear();
         var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
         foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())

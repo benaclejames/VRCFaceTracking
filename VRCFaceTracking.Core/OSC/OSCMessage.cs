@@ -6,8 +6,9 @@ namespace VRCFaceTracking.Core.OSC;
 
 public class OscMessage
 {
-    private OscMessageMeta _meta;
+    public OscMessageMeta _meta;
     private IntPtr _metaPtr;
+    private readonly bool _weOwn = true;
 
     public string Address
     {
@@ -98,6 +99,7 @@ public class OscMessage
         _metaPtr = fti_osc.parse_osc(bytes, len, ref messageIndex);
         if (_metaPtr != IntPtr.Zero)
         {
+            _weOwn = false;
             _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
         }
     }
@@ -108,11 +110,15 @@ public class OscMessage
     /// <param name="buffer">Target byte buffer to serialize to, starting from index 0</param>
     /// <returns>Length of serialized data</returns>
     public int Encode(byte[] buffer) => fti_osc.create_osc_message(buffer, ref _meta);
-    
+
     public OscMessage(OscMessageMeta meta) => _meta = meta;
     
     ~OscMessage()
-    {
-        fti_osc.free_osc_message(_metaPtr);
+    {   
+        // If we don't own this memory, then we need to sent it back to rust to free it
+        if (!_weOwn)
+        {
+            fti_osc.free_osc_message(_metaPtr);
+        }
     }
 }

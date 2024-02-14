@@ -1,38 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using CommunityToolkit.Mvvm.ComponentModel;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
-
-public class ParamSupervisor : ObservableObject
-{
-    public static readonly Queue<OscMessage> SendQueue = new();
- 
-    private readonly IDispatcherService _dispatcherService;
-    
-    public static bool AllParametersRelevantStatic { get; set; }
-
-    public bool AllParametersRelevant
-    {
-        get => AllParametersRelevantStatic;
-        set
-        {
-            if (AllParametersRelevantStatic == value) return;
-            AllParametersRelevantStatic = value;
-            SendQueue.Clear();
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(Array.Empty<IParameterDefinition>());
-            OnPropertyChanged();
-        }
-    }
-    
-    public ParamSupervisor(IDispatcherService dispatcherService)
-    {
-        _dispatcherService = dispatcherService;
-    }
-}
 
 public class BaseParam<T> : Parameter where T : struct
 {
@@ -45,26 +17,39 @@ public class BaseParam<T> : Parameter where T : struct
     private readonly Regex _regex;
 
     private bool _relevant;
-    private bool _sendOnLoad;
+    private readonly bool _sendOnLoad;
 
     public bool Relevant
     {
         get => _relevant;
         protected set
         {
-            if (_sendOnLoad && value) Enqueue();
+            if (_sendOnLoad && value)
+            {
+                Enqueue();
+            }
 
             // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
-            if (_relevant == value) return;
+            if (_relevant == value)
+            {
+                return;
+            }
 
             _relevant = value;
 
-            if (_getValueFunc == null) return;
+            if (_getValueFunc == null)
+            {
+                return;
+            }
 
             if (value)
+            {
                 UnifiedTracking.OnUnifiedDataUpdated += Process;
+            }
             else
+            {
                 UnifiedTracking.OnUnifiedDataUpdated -= Process;
+            }
         }
     }
 
@@ -75,7 +60,10 @@ public class BaseParam<T> : Parameter where T : struct
         get => (T)OscMessage.Value;
         set
         {
-            if (value.Equals(_lastValue)) return;
+            if (value.Equals(_lastValue))
+            {
+                return;
+            }
 
             OscMessage.Value = value;
             _lastValue = value;
@@ -83,7 +71,7 @@ public class BaseParam<T> : Parameter where T : struct
         }
     }
 
-    private void Enqueue() => ParamSupervisor.SendQueue.Enqueue(OscMessage);
+    private void Enqueue() => ParameterSenderService.Enqueue(OscMessage);
 
     protected readonly OscMessage OscMessage;
 
@@ -98,13 +86,13 @@ public class BaseParam<T> : Parameter where T : struct
 
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
-        if (ParamSupervisor.AllParametersRelevantStatic)
+        /*if (ParameterSendService.AllParametersRelevantStatic)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;
 
             return new Parameter[] { this };
-        }
+        }*/
 
         var compatibleParam = newParams.FirstOrDefault(param =>
             _regex.IsMatch(param.Address)
