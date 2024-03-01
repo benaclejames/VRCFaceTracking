@@ -8,6 +8,7 @@ public class ParameterSenderService : BackgroundService
     private static readonly Queue<OscMessage> SendQueue = new();
  
     private readonly OscQueryService _parameterOutputService;
+    public static bool AllParametersRelevant;
     
     public ParameterSenderService(OscQueryService parameterOutputService)
     {
@@ -19,6 +20,8 @@ public class ParameterSenderService : BackgroundService
     
     protected async override Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        await Task.Yield();
+        
         while (!cancellationToken.IsCancellationRequested)
         {
             await Task.Delay(10, cancellationToken);

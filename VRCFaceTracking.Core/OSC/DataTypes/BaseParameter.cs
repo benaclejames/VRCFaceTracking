@@ -78,7 +78,7 @@ public class BaseParam<T> : Parameter where T : struct
     public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc, bool sendOnLoad = false)
     {
         _paramName = name;
-        _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
+        _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + ")$|^(" + _paramName + ")$");
         _getValueFunc = getValueFunc;
         OscMessage = new OscMessage(DefaultPrefix + name, typeof(T));
         _sendOnLoad = sendOnLoad;
@@ -86,13 +86,13 @@ public class BaseParam<T> : Parameter where T : struct
 
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
-        /*if (ParameterSendService.AllParametersRelevantStatic)
+        if (ParameterSenderService.AllParametersRelevant)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;
 
             return new Parameter[] { this };
-        }*/
+        }
 
         var compatibleParam = newParams.FirstOrDefault(param =>
             _regex.IsMatch(param.Address)

@@ -1,38 +1,32 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
 public partial class RiskySettingsViewModel : ObservableObject
 {
     private readonly IMainService _mainService;
-    //private readonly ParameterSendService _parameterSendService;
+    private readonly ParameterSenderService _parameterSenderService;
     private readonly ILogger<RiskySettingsViewModel> _logger;
 
     [ObservableProperty] private bool _enabled;
 
     public bool AllRelevantDebug
     {
-        get
-        {
-            //return _parameterSendService.AllParametersRelevant;
-            return false;
-        }
-        set
-        {
-            //_parameterSendService.AllParametersRelevant = value;
-        }
+        get => ParameterSenderService.AllParametersRelevant;
+        set => ParameterSenderService.AllParametersRelevant = value;
     }
 
     public RiskySettingsViewModel(
         IMainService mainService, 
-        //ParameterSendService parameterSendService, 
+        ParameterSenderService parameterSendService, 
         ILogger<RiskySettingsViewModel> logger
         )
     {
         _mainService = mainService;
-        //_parameterSendService = parameterSendService;
+        _parameterSenderService = parameterSendService;
         _logger = logger;
     }
 
