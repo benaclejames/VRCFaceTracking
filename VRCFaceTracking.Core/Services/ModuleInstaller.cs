@@ -188,13 +188,19 @@ public class ModuleInstaller
         }
         else
         {
-            moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
-            var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
+            moduleMetadata.DllFileName = string.IsNullOrEmpty(moduleMetadata.DllFileName)
+                ? Path.GetFileName(moduleMetadata.DownloadUrl)
+                : moduleMetadata.DllFileName;
             
-            if (!Directory.Exists(moduleDirectory))
+            var dllPath = Path.Combine(
+                moduleDirectory, 
+                moduleMetadata.DllFileName);
+            
+            if (Directory.Exists(moduleDirectory))
             {
-                Directory.CreateDirectory(moduleDirectory);
+                Directory.Delete(moduleDirectory, true);
             }
+            Directory.CreateDirectory(moduleDirectory);
 
             await DownloadModuleToFile(moduleMetadata, dllPath);
             
