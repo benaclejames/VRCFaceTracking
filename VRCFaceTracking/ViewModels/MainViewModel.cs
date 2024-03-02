@@ -26,13 +26,16 @@ public partial class MainViewModel : ObservableRecipient
     
     [ObservableProperty] private bool _oscWasDisabled;
 
-    public MainViewModel()
+    public MainViewModel(
+        ILibManager libManager,
+        OscQueryService parameterOutputService,
+        IModuleDataService moduleDataService,
+        IDispatcherService dispatcherService
+        )
     {
         //Services
-        LibManager = App.GetService<ILibManager>();
-        ParameterOutputService = App.GetService<OscQueryService>();
-        var moduleDataService = App.GetService<IModuleDataService>();
-        var dispatcherService = App.GetService<IDispatcherService>();
+        LibManager = libManager;
+        ParameterOutputService = parameterOutputService;
         
         // Modules
         var installedNewModules = moduleDataService.GetInstalledModules();
@@ -49,7 +52,7 @@ public partial class MainViewModel : ObservableRecipient
         
         // Message Timer
         ParameterOutputService.OnMessageReceived += _ => { _messagesRecvd++; };
-        ParameterOutputService.OnMessageDispatched += () => { _messagesSent++; };
+        ParameterOutputService.OnMessagesDispatched += msgCount => { _messagesSent += msgCount; };
         var messageTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(1)

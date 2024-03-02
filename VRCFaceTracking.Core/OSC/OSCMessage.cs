@@ -8,7 +8,6 @@ public class OscMessage
 {
     public OscMessageMeta _meta;
     private IntPtr _metaPtr;
-    private readonly bool _weOwn = true;
 
     public string Address
     {
@@ -99,7 +98,6 @@ public class OscMessage
         _metaPtr = fti_osc.parse_osc(bytes, len, ref messageIndex);
         if (_metaPtr != IntPtr.Zero)
         {
-            _weOwn = false;
             _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
         }
     }
@@ -116,7 +114,7 @@ public class OscMessage
     ~OscMessage()
     {   
         // If we don't own this memory, then we need to sent it back to rust to free it
-        if (!_weOwn)
+        if (_metaPtr != IntPtr.Zero)
         {
             fti_osc.free_osc_message(_metaPtr);
         }

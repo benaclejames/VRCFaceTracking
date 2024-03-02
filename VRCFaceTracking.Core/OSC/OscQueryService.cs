@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC;
 
@@ -18,7 +19,7 @@ public partial class OscQueryService : ObservableObject
     private readonly QueryRegistrar _queryRegistrar;
     
     // Delegates
-    public Action OnMessageDispatched;
+    public Action<int> OnMessagesDispatched;
     public Action<OscMessage> OnMessageReceived;
     public Action<IAvatarInfo, List<Parameter>> OnAvatarLoaded;
     
@@ -53,7 +54,7 @@ public partial class OscQueryService : ObservableObject
         _localSettingsService = localSettingsService;
         _oscQueryConfigParser = oscQueryConfigParser;
         _logger = loggerFactory.CreateLogger("OSC");
-        OnMessageDispatched = () => { };
+        OnMessagesDispatched = _ => { };
         OnAvatarLoaded = (_, _) => { };
         OnMessageReceived = HandleNewMessage;
         _queryRegistrar = new QueryRegistrar();
@@ -181,38 +182,28 @@ public partial class OscQueryService : ObservableObject
         _recvThreadCts?.Cancel();    // In theory, the closure of the client should have already cancelled the token, but just in case
 
         var newToken = new CancellationTokenSource();
-        ThreadPool.QueueUserWorkItem(ct =>
+        ThreadPool.QueueUserWorkItem(async ct =>
         {
             var token = (CancellationToken)ct!;
             while (!token.IsCancellationRequested)
             {
-                Recv();
+                await RecvAsync(token);
             }
         }, newToken.Token);
         _recvThreadCts = newToken;
     }
 
-        
-    private void Recv()
-    {
-        try
-        {
-            var bytesReceived = _receiverClient.Receive(_recvBuffer, _recvBuffer.Length, SocketFlags.None);
-            var offset = 0;
-            var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
-            if (newMsg == null)
-            {
-                return;
-            }
 
-            Array.Clear(_recvBuffer, 0, bytesReceived);
-            OnMessageReceived(newMsg);
-        }
-        catch (Exception e)
+    private async Task RecvAsync(CancellationToken ct)
+    {
+        var bytesReceived = await _receiverClient.ReceiveAsync(_recvBuffer, ct);
+        var offset = 0;
+        var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
+        if (newMsg == null)
         {
-            // Ignore as this is most likely a timeout exception
-            _logger.LogTrace("Failed to receive message: {0}", e.Message);
+            return;
         }
+        OnMessageReceived(newMsg);
     }
 
     private async void HandleNewAvatar()
@@ -234,7 +225,7 @@ public partial class OscQueryService : ObservableObject
             case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                 if (msg.Value is bool relevancy)
                 {
-                    //_paramSupervisor.AllParametersRelevant = relevancy;
+                    ParameterSenderService.AllParametersRelevant = relevancy;
                 }
 
                 break;
@@ -270,7 +261,7 @@ public partial class OscQueryService : ObservableObject
         }
 
         await _senderClient?.SendAsync(_sendBuffer[..nextByteIndex])!;
-        OnMessageDispatched();
+        OnMessagesDispatched(1);
     }
 
     public async Task Send(OscMessage[] messages)
@@ -282,6 +273,7 @@ public partial class OscQueryService : ObservableObject
             var length = fti_osc.create_osc_bundle(_sendBuffer, cbt, messages.Length, ref index);
             await _senderClient?.SendAsync(_sendBuffer[..length])!;
         }
+        OnMessagesDispatched(index);
     }
         
     public void Teardown()
