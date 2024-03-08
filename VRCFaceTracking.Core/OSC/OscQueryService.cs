@@ -184,10 +184,18 @@ public partial class OscQueryService : ObservableObject
         var newToken = new CancellationTokenSource();
         ThreadPool.QueueUserWorkItem(async ct =>
         {
-            var token = (CancellationToken)ct!;
-            while (!token.IsCancellationRequested)
+            try
             {
-                await RecvAsync(token);
+                var token = (CancellationToken)ct!;
+                while (!token.IsCancellationRequested)
+                {
+                    await RecvAsync(token);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
+                SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
             }
         }, newToken.Token);
         _recvThreadCts = newToken;

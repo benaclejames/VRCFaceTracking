@@ -24,19 +24,26 @@ public class ParameterSenderService : BackgroundService
         
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(10, cancellationToken);
-
-            UnifiedTracking.UpdateData();
-
-            // Send all messages in OSCParams.SendQueue
-            if (SendQueue.Count <= 0)
+            try
             {
-                continue;
+                await Task.Delay(10, cancellationToken);
+
+                UnifiedTracking.UpdateData();
+
+                // Send all messages in OSCParams.SendQueue
+                if (SendQueue.Count <= 0)
+                {
+                    continue;
+                }
+
+                await _parameterOutputService.Send(SendQueue.ToArray());
+
+                SendQueue.Clear();
             }
-
-            await _parameterOutputService.Send(SendQueue.ToArray());
-
-            SendQueue.Clear();
+            catch (Exception e)
+            {
+                SentrySdk.CaptureException(e);
+            }
         }
     }
 }

@@ -220,8 +220,15 @@ public class ModuleInstaller
     {
         module.InstallationState = InstallState.AwaitingRestart;
         var moduleJsonPath = Path.Combine(Utils.CustomLibsDirectory, module.ModuleId.ToString(), "module.json");
-        File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
-        _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
+        try
+        {
+            File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
+            _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
+        }
+        catch
+        {
+            _logger.LogWarning("Attempted to mark module {module} for deletion, but it didn't exist", module.ModuleId);
+        }
     }
     
     public void UninstallModule(TrackingModuleMetadata moduleMetadata)
