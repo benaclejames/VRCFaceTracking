@@ -42,7 +42,13 @@ public class ParameterSenderService : BackgroundService
             }
             catch (Exception e)
             {
-                SentrySdk.CaptureException(e);
+                SentrySdk.CaptureException(e, scope =>
+                {
+                    foreach (var msg in SendQueue)
+                    {
+                        scope.AddAttachment($"Address: {msg.Address}, Values: {msg._meta.ValueLength}, Value 0: {msg.Value.ToString()}");
+                    }
+                });
             }
         }
     }
