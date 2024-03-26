@@ -11,18 +11,12 @@ using VRCFaceTracking.Services;
 
 namespace VRCFaceTracking.ViewModels;
 
-public class SettingsViewModel : ObservableRecipient
+public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
-    private ElementTheme _elementTheme;
-    private List<GithubContributor> _contributors;
-
-    public ElementTheme ElementTheme
-    {
-        get => _elementTheme;
-        set => SetProperty(ref _elementTheme, value);
-    }
-
+    [ObservableProperty] private ElementTheme _elementTheme;
+    [ObservableProperty] private List<GithubContributor> _contributors;
+    
     public ICommand SwitchThemeCommand
     {
         get;
@@ -37,12 +31,6 @@ public class SettingsViewModel : ObservableRecipient
     private OpenVRService OpenVRService
     {
         get;
-    }
-    
-    public List<GithubContributor> Contributors
-    {
-        get => _contributors;
-        set => SetProperty(ref _contributors, value);
     }
     
     public bool AutoStart

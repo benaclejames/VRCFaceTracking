@@ -1,8 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core;
-using VRCFaceTracking.Core.OSC.DataTypes;
-using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.OSC;
+
+[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
+[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
+[assembly:TypeForwardedTo(typeof(ModuleState))]
 
 namespace VRCFaceTracking;
 
@@ -10,7 +15,7 @@ public class MainStandalone : IMainService
 {
     public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
     
-    private readonly ParameterOutputService _parameterOutputService;
+    private readonly OscQueryService _parameterOutputService;
     private readonly ILogger _logger;
     private readonly ILibManager _libManager;
     private readonly UnifiedTrackingMutator _mutator;
@@ -19,7 +24,7 @@ public class MainStandalone : IMainService
 
     public MainStandalone(
         ILoggerFactory loggerFactory, 
-        ParameterOutputService parameterOutputService,
+        OscQueryService parameterOutputService,
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )
@@ -36,7 +41,7 @@ public class MainStandalone : IMainService
         _libManager.TeardownAllAndResetAsync();
 
         await _mutator.SaveCalibration();
-        
+
         // Kill our threads
         _logger.LogDebug("Cancelling token sources...");
         MasterCancellationTokenSource.Cancel();
@@ -47,7 +52,7 @@ public class MainStandalone : IMainService
         _logger.LogDebug("Teardown successful. Awaiting exit...");
     }
 
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
         // Ensure OSC is enabled
         if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
@@ -77,37 +82,10 @@ public class MainStandalone : IMainService
         };
         
         _mutator.LoadCalibration();
-
+        
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
         Utils.TimeBeginPeriod(1);
-        ThreadPool.QueueUserWorkItem(ct =>
-        {
-            var token = (CancellationToken)ct;
-            
-            while (!token.IsCancellationRequested)
-            {
-                Thread.Sleep(10);
-
-                UnifiedTracking.UpdateData();
-
-                // Send all messages in OSCParams.SendQueue
-                if (ParamSupervisor.SendQueue.Count <= 0) continue;
-
-                while (ParamSupervisor.SendQueue.TryDequeue(out var message))
-                {
-                    
-                    
-                    //if (relevantMessages[messageIndex].Type == OscValueType.Float)  // Little update function for debug parameter tab.
-                    //    ParameterUpdate(relevantMessages[messageIndex].Address, relevantMessages[messageIndex].Value.FloatValues[0]);
-                    
-                    _parameterOutputService.Send(message);
-                }
-
-                ParamSupervisor.SendQueue.Clear();
-            }
-        }, MasterCancellationTokenSource.Token);
-
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }

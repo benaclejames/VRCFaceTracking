@@ -4,8 +4,8 @@ using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.Osc.FileBased;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
-using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking;
 
@@ -48,11 +48,13 @@ public class AvatarConfigParser
                      .Where(folder => Directory.Exists(Path.Combine(folder, "Avatars"))))
         {
             foreach (var avatarFile in Directory.GetFiles(userFolder + "\\Avatars"))
-            {
+            {    
                 var configText = File.ReadAllText(avatarFile);
                 var tempConfig = JsonSerializer.Deserialize<AvatarConfigFile>(configText);
                 if (tempConfig == null || tempConfig.id != newId)
+                {
                     continue;
+                }
 
                 avatarConfig = tempConfig;
                 break;
@@ -61,13 +63,13 @@ public class AvatarConfigParser
 
         if (avatarConfig == null)
         {
-            _logger.LogError("Avatar config file for " + newId + " not found");
+            _logger.LogError("Avatar config file for {avatarId} not found", newId);
             return null;
         }
 
-        _logger.LogInformation("Parsing config file for avatar: " + avatarConfig.name);
-        ParamSupervisor.SendQueue.Clear();
-        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray();
+        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
+        ParameterSenderService.Clear();
+        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
         foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
         {

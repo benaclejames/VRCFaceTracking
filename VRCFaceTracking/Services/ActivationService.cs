@@ -7,6 +7,7 @@ using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Views;
 
@@ -17,7 +18,7 @@ public class ActivationService : IActivationService
     private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly IThemeSelectorService _themeSelectorService;
-    private readonly ParameterOutputService _parameterOutputService;
+    private readonly OscQueryService _parameterOutputService;
     private readonly IMainService _mainService;
     private readonly IModuleDataService _moduleDataService;
     private readonly ModuleInstaller _moduleInstaller;
@@ -25,9 +26,15 @@ public class ActivationService : IActivationService
     private readonly ILogger _logger;
     private UIElement? _shell;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
-        IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService, ParameterOutputService parameterOutputService,
-        IMainService mainService, IModuleDataService moduleDataService, ModuleInstaller moduleInstaller, ILibManager libManager,
+    public ActivationService(
+        ActivationHandler<LaunchActivatedEventArgs> defaultHandler, 
+        IEnumerable<IActivationHandler> activationHandlers, 
+        IThemeSelectorService themeSelectorService, 
+        OscQueryService parameterOutputService,
+        IMainService mainService, 
+        IModuleDataService moduleDataService, 
+        ModuleInstaller moduleInstaller, 
+        ILibManager libManager,
         ILoggerFactory loggerFactory)
     {
         _defaultHandler = defaultHandler;

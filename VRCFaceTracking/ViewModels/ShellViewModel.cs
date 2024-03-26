@@ -7,10 +7,10 @@ using VRCFaceTracking.Views;
 
 namespace VRCFaceTracking.ViewModels;
 
-public class ShellViewModel : ObservableRecipient
+public partial class ShellViewModel : ObservableRecipient
 {
-    private bool _isBackEnabled;
-    private object? _selected;
+    [ObservableProperty] private bool _isBackEnabled;
+    [ObservableProperty] private object? _selected;
 
     public INavigationService NavigationService
     {
@@ -20,18 +20,6 @@ public class ShellViewModel : ObservableRecipient
     public INavigationViewService NavigationViewService
     {
         get;
-    }
-
-    public bool IsBackEnabled
-    {
-        get => _isBackEnabled;
-        set => SetProperty(ref _isBackEnabled, value);
-    }
-
-    public object? Selected
-    {
-        get => _selected;
-        set => SetProperty(ref _selected, value);
     }
 
     public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)

@@ -5,13 +5,13 @@ namespace VRCFaceTracking.OSC
 {
     public static class OscUtils
     {
-        public static readonly Dictionary<Type, (OscValueType oscType, string configType)> TypeConversions =
+        public static readonly Dictionary<(Type, char[] typeChar), (OscValueType oscType, string configType)> TypeConversions =
             new()
             {
-                {typeof(bool), (OscValueType.Bool, "Bool")},
-                {typeof(float), (OscValueType.Float, "Float")},
-                {typeof(int), (OscValueType.Int, "Int")},
-                {typeof(string), (OscValueType.String, "String")},
+                {(typeof(bool), new[]{'T', 'F'}), (OscValueType.Bool, "Bool")},
+                {(typeof(float), new[]{'f'}), (OscValueType.Float, "Float")},
+                {(typeof(int), new[]{'i'}), (OscValueType.Int, "Int")},
+                {(typeof(string), new[]{'s'}), (OscValueType.String, "String")},
             };
     }
 }

@@ -2,16 +2,11 @@
 
 namespace VRCFaceTracking.ViewModels;
 
-public class ParameterViewModel : ObservableRecipient
+public partial class ParameterViewModel : ObservableRecipient
 {
     public string? ParameterName { get; set; }
 
-    private float _parameterValue;
-    public float ParameterValue
-    {
-        get => _parameterValue;
-        set => SetProperty(ref _parameterValue, value);
-    }
+    [ObservableProperty] private float _parameterValue;
     
     public bool CanBeNegative { get; set; }
     public float MinValue => CanBeNegative ? -1 : 0;

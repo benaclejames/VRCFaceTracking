@@ -362,12 +362,6 @@
   <data name="ReInitButton.Content" xml:space="preserve">
     <value>Re-Initialize</value>
   </data>
-  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Reset all VRChat OSC config data (will be regenerated when avatar is reloaded)</value>
-  </data>
-  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Reset VRChat Configs</value>
-  </data>
   <data name="ResetButton.Content" xml:space="preserve">
     <value>Reset</value>
   </data>

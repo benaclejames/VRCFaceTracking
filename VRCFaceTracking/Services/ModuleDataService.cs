@@ -10,7 +10,7 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleDataService : IModuleDataService
 {
-    private List<InstallableTrackingModule> _remoteModules;
+    private List<InstallableTrackingModule>? _remoteModules;
     private readonly Dictionary<Guid, int> _ratingCache = new();
 
     private readonly IIdentityService _identityService;
