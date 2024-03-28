@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Services;
@@ -13,88 +12,58 @@ namespace VRCFaceTracking.Core.OSC;
 public partial class OscQueryService : ObservableObject
 {
     // Services
-    private readonly ILocalSettingsService _localSettingsService;
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly QueryRegistrar _queryRegistrar;
-    
-    // Delegates
-    public Action<int> OnMessagesDispatched;
-    public Action<OscMessage> OnMessageReceived;
-    public Action<IAvatarInfo, List<Parameter>> OnAvatarLoaded;
-    
-    [ObservableProperty] private bool _isConnected;
-    
-    [ObservableProperty]
-    [property: SavedSetting("OSCInPort", 9001)] 
-    private int _inPort;
 
-    [ObservableProperty]
-    [property: SavedSetting("OSCOutPort", 9000)]
-    private int _outPort;
+    [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
+    [ObservableProperty] private List<Parameter> _avatarParameters;
 
-    [ObservableProperty]
-    [property: SavedSetting("OSCAddress", "127.0.0.1")]
-    private string _destinationAddress;
-    
-    // Recv and send buffers
-    private readonly byte[] _recvBuffer = new byte[4096], _sendBuffer = new byte[4096];
+    private readonly IOscTarget _oscTarget;
  
     // Local vars
-    private Socket _senderClient, _receiverClient;
-    private CancellationTokenSource _recvThreadCts;
+    private readonly OscRecvService _recvService;
     private HttpHandler _httpHandler;
+    private readonly ILocalSettingsService _settingsService;
     
     public OscQueryService(
-        ILocalSettingsService localSettingsService, 
-        ILoggerFactory loggerFactory,
-        OscQueryConfigParser oscQueryConfigParser
+        ILogger<OscQueryService> logger,
+        OscQueryConfigParser oscQueryConfigParser,
+        IOscTarget oscTarget,
+        OscRecvService recvService,
+        ILocalSettingsService settingsService
     )
     {
-        _localSettingsService = localSettingsService;
         _oscQueryConfigParser = oscQueryConfigParser;
-        _logger = loggerFactory.CreateLogger("OSC");
-        OnMessagesDispatched = _ => { };
-        OnAvatarLoaded = (_, _) => { };
-        OnMessageReceived = HandleNewMessage;
+        _logger = logger;
+        _recvService = recvService;
+        _recvService.OnMessageReceived = HandleNewMessage;
         _queryRegistrar = new QueryRegistrar();
+        _oscTarget = oscTarget;
+        _settingsService = settingsService;
     }
 
-    public async Task SaveSettings()
-    {
-        await _localSettingsService.Save(this);
-
-        await Task.CompletedTask;
-    }
-    
-    public async Task LoadSettings()
-    {
-        await _localSettingsService.Load(this);
-
-        await Task.CompletedTask;
-    }
-
-    public async Task<(bool, bool)> InitializeAsync()
+    public async Task InitializeAsync()
     {
         _logger.LogDebug("OSC Service Initializing");
             
-        await LoadSettings();
+        await _settingsService.Load(_oscTarget);
+        
         (bool listenerSuccess, bool senderSuccess) result = (false, false);
 
-        if (string.IsNullOrWhiteSpace(DestinationAddress))
+        if (string.IsNullOrWhiteSpace(_oscTarget.DestinationAddress))
         {
-            return result;  // Return both false as we cant bind to anything without an address
+            return;  // Return both false as we cant bind to anything without an address
         }
 
         InitOscQuery();
             
-        result = (BindListener(), BindSender());
 
         QueryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
-        return result;
+        return;
 
         void FirstClientDiscovered()
         {
@@ -106,112 +75,14 @@ public partial class OscQueryService : ObservableObject
     
     private void InitOscQuery()
     {
+        _httpHandler?.Dispose();
+        _httpHandler = new HttpHandler(6970);
+        
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
         QueryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
         QueryRegistrar.Advertise("_osc._udp", "VRCFT", 6969, IPAddress.Loopback);
-
-        _httpHandler?.Dispose();
-        _httpHandler = new HttpHandler(6970);
-    }
-
-    private bool BindSender()
-    {
-        _logger.LogDebug("Binding Sender Client");
-        _senderClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-        try
-        {
-            _senderClient.Connect(new IPEndPoint(IPAddress.Parse(DestinationAddress), OutPort));
-        }
-        catch(Exception e)
-        {
-            _logger.LogDebug("Failed to bind to port {0} with reason {1}", OutPort, e.Message);
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool BindListener()
-    {
-        _logger.LogTrace("Binding Receiver Client");
-        _receiverClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-        try
-        {
-            _receiverClient.Bind(new IPEndPoint(IPAddress.Parse(DestinationAddress), InPort));
-
-            StartListenerThread();
-        }
-        catch
-        {
-            _logger.LogError("Failed to bind to port {0}", InPort);
-            // Now we find the app that's bound to the port and log it
-            var p = new Process();
-            p.StartInfo.FileName = "netstat.exe";
-            p.StartInfo.Arguments = "-a -n -o";
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.Start();
-                
-            var output = p.StandardOutput.ReadToEnd();
-            p.WaitForExit();
-                
-            // Find the line with the port we're trying to bind to
-            var lines = output.Split('\n');
-            foreach (var line in lines.Where(line => line.Contains(InPort.ToString())))
-            {
-                // Get the PID
-                var pid = line.Split(' ').Last().Trim();
-                // Get the process
-                var proc = Process.GetProcessById(int.Parse(pid));
-                _logger.LogError("Port {inPort} is already bound by {processName}", InPort, proc.ProcessName);
-                break;
-            }
-
-            IsConnected = false;
-            return false;
-        }
-
-        IsConnected = true;
-        return true;
-    }
-
-    private void StartListenerThread()
-    {
-        _recvThreadCts?.Cancel();    // In theory, the closure of the client should have already cancelled the token, but just in case
-
-        var newToken = new CancellationTokenSource();
-        ThreadPool.QueueUserWorkItem(async ct =>
-        {
-            try
-            {
-                var token = (CancellationToken)ct!;
-                while (!token.IsCancellationRequested)
-                {
-                    await RecvAsync(token);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
-                SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
-            }
-        }, newToken.Token);
-        _recvThreadCts = newToken;
-    }
-
-
-    private async Task RecvAsync(CancellationToken ct)
-    {
-        var bytesReceived = await _receiverClient.ReceiveAsync(_recvBuffer, ct);
-        var offset = 0;
-        var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
-        if (newMsg == null)
-        {
-            return;
-        }
-        OnMessageReceived(newMsg);
+        
+        _queryRegistrar.QueryForVRChat();
     }
 
     private async void HandleNewAvatar()
@@ -219,7 +90,8 @@ public partial class OscQueryService : ObservableObject
         var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(_queryRegistrar.VrchatClientEndpoint);
         if (newAvatar.HasValue)
         {
-            OnAvatarLoaded(newAvatar.Value.avatarInfo, newAvatar.Value.relevantParameters);
+            AvatarInfo = newAvatar.Value.avatarInfo;
+            AvatarParameters = newAvatar.Value.relevantParameters;
         }
     }
         
@@ -248,9 +120,9 @@ public partial class OscQueryService : ObservableObject
                 break;
             case "/avatar/parameters/LipTrackingActive":
             case "/avatar/parameters/ExpressionTrackingActive":
-                if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
                 {
                     if (!msg.Value.BoolValue)
+                if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
                         UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
                     else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
                 }
@@ -259,38 +131,24 @@ public partial class OscQueryService : ObservableObject
         }
     }
 
-    public async Task Send(OscMessage message)
+    partial void OnAvatarParametersChanged(List<Parameter> discoveredParameters)
     {
-        var nextByteIndex = message.Encode(_sendBuffer);
-        if (nextByteIndex > 4096)
+        _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
+        var hasLoadedNative = discoveredParameters.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
+        if (hasLoadedNative)
         {
-            _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
-            return;
+            _logger.LogWarning("Native tracking parameters detected.");
         }
 
-        await _senderClient?.SendAsync(_sendBuffer[..nextByteIndex])!;
-        OnMessagesDispatched(1);
-    }
+        var deprecatedParams = discoveredParameters.Count(p => p.Deprecated);
 
-    public async Task Send(OscMessage[] messages)
-    {
-        var cbt = messages.Select(m => m._meta).ToArray();
-        var index = 0;
-        while (index < cbt.Length)
+        _logger.LogInformation(discoveredParameters.Count + " parameters loaded.");
+        if (deprecatedParams > 0)
         {
-            var length = fti_osc.create_osc_bundle(_sendBuffer, cbt, messages.Length, ref index);
-            await _senderClient?.SendAsync(_sendBuffer[..length])!;
+            _logger.LogWarning(
+                deprecatedParams +
+                " Legacy parameters detected. " +
+                "Please consider updating the avatar to use the latest documented parameters.");
         }
-        OnMessagesDispatched(index);
-    }
-        
-    public void Teardown()
-    {
-        // We just need to cancel our listener thread and close the sockets
-        _logger.LogDebug("OSC Service Teardown");
-        _recvThreadCts?.Cancel();
-            
-        _senderClient?.Close();
-        _receiverClient?.Close();
     }
 }

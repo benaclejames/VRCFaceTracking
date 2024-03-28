@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
+﻿namespace VRCFaceTracking.Core.OSC.Query;
 
 public enum AccessValues
 {

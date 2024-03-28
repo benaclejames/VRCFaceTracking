@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 
-namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
+namespace VRCFaceTracking.Core.OSC.Query;
 
 public class OscQueryHostInfo
 {
-    [JsonProperty(Keys.NAME)]
+    [JsonProperty("NAME")]
     public string name;
 
-    [JsonProperty(Keys.EXTENSIONS)] public Dictionary<string, bool> extensions = new Dictionary<string, bool>()
+    [JsonProperty("EXTENSIONS")] public Dictionary<string, bool> extensions = new()
     {
         { "ACCESS", true },
         { "CLIPMODE", false },
@@ -16,15 +16,15 @@ public class OscQueryHostInfo
         { "VALUE", true },
     };
         
-    [JsonProperty(Keys.OSC_IP)]
+    [JsonProperty("OSC_IP")]
     public string oscIP;
         
-    [JsonProperty(Keys.OSC_PORT)]
+    [JsonProperty("OSC_PORT")]
     public int oscPort = 6969;
 
-    [JsonProperty(Keys.OSC_TRANSPORT)] 
-    public string oscTransport = Keys.OSC_TRANSPORT_UDP;
-
+    [JsonProperty("OSC_TRANSPORT")] 
+    public string oscTransport = "UDP";
+    
     /// <summary>
     /// Empty Constructor required for JSON Serialization
     /// </summary>
@@ -37,15 +37,5 @@ public class OscQueryHostInfo
     {
         var result = JsonConvert.SerializeObject(this);
         return result;
-    }
-
-    public class Keys
-    {
-        public const string NAME = "NAME";
-        public const string EXTENSIONS = "EXTENSIONS";
-        public const string OSC_IP = "OSC_IP";
-        public const string OSC_PORT = "OSC_PORT";
-        public const string OSC_TRANSPORT = "OSC_TRANSPORT";
-        public const string OSC_TRANSPORT_UDP = "UDP";
     }
 }

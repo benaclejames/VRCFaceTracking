@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.ViewModels;
 using Windows.System;
 using Microsoft.UI.Xaml.Media.Imaging;
+using VRCFaceTracking.Core.Contracts.Services;
 using VrcftImage = VRCFaceTracking.Core.Types.Image;
 
 namespace VRCFaceTracking.Views;
@@ -25,7 +26,7 @@ public sealed partial class SettingsPage : Page
         get;
     }
     
-    public OscViewModel OscViewModel
+    public IOscTarget OscTarget
     {
         get;
     }
@@ -49,9 +50,9 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
-        OscViewModel = App.GetService<OscViewModel>();
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
+        OscTarget = App.GetService<IOscTarget>();
 
         // Initialize hardware debug streams for upper and lower face tracking
         InitializeHardwareDebugStream(UnifiedTracking.EyeImageData, ref _upperImageStream, ref _upperStream);

@@ -64,22 +64,6 @@ public class MainStandalone : IMainService
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
-
-        _parameterOutputService.OnAvatarLoaded += (configRaw, discoveredParameters) =>
-        {
-            _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
-            var hasLoadedNative = discoveredParameters.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
-            if (hasLoadedNative)
-                _logger.LogWarning("Native tracking parameters detected.");
-            var deprecatedParams = discoveredParameters.Count(p => p.Deprecated);
-
-            _logger.LogInformation(discoveredParameters.Count + " parameters loaded.");
-            if (deprecatedParams > 0)
-                _logger.LogWarning(
-                    deprecatedParams +
-                    " Legacy parameters detected. " +
-                    "Please consider updating the avatar to use the latest documented parameters.");
-        };
         
         _mutator.LoadCalibration();
         

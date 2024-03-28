@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models.Osc.FileBased;
 
-namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
+namespace VRCFaceTracking.Core.OSC.Query;
 
 public class OSCQueryNode
 {

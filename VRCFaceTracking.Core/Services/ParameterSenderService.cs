@@ -5,14 +5,16 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ParameterSenderService : BackgroundService
 {
+    // We probably don't need a queue since we use osc message bundles, but for now, we're keeping it as
+    // we might want to allow a way for the user to specify bundle or single message sends in the future
     private static readonly Queue<OscMessage> SendQueue = new();
  
-    private readonly OscQueryService _parameterOutputService;
+    private readonly OscSendService _sendService;
     public static bool AllParametersRelevant;
     
-    public ParameterSenderService(OscQueryService parameterOutputService)
+    public ParameterSenderService(OscSendService sendService)
     {
-        _parameterOutputService = parameterOutputService;
+        _sendService = sendService;
     }
 
     public static void Enqueue(OscMessage message) => SendQueue.Enqueue(message);
@@ -20,15 +22,13 @@ public class ParameterSenderService : BackgroundService
     
     protected async override Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await Task.Yield();
-        
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
                 await Task.Delay(10, cancellationToken);
 
-                UnifiedTracking.UpdateData();
+                await UnifiedTracking.UpdateData(cancellationToken);
 
                 // Send all messages in OSCParams.SendQueue
                 if (SendQueue.Count <= 0)
@@ -36,7 +36,7 @@ public class ParameterSenderService : BackgroundService
                     continue;
                 }
 
-                await _parameterOutputService.Send(SendQueue.ToArray());
+                await _sendService.Send(SendQueue.ToArray(), cancellationToken);
 
                 SendQueue.Clear();
             }
@@ -46,7 +46,7 @@ public class ParameterSenderService : BackgroundService
                 {
                     foreach (var msg in SendQueue)
                     {
-                        scope.AddAttachment($"Address: {msg.Address}, Values: {msg._meta.ValueLength}, Value 0: {msg.Value.ToString()}");
+                        scope.AddAttachment($"Address: {msg.Address}, Values: {msg._meta.ValueLength}, Value 0: {msg.Value}");
                     }
                 });
             }

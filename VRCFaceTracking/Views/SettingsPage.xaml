@@ -63,12 +63,12 @@
                                 Margin="15, 0, 15, 0"
                                 Minimum="0"
                                 Maximum="65535"
-                                Value="{x:Bind OscViewModel.RecvPort, Mode=TwoWay}"/>
+                                Value="{x:Bind OscTarget.InPort, Mode=TwoWay}"/>
                             
                             <TextBox
                                      Header="IP Address" 
                                      PlaceholderText="127.0.0.1" 
-                                     Text="{x:Bind OscViewModel.Address, Mode=TwoWay}"/>
+                                     Text="{x:Bind OscTarget.DestinationAddress, Mode=TwoWay}"/>
                             
                             <NumberBox
                                 Header="Send Port"
@@ -78,7 +78,7 @@
                                 Minimum="0"
                                 Maximum="65535"
                                 Margin="15, 0, 15, 0"
-                                Value="{x:Bind OscViewModel.SendPort, Mode=TwoWay}"/>
+                                Value="{x:Bind OscTarget.OutPort, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
                 </labs:SettingsCard>

@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sentry;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.OSC.Query;
 using VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
 using VRCFaceTracking.Core.Params;
 

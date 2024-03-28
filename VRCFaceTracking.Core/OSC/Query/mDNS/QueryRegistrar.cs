@@ -174,6 +174,29 @@ public partial class QueryRegistrar : ObservableObject
         }
     }
 
+    public async void QueryForVRChat()
+    {
+        var dnsPacket = new DNSPacket();
+        var labels = new List<string>();
+        labels.Add("_oscjson");
+        labels.Add("_tcp");
+        labels.Add("local");
+        var dnsQuestion = new DNSQuestion(labels, 255, 1);
+        dnsPacket.questions = new[] { dnsQuestion };
+        dnsPacket.QUERYRESPONSE = false;
+        dnsPacket.OPCODE = 0;
+        dnsPacket.TRUNCATION = false;
+
+        var bytes = dnsPacket.Serialize();
+        foreach (var sender in Senders)
+        {
+            await sender.Value.SendAsync(bytes, bytes.Length, MdnsEndpointIp4);
+        }
+        
+        //var unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
+        //await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
+    }
+
     private void ResolveVrChatClient(DNSPacket packet, IPEndPoint remoteEndpoint)
     {
         if (!packet.QUERYRESPONSE || packet.answers[0].Type != 12)
