@@ -12,6 +12,7 @@ using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
@@ -110,6 +111,7 @@ public partial class App : Application
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
             services.AddTransient<OpenVRService>();
+            services.AddSingleton<IOscTarget, OscTarget>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();
@@ -122,15 +124,17 @@ public partial class App : Application
             services.AddTransient<SettingsViewModel>();
             services.AddSingleton<UnifiedTrackingMutator>();
             services.AddSingleton<RiskySettingsViewModel>();
-            services.AddTransient<OscViewModel>();
             services.AddTransient<SettingsPage>();
             services.AddSingleton<MainViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
+            services.AddSingleton<OscSendService>();
+            services.AddSingleton<OscRecvService>();
             services.AddSingleton<ParameterSenderService>();
             
-            services.AddHostedService<ParameterSenderService>();
+            services.AddHostedService<ParameterSenderService>(provider => provider.GetService<ParameterSenderService>());
+            services.AddHostedService<OscRecvService>(provider => provider.GetService<OscRecvService>());
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
