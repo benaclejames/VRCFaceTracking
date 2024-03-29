@@ -56,10 +56,9 @@ public partial class OscQueryService : ObservableObject
             return;  // Return both false as we cant bind to anything without an address
         }
 
-        InitOscQuery();
-            
-
         QueryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
+        
+        InitOscQuery();
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
@@ -140,15 +139,16 @@ public partial class OscQueryService : ObservableObject
             _logger.LogWarning("Native tracking parameters detected.");
         }
 
-        var deprecatedParams = discoveredParameters.Count(p => p.Deprecated);
+        var deprecatedParams = discoveredParameters.Where(p => p.Deprecated).ToList();
 
         _logger.LogInformation(discoveredParameters.Count + " parameters loaded.");
-        if (deprecatedParams > 0)
+        if (deprecatedParams.Any())
         {
             _logger.LogWarning(
                 deprecatedParams +
                 " Legacy parameters detected. " +
                 "Please consider updating the avatar to use the latest documented parameters.");
+            _logger.LogDebug($"Loaded deprecated parameters: {string.Join(", ", deprecatedParams.SelectMany(x => x.GetParamNames()))}");
         }
     }
 }
