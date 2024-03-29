@@ -4,7 +4,7 @@ namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
 
 public class OscQueryAvatarInfo : IAvatarInfo
 {
-    public string Name => "Half-baked OSCQuery impl";
+    public string Name { get; internal set; }
 
     public string Id { get; }
 
@@ -12,6 +12,7 @@ public class OscQueryAvatarInfo : IAvatarInfo
     
     public OscQueryAvatarInfo(OSCQueryNode rootNode)
     {
+        Name = "Half-baked OSCQuery impl";
         if (!rootNode.Contents.ContainsKey("change"))
         {
             // We likely queried while an avatar was still loading. Return without parsing.

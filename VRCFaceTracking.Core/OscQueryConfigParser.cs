@@ -6,15 +6,17 @@ using VRCFaceTracking.Core.OSC.Query;
 using VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
 using VRCFaceTracking.Core.Params;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking.Core
 {
     public class OscQueryConfigParser
     {
-        private static ILogger<OscQueryConfigParser> _logger;
+        private readonly ILogger<OscQueryConfigParser> _logger;
+        private readonly AvatarConfigParser _configParser;
 
-        public OscQueryConfigParser(ILogger<OscQueryConfigParser> parserLogger)
+        public OscQueryConfigParser(ILogger<OscQueryConfigParser> parserLogger, AvatarConfigParser configParser)
         {
             _logger = parserLogger;
+            _configParser = configParser;
         }
 
         private readonly HttpClient _httpClient = new();
@@ -43,6 +45,20 @@ namespace VRCFaceTracking
                              .ToArray())
                 {
                     paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters));
+                }
+                
+                // God help me why is this something I need to do to get the avatar name
+                // this impl is really disappointing vrc
+                var configFileInfo = await _configParser.ParseNewAvatar(avatarInfo.Id);
+                _logger.LogInformation($"Attempting to resolve avatar config file for {avatarInfo.Id}");
+                if (!string.IsNullOrEmpty(configFileInfo?.avatarInfo.Name))
+                {
+                    avatarInfo.Name = configFileInfo.Value.avatarInfo.Name;
+                    _logger.LogInformation($"Successfully found config containing avatar name {avatarInfo.Name}");
+                }
+                else
+                {
+                    _logger.LogWarning("Odd. Out attempt to find the legacy osc config json for this avatar failed.");
                 }
 
                 return (avatarInfo, paramList);
