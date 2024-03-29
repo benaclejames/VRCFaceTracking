@@ -14,8 +14,6 @@ namespace VRCFaceTracking.Core.Params.DataTypes
             OscMessage.Address = paramAddress;
             Relevant = true;
         }
-
-        public new (string, Parameter)[] GetParamNames() => new[] { (OscMessage.Address, (Parameter)this) };
         
         public override Parameter[] ResetParam(IParameterDefinition[] newParams)
         {
@@ -35,16 +33,15 @@ namespace VRCFaceTracking.Core.Params.DataTypes
         
         public override Parameter[] ResetParam(IParameterDefinition[] newParams)
         {
-            if (!_condition.Invoke(newParams))
+            if (_condition.Invoke(newParams))
             {
-                Relevant = false;
-                return Array.Empty<Parameter>();
+                return base.ResetParam(newParams);
             }
-            
-            return base.ResetParam(newParams);
+
+            Relevant = false;
+            return Array.Empty<Parameter>();
+
         }
-        
-        public new (string, Parameter)[] GetParamNames() => new (string, Parameter)[] { (OscMessage.Address, this) };
     }
 
     // This parameter type will only update parameter 1 if parameter 2 is true
@@ -54,12 +51,19 @@ namespace VRCFaceTracking.Core.Params.DataTypes
         
         public ConditionalBoolParameter(Func<UnifiedTrackingData, (bool, bool)> getValueFunc, string paramName) :
             base(paramName, exp => getValueFunc.Invoke(exp).Item1)
-        => _conditionalValueFunc = getValueFunc;
+        {
+            _conditionalValueFunc = getValueFunc;
+        }
+
+        // Override deprecated, since we never really want to deprecate these parameters
+        public override bool Deprecated => false;
 
         protected override void Process(UnifiedTrackingData exp)
         {
             if (_conditionalValueFunc.Invoke(exp).Item2)
+            {
                 base.Process(exp);
+            }
         }
     }
 
