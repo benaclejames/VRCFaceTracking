@@ -8,11 +8,11 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleInstaller
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<ModuleInstaller> _logger;
 
-    public ModuleInstaller(ILoggerFactory loggerFactory)
+    public ModuleInstaller(ILogger<ModuleInstaller> logger)
     {
-        _logger = loggerFactory.CreateLogger("ModuleInstaller");
+        _logger = logger;
         
         if (!Directory.Exists(Utils.CustomLibsDirectory))
         {
@@ -21,7 +21,7 @@ public class ModuleInstaller
     }
 
     // Move a directory using just Copy and Remove as MoveDirectory is not usable across drives
-    private void MoveDirectory(string source, string dest)
+    private static void MoveDirectory(string source, string dest)
     {
         if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(dest))
         {
@@ -51,7 +51,7 @@ public class ModuleInstaller
         Directory.Delete(source, true);
     }
 
-    private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
