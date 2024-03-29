@@ -16,7 +16,7 @@ public static class UnifiedExpressionsParameters
             .SelectMany(p => p.GetParamNames());
                 
         // Now we match parameters to the literals as a sort of sanity check
-        return allParams.Where(p => param.Any(p2 => p.paramName == p2.Name)).ToArray();
+        return allParams.Where(p => param.Any(p2 => p2.Address.EndsWith(p.paramName))).ToArray();
     }
     
     public static readonly Parameter[] UnifiedCombinedShapes =
