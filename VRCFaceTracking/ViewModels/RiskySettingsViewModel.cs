@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Services;
 
@@ -8,7 +9,6 @@ namespace VRCFaceTracking.ViewModels;
 public partial class RiskySettingsViewModel : ObservableObject
 {
     private readonly IMainService _mainService;
-    private readonly ParameterSenderService _parameterSenderService;
     private readonly ILogger<RiskySettingsViewModel> _logger;
 
     [ObservableProperty] private bool _enabled;
@@ -20,13 +20,11 @@ public partial class RiskySettingsViewModel : ObservableObject
     }
 
     public RiskySettingsViewModel(
-        IMainService mainService, 
-        ParameterSenderService parameterSendService, 
+        IMainService mainService,
         ILogger<RiskySettingsViewModel> logger
         )
     {
         _mainService = mainService;
-        _parameterSenderService = parameterSendService;
         _logger = logger;
     }
 

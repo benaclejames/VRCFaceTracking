@@ -21,9 +21,10 @@ public partial class QueryRegistrar : ObservableObject
             Address = address;
         }
     }
-    
+
     private static readonly IPAddress MulticastIp = IPAddress.Parse("224.0.0.251");
-    private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, 5353);
+    private const int MulticastPost = 5353;
+    private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, MulticastPost);
     private readonly List<IPAddress> _localIpAddresses;
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
@@ -34,7 +35,7 @@ public partial class QueryRegistrar : ObservableObject
 
     [ObservableProperty] private static IPEndPoint _vrchatClientEndpoint;
 
-    partial void OnVrchatClientEndpointChanged(IPEndPoint? value) => OnVrcClientDiscovered();
+    partial void OnVrchatClientEndpointChanged(IPEndPoint value) => OnVrcClientDiscovered();
         
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
@@ -53,7 +54,7 @@ public partial class QueryRegistrar : ObservableObject
         // Create listeners for all interfaces
         var receiver = new UdpClient(AddressFamily.InterNetwork);
         receiver.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        receiver.Client.Bind(new IPEndPoint(IPAddress.Any, 5353));
+        receiver.Client.Bind(new IPEndPoint(IPAddress.Any, MulticastPost));
         Receivers.Add(receiver, new CancellationToken());
 
         // For each ip address, create a sender udp client to respond to multicast requests
@@ -71,7 +72,7 @@ public partial class QueryRegistrar : ObservableObject
             receiver.JoinMulticastGroup(MulticastIp, ipAddress);
                 
             sender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            sender.Client.Bind(new IPEndPoint(ipAddress, 5353));    // Bind to the local ip address
+            sender.Client.Bind(new IPEndPoint(ipAddress, MulticastPost));    // Bind to the local ip address
             sender.JoinMulticastGroup(MulticastIp);                           // Join the multicast group
             sender.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
                 
@@ -158,7 +159,7 @@ public partial class QueryRegistrar : ObservableObject
 
                 var bytes = response.Serialize();
 
-                if (remoteEndpoint.Port == 5353)
+                if (remoteEndpoint.Port == MulticastPost)
                 {
                     foreach (var sender in Senders)
                     {
@@ -259,7 +260,7 @@ public partial class QueryRegistrar : ObservableObject
         }
     }
 
-    public static void Advertise(string serviceName, string instanceName, int port, IPAddress address)
+    public void Advertise(string serviceName, string instanceName, int port, IPAddress address)
     {
         // If we're already advertising on this service, we can just update it
         if (Services.ContainsKey(serviceName))

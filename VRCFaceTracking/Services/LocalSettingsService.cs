@@ -4,6 +4,7 @@ using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
 using Windows.Storage;
+using VRCFaceTracking.Core;
 
 namespace VRCFaceTracking.Services;
 

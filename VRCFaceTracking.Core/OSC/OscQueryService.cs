@@ -79,8 +79,8 @@ public partial class OscQueryService : ObservableObject
         _httpHandler = new HttpHandler(6970);
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
-        QueryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
-        QueryRegistrar.Advertise("_osc._udp", "VRCFT", 6969, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_osc._udp", "VRCFT", 6969, IPAddress.Loopback);
         
         _queryRegistrar.QueryForVRChat();
     }

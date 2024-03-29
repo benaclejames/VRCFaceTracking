@@ -1,21 +1,17 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Library;
-using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.Params.Data;
 
 [assembly:TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
 [assembly:TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
 [assembly:TypeForwardedTo(typeof(ModuleState))]
 
-namespace VRCFaceTracking;
+namespace VRCFaceTracking.Core;
 
 public class MainStandalone : IMainService
 {
-    public static readonly CancellationTokenSource MasterCancellationTokenSource = new();
-    
-    private readonly OscQueryService _parameterOutputService;
     private readonly ILogger _logger;
     private readonly ILibManager _libManager;
     private readonly UnifiedTrackingMutator _mutator;
@@ -24,13 +20,11 @@ public class MainStandalone : IMainService
 
     public MainStandalone(
         ILoggerFactory loggerFactory, 
-        OscQueryService parameterOutputService,
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )
     {
         _logger = loggerFactory.CreateLogger("MainStandalone");
-        _parameterOutputService = parameterOutputService;
         _libManager = libManager;
         _mutator = mutator;
     }
@@ -41,10 +35,6 @@ public class MainStandalone : IMainService
         _libManager.TeardownAllAndResetAsync();
 
         await _mutator.SaveCalibration();
-
-        // Kill our threads
-        _logger.LogDebug("Cancelling token sources...");
-        MasterCancellationTokenSource.Cancel();
         
         _logger.LogDebug("Resetting our time end period...");
         Utils.TimeEndPeriod(1);

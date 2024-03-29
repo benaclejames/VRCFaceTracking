@@ -43,16 +43,16 @@ public class DNSPacket
         authorities = new DNSResource[stream.ReadUInt16()];
         additionals = new DNSResource[stream.ReadUInt16()];
             
-        for (int i = 0; i < questions.Length; i++)
+        for (var i = 0; i < questions.Length; i++)
             questions[i] = new DNSQuestion(stream);
 
-        for (int i = 0; i < answers.Length; i++)
+        for (var i = 0; i < answers.Length; i++)
             answers[i] = new DNSResource(stream);
             
-        for (int i = 0; i < authorities.Length; i++)
+        for (var i = 0; i < authorities.Length; i++)
             authorities[i] = new DNSResource(stream);
             
-        for (int i = 0; i < additionals.Length; i++)
+        for (var i = 0; i < additionals.Length; i++)
             additionals[i] = new DNSResource(stream);
     }
 
@@ -63,7 +63,7 @@ public class DNSPacket
 
     public byte[] Serialize()
     {
-        List<byte> bytes = new List<byte>();
+        var bytes = new List<byte>();
             
         bytes.AddRange(BigWriter.WriteUInt16(ID));
             
