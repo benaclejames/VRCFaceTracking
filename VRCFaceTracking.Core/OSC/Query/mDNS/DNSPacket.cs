@@ -9,10 +9,10 @@ public class DNSPacket
     public bool TRUNCATION;
     public bool TENTATIVE;
     public int RESPONSECODE;
-    public DNSQuestion[] questions;
-    public DNSResource[] answers;
-    public DNSResource[] authorities;
-    public DNSResource[] additionals;
+    public DNSQuestion[] questions = Array.Empty<DNSQuestion>();
+    public DNSResource[] answers = Array.Empty<DNSResource>();
+    public DNSResource[] authorities = Array.Empty<DNSResource>();
+    public DNSResource[] additionals = Array.Empty<DNSResource>();
         
 
     public DNSPacket(BigReader stream)
