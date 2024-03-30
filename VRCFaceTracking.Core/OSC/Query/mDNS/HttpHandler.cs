@@ -27,10 +27,12 @@ public class HttpHandler : IDisposable
         string respStr;
         if (context.Request.RawUrl.Contains("HOST_INFO"))
         {
-            var hostInfo = new OscQueryHostInfo();
-            hostInfo.name = "VRCFaceTracking";
-            hostInfo.oscIP = "127.0.0.1";
-            hostInfo.oscPort = 6969;
+            var hostInfo = new OscQueryHostInfo
+            {
+                name = "VRCFaceTracking",
+                oscIP = "127.0.0.1",
+                oscPort = 6969
+            };
             respStr = hostInfo.ToString();
         }
         else
