@@ -17,7 +17,6 @@ public class OscSendService
     private readonly ILogger<OscSendService> _logger;
     public Action<int> OnMessagesDispatched = _ => { };
     private readonly IOscTarget _oscTarget;
-    private readonly ILocalSettingsService _settingsService;
 
     public OscSendService(
         ILogger<OscSendService> logger,
@@ -29,7 +28,6 @@ public class OscSendService
         _cts = new CancellationTokenSource();
 
         _oscTarget = oscTarget;
-        _settingsService = settingsService;
 
         _oscTarget.PropertyChanged += (_, args) =>
         {

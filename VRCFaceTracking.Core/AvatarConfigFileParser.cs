@@ -1,13 +1,10 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.Osc.FileBased;
-using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.Params;
-using VRCFaceTracking.Core.Services;
 
-namespace VRCFaceTracking;
+namespace VRCFaceTracking.Core;
 
 /// <summary>
 /// ConfigParser is responsible for parsing the traditional JSON OSC config that VRChat produces
@@ -15,16 +12,15 @@ namespace VRCFaceTracking;
 public class AvatarConfigParser
 {
     private readonly ILogger<AvatarConfigParser> _logger;
-    private string _lastAvatarId;
 
     public AvatarConfigParser(ILogger<AvatarConfigParser> parserLogger)
     {
         _logger = parserLogger;
     }
 
-    public async Task<(IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?> ParseNewAvatar(string newId)
+    public async Task<(IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?> ParseAvatar(string newId)
     {
-        if (newId == _lastAvatarId || string.IsNullOrEmpty(newId))
+        if (string.IsNullOrEmpty(newId))
         {
             return null;
         }

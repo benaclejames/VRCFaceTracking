@@ -15,6 +15,7 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
@@ -102,18 +103,20 @@ public partial class App : Application
             services.AddSingleton<IDispatcherService, DispatcherService>();
 
             // Core Services
-            services.AddSingleton<IIdentityService, IdentityService>();
+            services.AddTransient<IIdentityService, IdentityService>();
             services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
-            services.AddSingleton<IFileService, FileService>();
+            services.AddTransient<IFileService, FileService>();
             services.AddSingleton<OscQueryService>();
+            services.AddSingleton<QueryRegistrar>();
             services.AddSingleton<IMainService, MainStandalone>();
-            services.AddSingleton<AvatarConfigParser>();
-            services.AddSingleton<OscQueryConfigParser>();
+            services.AddTransient<AvatarConfigParser>();
+            services.AddTransient<OscQueryConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
             services.AddTransient<OpenVRService>();
             services.AddSingleton<IOscTarget, OscTarget>();
+            services.AddSingleton<HttpHandler>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();

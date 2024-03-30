@@ -2,7 +2,6 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Sentry;
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
@@ -31,9 +30,9 @@ public partial class QueryRegistrar : ObservableObject
     private static readonly Dictionary<UdpClient, CancellationToken> Receivers = new();
     private static readonly Dictionary<string, AdvertisedService> Services = new();
 
-    public static Action OnVrcClientDiscovered = () => { };
+    public Action OnVrcClientDiscovered = () => { };
 
-    [ObservableProperty] private static IPEndPoint _vrchatClientEndpoint;
+    [ObservableProperty] private IPEndPoint _vrchatClientEndpoint;
 
     partial void OnVrchatClientEndpointChanged(IPEndPoint value) => OnVrcClientDiscovered();
         

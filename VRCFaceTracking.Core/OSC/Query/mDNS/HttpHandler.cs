@@ -4,17 +4,23 @@ namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
 public class HttpHandler : IDisposable
 {
-    private readonly HttpListener _listener;
-    
-    public HttpHandler(int port)
+    private readonly HttpListener _listener = new();
+    private IAsyncResult _contextListenerResult;
+
+    public void BindTo(string uri)
     {
-        _listener = new HttpListener();
-        _listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+        if (_contextListenerResult != null)
+        {
+            _listener.EndGetContext(_contextListenerResult);
+        }
+        _listener.Stop();
+        _listener.Prefixes.Clear();
+        _listener.Prefixes.Add(uri);
         _listener.Start();
-        _listener.BeginGetContext(HttpListenerLoop, _listener);
+        _contextListenerResult = _listener.BeginGetContext(HttpListenerLoop, _listener);
     }
 
-    async void HttpListenerLoop(IAsyncResult result)
+    private async void HttpListenerLoop(IAsyncResult result)
     {
         var context = _listener.EndGetContext(result);
         _listener.BeginGetContext(HttpListenerLoop, _listener);

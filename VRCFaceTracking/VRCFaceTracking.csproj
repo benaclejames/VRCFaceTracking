@@ -44,6 +44,9 @@
     <Content Include="OpenVR\app.vrmanifest" Link="app.vrmanifest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Remove="solution-config.props.sample" />
+    <None Remove="global.json" />
+    <None Remove="VRCFaceTracking\ReadMe.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +81,14 @@
 
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="VRCFaceTracking\MainPage.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="VRCFaceTracking\MainPage.xaml" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

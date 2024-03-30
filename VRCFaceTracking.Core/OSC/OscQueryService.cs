@@ -23,24 +23,27 @@ public partial class OscQueryService : ObservableObject
  
     // Local vars
     private readonly OscRecvService _recvService;
-    private HttpHandler _httpHandler;
     private readonly ILocalSettingsService _settingsService;
+    private readonly HttpHandler _httpHandler;
     
     public OscQueryService(
         ILogger<OscQueryService> logger,
         OscQueryConfigParser oscQueryConfigParser,
         IOscTarget oscTarget,
+        QueryRegistrar queryRegistrar,
         OscRecvService recvService,
-        ILocalSettingsService settingsService
+        ILocalSettingsService settingsService,
+        HttpHandler httpHandler
     )
     {
         _oscQueryConfigParser = oscQueryConfigParser;
         _logger = logger;
         _recvService = recvService;
         _recvService.OnMessageReceived = HandleNewMessage;
-        _queryRegistrar = new QueryRegistrar();
+        _queryRegistrar = queryRegistrar;
         _oscTarget = oscTarget;
         _settingsService = settingsService;
+        _httpHandler = httpHandler;
     }
 
     public async Task InitializeAsync()
@@ -56,7 +59,7 @@ public partial class OscQueryService : ObservableObject
             return;  // Return both false as we cant bind to anything without an address
         }
 
-        QueryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
+        _queryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
         
         InitOscQuery();
             
@@ -66,7 +69,7 @@ public partial class OscQueryService : ObservableObject
 
         void FirstClientDiscovered()
         {
-            QueryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
+            _queryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
                 
             HandleNewAvatar();
         }
@@ -74,8 +77,7 @@ public partial class OscQueryService : ObservableObject
     
     private void InitOscQuery()
     {
-        _httpHandler?.Dispose();
-        _httpHandler = new HttpHandler(6970);
+        _httpHandler.BindTo($"http://127.0.0.1:{6970}/");
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
         _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
@@ -86,7 +88,7 @@ public partial class OscQueryService : ObservableObject
 
     private async void HandleNewAvatar()
     {
-        var newAvatar = await _oscQueryConfigParser.ParseNewAvatar(_queryRegistrar.VrchatClientEndpoint);
+        var newAvatar = await _oscQueryConfigParser.ParseAvatar("");
         if (newAvatar.HasValue)
         {
             AvatarInfo = newAvatar.Value.avatarInfo;
