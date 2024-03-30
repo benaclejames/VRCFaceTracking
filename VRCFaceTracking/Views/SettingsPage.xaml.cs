@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.ViewModels;
 using Windows.System;
 using Microsoft.UI.Xaml.Media.Imaging;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params.Data;
 using VrcftImage = VRCFaceTracking.Core.Types.Image;
 

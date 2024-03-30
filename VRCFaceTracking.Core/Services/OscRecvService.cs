@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC;
 
@@ -32,12 +33,12 @@ public class OscRecvService : BackgroundService
         
         _oscTarget.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName is not (nameof(IOscTarget.InPort) or nameof(IOscTarget.DestinationAddress)))
+            if (args.PropertyName is not nameof(IOscTarget.DestinationAddress))
             {
                 return;
             }
 
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.InPort == default)
+            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
             {
                 return;
             }
@@ -60,11 +61,14 @@ public class OscRecvService : BackgroundService
         _oscTarget.IsConnected = false;
 
         _recvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        endpoint.Port = 0;
         
         try
         {
             _recvSocket.Bind(endpoint);
             _oscTarget.IsConnected = true;
+            _oscTarget.InPort = ((IPEndPoint)_recvSocket.LocalEndPoint).Port;
+            _logger.LogInformation($"Sorry bucko, this is oscquery time. You're gonna be using port {_oscTarget.InPort}");
         }
         catch (SocketException ex)
         {

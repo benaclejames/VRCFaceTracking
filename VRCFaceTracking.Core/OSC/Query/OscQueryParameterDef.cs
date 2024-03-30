@@ -1,7 +1,7 @@
-﻿using VRCFaceTracking.Core.Contracts.Services;
+﻿using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.OSC;
 
-namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
+namespace VRCFaceTracking.Core.OSC.Query;
 
 public class OscQueryParameterDef : IParameterDefinition
 {

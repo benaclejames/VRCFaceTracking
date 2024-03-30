@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC.Query;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
-using VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
 using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.Core;

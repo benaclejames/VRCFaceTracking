@@ -1,4 +1,4 @@
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.DataTypes;

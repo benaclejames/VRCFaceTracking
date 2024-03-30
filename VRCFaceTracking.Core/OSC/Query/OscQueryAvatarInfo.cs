@@ -1,6 +1,6 @@
-﻿using VRCFaceTracking.Core.Contracts.Services;
+﻿using VRCFaceTracking.Core.Contracts;
 
-namespace VRCFaceTracking.Core.OSC.Query.mDNS.Types.OscQuery;
+namespace VRCFaceTracking.Core.OSC.Query;
 
 public class OscQueryAvatarInfo : IAvatarInfo
 {

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models.Osc.FileBased;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Models.ParameterDefinition.FileBased;
 using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.Core;

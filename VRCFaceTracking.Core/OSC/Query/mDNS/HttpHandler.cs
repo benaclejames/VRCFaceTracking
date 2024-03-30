@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts;
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
@@ -6,7 +8,15 @@ public class HttpHandler : IDisposable
 {
     private readonly HttpListener _listener = new();
     private IAsyncResult _contextListenerResult;
-
+    private readonly IOscTarget _oscTarget;
+    private readonly ILogger<HttpHandler> _logger;
+    
+    public HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger)
+    {
+        _oscTarget = oscTarget;
+        _logger = logger;
+    }
+    
     public void BindTo(string uri)
     {
         if (_contextListenerResult != null)
@@ -30,26 +40,33 @@ public class HttpHandler : IDisposable
             var hostInfo = new OscQueryHostInfo
             {
                 name = "VRCFaceTracking",
-                oscIP = "127.0.0.1",
-                oscPort = 6969
+                oscIP = _oscTarget.DestinationAddress,
+                oscPort = _oscTarget.InPort
             };
             respStr = hostInfo.ToString();
+            _logger.LogDebug($"Responding to oscquery host info request with {respStr}");
         }
         else
         {
             if (context.Request.Url.LocalPath != "/")
                 return; // Not properly implementing oscquery protocol because I'm unemployed and not being paid to
 
-            var responseNode = new OSCQueryNode("/");
-            responseNode.Description = "root node";
-            responseNode.Access = AccessValues.NoValue;
+            var responseNode = new OSCQueryNode("/")
+            {
+                Description = "root node",
+                Access = AccessValues.NoValue
+            };
 
-            var avatarNode = new OSCQueryNode("/avatar");
-            avatarNode.Access = AccessValues.NoValue;
+            var avatarNode = new OSCQueryNode("/avatar")
+            {
+                Access = AccessValues.NoValue
+            };
 
-            var avatarChangeNode = new OSCQueryNode("/avatar/change");
-            avatarChangeNode.Access = AccessValues.WriteOnly;
-            avatarChangeNode.OscType = "s";
+            var avatarChangeNode = new OSCQueryNode("/avatar/change")
+            {
+                Access = AccessValues.WriteOnly,
+                OscType = "s"
+            };
 
             avatarNode.Contents = new Dictionary<string, OSCQueryNode>()
             {
@@ -74,7 +91,6 @@ public class HttpHandler : IDisposable
             await sw.WriteAsync(respStr);
             await sw.FlushAsync();
         }
-
     }
 
     public void Dispose()

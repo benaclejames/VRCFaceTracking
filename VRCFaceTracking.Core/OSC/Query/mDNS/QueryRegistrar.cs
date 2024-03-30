@@ -85,9 +85,11 @@ public partial class QueryRegistrar : ObservableObject
         }
     }
 
-    private static async void ResolveDnsQueries(DNSPacket packet, IPEndPoint remoteEndpoint)
+    private async void ResolveDnsQueries(DNSPacket packet, IPEndPoint remoteEndpoint)
     {
-        if (packet.OPCODE != 0)
+        // Me when having to wait for vrchat to resolve itself
+        // https://www.youtube.com/watch?v=wLg04uu2j2o
+        if (packet.OPCODE != 0 || VrchatClientEndpoint == null)
         {
             return;
         }
@@ -168,8 +170,8 @@ public partial class QueryRegistrar : ObservableObject
                     continue;
                 }
 
-                var unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
-                await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
+                //var unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
+                //await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
             }
         }
     }

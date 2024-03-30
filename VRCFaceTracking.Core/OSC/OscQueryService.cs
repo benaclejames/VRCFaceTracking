@@ -1,6 +1,8 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
@@ -77,11 +79,16 @@ public partial class OscQueryService : ObservableObject
     
     private void InitOscQuery()
     {
-        _httpHandler.BindTo($"http://127.0.0.1:{6970}/");
+        // TODO: Move this somewhere more appropriate
+        var listener = new TcpListener(IPAddress.Any, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        _httpHandler.BindTo($"http://127.0.0.1:{port}/");
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
-        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT", 6970, IPAddress.Loopback);
-        _queryRegistrar.Advertise("_osc._udp", "VRCFT", 6969, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT", port, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_osc._udp", "VRCFT", _oscTarget.InPort, IPAddress.Loopback);
         
         _queryRegistrar.QueryForVRChat();
     }

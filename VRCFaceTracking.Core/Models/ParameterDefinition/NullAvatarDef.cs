@@ -1,5 +1,4 @@
-﻿using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models.Osc.FileBased;
+﻿using VRCFaceTracking.Core.Contracts;
 
 namespace VRCFaceTracking.Core.Models.ParameterDefinition;
 

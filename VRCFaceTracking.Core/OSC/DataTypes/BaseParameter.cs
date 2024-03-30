@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;

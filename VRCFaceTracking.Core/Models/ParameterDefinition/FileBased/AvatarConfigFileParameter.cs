@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Models.Osc.FileBased;
 
-namespace VRCFaceTracking.Core.Models.Osc.FileBased;
+namespace VRCFaceTracking.Core.Models.ParameterDefinition.FileBased;
 
 public class AvatarConfigFileParameter : IParameterDefinition
 {
