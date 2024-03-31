@@ -82,7 +82,7 @@ public partial class OscQueryService : ObservableObject
     
     private void InitOscQuery()
     {
-        var randomStr = new string(Enumerable.Repeat(chars, 8).Select(s => s[Random.Next(s.Length)]).ToArray());
+        var randomStr = new string(Enumerable.Repeat(chars, 6).Select(s => s[Random.Next(s.Length)]).ToArray());
         
         // TODO: Move this somewhere more appropriate
         var listener = new TcpListener(IPAddress.Any, 0);
