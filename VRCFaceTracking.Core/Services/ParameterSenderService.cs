@@ -31,7 +31,7 @@ public class ParameterSenderService : BackgroundService
                 await UnifiedTracking.UpdateData(cancellationToken);
 
                 // Send all messages in OSCParams.SendQueue
-                if (SendQueue.Count <= 100)
+                if (SendQueue.Count <= 0)
                 {
                     continue;
                 }
