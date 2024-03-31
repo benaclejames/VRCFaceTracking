@@ -12,19 +12,19 @@ namespace VRCFaceTracking.Core;
 
 public class MainStandalone : IMainService
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<MainStandalone> _logger;
     private readonly ILibManager _libManager;
     private readonly UnifiedTrackingMutator _mutator;
 
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
     public MainStandalone(
-        ILoggerFactory loggerFactory, 
+        ILogger<MainStandalone> logger, 
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )
     {
-        _logger = loggerFactory.CreateLogger("MainStandalone");
+        _logger = logger;
         _libManager = libManager;
         _mutator = mutator;
     }

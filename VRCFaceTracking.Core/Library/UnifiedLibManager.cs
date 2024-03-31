@@ -9,7 +9,7 @@ namespace VRCFaceTracking.Core.Library;
 public class UnifiedLibManager : ILibManager
 {
     #region Logger
-    private readonly ILogger _logger;
+    private readonly ILogger<UnifiedLibManager> _logger;
     private readonly ILoggerFactory _loggerFactory;
     #endregion
 
@@ -37,7 +37,7 @@ public class UnifiedLibManager : ILibManager
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
     {
         _loggerFactory = factory;
-        _logger = factory.CreateLogger("UnifiedLibManager");
+        _logger = factory.CreateLogger<UnifiedLibManager>();
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
 
