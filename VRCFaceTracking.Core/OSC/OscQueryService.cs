@@ -13,11 +13,14 @@ namespace VRCFaceTracking.Core.OSC;
 
 public partial class OscQueryService : ObservableObject
 {
+    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    
     // Services
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly QueryRegistrar _queryRegistrar;
-
+    private static readonly Random Random = new ();
+    
     [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
     [ObservableProperty] private List<Parameter> _avatarParameters;
 
@@ -86,9 +89,11 @@ public partial class OscQueryService : ObservableObject
         listener.Stop();
         _httpHandler.BindTo($"http://127.0.0.1:{port}/");
         
+        var randomStr = new string(Enumerable.Repeat(chars, 8).Select(s => s[Random.Next(s.Length)]).ToArray());
+        
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
-        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT", port, IPAddress.Loopback);
-        _queryRegistrar.Advertise("_osc._udp", "VRCFT", _oscTarget.InPort, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT-"+randomStr, port, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_osc._udp", "VRCFT-"+randomStr, _oscTarget.InPort, IPAddress.Loopback);
         
         _queryRegistrar.QueryForVRChat();
     }
