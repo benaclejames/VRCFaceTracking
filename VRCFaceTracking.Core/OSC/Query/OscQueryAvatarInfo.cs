@@ -25,13 +25,13 @@ public class OscQueryAvatarInfo : IAvatarInfo
         {
             return entries
                 .SelectMany(entry =>
-                    entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) }
+                    entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : !string.IsNullOrEmpty(entry.Value.OscType) ? new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) } : Array.Empty<OscQueryParameterDef>()
                 );
         }
         
         Parameters = rootNode.Contents["parameters"].Contents
             .SelectMany(entry => 
-                entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) }
+                entry.Value.Contents != null ? ConstructParameterArray(entry.Value.Contents) : !string.IsNullOrEmpty(entry.Value.OscType) ? new[] { new OscQueryParameterDef(entry.Value.FullPath, entry.Value) } : Array.Empty<OscQueryParameterDef>()
             )
             .ToArray();
     }
