@@ -10,6 +10,7 @@ public class HttpHandler : IDisposable
     private IAsyncResult _contextListenerResult;
     private readonly IOscTarget _oscTarget;
     private readonly ILogger<HttpHandler> _logger;
+    private string _appName = "VRCFT";
     
     public HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger)
     {
@@ -30,6 +31,11 @@ public class HttpHandler : IDisposable
         _contextListenerResult = _listener.BeginGetContext(HttpListenerLoop, _listener);
     }
 
+    public void SetAppName(string newAppName)
+    {
+        _appName = newAppName;
+    }
+
     private async void HttpListenerLoop(IAsyncResult result)
     {
         var context = _listener.EndGetContext(result);
@@ -39,7 +45,7 @@ public class HttpHandler : IDisposable
         {
             var hostInfo = new OscQueryHostInfo
             {
-                name = "VRCFaceTracking",
+                name = _appName,
                 oscIP = _oscTarget.DestinationAddress,
                 oscPort = _oscTarget.InPort
             };

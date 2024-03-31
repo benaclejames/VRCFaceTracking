@@ -82,14 +82,15 @@ public partial class OscQueryService : ObservableObject
     
     private void InitOscQuery()
     {
+        var randomStr = new string(Enumerable.Repeat(chars, 8).Select(s => s[Random.Next(s.Length)]).ToArray());
+        
         // TODO: Move this somewhere more appropriate
         var listener = new TcpListener(IPAddress.Any, 0);
         listener.Start();
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
+        _httpHandler.SetAppName("VRCFT-" + randomStr);
         _httpHandler.BindTo($"http://127.0.0.1:{port}/");
-        
-        var randomStr = new string(Enumerable.Repeat(chars, 8).Select(s => s[Random.Next(s.Length)]).ToArray());
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
         _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT-"+randomStr, port, IPAddress.Loopback);
