@@ -31,7 +31,7 @@ public class ParameterSenderService : BackgroundService
                 await UnifiedTracking.UpdateData(cancellationToken);
 
                 // Send all messages in OSCParams.SendQueue
-                if (SendQueue.Count <= 0)
+                if (SendQueue.Count <= 100)
                 {
                     continue;
                 }
@@ -44,9 +44,13 @@ public class ParameterSenderService : BackgroundService
             {
                 SentrySdk.CaptureException(e, scope =>
                 {
+                    var i = 0;
                     foreach (var msg in SendQueue)
                     {
-                        scope.AddAttachment($"Address: {msg.Address}, Values: {msg._meta.ValueLength}, Value 0: {msg.Value}");
+                        scope.SetExtra($"Address {i}", msg.Address);
+                        scope.SetExtra($"Values {i}", msg._meta.ValueLength);
+                        scope.SetExtra($"Value 0 {i}", msg.Value);
+                        i++;
                     }
                 });
             }
