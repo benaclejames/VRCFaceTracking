@@ -2,6 +2,7 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
@@ -25,6 +26,7 @@ public partial class QueryRegistrar : ObservableObject
     private const int MulticastPost = 5353;
     private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, MulticastPost);
     private readonly List<IPAddress> _localIpAddresses;
+    private readonly ILogger<QueryRegistrar> _logger;
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
     private static readonly Dictionary<UdpClient, CancellationToken> Receivers = new();
@@ -33,8 +35,6 @@ public partial class QueryRegistrar : ObservableObject
     public Action OnVrcClientDiscovered = () => { };
 
     [ObservableProperty] private IPEndPoint _vrchatClientEndpoint;
-
-    partial void OnVrchatClientEndpointChanged(IPEndPoint value) => OnVrcClientDiscovered();
         
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
@@ -48,8 +48,10 @@ public partial class QueryRegistrar : ObservableObject
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
         
-    public QueryRegistrar()
+    public QueryRegistrar(ILogger<QueryRegistrar> logger)
     {
+        _logger = logger;
+        
         // Create listeners for all interfaces
         var receiver = new UdpClient(AddressFamily.InterNetwork);
         receiver.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -228,8 +230,10 @@ public partial class QueryRegistrar : ObservableObject
 
         var vrChatClientIp = aRecord.Data as ARecord;
         var vrChatClientPort = srvRecord.Data as SRVRecord;
-            
+        
         VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
+        OnVrcClientDiscovered();
+        _logger.LogInformation("Resolved VRChat client at "+VrchatClientEndpoint);
     }
         
     private async void Listen(UdpClient client, CancellationToken ct)
@@ -272,5 +276,7 @@ public partial class QueryRegistrar : ObservableObject
         {
             Services.Add(serviceName, new AdvertisedService(instanceName, port, address));
         }
+        
+        _logger.LogDebug($"Advertising service: {serviceName}, instance: {instanceName}, port: {port}, address: {address}");
     }
 }

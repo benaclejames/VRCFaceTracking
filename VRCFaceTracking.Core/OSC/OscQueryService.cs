@@ -66,23 +66,27 @@ public partial class OscQueryService : ObservableObject
 
         _queryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
         
-        InitOscQuery();
+        _queryRegistrar.QueryForVRChat();
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
-        return;
-
-        void FirstClientDiscovered()
-        {
-            _queryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
-                
-            HandleNewAvatar();
-        }
     }
     
-    private void InitOscQuery()
+    private void FirstClientDiscovered()
     {
+        _queryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
+        
+        _logger.LogInformation("OSCQuery detected. Setting port negotiation to autopilot.");
+        
         var randomStr = new string(Enumerable.Repeat(chars, 6).Select(s => s[Random.Next(s.Length)]).ToArray());
+        _httpHandler.OnHostInfoQueried += HandleNewAvatar;
+        
+        var recvEndpoint = _recvService.UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), 0));
+        if (recvEndpoint == null)
+        {
+            _logger.LogError("Very strange. We were unable to bind to a random port.");
+            recvEndpoint = new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.InPort);
+        }
         
         // TODO: Move this somewhere more appropriate
         var listener = new TcpListener(IPAddress.Any, 0);
@@ -90,17 +94,18 @@ public partial class OscQueryService : ObservableObject
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         _httpHandler.SetAppName("VRCFT-" + randomStr);
-        _httpHandler.BindTo($"http://127.0.0.1:{port}/");
+        _httpHandler.BindTo($"http://127.0.0.1:{port}/", recvEndpoint.Port);
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
         _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT-"+randomStr, port, IPAddress.Loopback);
-        _queryRegistrar.Advertise("_osc._udp", "VRCFT-"+randomStr, _oscTarget.InPort, IPAddress.Loopback);
+        _queryRegistrar.Advertise("_osc._udp", "VRCFT-"+randomStr, recvEndpoint.Port, IPAddress.Loopback);
         
-        _queryRegistrar.QueryForVRChat();
+        HandleNewAvatar();
     }
 
     private async void HandleNewAvatar()
     {
+        _httpHandler.OnHostInfoQueried -= HandleNewAvatar;
         var newAvatar = await _oscQueryConfigParser.ParseAvatar("");
         if (newAvatar.HasValue)
         {

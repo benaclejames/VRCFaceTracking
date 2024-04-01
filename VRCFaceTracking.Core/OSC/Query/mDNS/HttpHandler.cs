@@ -11,15 +11,19 @@ public class HttpHandler : IDisposable
     private readonly IOscTarget _oscTarget;
     private readonly ILogger<HttpHandler> _logger;
     private string _appName = "VRCFT";
-    
+    private int _oscPort = 9001;
+
+    public Action OnHostInfoQueried = () => { };
+
     public HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger)
     {
         _oscTarget = oscTarget;
         _logger = logger;
     }
     
-    public void BindTo(string uri)
+    public void BindTo(string uri, int oscPort)
     {
+        _oscPort = oscPort;
         if (_contextListenerResult != null)
         {
             _listener.EndGetContext(_contextListenerResult);
@@ -47,9 +51,10 @@ public class HttpHandler : IDisposable
             {
                 name = _appName,
                 oscIP = _oscTarget.DestinationAddress,
-                oscPort = _oscTarget.InPort
+                oscPort = _oscPort
             };
             respStr = hostInfo.ToString();
+            OnHostInfoQueried();
             _logger.LogDebug($"Responding to oscquery host info request with {respStr}");
         }
         else

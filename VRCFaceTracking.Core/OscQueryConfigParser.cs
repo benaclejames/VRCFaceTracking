@@ -42,6 +42,7 @@ public class OscQueryConfigParser
 
             var avatarConfig =
                 JsonConvert.DeserializeObject<OSCQueryNode>(await response.Content.ReadAsStringAsync());
+            _logger.LogDebug(avatarConfig.ToString());
             var avatarInfo = new OscQueryAvatarInfo(avatarConfig);
 
             // Reset all parameters
@@ -70,6 +71,7 @@ public class OscQueryConfigParser
         }
         catch (Exception e)
         {
+            _logger.LogError(e.Message);
             SentrySdk.CaptureException(e, scope => scope.SetExtra("endpoint", _queryRegistrar.VrchatClientEndpoint));
             return null;
         }
