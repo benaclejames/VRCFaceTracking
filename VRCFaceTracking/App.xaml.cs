@@ -79,6 +79,7 @@ public partial class App : Application
         {
             logging.ClearProviders();
             logging.AddDebug();
+            logging.AddConsole();
             logging.AddProvider(new OutputLogProvider(DispatcherQueue.GetForCurrentThread()));
             logging.AddProvider(new LogFileProvider());
         }).
