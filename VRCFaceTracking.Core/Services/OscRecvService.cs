@@ -33,6 +33,7 @@ public class OscRecvService : BackgroundService
         
         _oscTarget.PropertyChanged += (_, args) =>
         {
+            //TODO: Should probably remove references of this delegate in favor of manual target updating flow
             if (args.PropertyName is not (nameof(IOscTarget.InPort) or nameof(IOscTarget.DestinationAddress)))
             {
                 return;

@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class DNSPacket
+public class DnsPacket
 {
     public ushort ID;
     public bool QUERYRESPONSE;
@@ -9,13 +9,13 @@ public class DNSPacket
     public bool TRUNCATION;
     public bool TENTATIVE;
     public int RESPONSECODE;
-    public DNSQuestion[] questions = Array.Empty<DNSQuestion>();
-    public DNSResource[] answers = Array.Empty<DNSResource>();
-    public DNSResource[] authorities = Array.Empty<DNSResource>();
-    public DNSResource[] additionals = Array.Empty<DNSResource>();
+    public DnsQuestion[] questions = Array.Empty<DnsQuestion>();
+    public DnsResource[] answers = Array.Empty<DnsResource>();
+    public DnsResource[] authorities = Array.Empty<DnsResource>();
+    public DnsResource[] additionals = Array.Empty<DnsResource>();
         
 
-    public DNSPacket(BigReader stream)
+    public DnsPacket(BigReader stream)
     {
         /**
             Bit offset	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15
@@ -38,25 +38,25 @@ public class DNSPacket
         TENTATIVE = (flags & 0x0100) == 0x0100;
         RESPONSECODE = flags & 0x000F;
 
-        questions = new DNSQuestion[stream.ReadUInt16()];
-        answers = new DNSResource[stream.ReadUInt16()];
-        authorities = new DNSResource[stream.ReadUInt16()];
-        additionals = new DNSResource[stream.ReadUInt16()];
+        questions = new DnsQuestion[stream.ReadUInt16()];
+        answers = new DnsResource[stream.ReadUInt16()];
+        authorities = new DnsResource[stream.ReadUInt16()];
+        additionals = new DnsResource[stream.ReadUInt16()];
             
         for (var i = 0; i < questions.Length; i++)
-            questions[i] = new DNSQuestion(stream);
+            questions[i] = new DnsQuestion(stream);
 
         for (var i = 0; i < answers.Length; i++)
-            answers[i] = new DNSResource(stream);
+            answers[i] = new DnsResource(stream);
             
         for (var i = 0; i < authorities.Length; i++)
-            authorities[i] = new DNSResource(stream);
+            authorities[i] = new DnsResource(stream);
             
         for (var i = 0; i < additionals.Length; i++)
-            additionals[i] = new DNSResource(stream);
+            additionals[i] = new DnsResource(stream);
     }
 
-    public DNSPacket()
+    public DnsPacket()
     {
         QUERYRESPONSE = true;
     }

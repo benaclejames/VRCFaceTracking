@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class DNSResource : DNSQuestion
+public class DnsResource : DnsQuestion
 {
     private static readonly Dictionary<ushort, Type> _typeMap = new Dictionary<ushort, Type>
     {
@@ -12,9 +12,9 @@ public class DNSResource : DNSQuestion
     };
         
     public TimeSpan TTL;
-    public DNSSerializer Data;
+    public IDnsSerializer Data;
 
-    public DNSResource(BigReader reader) : base(reader)
+    public DnsResource(BigReader reader) : base(reader)
     {
         TTL = TimeSpan.FromSeconds(reader.ReadUInt32());
             
@@ -23,7 +23,7 @@ public class DNSResource : DNSQuestion
             
         if (_typeMap.TryGetValue(Type, out var type))
         {
-            Data = (DNSSerializer)Activator.CreateInstance(type);
+            Data = (IDnsSerializer)Activator.CreateInstance(type);
             Data.Deserialize(reader, dataLength);
         }
         else
@@ -35,7 +35,7 @@ public class DNSResource : DNSQuestion
             throw new Exception("Invalid resource record");
     }
 
-    public DNSResource(DNSSerializer data, List<string> names) : base(names, _typeMap.First(x => x.Value == data.GetType()).Key, 1)
+    public DnsResource(IDnsSerializer data, List<string> names) : base(names, _typeMap.First(x => x.Value == data.GetType()).Key, 1)
     {
         Data = data;
         TTL = TimeSpan.FromSeconds(120);

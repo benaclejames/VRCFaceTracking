@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class NSRecord : DNSSerializer
+public class NSRecord : IDnsSerializer
 {
     public List<string> Authority;
     

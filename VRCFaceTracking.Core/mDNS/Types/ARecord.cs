@@ -2,7 +2,7 @@
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class ARecord : DNSSerializer
+public class ARecord : IDnsSerializer
 {
     public IPAddress Address;
         

@@ -2,7 +2,7 @@
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class TXTRecord : DNSSerializer
+public class TXTRecord : IDnsSerializer
 {
     public List<string> Text;
         

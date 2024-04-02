@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class PTRRecord : DNSSerializer
+public class PTRRecord : IDnsSerializer
 {
     public List<string> DomainLabels;
         

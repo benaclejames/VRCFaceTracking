@@ -9,7 +9,7 @@ public class OscQueryParameterDef : IParameterDefinition
     public string Name { get; }
     public Type Type { get; }
 
-    public OscQueryParameterDef(string address, OSCQueryNode node)
+    public OscQueryParameterDef(string address, OscQueryNode node)
     {
         Address = address;
         Name = node.Name;

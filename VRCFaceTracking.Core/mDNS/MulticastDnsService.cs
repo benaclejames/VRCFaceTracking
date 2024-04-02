@@ -3,30 +3,17 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.OSC.Query.mDNS;
 
-namespace VRCFaceTracking.Core.OSC.Query.mDNS;
+namespace VRCFaceTracking.Core.mDNS;
 
-public partial class QueryRegistrar : ObservableObject
+public partial class MulticastDnsService : ObservableObject
 {
-    private struct AdvertisedService
-    {
-        public readonly string ServiceName;
-        public readonly int Port;
-        public readonly IPAddress Address;
-
-        public AdvertisedService(string serviceName, int port, IPAddress address)
-        {
-            ServiceName = serviceName;
-            Port = port;
-            Address = address;
-        }
-    }
-
     private static readonly IPAddress MulticastIp = IPAddress.Parse("224.0.0.251");
     private const int MulticastPost = 5353;
     private static readonly IPEndPoint MdnsEndpointIp4 = new(MulticastIp, MulticastPost);
     private readonly List<IPAddress> _localIpAddresses;
-    private readonly ILogger<QueryRegistrar> _logger;
+    private readonly ILogger<MulticastDnsService> _logger;
 
     private static readonly Dictionary<IPAddress, UdpClient> Senders = new();
     private static readonly Dictionary<UdpClient, CancellationToken> Receivers = new();
@@ -48,7 +35,7 @@ public partial class QueryRegistrar : ObservableObject
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
         
-    public QueryRegistrar(ILogger<QueryRegistrar> logger)
+    public MulticastDnsService(ILogger<MulticastDnsService> logger)
     {
         _logger = logger;
         
@@ -87,7 +74,7 @@ public partial class QueryRegistrar : ObservableObject
         }
     }
 
-    private async void ResolveDnsQueries(DNSPacket packet, IPEndPoint remoteEndpoint)
+    private async void ResolveDnsQueries(DnsPacket packet, IPEndPoint remoteEndpoint)
     {
         // Me when having to wait for vrchat to resolve itself
         // https://www.youtube.com/watch?v=wLg04uu2j2o
@@ -136,16 +123,16 @@ public partial class QueryRegistrar : ObservableObject
                     DomainLabels = qualifiedServiceName
                 };
                             
-                var additionalRecords = new List<DNSResource>
+                var additionalRecords = new List<DnsResource>
                 {
                     new (txt, qualifiedServiceName),
                     new (srv, qualifiedServiceName),
                     new (aRecord, serviceName)
                 };
 
-                var answers = new List<DNSResource> { new (ptrRecord, question.Labels) };
+                var answers = new List<DnsResource> { new (ptrRecord, question.Labels) };
 
-                var response = new DNSPacket
+                var response = new DnsPacket
                 {
                     CONFLICT = true,
                     ID = 0,
@@ -154,9 +141,9 @@ public partial class QueryRegistrar : ObservableObject
                     RESPONSECODE = 0,
                     TENTATIVE = false,
                     TRUNCATION = false,
-                    questions = Array.Empty<DNSQuestion>(),
+                    questions = Array.Empty<DnsQuestion>(),
                     answers = answers.ToArray(),
-                    authorities = Array.Empty<DNSResource>(),
+                    authorities = Array.Empty<DnsResource>(),
                     additionals = additionalRecords.ToArray()
                 };
 
@@ -178,14 +165,10 @@ public partial class QueryRegistrar : ObservableObject
         }
     }
 
-    public async void QueryForVRChat()
+    public async void SendQuery(string labels)
     {
-        var dnsPacket = new DNSPacket();
-        var labels = new List<string>();
-        labels.Add("_oscjson");
-        labels.Add("_tcp");
-        labels.Add("local");
-        var dnsQuestion = new DNSQuestion(labels, 255, 1);
+        var dnsPacket = new DnsPacket();
+        var dnsQuestion = new DnsQuestion(labels.Split('.').ToList(), 255, 1);
         dnsPacket.questions = new[] { dnsQuestion };
         dnsPacket.QUERYRESPONSE = false;
         dnsPacket.OPCODE = 0;
@@ -201,7 +184,7 @@ public partial class QueryRegistrar : ObservableObject
         //await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
     }
 
-    private void ResolveVrChatClient(DNSPacket packet, IPEndPoint remoteEndpoint)
+    private void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
     {
         if (!packet.QUERYRESPONSE || packet.answers[0].Type != 12)
         {
@@ -252,7 +235,7 @@ public partial class QueryRegistrar : ObservableObject
             try
             {
                 var reader = new BigReader(result.Buffer);
-                var packet = new DNSPacket(reader);
+                var packet = new DnsPacket(reader);
 
                 // I'm aware this is cringe, but we do this first as it's a lot more likely vrchat beats us to the punch responding to the query
                 ResolveVrChatClient(packet, result.RemoteEndPoint);
@@ -264,7 +247,7 @@ public partial class QueryRegistrar : ObservableObject
             }
         }
     }
-
+    
     public void Advertise(string serviceName, string instanceName, int port, IPAddress address)
     {
         // If we're already advertising on this service, we can just update it

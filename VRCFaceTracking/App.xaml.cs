@@ -14,6 +14,7 @@ using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
@@ -110,7 +111,7 @@ public partial class App : Application
             services.AddSingleton<IModuleDataService, ModuleDataService>();
             services.AddTransient<IFileService, FileService>();
             services.AddSingleton<OscQueryService>();
-            services.AddSingleton<QueryRegistrar>();
+            services.AddSingleton<MulticastDnsService>();
             services.AddSingleton<IMainService, MainStandalone>();
             services.AddTransient<AvatarConfigParser>();
             services.AddTransient<OscQueryConfigParser>();

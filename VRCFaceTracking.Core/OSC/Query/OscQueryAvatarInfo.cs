@@ -10,7 +10,7 @@ public class OscQueryAvatarInfo : IAvatarInfo
 
     public IParameterDefinition[] Parameters { get; }
     
-    public OscQueryAvatarInfo(OSCQueryNode rootNode)
+    public OscQueryAvatarInfo(OscQueryNode rootNode)
     {
         Name = "Half-baked OSCQuery impl";
         if (!rootNode.Contents.ContainsKey("change"))
@@ -21,7 +21,7 @@ public class OscQueryAvatarInfo : IAvatarInfo
         Id = rootNode.Contents["change"].Value[0] as string;
         
         //TODO: Figure out a way to reconstruct the traditional address pattern instead of the whole thing.
-        IEnumerable<IParameterDefinition> ConstructParameterArray(Dictionary<string, OSCQueryNode> entries)
+        IEnumerable<IParameterDefinition> ConstructParameterArray(Dictionary<string, OscQueryNode> entries)
         {
             return entries
                 .SelectMany(entry =>

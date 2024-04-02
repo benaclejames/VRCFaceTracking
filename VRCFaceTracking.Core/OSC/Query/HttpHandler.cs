@@ -59,37 +59,15 @@ public class HttpHandler : IDisposable
         }
         else
         {
-            if (context.Request.Url.LocalPath != "/")
+            if (context.Request.Url != null && context.Request.Url.LocalPath != "/")
+            {
                 return; // Not properly implementing oscquery protocol because I'm unemployed and not being paid to
+            }
+            
+            var rootNode = new OscQueryRoot();
+            rootNode.AddNode(new OscQueryNode("/avatar/change", AccessValues.WriteOnly, "s"));
 
-            var responseNode = new OSCQueryNode("/")
-            {
-                Description = "root node",
-                Access = AccessValues.NoValue
-            };
-
-            var avatarNode = new OSCQueryNode("/avatar")
-            {
-                Access = AccessValues.NoValue
-            };
-
-            var avatarChangeNode = new OSCQueryNode("/avatar/change")
-            {
-                Access = AccessValues.WriteOnly,
-                OscType = "s"
-            };
-
-            avatarNode.Contents = new Dictionary<string, OSCQueryNode>()
-            {
-                { "change", avatarChangeNode }
-            };
-
-            responseNode.Contents = new Dictionary<string, OSCQueryNode>()
-            {
-                { "avatar", avatarNode }
-            };
-
-            respStr = responseNode.ToString();
+            respStr = rootNode.ToString();
         }
 
         // Send Response

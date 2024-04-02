@@ -1,6 +1,6 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class SRVRecord : DNSSerializer
+public class SRVRecord : IDnsSerializer
 {
     public ushort Priority;
     public ushort Weight;

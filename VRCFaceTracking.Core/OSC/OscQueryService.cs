@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
@@ -18,7 +19,7 @@ public partial class OscQueryService : ObservableObject
     // Services
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
-    private readonly QueryRegistrar _queryRegistrar;
+    private readonly MulticastDnsService _multicastDnsService;
     private static readonly Random Random = new ();
     
     [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
@@ -35,7 +36,7 @@ public partial class OscQueryService : ObservableObject
         ILogger<OscQueryService> logger,
         OscQueryConfigParser oscQueryConfigParser,
         IOscTarget oscTarget,
-        QueryRegistrar queryRegistrar,
+        MulticastDnsService multicastDnsService,
         OscRecvService recvService,
         ILocalSettingsService settingsService,
         HttpHandler httpHandler
@@ -45,7 +46,7 @@ public partial class OscQueryService : ObservableObject
         _logger = logger;
         _recvService = recvService;
         _recvService.OnMessageReceived = HandleNewMessage;
-        _queryRegistrar = queryRegistrar;
+        _multicastDnsService = multicastDnsService;
         _oscTarget = oscTarget;
         _settingsService = settingsService;
         _httpHandler = httpHandler;
@@ -64,9 +65,9 @@ public partial class OscQueryService : ObservableObject
             return;  // Return both false as we cant bind to anything without an address
         }
 
-        _queryRegistrar.OnVrcClientDiscovered += FirstClientDiscovered;
+        _multicastDnsService.OnVrcClientDiscovered += FirstClientDiscovered;
         
-        _queryRegistrar.QueryForVRChat();
+        _multicastDnsService.SendQuery("_oscjson._tcp.local");
             
         _logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
@@ -74,7 +75,7 @@ public partial class OscQueryService : ObservableObject
     
     private void FirstClientDiscovered()
     {
-        _queryRegistrar.OnVrcClientDiscovered -= FirstClientDiscovered;
+        _multicastDnsService.OnVrcClientDiscovered -= FirstClientDiscovered;
         
         _logger.LogInformation("OSCQuery detected. Setting port negotiation to autopilot.");
         
@@ -97,8 +98,8 @@ public partial class OscQueryService : ObservableObject
         _httpHandler.BindTo($"http://127.0.0.1:{port}/", recvEndpoint.Port);
         
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
-        _queryRegistrar.Advertise("_oscjson._tcp", "VRCFT-"+randomStr, port, IPAddress.Loopback);
-        _queryRegistrar.Advertise("_osc._udp", "VRCFT-"+randomStr, recvEndpoint.Port, IPAddress.Loopback);
+        _multicastDnsService.Advertise("_oscjson._tcp", "VRCFT-"+randomStr, port, IPAddress.Loopback);
+        _multicastDnsService.Advertise("_osc._udp", "VRCFT-"+randomStr, recvEndpoint.Port, IPAddress.Loopback);
         
         HandleNewAvatar();
     }

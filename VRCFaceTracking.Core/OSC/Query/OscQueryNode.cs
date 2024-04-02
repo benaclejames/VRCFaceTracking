@@ -2,14 +2,16 @@
 
 namespace VRCFaceTracking.Core.OSC.Query;
 
-public class OSCQueryNode
+public class OscQueryNode
 {
     // Empty Constructor for Json Serialization
-    public OSCQueryNode(){}
+    public OscQueryNode(){}
 
-    public OSCQueryNode(string fullPath)
+    public OscQueryNode(string fullPath, AccessValues access = AccessValues.NoValue, string oscType = null)
     {
         FullPath = fullPath;
+        Access = access;
+        OscType = oscType;
     }
         
     [JsonProperty("DESCRIPTION")]
@@ -21,7 +23,7 @@ public class OSCQueryNode
     public AccessValues Access;
 
     [JsonProperty("CONTENTS")]
-    public Dictionary<string, OSCQueryNode> Contents;
+    public Dictionary<string, OscQueryNode> Contents;
 
     [JsonProperty("TYPE")]
     public string OscType;
@@ -33,7 +35,7 @@ public class OSCQueryNode
     public string ParentPath {
         get
         {
-            int length = Math.Max(1, FullPath.LastIndexOf("/"));
+            var length = Math.Max(1, FullPath.LastIndexOf("/", StringComparison.Ordinal));
             return FullPath.Substring(0, length);
         }
             
@@ -44,18 +46,10 @@ public class OSCQueryNode
 
     public override string ToString()
     {
-        var result = JsonConvert.SerializeObject(this, WriteSettings);
+        var result = JsonConvert.SerializeObject(this,  new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+        });
         return result;
     }
-
-    public static void AddConverter(JsonConverter c)
-    {
-        WriteSettings.Converters.Add(c);
-    }
-
-    private static JsonSerializerSettings WriteSettings = new JsonSerializerSettings()
-    {
-        NullValueHandling = NullValueHandling.Ignore,
-    };
-        
 }

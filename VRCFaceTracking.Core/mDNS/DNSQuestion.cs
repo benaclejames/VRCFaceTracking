@@ -1,19 +1,19 @@
 ﻿namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class DNSQuestion
+public class DnsQuestion
 {
     public List<string> Labels;
     public ushort Type;
     public ushort Class;
         
-    public DNSQuestion(BigReader reader)
+    public DnsQuestion(BigReader reader)
     {
         Labels = reader.ReadDomainLabels();
         Type = reader.ReadUInt16();
         Class = reader.ReadUInt16();
     }
         
-    public DNSQuestion(List<string> labels, ushort type, ushort @class)
+    public DnsQuestion(List<string> labels, ushort type, ushort @class)
     {
         Labels = labels;
         Type = type;
