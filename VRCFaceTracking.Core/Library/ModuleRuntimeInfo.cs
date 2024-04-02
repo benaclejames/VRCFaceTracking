@@ -2,10 +2,10 @@
 
 namespace VRCFaceTracking.Core.Library;
 
-public struct ModuleRuntimeInfo
+public record ModuleRuntimeInfo(ExtTrackingModule Module, AssemblyLoadContext AssemblyLoadContext, CancellationTokenSource UpdateCancellationToken, Thread UpdateThread)
 {
-    public ExtTrackingModule Module;
-    public AssemblyLoadContext AssemblyLoadContext;
-    public CancellationTokenSource UpdateCancellationToken;
-    public Thread UpdateThread;
+    public readonly ExtTrackingModule Module = Module;
+    public readonly AssemblyLoadContext AssemblyLoadContext = AssemblyLoadContext;
+    public readonly CancellationTokenSource UpdateCancellationToken = UpdateCancellationToken;
+    public readonly Thread UpdateThread = UpdateThread;
 }

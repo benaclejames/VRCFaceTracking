@@ -216,7 +216,6 @@ public partial class MulticastDnsService : ObservableObject
         
         VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
         OnVrcClientDiscovered();
-        _logger.LogInformation("Resolved VRChat client at "+VrchatClientEndpoint);
     }
         
     private async void Listen(UdpClient client, CancellationToken ct)
