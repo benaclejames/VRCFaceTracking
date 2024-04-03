@@ -30,10 +30,6 @@ public class UnifiedLibManager : ILibManager
     private readonly IModuleDataService _moduleDataService;
     #endregion
 
-    #region Thread
-    private Thread _initializeWorker;
-    #endregion
-
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
     {
         _loggerFactory = factory;
@@ -48,46 +44,42 @@ public class UnifiedLibManager : ILibManager
     {
         LoadedModulesMetadata.Clear();
         LoadedModulesMetadata.Add(new ModuleMetadata
-        { 
+        {
             Active = false,
             Name = "Initializing Modules..."
         });
 
-        // Start Initialization
-        _initializeWorker = new Thread(() =>
+        // Kill lingering threads
+        TeardownAllAndResetAsync();
+
+        // Find all modules
+        var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+        var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+        // Load all modules
+        AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
+
+        // Attempt to initialize the requested runtimes.
+        if (AvailableModules != null)
         {
-            // Kill lingering threads
-            TeardownAllAndResetAsync();
-
-            // Find all modules
-            var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
-
-            // Load all modules
-            AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
-
-            // Attempt to initialize the requested runtimes.
-            if (AvailableModules != null)
+            _logger.LogDebug("Initializing requested runtimes...");
+            InitRequestedRuntimes(AvailableModules);
+        }
+        else
+        {
+            _dispatcherService.Run(() =>
             {
-                _logger.LogDebug("Initializing requested runtimes...");
-                InitRequestedRuntimes(AvailableModules);
-            }
-            else
-            {
-                _dispatcherService.Run(() =>
+                LoadedModulesMetadata.Clear();
+                LoadedModulesMetadata.Add(new ModuleMetadata
                 {
-                    LoadedModulesMetadata.Clear();
-                    LoadedModulesMetadata.Add(new ModuleMetadata
-                    {
-                        Active = false,
-                        Name = "No Modules Loaded"
-                    });
+                    Active = false,
+                    Name = "No Modules Loaded"
                 });
-                _logger.LogWarning("No modules loaded.");
-            }
-        });
+            });
+            _logger.LogWarning("No modules loaded.");
+        }
+
         _logger.LogInformation("Starting initialization tracking");
-        _initializeWorker.Start();
     }
 
     private ExtTrackingModule LoadExternalModule(Assembly dll)
@@ -222,20 +214,17 @@ public class UnifiedLibManager : ILibManager
         {
             return;
         }
-
-        EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-        ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
-        module.ModuleInformation.Active = true;
+        if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
+        {
+            LoadedModulesMetadata.Add(module.ModuleInformation);
+        }
+        
         module.ModuleInformation.UsingEye = eyeSuccess;
         module.ModuleInformation.UsingExpression = expressionSuccess;
-        _dispatcherService.Run(() => { 
-            if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
-            {
-                LoadedModulesMetadata.Add(module.ModuleInformation);
-            }
-        });
         EnsureModuleThreadStarted(module);
+        
+        module.ModuleInformation.Active = true;
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
