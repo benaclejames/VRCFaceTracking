@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
@@ -123,27 +122,32 @@ public partial class OscQueryService : ObservableObject
             case "/avatar/change":
                 HandleNewAvatar();
                 break;
-            case "/vrcft/settings/forceRelevant": // Endpoint for external tools to force vrcft to send all parameters
+            case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                 if (msg.Value is bool relevancy)
                 {
                     ParameterSenderService.AllParametersRelevant = relevancy;
                 }
 
                 break;
+            /*
             case "/avatar/parameters/EyeTrackingActive":
-                if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized && msg.Value is bool eyeValue)
+                if (UnifiedLibManager.EyeStatus != ModuleState.Uninitialized)
                 {
-                    UnifiedLibManager.EyeStatus = eyeValue ? ModuleState.Active : ModuleState.Idle;
+                    if (!msg.Value.BoolValue)
+                        UnifiedLibManager.EyeStatus = ModuleState.Idle;
+                    else UnifiedLibManager.EyeStatus = ModuleState.Active;
                 }
                 break;
             case "/avatar/parameters/LipTrackingActive":
             case "/avatar/parameters/ExpressionTrackingActive":
-                if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized &&
-                    msg.Value is bool expressionValue)
                 {
-                    UnifiedLibManager.ExpressionStatus = expressionValue ? ModuleState.Active : ModuleState.Idle;
+                    if (!msg.Value.BoolValue)
+                if (UnifiedLibManager.ExpressionStatus != ModuleState.Uninitialized)
+                        UnifiedLibManager.ExpressionStatus = ModuleState.Idle;
+                    else UnifiedLibManager.ExpressionStatus = ModuleState.Active;
                 }
                 break;
+            */
         }
     }
 
