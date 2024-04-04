@@ -30,6 +30,10 @@ public class UnifiedLibManager : ILibManager
     private readonly IModuleDataService _moduleDataService;
     #endregion
 
+    #region Thread
+    private Thread _initializeWorker;
+    #endregion
+
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
     {
         _loggerFactory = factory;
@@ -44,42 +48,46 @@ public class UnifiedLibManager : ILibManager
     {
         LoadedModulesMetadata.Clear();
         LoadedModulesMetadata.Add(new ModuleMetadata
-        {
+        { 
             Active = false,
             Name = "Initializing Modules..."
         });
 
-        // Kill lingering threads
-        TeardownAllAndResetAsync();
-
-        // Find all modules
-        var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-        var modulePaths = modules.Select(m => m.AssemblyLoadPath);
-
-        // Load all modules
-        AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
-
-        // Attempt to initialize the requested runtimes.
-        if (AvailableModules != null)
+        // Start Initialization
+        _initializeWorker = new Thread(() =>
         {
-            _logger.LogDebug("Initializing requested runtimes...");
-            InitRequestedRuntimes(AvailableModules);
-        }
-        else
-        {
-            _dispatcherService.Run(() =>
+            // Kill lingering threads
+            TeardownAllAndResetAsync();
+
+            // Find all modules
+            var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+            // Load all modules
+            AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
+
+            // Attempt to initialize the requested runtimes.
+            if (AvailableModules != null)
             {
-                LoadedModulesMetadata.Clear();
-                LoadedModulesMetadata.Add(new ModuleMetadata
+                _logger.LogDebug("Initializing requested runtimes...");
+                InitRequestedRuntimes(AvailableModules);
+            }
+            else
+            {
+                _dispatcherService.Run(() =>
                 {
-                    Active = false,
-                    Name = "No Modules Loaded"
+                    LoadedModulesMetadata.Clear();
+                    LoadedModulesMetadata.Add(new ModuleMetadata
+                    {
+                        Active = false,
+                        Name = "No Modules Loaded"
+                    });
                 });
-            });
-            _logger.LogWarning("No modules loaded.");
-        }
-
+                _logger.LogWarning("No modules loaded.");
+            }
+        });
         _logger.LogInformation("Starting initialization tracking");
+        _initializeWorker.Start();
     }
 
     private ExtTrackingModule LoadExternalModule(Assembly dll)
@@ -217,17 +225,20 @@ public class UnifiedLibManager : ILibManager
         {
             return;
         }
-        
-        if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
-        {
-            LoadedModulesMetadata.Add(module.ModuleInformation);
-        }
-        
-        module.ModuleInformation.UsingEye = eyeSuccess;
-        module.ModuleInformation.UsingExpression = expressionSuccess;
-        EnsureModuleThreadStarted(module);
+
+        EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
         module.ModuleInformation.Active = true;
+        module.ModuleInformation.UsingEye = eyeSuccess;
+        module.ModuleInformation.UsingExpression = expressionSuccess;
+        _dispatcherService.Run(() => { 
+            if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
+            {
+                LoadedModulesMetadata.Add(module.ModuleInformation);
+            }
+        });
+        EnsureModuleThreadStarted(module);
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
