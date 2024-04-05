@@ -10,14 +10,17 @@ namespace VRCFaceTracking.Core.Services;
 
 public class OscRecvService : BackgroundService
 {
-    private Socket _recvSocket;
-    private readonly byte[] _recvBuffer = new byte[4096];
-    private CancellationToken _stoppingToken;
-    private CancellationTokenSource _cts, _linkedToken;
     private readonly ILogger<OscRecvService> _logger;
-    public Action<OscMessage> OnMessageReceived = _ => { };
     private readonly IOscTarget _oscTarget;
     private readonly ILocalSettingsService _settingsService;
+    
+    private Socket _recvSocket;
+    private readonly byte[] _recvBuffer = new byte[4096];
+    
+    private CancellationTokenSource _cts, _linkedToken;
+    private CancellationToken _stoppingToken;
+    
+    public Action<OscMessage> OnMessageReceived = _ => { };
 
     public OscRecvService(
         ILogger<OscRecvService> logger,
@@ -33,8 +36,7 @@ public class OscRecvService : BackgroundService
         
         _oscTarget.PropertyChanged += (_, args) =>
         {
-            //TODO: Should probably remove references of this delegate in favor of manual target updating flow
-            if (args.PropertyName is not (nameof(IOscTarget.InPort) or nameof(IOscTarget.DestinationAddress)))
+            if (args.PropertyName is not nameof(IOscTarget.InPort))
             {
                 return;
             }
@@ -90,7 +92,7 @@ public class OscRecvService : BackgroundService
         
         while (!_stoppingToken.IsCancellationRequested)
         {
-            if (_linkedToken.IsCancellationRequested || _recvSocket is not { IsBound: true })
+            if (_linkedToken.IsCancellationRequested)
             {
                 continue;
             }

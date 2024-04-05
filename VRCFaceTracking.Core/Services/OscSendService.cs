@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
-using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking.Core.Services;
@@ -12,17 +11,18 @@ namespace VRCFaceTracking.Core.Services;
  */
 public class OscSendService
 {
+    private readonly ILogger<OscSendService> _logger;
+    private readonly IOscTarget _oscTarget;
+    
     private Socket _sendSocket;
     private readonly byte[] _sendBuffer = new byte[4096];
+    
     private CancellationTokenSource _cts;
-    private readonly ILogger<OscSendService> _logger;
     public Action<int> OnMessagesDispatched = _ => { };
-    private readonly IOscTarget _oscTarget;
 
     public OscSendService(
         ILogger<OscSendService> logger,
-        IOscTarget oscTarget,
-        ILocalSettingsService settingsService
+        IOscTarget oscTarget
     )
     {
         _logger = logger;
@@ -32,7 +32,7 @@ public class OscSendService
 
         _oscTarget.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName is not (nameof(IOscTarget.OutPort) or nameof(IOscTarget.DestinationAddress)))
+            if (args.PropertyName is not nameof(IOscTarget.OutPort))
             {
                 return;
             }
