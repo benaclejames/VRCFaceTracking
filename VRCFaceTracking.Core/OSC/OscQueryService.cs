@@ -169,7 +169,7 @@ public partial class OscQueryService : ObservableObject
                 deprecatedParams.Count +
                 " Legacy parameters detected. " +
                 "Please consider updating the avatar to use the latest documented parameters.");
-            _logger.LogDebug($"Loaded deprecated parameters: {string.Join(", ", deprecatedParams.SelectMany(x => x.GetParamNames()))}");
+            _logger.LogDebug($"Loaded deprecated parameters: {string.Join(", ", deprecatedParams.SelectMany(x => x.GetParamNames()).Select(y => y.paramName))}");
         }
     }
 }
