@@ -5,7 +5,7 @@
     <Platforms>x64</Platforms>
     <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>5.2.3.2</AssemblyVersion>
+    <AssemblyVersion>5.2.3.3</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
