@@ -31,6 +31,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;
     private readonly ILocalSettingsService _localSettingsService;
+    private UnifiedTrackingData _inputBuffer;
 
     public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, ILocalSettingsService localSettingsService)
     {
@@ -41,6 +42,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
         Enabled = false;
         ContinuousCalibration = true;
         CalibrationWeight = 0.2f;
+        _inputBuffer = new UnifiedTrackingData();
     }
 
     static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
@@ -114,14 +116,13 @@ public partial class UnifiedTrackingMutator : ObservableObject
             return input;
         }
 
-        var inputBuffer = new UnifiedTrackingData();
-        inputBuffer.CopyPropertiesOf(input);
+        _inputBuffer.CopyPropertiesOf(input);
 
-        ApplyCalibrator(ref inputBuffer);
-        ApplySmoothing(ref inputBuffer);
+        ApplyCalibrator(ref _inputBuffer);
+        ApplySmoothing(ref _inputBuffer);
 
-        _trackingDataBuffer.CopyPropertiesOf(inputBuffer);
-        return inputBuffer;
+        _trackingDataBuffer.CopyPropertiesOf(_inputBuffer);
+        return _inputBuffer;
     }
 
     public async Task InitializeCalibration(int durationMs = 30000)
