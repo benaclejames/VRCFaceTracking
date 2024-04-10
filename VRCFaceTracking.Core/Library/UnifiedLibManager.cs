@@ -282,25 +282,43 @@ public class UnifiedLibManager : ILibManager
         }
     }
 
+    private bool TeardownModule(ModuleRuntimeInfo module)
+    {
+        _logger.LogInformation("Tearing down {module} ", module.Module.GetType().Name);
+        module.UpdateCancellationToken.Cancel();
+        if (module.UpdateThread.IsAlive)
+        {
+            // Edge case, we wait for the thread to finish before unloading the assembly
+            _logger.LogDebug("Waiting for {module}'s thread to join...", module.Module.GetType().Name);
+            module.UpdateThread.Join();
+        }
+
+        module.Module.Teardown();
+        module.AssemblyLoadContext.Unload();
+        
+        return true;
+    }
+
     // Signal all active modules to gracefully shut down their respective runtimes
     public void TeardownAllAndResetAsync()
     {
         _logger.LogInformation("Tearing down all modules...");
 
-        foreach (var modulePair in _moduleThreads)
+        foreach (var module in _moduleThreads)
         {
-            _logger.LogInformation("Tearing down {module} ", modulePair.Module.GetType().Name);
-            modulePair.UpdateCancellationToken.Cancel();
-            if (modulePair.UpdateThread.IsAlive)
+            var success = false;
+            try
             {
-                // Edge case, we wait for the thread to finish before unloading the assembly
-                _logger.LogDebug("Waiting for {module}'s thread to join...", modulePair.Module.GetType().Name);
-                modulePair.UpdateThread.Join();
+                success = TeardownModule(module);
             }
-
-            modulePair.Module.Teardown();
-            modulePair.AssemblyLoadContext.Unload();
-            LoadedModulesMetadata.Remove(modulePair.Module.ModuleInformation);
+            finally
+            {
+                if (!success)
+                {
+                    _logger.LogWarning($"Module: {module.Module.ModuleInformation.Name} failed to shut down. Killing its thread.");
+                    module.UpdateThread.Interrupt();
+                }
+            }
         }
 
         _moduleThreads.Clear();
