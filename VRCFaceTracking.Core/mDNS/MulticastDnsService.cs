@@ -186,7 +186,7 @@ public partial class MulticastDnsService : ObservableObject
 
     private void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
     {
-        if (!packet.QUERYRESPONSE || packet.answers[0].Type != 12)
+        if (!packet.QUERYRESPONSE || (packet.answers.Length > 0 && packet.answers[0].Type != 12))
         {
             return;
         }
