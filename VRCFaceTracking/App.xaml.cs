@@ -81,6 +81,9 @@ public partial class App : Application
             logging.ClearProviders();
             logging.AddDebug();
             logging.AddConsole();
+            logging.AddSentry(o =>
+                o.Dsn =
+                    "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.us.sentry.io/4506152246575104");
             logging.AddProvider(new OutputLogProvider(DispatcherQueue.GetForCurrentThread()));
             logging.AddProvider(new LogFileProvider());
         }).
