@@ -1,5 +1,4 @@
-﻿using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models.Osc.FileBased;
+﻿using VRCFaceTracking.Core.Contracts;
 
 namespace VRCFaceTracking.Core.Models.ParameterDefinition;
 
@@ -21,8 +20,5 @@ public class NullAvatarDef : IAvatarInfo
 
     public string Id => _id;
 
-    public AvatarConfigFileParameter[] Parameters
-    {
-        get;
-    }
+    public IParameterDefinition[] Parameters { get; }
 }

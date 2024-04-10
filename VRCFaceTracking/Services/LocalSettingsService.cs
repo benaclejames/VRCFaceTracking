@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
-
-using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
+using VRCFaceTracking.Core;
 
 namespace VRCFaceTracking.Services;
 
@@ -82,7 +79,61 @@ public class LocalSettingsService : ILocalSettingsService
 
             _settings[key] = await Json.StringifyAsync(value);
 
-            await Task.Run(() => _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings));
+            await _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
+        }
+    }
+
+    public async Task Load(object instance)
+    {
+        var type = instance.GetType();
+        var properties = type.GetProperties();
+        
+        foreach (var property in properties)
+        {
+            var attributes = property.GetCustomAttributes(typeof(SavedSettingAttribute), false);
+
+            if (attributes.Length <= 0)
+            {
+                continue;
+            }
+
+            var savedSettingAttribute = (SavedSettingAttribute)attributes[0];
+            var settingName = savedSettingAttribute.GetName();
+            var defaultValue = savedSettingAttribute.Default();
+
+            var setting = await ReadSettingAsync(settingName, defaultValue, savedSettingAttribute.ForceLocal());
+            object? convertedSetting;
+            try
+            {
+                convertedSetting = Convert.ChangeType(setting, property.PropertyType);
+            }
+            catch
+            {
+                convertedSetting = defaultValue;
+            }
+
+            property.SetValue(instance, convertedSetting);
+        }
+    }
+
+    public async Task Save(object instance)
+    {
+        var type = instance.GetType();
+        var properties = type.GetProperties();
+
+        foreach (var property in properties)
+        {
+            var attributes = property.GetCustomAttributes(typeof(SavedSettingAttribute), false);
+
+            if (attributes.Length <= 0)
+            {
+                continue;
+            }
+
+            var savedSettingAttribute = (SavedSettingAttribute)attributes[0];
+            var settingName = savedSettingAttribute.GetName();
+
+            await SaveSettingAsync(settingName, property.GetValue(instance), savedSettingAttribute.ForceLocal());
         }
     }
 }

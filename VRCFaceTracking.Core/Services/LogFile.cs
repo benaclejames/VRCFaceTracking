@@ -6,7 +6,7 @@ public class LogFileLogger : ILogger
 {
     private readonly string _categoryName;
     private readonly StreamWriter _file;
-    private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1,1);
+    private static readonly Mutex Mutex = new ();
 
     public LogFileLogger(string categoryName, StreamWriter file)
     {
@@ -25,7 +25,7 @@ public class LogFileLogger : ILogger
         Exception exception,
         Func<TState, Exception, string> formatter)
     {
-        semaphoreSlim.Wait(); // Wait for the semaphore to be released
+        Mutex.WaitOne(); // Wait for the semaphore to be released
         try
         {
             _file.Write($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
@@ -33,7 +33,7 @@ public class LogFileLogger : ILogger
         }
         finally
         {
-            semaphoreSlim.Release(); // Release the semaphore
+            Mutex.ReleaseMutex(); // Release the semaphore
         }
     }
 }

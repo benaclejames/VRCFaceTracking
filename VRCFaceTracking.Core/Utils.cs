@@ -2,7 +2,7 @@
 using System.Security;
 using System.Security.Principal;
 
-namespace VRCFaceTracking;
+namespace VRCFaceTracking.Core;
 
 public static class Utils
 {

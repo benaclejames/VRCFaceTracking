@@ -13,7 +13,7 @@
   <Identity
     Name="96ba052f-0948-44d8-86c4-a0212e4ae047"
     Publisher="CN=E=benaclejames@gmail.com, &quot;Open Source Developer, Benjamin Thomas&quot;, O=Open Source Developer, L=Gloucester, S=Gloucestershire, C=GB"
-    Version="5.1.1.1" />
+    Version="5.2.0.0" />
     
   <mp:PhoneIdentity PhoneProductId="96ba052f-0948-44d8-86c4-a0212e4ae047" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     

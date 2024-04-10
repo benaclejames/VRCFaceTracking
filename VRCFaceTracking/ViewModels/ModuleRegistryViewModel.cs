@@ -8,16 +8,10 @@ using VRCFaceTracking.Core.Models;
 
 namespace VRCFaceTracking.ViewModels;
 
-public class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
+public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
 {
     private readonly IModuleDataService _moduleDataService;
-    private InstallableTrackingModule? _selected;
-
-    public InstallableTrackingModule? Selected
-    {
-        get => _selected;
-        set => SetProperty(ref _selected, value);
-    }
+    [ObservableProperty] private InstallableTrackingModule? _selected;
 
     public ObservableCollection<InstallableTrackingModule> ModuleInfos { get; } = new();
     

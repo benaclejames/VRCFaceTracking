@@ -5,6 +5,8 @@ using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.ViewModels;
 using Windows.System;
 using Microsoft.UI.Xaml.Media.Imaging;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Params.Data;
 using VrcftImage = VRCFaceTracking.Core.Types.Image;
 
 namespace VRCFaceTracking.Views;
@@ -25,7 +27,7 @@ public sealed partial class SettingsPage : Page
         get;
     }
     
-    public OscViewModel OscViewModel
+    public IOscTarget OscTarget
     {
         get;
     }
@@ -49,9 +51,9 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
-        OscViewModel = App.GetService<OscViewModel>();
         CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
+        OscTarget = App.GetService<IOscTarget>();
 
         // Initialize hardware debug streams for upper and lower face tracking
         InitializeHardwareDebugStream(UnifiedTracking.EyeImageData, ref _upperImageStream, ref _upperStream);
@@ -155,6 +157,9 @@ public sealed partial class SettingsPage : Page
 
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
     => await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/issues/new/choose"));
+    
+    private async void privacyPolicyCard_Click(object sender, RoutedEventArgs e) 
+     => await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/blob/master/PRIVACY.md"));
 
     private void themeMode_SelectionChanged(object sender, RoutedEventArgs e)
     {
@@ -180,13 +185,11 @@ public sealed partial class SettingsPage : Page
             // Enable cards
             allParamsRelevant.IsEnabled = true;
             resetVRCFT.IsEnabled = true;
-            resetAvatarConfig.IsEnabled = true;
             forceReInit.IsEnabled = true;
 
             // Enable toggles/buttons
             allParamsRelevantToggle.IsEnabled = true;
             resetVRCFTButton.IsEnabled = true;
-            resetVRCAvatarConf.IsEnabled = true;
             forceReInitButton.IsEnabled = true;
         }
         else
@@ -194,14 +197,12 @@ public sealed partial class SettingsPage : Page
             // Disable cards
             allParamsRelevant.IsEnabled = false;
             resetVRCFT.IsEnabled = false;
-            resetAvatarConfig.IsEnabled = false;
             forceReInit.IsEnabled = false;
 
             // Disable toggles/buttons and set them to off
             allParamsRelevantToggle.IsEnabled = false;
             allParamsRelevantToggle.IsOn = false;
             resetVRCFTButton.IsEnabled = false;
-            resetVRCAvatarConf.IsEnabled = false;
             forceReInitButton.IsEnabled = false;
         }
     }
@@ -210,7 +211,5 @@ public sealed partial class SettingsPage : Page
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
 
-    private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetAvatarOscManifests();
-
-    private void ButtonBase_OnClick(object sender, RoutedEventArgs e) => CalibrationSettings.InitializeCalibration();
+    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.InitializeCalibration();
 }

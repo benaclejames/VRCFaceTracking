@@ -7,11 +7,11 @@ namespace VRCFaceTracking.Services;
 public class OpenVRService
 {
     private CVRSystem _system;
-    private ILogger _logger;
+    private readonly ILogger<OpenVRService> _logger;
     
-    public OpenVRService(ILoggerFactory loggerFactory)
+    public OpenVRService(ILogger<OpenVRService> logger)
     {
-        _logger = loggerFactory.CreateLogger("OpenVRService");
+        _logger = logger;
         
         EVRInitError error = EVRInitError.None;
         _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Background);

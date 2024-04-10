@@ -1,4 +1,4 @@
-﻿using VRCFaceTracking.Core.Contracts.Services;
+﻿using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC.DataTypes;
 
 namespace VRCFaceTracking.Core.Types

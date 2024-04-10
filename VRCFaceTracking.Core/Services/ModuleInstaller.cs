@@ -8,11 +8,11 @@ namespace VRCFaceTracking.Core.Services;
 
 public class ModuleInstaller
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<ModuleInstaller> _logger;
 
-    public ModuleInstaller(ILoggerFactory loggerFactory)
+    public ModuleInstaller(ILogger<ModuleInstaller> logger)
     {
-        _logger = loggerFactory.CreateLogger("ModuleInstaller");
+        _logger = logger;
         
         if (!Directory.Exists(Utils.CustomLibsDirectory))
         {
@@ -21,7 +21,7 @@ public class ModuleInstaller
     }
 
     // Move a directory using just Copy and Remove as MoveDirectory is not usable across drives
-    private void MoveDirectory(string source, string dest)
+    private static void MoveDirectory(string source, string dest)
     {
         if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(dest))
         {
@@ -51,7 +51,7 @@ public class ModuleInstaller
         Directory.Delete(source, true);
     }
 
-    private async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
@@ -188,13 +188,19 @@ public class ModuleInstaller
         }
         else
         {
-            moduleMetadata.DllFileName ??= Path.GetFileName(moduleMetadata.DownloadUrl);
-            var dllPath = Path.Combine(moduleDirectory, moduleMetadata.DllFileName);
+            moduleMetadata.DllFileName = string.IsNullOrEmpty(moduleMetadata.DllFileName)
+                ? Path.GetFileName(moduleMetadata.DownloadUrl)
+                : moduleMetadata.DllFileName;
             
-            if (!Directory.Exists(moduleDirectory))
+            var dllPath = Path.Combine(
+                moduleDirectory, 
+                moduleMetadata.DllFileName);
+            
+            if (Directory.Exists(moduleDirectory))
             {
-                Directory.CreateDirectory(moduleDirectory);
+                Directory.Delete(moduleDirectory, true);
             }
+            Directory.CreateDirectory(moduleDirectory);
 
             await DownloadModuleToFile(moduleMetadata, dllPath);
             
@@ -214,8 +220,15 @@ public class ModuleInstaller
     {
         module.InstallationState = InstallState.AwaitingRestart;
         var moduleJsonPath = Path.Combine(Utils.CustomLibsDirectory, module.ModuleId.ToString(), "module.json");
-        File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
-        _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
+        try
+        {
+            File.WriteAllText(moduleJsonPath, JsonConvert.SerializeObject(module, Formatting.Indented));
+            _logger.LogInformation("Marked module {module} for deletion", module.ModuleId);
+        }
+        catch
+        {
+            _logger.LogWarning("Attempted to mark module {module} for deletion, but it didn't exist", module.ModuleId);
+        }
     }
     
     public void UninstallModule(TrackingModuleMetadata moduleMetadata)

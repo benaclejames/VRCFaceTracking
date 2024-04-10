@@ -1,24 +1,31 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-
+using System.Runtime.ExceptionServices;
+using System.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-
+using Sentry.Protocol;
 using VRCFaceTracking.Activation;
 using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
+using VRCFaceTracking.Core.mDNS;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.OSC;
-using VRCFaceTracking.Core.OSC.DataTypes;
+using VRCFaceTracking.Core.OSC.Query.mDNS;
+using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Notifications;
 using VRCFaceTracking.Services;
 using VRCFaceTracking.ViewModels;
 using VRCFaceTracking.Views;
+using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArgs;
 
 namespace VRCFaceTracking;
 
@@ -35,7 +42,7 @@ public partial class App : Application
         get;
     }
     
-    private ILogger _logger;
+    private ILogger? _logger;
 
     public static T GetService<T>()
         where T : class
@@ -73,6 +80,7 @@ public partial class App : Application
         {
             logging.ClearProviders();
             logging.AddDebug();
+            logging.AddConsole();
             logging.AddProvider(new OutputLogProvider(DispatcherQueue.GetForCurrentThread()));
             logging.AddProvider(new LogFileProvider());
         }).
@@ -98,16 +106,20 @@ public partial class App : Application
             services.AddSingleton<IDispatcherService, DispatcherService>();
 
             // Core Services
-            services.AddSingleton<IIdentityService, IdentityService>();
+            services.AddTransient<IIdentityService, IdentityService>();
             services.AddSingleton<ModuleInstaller>();
             services.AddSingleton<IModuleDataService, ModuleDataService>();
-            services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<ParameterOutputService, OscService>();
+            services.AddTransient<IFileService, FileService>();
+            services.AddSingleton<OscQueryService>();
+            services.AddSingleton<MulticastDnsService>();
             services.AddSingleton<IMainService, MainStandalone>();
-            services.AddSingleton<AvatarConfigParser>();
+            services.AddTransient<AvatarConfigParser>();
+            services.AddTransient<OscQueryConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
             services.AddTransient<OpenVRService>();
+            services.AddSingleton<IOscTarget, OscTarget>();
+            services.AddSingleton<HttpHandler>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();
@@ -120,13 +132,17 @@ public partial class App : Application
             services.AddTransient<SettingsViewModel>();
             services.AddSingleton<UnifiedTrackingMutator>();
             services.AddSingleton<RiskySettingsViewModel>();
-            services.AddTransient<OscViewModel>();
             services.AddTransient<SettingsPage>();
             services.AddSingleton<MainViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<IParamSupervisor, ParamSupervisor>();
+            services.AddSingleton<OscSendService>();
+            services.AddSingleton<OscRecvService>();
+            services.AddSingleton<ParameterSenderService>();
+            
+            services.AddHostedService<ParameterSenderService>(provider => provider.GetService<ParameterSenderService>());
+            services.AddHostedService<OscRecvService>(provider => provider.GetService<OscRecvService>());
 
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
@@ -146,25 +162,54 @@ public partial class App : Application
         }
 
         App.GetService<IAppNotificationService>().Initialize();
-
-        UnhandledException += App_UnhandledException;
-    }
-
-    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
-    {
-        _logger.LogError(e.Exception, "Unhandled exception");
-        _logger.LogCritical("Stacktrace: {0}", e.Exception.StackTrace);
-        _logger.LogCritical("Inner exception: {0}", e.Exception.InnerException);
-        _logger.LogCritical("Message: {0}", e.Exception.Message);
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);
 
+        SentrySdk.Init(o =>
+        {
+            o.Dsn = "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.sentry.io/4506152246575104";
+            o.TracesSampleRate = 1.0;
+            o.AutoSessionTracking = true;
+            #if DEBUG
+            o.Environment = "debug";
+            #else
+            o.Environment = "release";
+            #endif
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            if (version != null)
+            {
+                o.Release = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            }
+        });
+        Current.UnhandledException += ExceptionHandler;
         //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
+        await Host.StartAsync();
+    }
+    
+    [HandleProcessCorruptedStateExceptions, SecurityCritical]
+    internal void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+    {
+        _logger?.LogError(e.Exception, "Unhandled exception");
+        _logger?.LogCritical("Stacktrace: {0}", e.Exception.StackTrace);
+        _logger?.LogCritical("Inner exception: {0}", e.Exception.InnerException);
+        _logger?.LogCritical("Message: {0}", e.Exception.Message);
+        
+        // We need to hold the reference, because the Exception property is cleared when accessed.
+        var exception = e.Exception;
+        if (exception != null)
+        {
+            // Tells Sentry this was an Unhandled Exception
+            exception.Data[Mechanism.HandledKey] = false;
+            exception.Data[Mechanism.MechanismKey] = "Application.UnhandledException";
+            SentrySdk.CaptureException(exception);
+            // Make sure the event is flushed to disk or to Sentry
+            SentrySdk.FlushAsync(TimeSpan.FromSeconds(3)).Wait();
+        }
     }
 
     public static TEnum GetEnum<TEnum>(string text) where TEnum : struct
