@@ -230,6 +230,9 @@
   <data name="BugRequestCard.Header" xml:space="preserve">
     <value>File a bug report</value>
   </data>
+  <data name="PrivacyPolicyCard.Header" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
   <data name="LastUpdated.Text" xml:space="preserve">
     <value>Last Updated</value>
   </data>

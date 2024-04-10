@@ -157,6 +157,9 @@ public sealed partial class SettingsPage : Page
 
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
     => await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/issues/new/choose"));
+    
+    private async void privacyPolicyCard_Click(object sender, RoutedEventArgs e) 
+     => await Launcher.LaunchUriAsync(new Uri("https://github.com/benaclejames/VRCFaceTracking/blob/master/PRIVACY.md"));
 
     private void themeMode_SelectionChanged(object sender, RoutedEventArgs e)
     {

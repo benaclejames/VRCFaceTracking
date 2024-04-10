@@ -154,34 +154,7 @@
 
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="About" />
-                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard HorizontalContentAlignment="Stretch"
-                                           ContentAlignment="Vertical"
-                                           x:Uid="ContributorsCard">
-                                <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="models:GithubContributor">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <!-- Left alligned hyperlink w/ text -->
-                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{x:Bind login}" NavigateUri="{x:Bind html_url}"/>
-                                                
-                                                <!-- Right alligned text -->
-                                                <TextBlock Grid.Column="1" Text="{x:Bind contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
-                                                <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                    
+                
                 <labs:SettingsExpander x:Uid="Copyright" Header="VRCFaceTracking">
                     <TextBlock
                             Margin="0,-2,0,0"
@@ -189,6 +162,14 @@
                             IsTextSelectionEnabled="True"
                             Text="{x:Bind Version}" />
                     <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            x:Uid="PrivacyPolicyCard"
+                            IsClickEnabled="True"
+                            Click="privacyPolicyCard_Click">
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
                         <labs:SettingsCard x:Uid="CloneRepoCard">
                             <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -215,6 +196,34 @@
                                 HorizontalContentAlignment="Left"
                                 ContentAlignment="Vertical"
                                 x:Uid="Disclaimer">
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                
+                <labs:SettingsExpander x:Uid="Credits" Header="Credits">
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard HorizontalContentAlignment="Stretch"
+                                           ContentAlignment="Vertical"
+                                           x:Uid="ContributorsCard">
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.Contributors, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:GithubContributor">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Left alligned hyperlink w/ text -->
+                                                <HyperlinkButton Grid.Column="0" Margin="-12,0,0,0" Content="{x:Bind login}" NavigateUri="{x:Bind html_url}"/>
+                                                
+                                                <!-- Right alligned text -->
+                                                <TextBlock Grid.Column="1" Text="{x:Bind contributions}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                                <TextBlock Grid.Column="2" Text=" Contributions" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextAlignment="Right"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
