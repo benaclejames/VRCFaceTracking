@@ -92,7 +92,7 @@ public class OscRecvService : BackgroundService
         
         while (!_stoppingToken.IsCancellationRequested)
         {
-            if (_linkedToken.IsCancellationRequested)
+            if (_linkedToken.IsCancellationRequested || _recvSocket is not { IsBound: true })
             {
                 continue;
             }
