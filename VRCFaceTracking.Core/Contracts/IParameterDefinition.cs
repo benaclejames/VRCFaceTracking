@@ -1,4 +1,4 @@
-﻿namespace VRCFaceTracking.Core.Contracts.Services;
+﻿namespace VRCFaceTracking.Core.Contracts;
 
 public interface IParameterDefinition
 {

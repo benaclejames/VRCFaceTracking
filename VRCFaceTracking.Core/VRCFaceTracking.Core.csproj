@@ -5,7 +5,7 @@
     <Platforms>x64</Platforms>
     <Platforms>x64</Platforms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>5.1.1.1</AssemblyVersion>
+    <AssemblyVersion>5.2.4.0</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
@@ -14,7 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Sentry" Version="4.0.0-beta.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VRCFaceTracking.SDK\VRCFaceTracking.SDK.csproj" />
   </ItemGroup>
 </Project>

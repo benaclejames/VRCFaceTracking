@@ -1,54 +1,10 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using VRCFaceTracking.Core.Contracts.Services;
+﻿using System.Text.RegularExpressions;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
-
-public class ParamSupervisor : IParamSupervisor
-{
-    public static readonly Queue<OscMessage> SendQueue = new();
- 
-    private readonly IDispatcherService _dispatcherService;
-    
-    public static bool AllParametersRelevantStatic { get; set; }
-
-    public bool AllParametersRelevant
-    {
-        get => AllParametersRelevantStatic;
-        set
-        {
-            if (AllParametersRelevantStatic == value) return;
-            AllParametersRelevantStatic = value;
-            SendQueue.Clear();
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
-                parameter.ResetParam(Array.Empty<IParameterDefinition>());
-            OnPropertyChanged();
-        }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-    }
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-    
-    public ParamSupervisor(IDispatcherService dispatcherService)
-    {
-        _dispatcherService = dispatcherService;
-    }
-}
 
 public class BaseParam<T> : Parameter where T : struct
 {
@@ -61,26 +17,39 @@ public class BaseParam<T> : Parameter where T : struct
     private readonly Regex _regex;
 
     private bool _relevant;
-    private bool _sendOnLoad;
+    private readonly bool _sendOnLoad;
 
     public bool Relevant
     {
         get => _relevant;
         protected set
         {
-            if (_sendOnLoad && value) Enqueue();
+            if (_sendOnLoad && value)
+            {
+                Enqueue();
+            }
 
             // If we're irrelevant or we don't have a getValueFunc, we don't need to do anything
-            if (_relevant == value) return;
+            if (_relevant == value)
+            {
+                return;
+            }
 
             _relevant = value;
 
-            if (_getValueFunc == null) return;
+            if (_getValueFunc == null)
+            {
+                return;
+            }
 
             if (value)
+            {
                 UnifiedTracking.OnUnifiedDataUpdated += Process;
+            }
             else
+            {
                 UnifiedTracking.OnUnifiedDataUpdated -= Process;
+            }
         }
     }
 
@@ -91,7 +60,10 @@ public class BaseParam<T> : Parameter where T : struct
         get => (T)OscMessage.Value;
         set
         {
-            if (value.Equals(_lastValue)) return;
+            if (value.Equals(_lastValue))
+            {
+                return;
+            }
 
             OscMessage.Value = value;
             _lastValue = value;
@@ -99,14 +71,14 @@ public class BaseParam<T> : Parameter where T : struct
         }
     }
 
-    private void Enqueue() => ParamSupervisor.SendQueue.Enqueue(OscMessage);
+    private void Enqueue() => ParameterSenderService.Enqueue(OscMessage);
 
     protected readonly OscMessage OscMessage;
 
     public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc, bool sendOnLoad = false)
     {
         _paramName = name;
-        _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + @")$|^(" + _paramName + @")$");
+        _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + ")$|^(" + _paramName + ")$");
         _getValueFunc = getValueFunc;
         OscMessage = new OscMessage(DefaultPrefix + name, typeof(T));
         _sendOnLoad = sendOnLoad;
@@ -114,7 +86,7 @@ public class BaseParam<T> : Parameter where T : struct
 
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
-        if (ParamSupervisor.AllParametersRelevantStatic)
+        if (ParameterSenderService.AllParametersRelevant)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;
@@ -123,7 +95,7 @@ public class BaseParam<T> : Parameter where T : struct
         }
 
         var compatibleParam = newParams.FirstOrDefault(param =>
-            _regex.IsMatch(param.Name)
+            _regex.IsMatch(param.Address)
             && param.Type == typeof(T));
 
         if (compatibleParam != null)

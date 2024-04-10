@@ -1,210 +1,194 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
-using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 
-namespace VRCFaceTracking
+namespace VRCFaceTracking.Core.Params.Data;
+
+/// <summary>
+/// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
+/// </summary>
+public partial class UnifiedTrackingMutator : ObservableObject
 {
-    /// <summary>
-    /// Container of all functions and structures retaining to mutating the incoming Expression Data to be usable for output parameters.
-    /// </summary>
-    public class UnifiedTrackingMutator : INotifyPropertyChanged
-    {
-        private UnifiedTrackingData trackingDataBuffer = new();
-        public UnifiedMutationConfig mutationData = new();
+    private readonly UnifiedTrackingData _trackingDataBuffer = new();
 
-        private float _calibrationWeight;
-        public float CalibrationWeight
-        {
-            get => _calibrationWeight;
-            set => SetField(ref _calibrationWeight, value);
-        }
+    private UnifiedMutationConfig _mutationData = new();
+
+    [ObservableProperty]
+    [property: SavedSetting("CalibrationWeight", 0.2f)]
+    private float _calibrationWeight;
         
-        private bool _continuousCalibration;
-        public bool ContinuousCalibration
-        {
-            get => _continuousCalibration;
-            set => SetField(ref _continuousCalibration, value);
-        }
+    [ObservableProperty]
+    [property: SavedSetting("ContinuousCalibrationEnabled")]
+    private bool _continuousCalibration;
 
-        public bool SmoothingMode = false;
+    public bool SmoothingMode = false;
 
-        private bool _enabled;
-        public bool Enabled 
-        {
-            get => _enabled;
-            set => SetField(ref _enabled, value);
-        }
+    [ObservableProperty]
+    [property: SavedSetting("CalibrationEnabled")]
+    private bool _enabled;
 
-        private readonly ILogger<UnifiedTrackingMutator> _logger;
-        private readonly IDispatcherService _dispatcherService;
-        private readonly ILocalSettingsService _localSettingsService;
+    private readonly ILogger<UnifiedTrackingMutator> _logger;
+    private readonly ILocalSettingsService _localSettingsService;
+    private UnifiedTrackingData _inputBuffer;
 
-        public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, IDispatcherService dispatcherService, ILocalSettingsService localSettingsService)
-        {
-            UnifiedTracking.Mutator = this;
-            _logger = logger;
-            _dispatcherService = dispatcherService;
-            _localSettingsService = localSettingsService;
+    public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, ILocalSettingsService localSettingsService)
+    {
+        UnifiedTracking.Mutator = this;
+        _logger = logger;
+        _localSettingsService = localSettingsService;
             
-            Enabled = false;
-            ContinuousCalibration = true;
-            CalibrationWeight = 0.2f;
+        Enabled = false;
+        ContinuousCalibration = true;
+        CalibrationWeight = 0.2f;
+        _inputBuffer = new UnifiedTrackingData();
+    }
+
+    static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
+
+    private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
+    {
+        if (!Enabled)
+        {
+            return;
         }
 
-        static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;
-
-        private void Calibrate(ref UnifiedTrackingData inputData, float calibrationWeight)
+        for (var i = 0; i < (int)UnifiedExpressions.Max; i++)
         {
-            if (!Enabled) 
-                return;
-
-            for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
+            if (inputData.Shapes[i].Weight <= 0.0f)
             {
-                if (inputData.Shapes[i].Weight <= 0.0f)
-                    continue;
-                if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight > mutationData.ShapeMutations[i].Ceil) // Calibrator
-                    mutationData.ShapeMutations[i].Ceil = SimpleLerp(inputData.Shapes[i].Weight, mutationData.ShapeMutations[i].Ceil, calibrationWeight);
-                if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight < mutationData.ShapeMutations[i].Floor)
-                    mutationData.ShapeMutations[i].Floor = SimpleLerp(inputData.Shapes[i].Weight, mutationData.ShapeMutations[i].Floor, calibrationWeight);
-
-                inputData.Shapes[i].Weight = (inputData.Shapes[i].Weight - mutationData.ShapeMutations[i].Floor) / (mutationData.ShapeMutations[i].Ceil - mutationData.ShapeMutations[i].Floor);
+                continue;
             }
-        }
 
-        private void ApplyCalibrator(ref UnifiedTrackingData inputData)
-            => Calibrate(ref inputData, Enabled ? CalibrationWeight : 0.0f);
-
-        private void ApplySmoothing(ref UnifiedTrackingData input)
-        {
-            // Example of applying smoothing to the data within the mutator:
-            if (!SmoothingMode) return;
-
-            for (int i = 0; i < input.Shapes.Length; i++)
-                input.Shapes[i].Weight =
-                    SimpleLerp(
-                        input.Shapes[i].Weight,
-                        trackingDataBuffer.Shapes[i].Weight,
-                        mutationData.ShapeMutations[i].SmoothnessMult
-                    );
-
-            input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, trackingDataBuffer.Eye.Left.Openness, mutationData.OpennessMutationsConfig.SmoothnessMult);
-            input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, trackingDataBuffer.Eye.Left.PupilDiameter_MM, mutationData.PupilMutationsConfig.SmoothnessMult);
-            input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, trackingDataBuffer.Eye.Left.Gaze, mutationData.GazeMutationsConfig.SmoothnessMult);
-
-            input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, trackingDataBuffer.Eye.Right.Openness, mutationData.OpennessMutationsConfig.SmoothnessMult);
-            input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, trackingDataBuffer.Eye.Right.PupilDiameter_MM, mutationData.PupilMutationsConfig.SmoothnessMult);
-            input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, trackingDataBuffer.Eye.Right.Gaze, mutationData.GazeMutationsConfig.SmoothnessMult);
-        }
-
-        /// <summary>
-        /// Takes in the latest base expression Weight data from modules and mutates into the Weight data for output parameters.
-        /// </summary>
-        /// <returns> Mutated Expression Data. </returns>
-        public UnifiedTrackingData MutateData(UnifiedTrackingData input)
-        {
-            if (!Enabled && SmoothingMode == false)
-                return input;
-
-            UnifiedTrackingData inputBuffer = new UnifiedTrackingData();
-            inputBuffer.CopyPropertiesOf(input);
-
-            ApplyCalibrator(ref inputBuffer);
-            ApplySmoothing(ref inputBuffer);
-
-            trackingDataBuffer.CopyPropertiesOf(inputBuffer);
-            return inputBuffer;
-        }
-
-        public void InitializeCalibration()
-        {
-            Thread _thread = new Thread(() =>
+            if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight > _mutationData.ShapeMutations[i].Ceil) // Calibrator
             {
-                _logger.LogInformation("Initialized calibration.");
+                _mutationData.ShapeMutations[i].Ceil = SimpleLerp(inputData.Shapes[i].Weight, _mutationData.ShapeMutations[i].Ceil, calibrationWeight);
+            }
 
-                UnifiedTracking.Mutator.SetCalibration();
+            if (calibrationWeight > 0.0f && inputData.Shapes[i].Weight < _mutationData.ShapeMutations[i].Floor)
+            {
+                _mutationData.ShapeMutations[i].Floor = SimpleLerp(inputData.Shapes[i].Weight, _mutationData.ShapeMutations[i].Floor, calibrationWeight);
+            }
 
-                UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
-                UnifiedTracking.Mutator.Enabled = true;
+            inputData.Shapes[i].Weight = (inputData.Shapes[i].Weight - _mutationData.ShapeMutations[i].Floor) / (_mutationData.ShapeMutations[i].Ceil - _mutationData.ShapeMutations[i].Floor);
+        }
+    }
 
-                _logger.LogInformation("Calibrating deep normalization for 30s.");
-                Thread.Sleep(30000);
+    private void ApplyCalibrator(ref UnifiedTrackingData inputData)
+        => Calibrate(ref inputData, Enabled ? CalibrationWeight : 0.0f);
 
-                UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
-                _logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
-
-            });
-            _thread.Start();
+    private void ApplySmoothing(ref UnifiedTrackingData input)
+    {
+        // Example of applying smoothing to the data within the mutator:
+        if (!SmoothingMode)
+        {
+            return;
         }
 
-        public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
+        for (var i = 0; i < input.Shapes.Length; i++)
         {
-            // Currently eye data does not get parsed by calibration.
-            mutationData.PupilMutationsConfig.Ceil = ceiling;
-            mutationData.GazeMutationsConfig.Ceil = ceiling;
-            mutationData.OpennessMutationsConfig.Ceil = ceiling;
+            input.Shapes[i].Weight =
+                SimpleLerp(
+                    input.Shapes[i].Weight,
+                    _trackingDataBuffer.Shapes[i].Weight,
+                    _mutationData.ShapeMutations[i].SmoothnessMult
+                );
+        }
+
+        input.Eye.Left.Openness = SimpleLerp(input.Eye.Left.Openness, _trackingDataBuffer.Eye.Left.Openness, _mutationData.OpennessMutationsConfig.SmoothnessMult);
+        input.Eye.Left.PupilDiameter_MM = SimpleLerp(input.Eye.Left.PupilDiameter_MM, _trackingDataBuffer.Eye.Left.PupilDiameter_MM, _mutationData.PupilMutationsConfig.SmoothnessMult);
+        input.Eye.Left.Gaze = SimpleLerp(input.Eye.Left.Gaze, _trackingDataBuffer.Eye.Left.Gaze, _mutationData.GazeMutationsConfig.SmoothnessMult);
+
+        input.Eye.Right.Openness = SimpleLerp(input.Eye.Right.Openness, _trackingDataBuffer.Eye.Right.Openness, _mutationData.OpennessMutationsConfig.SmoothnessMult);
+        input.Eye.Right.PupilDiameter_MM = SimpleLerp(input.Eye.Right.PupilDiameter_MM, _trackingDataBuffer.Eye.Right.PupilDiameter_MM, _mutationData.PupilMutationsConfig.SmoothnessMult);
+        input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, _trackingDataBuffer.Eye.Right.Gaze, _mutationData.GazeMutationsConfig.SmoothnessMult);
+    }
+
+    /// <summary>
+    /// Takes in the latest base expression Weight data from modules and mutates into the Weight data for output parameters.
+    /// </summary>
+    /// <returns> Mutated Expression Data. </returns>
+    public UnifiedTrackingData MutateData(UnifiedTrackingData input)
+    {
+        if (!Enabled && SmoothingMode == false)
+        {
+            return input;
+        }
+
+        _inputBuffer.CopyPropertiesOf(input);
+
+        ApplyCalibrator(ref _inputBuffer);
+        ApplySmoothing(ref _inputBuffer);
+
+        _trackingDataBuffer.CopyPropertiesOf(_inputBuffer);
+        return _inputBuffer;
+    }
+
+    public async Task InitializeCalibration(int durationMs = 30000)
+    {
+        _logger.LogInformation("Initialized calibration.");
+
+        UnifiedTracking.Mutator.SetCalibration();
+
+        UnifiedTracking.Mutator.CalibrationWeight = 0.75f;
+        UnifiedTracking.Mutator.Enabled = true;
+
+        _logger.LogInformation("Calibrating deep normalization for {durationSec}s.", durationMs / 100);
+        await Task.Delay(durationMs);
+
+        UnifiedTracking.Mutator.CalibrationWeight = 0.2f;
+        _logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
+    }
+
+    public void SetCalibration(float floor = 999.0f, float ceiling = 0.0f)
+    {
+        // Currently eye data does not get parsed by calibration.
+        _mutationData.PupilMutationsConfig.Ceil = ceiling;
+        _mutationData.GazeMutationsConfig.Ceil = ceiling;
+        _mutationData.OpennessMutationsConfig.Ceil = ceiling;
             
-            mutationData.PupilMutationsConfig.Floor = floor;
-            mutationData.GazeMutationsConfig.Floor = floor;
-            mutationData.OpennessMutationsConfig.Floor = floor;
+        _mutationData.PupilMutationsConfig.Floor = floor;
+        _mutationData.GazeMutationsConfig.Floor = floor;
+        _mutationData.OpennessMutationsConfig.Floor = floor;
 
-            mutationData.PupilMutationsConfig.Name = "Pupil";
-            mutationData.GazeMutationsConfig.Name = "Gaze";
-            mutationData.OpennessMutationsConfig.Name = "Openness";
+        _mutationData.PupilMutationsConfig.Name = "Pupil";
+        _mutationData.GazeMutationsConfig.Name = "Gaze";
+        _mutationData.OpennessMutationsConfig.Name = "Openness";
 
-            for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
-            {
-                mutationData.ShapeMutations[i].Name = ((UnifiedExpressions)i).ToString();
-                mutationData.ShapeMutations[i].Ceil = ceiling;
-                mutationData.ShapeMutations[i].Floor = floor;
-            }
-        }
-
-        public void SetSmoothness(float setValue = 0.0f)
+        for (int i = 0; i < _mutationData.ShapeMutations.Length; i++)
         {
-            // Currently eye data does not get parsed by calibration.
-            mutationData.PupilMutationsConfig.SmoothnessMult = setValue;
-            mutationData.GazeMutationsConfig.SmoothnessMult = setValue;
-            mutationData.OpennessMutationsConfig.SmoothnessMult = setValue;
-
-            for (int i = 0; i < mutationData.ShapeMutations.Length; i++)
-                mutationData.ShapeMutations[i].SmoothnessMult = setValue;
+            _mutationData.ShapeMutations[i].Name = ((UnifiedExpressions)i).ToString();
+            _mutationData.ShapeMutations[i].Ceil = ceiling;
+            _mutationData.ShapeMutations[i].Floor = floor;
         }
+    }
 
-        public async Task SaveCalibration()
-        {
-            _logger.LogDebug("Saving configuration...");
-            await _localSettingsService.SaveSettingAsync("CalibrationEnabled", Enabled);
-            await _localSettingsService.SaveSettingAsync("CalibrationWeight", CalibrationWeight);
-            await _localSettingsService.SaveSettingAsync("ContinuousCalibrationEnabled", ContinuousCalibration);
-            await _localSettingsService.SaveSettingAsync("Mutations", mutationData, true);
-        }
+    public void SetSmoothness(float setValue = 0.0f)
+    {
+        // Currently eye data does not get parsed by calibration.
+        _mutationData.PupilMutationsConfig.SmoothnessMult = setValue;
+        _mutationData.GazeMutationsConfig.SmoothnessMult = setValue;
+        _mutationData.OpennessMutationsConfig.SmoothnessMult = setValue;
 
-        public async void LoadCalibration()
-        {
-            // Try to load config and propogate data into Unified if they exist.
-            _logger.LogDebug("Reading configuration...");
-            Enabled = await _localSettingsService.ReadSettingAsync<bool>("CalibrationEnabled");
-            CalibrationWeight = await _localSettingsService.ReadSettingAsync<float>("CalibrationWeight", 0.2f);
-            ContinuousCalibration = await _localSettingsService.ReadSettingAsync<bool>("ContinuousCalibrationEnabled", true);
-            mutationData = await _localSettingsService.ReadSettingAsync<UnifiedMutationConfig>("Mutation", new());
-            _logger.LogDebug("Configuration loaded.");
-        }
+        for (int i = 0; i < _mutationData.ShapeMutations.Length; i++)
+            _mutationData.ShapeMutations[i].SmoothnessMult = setValue;
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public async Task SaveCalibration()
+    {
+        _logger.LogDebug("Saving configuration...");
+        await _localSettingsService.Save(this);
+        await _localSettingsService.SaveSettingAsync("Mutations", _mutationData, true);
+        _logger.LogDebug("Configuration saved.");
+    }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            _dispatcherService.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
-
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
+    public async void LoadCalibration()
+    {
+        // Try to load config and propogate data into Unified if they exist.
+        _logger.LogDebug("Reading configuration...");
+        await _localSettingsService.Load(this);
+        _mutationData = await _localSettingsService.ReadSettingAsync("Mutations", new UnifiedMutationConfig(), true);
+        _logger.LogDebug("Configuration loaded.");
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 
@@ -48,7 +48,7 @@ public class BinaryBaseParameter : Parameter
         var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
         var boolParams = newParams.Where(p =>
-            p.Type == typeof(bool) && _regex.IsMatch(p.Name));
+            p.Type == typeof(bool) && _regex.IsMatch(p.Address));
 
         var paramsToCreate = new Dictionary<string, int>();
         foreach (var param in boolParams)

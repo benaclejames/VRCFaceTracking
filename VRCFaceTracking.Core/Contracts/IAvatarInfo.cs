@@ -1,10 +1,8 @@
-﻿using VRCFaceTracking.Core.Models.Osc.FileBased;
-
-namespace VRCFaceTracking.Core.Contracts.Services;
+﻿namespace VRCFaceTracking.Core.Contracts;
 
 public interface IAvatarInfo
 {
     public string Name { get; }
     public string Id { get; }
-    public AvatarConfigFileParameter[] Parameters { get; }
+    public IParameterDefinition[] Parameters { get; }
 }

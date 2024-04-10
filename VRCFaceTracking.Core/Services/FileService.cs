@@ -18,7 +18,7 @@ public class FileService : IFileService
         return default;
     }
 
-    public void Save<T>(string folderPath, string fileName, T content)
+    public async Task Save<T>(string folderPath, string fileName, T content)
     {
         if (!Directory.Exists(folderPath))
         {
@@ -26,7 +26,7 @@ public class FileService : IFileService
         }
 
         var fileContent = JsonConvert.SerializeObject(content);
-        File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
+        await File.WriteAllTextAsync(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
     }
 
     public void Delete(string folderPath, string fileName)

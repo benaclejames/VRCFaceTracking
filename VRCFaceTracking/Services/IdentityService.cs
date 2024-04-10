@@ -17,15 +17,15 @@ public class IdentityService : IIdentityService
             return _uniqueUserId;
         }
 
-        SystemIdentificationInfo systemId = SystemIdentification.GetSystemIdForPublisher();
+        var systemId = SystemIdentification.GetSystemIdForPublisher();
 
         // Convert the binary ID to a string
-        IBuffer binaryId = systemId.Id;
-        string systemIdString = CryptographicBuffer.EncodeToHexString(binaryId);
+        var binaryId = systemId.Id;
+        var systemIdString = CryptographicBuffer.EncodeToHexString(binaryId);
 
         // Hash the string
         var hasher = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-        IBuffer hashed =
+        var hashed =
             hasher.HashData(CryptographicBuffer.ConvertStringToBinary(systemIdString, BinaryStringEncoding.Utf8));
         _uniqueUserId = CryptographicBuffer.EncodeToHexString(hashed);
 

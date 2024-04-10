@@ -62,15 +62,22 @@ public sealed partial class ModuleRegistryPage
         var file = await openPicker.PickSingleFileAsync();
         if (file != null)
         {
-            var path = await ModuleInstaller.InstallLocalModule(file.Path);
-            if (path != null)
+            string? path = null;
+            try
             {
-                CustomInstallStatus.Text = "Successfully installed module.";
-                App.MainWindow.DispatcherQueue.TryEnqueue(() => LibManager.Initialize());
+                path = await ModuleInstaller.InstallLocalModule(file.Path);
             }
-            else
+            finally
             {
-                CustomInstallStatus.Text = "Failed to install module. Check logs for more information.";
+                if (path != null)
+                {
+                    CustomInstallStatus.Text = "Successfully installed module.";
+                    App.MainWindow.DispatcherQueue.TryEnqueue(() => LibManager.Initialize());
+                }
+                else
+                {
+                    CustomInstallStatus.Text = "Failed to install module. Check logs for more information.";
+                }
             }
         }
         else

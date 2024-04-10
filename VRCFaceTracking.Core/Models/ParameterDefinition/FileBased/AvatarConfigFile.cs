@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
-using VRCFaceTracking.Core.Contracts.Services;
+﻿using System.Text.Json.Serialization;
+using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Models.Osc.FileBased;
 
-namespace VRCFaceTracking.Core.Models.Osc.FileBased;
+namespace VRCFaceTracking.Core.Models.ParameterDefinition.FileBased;
 
 public class AvatarConfigFile : IAvatarInfo
 {
@@ -14,5 +14,5 @@ public class AvatarConfigFile : IAvatarInfo
 
     [JsonIgnore] public string Id => id;
 
-    [JsonIgnore] public AvatarConfigFileParameter[] Parameters => parameters;
+    [JsonIgnore] public IParameterDefinition[] Parameters => parameters;
 }

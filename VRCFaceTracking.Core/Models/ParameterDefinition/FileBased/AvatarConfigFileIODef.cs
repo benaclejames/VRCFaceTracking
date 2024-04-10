@@ -9,6 +9,6 @@ public class AvatarConfigFileIODef
     public string type { get; set; }
 
     [JsonIgnore]
-    public Type Type => OscUtils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault();
+    public Type Type => OscUtils.TypeConversions.Where(conversion => conversion.Value.configType == type).Select(conversion => conversion.Key).FirstOrDefault().Item1;
 
 }
