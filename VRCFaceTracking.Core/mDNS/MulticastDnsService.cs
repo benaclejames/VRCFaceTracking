@@ -21,7 +21,7 @@ public partial class MulticastDnsService : ObservableObject
 
     public Action OnVrcClientDiscovered = () => { };
 
-    [ObservableProperty] private IPEndPoint _vrchatClientEndpoint;
+    [ObservableProperty] private IPEndPoint? _vrchatClientEndpoint;
         
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
@@ -213,6 +213,11 @@ public partial class MulticastDnsService : ObservableObject
 
         var vrChatClientIp = aRecord.Data as ARecord;
         var vrChatClientPort = srvRecord.Data as SRVRecord;
+
+        if (vrChatClientIp?.Address == null || vrChatClientPort?.Port == null)
+        {
+            return;
+        }
         
         VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
         OnVrcClientDiscovered();

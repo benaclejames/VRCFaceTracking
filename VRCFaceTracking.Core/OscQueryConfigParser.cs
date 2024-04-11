@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.OSC.Query;
-using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
 
 namespace VRCFaceTracking.Core;
@@ -31,6 +30,11 @@ public class OscQueryConfigParser
     {
         try
         {
+            if (_multicastDnsService.VrchatClientEndpoint == null)
+            {
+                return null;
+            }
+            
             // Request on the endpoint + /avatar/parameters
             var httpEndpoint = "http://" + _multicastDnsService.VrchatClientEndpoint + "/avatar";
 
@@ -65,7 +69,7 @@ public class OscQueryConfigParser
             }
             else
             {
-                _logger.LogWarning("Odd. Out attempt to find the legacy osc config json for this avatar failed.");
+                _logger.LogWarning("Odd. Our attempt to find the legacy osc config json for this avatar failed.");
             }
 
             return (avatarInfo, paramList);
