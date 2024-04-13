@@ -23,8 +23,7 @@ public class Utils
 
     public static uint GetFileAttributes(string lpFileName) => Core.Utils.GetFileAttributes(lpFileName);
 
-    public static readonly bool HasAdmin =
-        new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+    public static readonly bool HasAdmin = Core.Utils.HasAdmin;
 
     public static readonly string UserAccessibleDataDirectory =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VRCFaceTracking");

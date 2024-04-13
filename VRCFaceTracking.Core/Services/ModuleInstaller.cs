@@ -60,6 +60,29 @@ public class ModuleInstaller
         await Task.CompletedTask;
     }
 
+    /* Removes the 'downloaded from the internet' attribute from a module
+     * @param DLL file path
+     * @return error; if true then the module should be skipped
+     */
+    private bool RemoveZoneIdentifier(string path)
+    {
+        string zoneFile = path + ":Zone.Identifier";
+
+        if (Utils.GetFileAttributes(zoneFile) == 0xffffffff) // INVALID_FILE_ATTRIBUTES
+            //zone file doesn't exist, everything's good
+            return false;
+
+        if (Utils.DeleteFile(zoneFile))
+            _logger.LogDebug("Removing the downloaded file identifier from " + path);
+        else
+        {
+            _logger.LogError("Couldn't removed the 'file downloaded' mark from the " + path + " module! Please unblock the file manually");
+            return true;
+        }
+
+        return false;
+    }
+
     private string TryFindModuleDll(string moduleDirectory, TrackingModuleMetadata moduleMetadata)
     {
         // Attempt to find the first DLL. If there's more than one, try find the one with the same name as the module
@@ -164,19 +187,69 @@ public class ModuleInstaller
         var downloadExtension = Path.GetExtension(moduleMetadata.DownloadUrl);
         if (downloadExtension != ".dll")
         {
-            var tempDirectory = Path.Combine(Path.GetTempPath(), moduleMetadata.ModuleId.ToString());
-            if (Directory.Exists(tempDirectory))
+            // Create the temp directory for the .zip
+            _logger.LogDebug($"Provisioning temp download dir for {moduleMetadata.ModuleName}");
+            string tempDirectory;
+            try
             {
-                Directory.Delete(tempDirectory, true);
+                tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                if (Directory.Exists(tempDirectory))
+                {
+                    Directory.Delete(tempDirectory, true);
+                }
+
+                Directory.CreateDirectory(tempDirectory);
             }
-            Directory.CreateDirectory(tempDirectory);
-            var tempZipPath = Path.Combine(tempDirectory, "module.zip");
-            await DownloadModuleToFile(moduleMetadata, tempZipPath);
-            ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
-            
-            // Delete our zip and copy over all files and folders to the new module directory while preserving the directory structure
-            File.Delete(tempZipPath);
-            MoveDirectory(tempDirectory, moduleDirectory);
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to provision download dir for {moduleMetadata.ModuleName}. {e}");
+                return null;
+            }
+
+            // Download the zip into the tempDirectory and save as module.zip
+            _logger.LogInformation($"Downloading {moduleMetadata.ModuleName} to temp dir {tempDirectory}");
+            string tempZipPath;
+            try
+            {
+                tempZipPath = Path.Combine(tempDirectory, "module.zip");
+                await DownloadModuleToFile(moduleMetadata, tempZipPath);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to download module data for {moduleMetadata.ModuleName}. {e}");
+                return null;
+            }
+
+            // Extract the zip to the temp directory and delete the zip afterwards
+            _logger.LogInformation($"Extracting zip to {tempDirectory}");
+            try
+            {
+                ZipFile.ExtractToDirectory(tempZipPath, tempDirectory);
+                File.Delete(tempZipPath);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to extract {moduleMetadata.ModuleName}. {e}");
+                return null;
+            }
+
+            // Move the contents of this directory to our newly made module directory
+            _logger.LogInformation($"Moving extracted files for {moduleMetadata.ModuleName} from {tempDirectory} to {moduleDirectory}");
+            try
+            {
+                MoveDirectory(tempDirectory, moduleDirectory);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to move files for {moduleMetadata.ModuleName}. {e}");
+                return null;
+            }
+
+            // Remove zone identifiers (unblock dlls)
+            foreach (var dll in Directory.GetFiles(moduleDirectory, "*.dll", SearchOption.AllDirectories))
+            {
+                RemoveZoneIdentifier(dll);
+            }
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model
             moduleMetadata.DllFileName ??= TryFindModuleDll(moduleDirectory, moduleMetadata);
@@ -249,7 +322,7 @@ public class ModuleInstaller
         }
         else
         {
-            _logger.LogWarning("Module {module} could not be found where it was expected in {moduleDirectory}", moduleMetadata.ModuleId, moduleDirectory);
+            _logger.LogDebug("Module {module} could not be found where it was expected in {moduleDirectory}", moduleMetadata.ModuleId, moduleDirectory);
         }
     }
 }
