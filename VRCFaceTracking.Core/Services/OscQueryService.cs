@@ -6,15 +6,15 @@ using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.Models.ParameterDefinition;
+using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
-using VRCFaceTracking.Core.Services;
 
-namespace VRCFaceTracking.Core.OSC;
+namespace VRCFaceTracking.Core.Services;
 
 public partial class OscQueryService : ObservableObject
 {
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private const string k_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     
     // Services
     private readonly ILogger _logger;
@@ -79,7 +79,7 @@ public partial class OscQueryService : ObservableObject
         
         _logger.LogInformation("OSCQuery detected. Setting port negotiation to autopilot.");
         
-        var randomStr = new string(Enumerable.Repeat(chars, 6).Select(s => s[Random.Next(s.Length)]).ToArray());
+        var randomStr = new string(Enumerable.Repeat(k_chars, 6).Select(s => s[Random.Next(s.Length)]).ToArray());
         _httpHandler.OnHostInfoQueried += HandleNewAvatar;
         
         var recvEndpoint = _recvService.UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), 0));
