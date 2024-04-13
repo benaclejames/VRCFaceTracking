@@ -177,6 +177,9 @@ public partial class App : Application
             {
                 o.Release = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
             }
+
+            o.IsGlobalModeEnabled = true;
+            o.DisableWinUiUnhandledExceptionIntegration();
         });
         Current.UnhandledException += ExceptionHandler;
         //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
@@ -203,14 +206,9 @@ public partial class App : Application
         await Host.StartAsync();
     }
     
-    [HandleProcessCorruptedStateExceptions, SecurityCritical]
+    [SecurityCritical]
     internal void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)
     {
-        _logger?.LogError(e.Exception, "Unhandled exception");
-        _logger?.LogCritical("Stacktrace: {0}", e.Exception.StackTrace);
-        _logger?.LogCritical("Inner exception: {0}", e.Exception.InnerException);
-        _logger?.LogCritical("Message: {0}", e.Exception.Message);
-        
         // We need to hold the reference, because the Exception property is cleared when accessed.
         var exception = e.Exception;
         if (exception != null)
@@ -221,6 +219,11 @@ public partial class App : Application
             SentrySdk.CaptureException(exception);
             // Make sure the event is flushed to disk or to Sentry
             SentrySdk.FlushAsync(TimeSpan.FromSeconds(3)).Wait();
+            
+            _logger?.LogError(exception, "Unhandled exception");
+            _logger?.LogCritical("Stacktrace: {0}", exception.StackTrace);
+            _logger?.LogCritical("Inner exception: {0}", exception.InnerException);
+            _logger?.LogCritical("Message: {0}", exception.Message);
         }
     }
 
