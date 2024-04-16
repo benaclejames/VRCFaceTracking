@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>VRCFaceTracking</RootNamespace>
     <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x64</Platforms>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <PublishProfile>Properties\PublishProfiles\win10-$(Platform).pubxml</PublishProfile>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
@@ -15,15 +16,18 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>EEF215D509BA7B20E38BBFF6BEBC3124EE08F35C</PackageCertificateThumbprint>
+    <CreatePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreatePackageMakeAppxParameters>
+    <CreateResourcePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreateResourcePackageMakeAppxParameters>
+    <PackageCertificateThumbprint>7EDB400AE163AD281DF9747BAFEAA097579AA178</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Never</AppxBundle>
-    <AssemblyVersion>5.2.4.0</AssemblyVersion>
+    <AppxBundle>Auto</AppxBundle>
+    <AssemblyVersion>5.2.3.0</AssemblyVersion>
     <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/latest/download/</AppInstallerUri>
-    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxPackageDir>C:\Users\Ben\Downloads\Bruh\</AppxPackageDir>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
@@ -37,6 +41,8 @@
     <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
     <Content Remove="Assets\StoreLogo.scale-125.png" />
     <Content Remove="Assets\StoreLogo.scale-150.png" />
+    <Compile Remove="VRCFaceTracking\MainPage.xaml.cs" />
+    <Page Remove="VRCFaceTracking\MainPage.xaml" />
     <None Remove="OpenVR\openvr_api.dll" />
     <Content Include="OpenVR\openvr_api.dll" Link="openvr_api.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -57,17 +63,17 @@
     <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240404000" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
-    <PackageReference Include="Sentry" Version="4.0.0-beta.9" />
-    <PackageReference Include="WinUIEx" Version="2.1" />
+    <PackageReference Include="Sentry" Version="4.4.0" />
+    <PackageReference Include="Sentry.Extensions.Logging" Version="4.4.0" />
+    <PackageReference Include="WinUIEx" Version="2.3.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Update="Assets\WindowIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -81,14 +87,6 @@
 
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="VRCFaceTracking\MainPage.xaml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Remove="VRCFaceTracking\MainPage.xaml" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
