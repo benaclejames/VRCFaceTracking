@@ -50,6 +50,6 @@ public partial class RiskySettingsViewModel : ObservableObject
         
         // Create a file in the VRCFT folder called "reset"
         // This will cause the app to reset on the next launch
-        File.Create(Path.Combine(Utils.PersistentDataDirectory, "reset"));
+        File.Create(Path.Combine(VRCFaceTracking.Core.Utils.PersistentDataDirectory, "reset"));
     }
 }

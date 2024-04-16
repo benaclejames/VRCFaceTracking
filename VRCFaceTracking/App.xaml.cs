@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +15,6 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.Models;
-using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;
@@ -63,11 +61,11 @@ public partial class App : Application
         
         // Check for a "reset" file in the root of the app directory. If one is found, wipe all files from inside it
         // and delete the file.
-        var resetFile = Path.Combine(Utils.PersistentDataDirectory, "reset");
+        var resetFile = Path.Combine(VRCFaceTracking.Core.Utils.PersistentDataDirectory, "reset");
         if (File.Exists(resetFile))
         {
             // Delete everything including files and folders in Utils.PersistentDataDirectory
-            foreach (var file in Directory.EnumerateFiles(Utils.PersistentDataDirectory, "*", SearchOption.AllDirectories))
+            foreach (var file in Directory.EnumerateFiles(VRCFaceTracking.Core.Utils.PersistentDataDirectory, "*", SearchOption.AllDirectories))
             {
                 File.Delete(file);
             }
@@ -179,7 +177,6 @@ public partial class App : Application
             }
 
             o.IsGlobalModeEnabled = true;
-            o.DisableWinUiUnhandledExceptionIntegration();
         });
         Current.UnhandledException += ExceptionHandler;
         //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));

@@ -4,7 +4,6 @@ using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
 using Windows.Storage;
-using VRCFaceTracking.Core;
 
 namespace VRCFaceTracking.Services;
 
@@ -16,7 +15,7 @@ public class LocalSettingsService : ILocalSettingsService
     private readonly IFileService _fileService;
     private readonly LocalSettingsOptions _options;
 
-    private readonly string _localApplicationData = Utils.PersistentDataDirectory;
+    private readonly string _localApplicationData = Core.Utils.PersistentDataDirectory;
     private readonly string _applicationDataFolder;
     private readonly string _localSettingsFile;
 
