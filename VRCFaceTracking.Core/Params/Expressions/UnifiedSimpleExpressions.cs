@@ -11,8 +11,8 @@ namespace VRCFaceTracking.Core.Params.Expressions
     /// </remarks>
     public enum UnifiedSimpleExpressions
     {
-        BrowUpRight, // Lowers and pinches the right eyebrow.
-        BrowUpLeft, // Lowers and pinches the left eyebrow.
+        BrowUpRight, // Raises the inner and outer right eyebrow.
+        BrowUpLeft, // Raises the inner and outer left eyebrow.
         BrowDownRight, // Lowers and pinches the right eyebrow.
         BrowDownLeft, // Lowers and pinches the left eyebrow.
         MouthSmileRight, // Moves the right corner of the lip into a smile expression.
