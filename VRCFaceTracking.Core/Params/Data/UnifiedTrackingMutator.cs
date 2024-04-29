@@ -20,13 +20,13 @@ public partial class UnifiedTrackingMutator : ObservableObject
     private float _calibrationWeight;
         
     [ObservableProperty]
-    [property: SavedSetting("ContinuousCalibrationEnabled")]
+    [property: SavedSetting("ContinuousCalibrationEnabled", true)]
     private bool _continuousCalibration;
 
     public bool SmoothingMode = false;
 
     [ObservableProperty]
-    [property: SavedSetting("CalibrationEnabled")]
+    [property: SavedSetting("CalibrationEnabled", true)]
     private bool _enabled;
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;

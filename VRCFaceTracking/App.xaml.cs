@@ -19,7 +19,6 @@ using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
-using VRCFaceTracking.Notifications;
 using VRCFaceTracking.Services;
 using VRCFaceTracking.ViewModels;
 using VRCFaceTracking.Views;
@@ -91,11 +90,6 @@ public partial class App : Application
             // Default Activation Handler
             services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
-            // Other Activation Handlers
-            services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
-
-            // Services
-            services.AddSingleton<IAppNotificationService, AppNotificationService>();
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
             services.AddTransient<INavigationViewService, NavigationViewService>();
@@ -152,8 +146,6 @@ public partial class App : Application
         
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
-
-        App.GetService<IAppNotificationService>().Initialize();
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
@@ -179,7 +171,6 @@ public partial class App : Application
             o.IsGlobalModeEnabled = true;
         });
         Current.UnhandledException += ExceptionHandler;
-        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         // Kill any other instances of VRCFaceTracking.exe
         foreach (var proc in Process.GetProcessesByName("VRCFaceTracking"))
