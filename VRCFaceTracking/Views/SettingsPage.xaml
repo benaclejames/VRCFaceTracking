@@ -125,6 +125,11 @@
                             IsEnabled="False">
                             <Button x:Name="resetVRCFTButton" Click="resetVRCFTButton_OnClick" x:Uid="ResetButton" />
                         </labs:SettingsCard>
+                        <labs:SettingsCard x:Uid="ResetAvatarConfButton"
+                            x:Name="resetAvatarConfig"
+                            IsEnabled="False">
+                            <Button x:Name="resetVRCAvatarConf" Click="resetVRCAvatarConf_OnClick" x:Uid="ResetButton" />
+                        </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
 
