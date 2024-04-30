@@ -104,13 +104,6 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 
-                <labs:SettingsCard x:Uid="AutoStartSettings" IsEnabled="{x:Bind ViewModel.IsOpenVREnabled, Mode=OneWay}">
-                    <labs:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE840;" />
-                    </labs:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"/>
-                </labs:SettingsCard>
-                
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
