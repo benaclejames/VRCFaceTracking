@@ -32,14 +32,18 @@ public class MainStandalone : IMainService
     public async Task Teardown()
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
-        _libManager.TeardownAllAndResetAsync();
-
         await _mutator.SaveCalibration();
         
-        _logger.LogDebug("Resetting our time end period...");
-        Utils.TimeEndPeriod(1);
+        _libManager.TeardownAllAndResetAsync();
         
-        _logger.LogDebug("Teardown successful. Awaiting exit...");
+        _logger.LogDebug("Resetting our time end period...");
+        var timeEndRes = Utils.TimeEndPeriod(1);
+        if (timeEndRes != 0)
+        {
+            _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+        }
+        
+        _logger.LogDebug("Teardown complete. Awaiting exit...");
     }
 
     public Task InitializeAsync()
