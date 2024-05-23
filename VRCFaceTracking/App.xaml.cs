@@ -93,7 +93,6 @@ public partial class App : Application
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
             services.AddTransient<INavigationViewService, NavigationViewService>();
-            services.AddTransient<GithubService>();
 
             services.AddSingleton<IActivationService, ActivationService>();
             services.AddSingleton<IPageService, PageService>();
@@ -114,6 +113,11 @@ public partial class App : Application
             services.AddSingleton<ILibManager, UnifiedLibManager>();
             services.AddSingleton<IOscTarget, OscTarget>();
             services.AddSingleton<HttpHandler>();
+            services.AddSingleton<OscSendService>();
+            services.AddSingleton<OscRecvService>();
+            services.AddSingleton<ParameterSenderService>();
+            services.AddSingleton<UnifiedTrackingMutator>();
+            services.AddTransient<GithubService>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();
@@ -124,16 +128,12 @@ public partial class App : Application
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();
-            services.AddSingleton<UnifiedTrackingMutator>();
-            services.AddSingleton<RiskySettingsViewModel>();
+            services.AddTransient<RiskySettingsViewModel>();
             services.AddTransient<SettingsPage>();
-            services.AddSingleton<MainViewModel>();
+            services.AddTransient<MainViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<OscSendService>();
-            services.AddSingleton<OscRecvService>();
-            services.AddSingleton<ParameterSenderService>();
             
             services.AddHostedService<ParameterSenderService>(provider => provider.GetService<ParameterSenderService>());
             services.AddHostedService<OscRecvService>(provider => provider.GetService<OscRecvService>());
