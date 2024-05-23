@@ -49,11 +49,11 @@ public class MainStandalone : IMainService
     public Task InitializeAsync()
     {
         // Ensure OSC is enabled
-        if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
+        if (OperatingSystem.IsWindows() && VRChat.ForceEnableOsc()) // If osc was previously not enabled
         {
             _logger.LogWarning("VRCFT detected OSC was disabled and automatically enabled it.");
             // If we were launched after VRChat
-            if (VRChat.IsVRChatRunning())
+            if (VRChat.IsVrChatRunning())
                 _logger.LogError(
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
