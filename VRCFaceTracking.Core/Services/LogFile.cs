@@ -31,9 +31,11 @@ public class LogFileLogger : ILogger
             _file.Write($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
             _file.Flush();
         }
-        finally
+        catch
         {
-            Mutex.ReleaseMutex(); // Release the semaphore
+            // Ignore cus sandboxing causes a lot of issues here
         }
+        
+        Mutex.ReleaseMutex(); // Release the semaphore
     }
 }
