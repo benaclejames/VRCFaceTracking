@@ -11,6 +11,8 @@ namespace VRCFaceTracking.Core.Params.Expressions
     /// </remarks>
     public enum UnifiedSimpleExpressions
     {
+        BrowUpRight, // Raises the inner and outer right eyebrow.
+        BrowUpLeft, // Raises the inner and outer left eyebrow.
         BrowDownRight, // Lowers and pinches the right eyebrow.
         BrowDownLeft, // Lowers and pinches the left eyebrow.
         MouthSmileRight, // Moves the right corner of the lip into a smile expression.
@@ -27,6 +29,11 @@ namespace VRCFaceTracking.Core.Params.Expressions
         /// <remarks>This is to keep all conversion data self contained and easily accessible.</remarks>
         public static Dictionary<UnifiedSimpleExpressions, Func<UnifiedTrackingData, float>> ExpressionMap = new Dictionary<UnifiedSimpleExpressions, Func<UnifiedTrackingData, float>>
         {
+            { UnifiedSimpleExpressions.BrowUpRight, exp =>
+                exp.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight * .60f + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight * .40f },
+            { UnifiedSimpleExpressions.BrowUpLeft, exp =>
+                exp.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight * .60f + exp.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft].Weight * .40f },
+
             { UnifiedSimpleExpressions.BrowDownRight, exp =>
                 exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight * .75f + exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight * .25f },
             { UnifiedSimpleExpressions.BrowDownLeft, exp =>
