@@ -77,6 +77,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
+    <ProjectReference Include="..\VRCFaceTracking.ModuleProcess\VRCFaceTracking.ModuleProcess.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\WindowIcon.ico">
