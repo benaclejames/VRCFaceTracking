@@ -139,6 +139,15 @@ public sealed partial class SettingsPage : Page
                 _lowerStream = null;
             }
         }
+
+        if ( _lowerStream == null || _upperStream == null )
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Visible;
+        }
     }
 
     private void OnPageLoaded(object sender, RoutedEventArgs e)
