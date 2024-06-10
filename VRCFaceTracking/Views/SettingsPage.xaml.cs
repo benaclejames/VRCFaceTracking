@@ -61,7 +61,7 @@ public sealed partial class SettingsPage : Page
 
         Loaded += OnPageLoaded;
         
-        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
+        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue?.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
