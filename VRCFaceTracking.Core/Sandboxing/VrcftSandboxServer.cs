@@ -5,22 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.Sandboxing.IPC;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 public class VrcftSandboxServer
 {
     private static readonly Random Random = new ();
 
-    private string _namedPipeString;
+    private string _moduleServerId;
 
-    // View into the sub-process' local data
-    private SubprocessData _subprocessData = new();
+    // View into the sub-process' newest packet
+    private IpcPacket _stagedPacket = new();
     private NamedPipeServerStream _namedPipeServer;
 
     public VrcftSandboxServer(string targetNamedPipe)
     {
-        _namedPipeString = $"{targetNamedPipe}_moduleId{Random.NextInt64()}";
-        _namedPipeServer = new NamedPipeServerStream(targetNamedPipe, PipeDirection.InOut, 1);
+        _moduleServerId = $"{targetNamedPipe}_moduleId{Random.NextInt64()}";
+        _namedPipeServer = new NamedPipeServerStream(_moduleServerId, PipeDirection.InOut, 1);
     }
 
     /// <summary>
