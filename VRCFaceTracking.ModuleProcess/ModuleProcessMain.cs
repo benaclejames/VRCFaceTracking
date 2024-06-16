@@ -1,4 +1,7 @@
-﻿using VRCFaceTracking.Core.Models;
+﻿using System.Net.Sockets;
+using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.Sandboxing;
+using VRCFaceTracking.Core.Sandboxing.IPC;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -12,14 +15,18 @@ public class ModuleProcessMain
             return ModuleProcessExitCodes.INVALID_ARGS;
         }
 
-        string namedPipeDestination = string.Join(' ', args);
+        int serverPortNumber = 0;
+        if ( !int.TryParse(args[0], out serverPortNumber) )
+        {
+            // Port number is not a number
+            return ModuleProcessExitCodes.INVALID_ARGS;
+        }
 
-        // A module process will connect to a given named pipe first. We try connecting to the named pipe for 30 seconds, then give up, returning an error code in the process.
-        VrcftSandboxClient client = new VrcftSandboxClient(namedPipeDestination);
+        // A module process will connect to a given port number first. We try connecting to the server for 30 seconds, then give up, returning an error code in the process.
+        VrcftSandboxClient client = new VrcftSandboxClient(serverPortNumber);
         client.Connect();
 
-        SubprocessData subprocessData = new SubprocessData();
-        UnifiedTrackingProxy.UpdateSharedData(ref subprocessData);
+
 
         return ModuleProcessExitCodes.OK;
     }
