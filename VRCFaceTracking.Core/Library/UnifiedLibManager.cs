@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Sandboxing;
 
 namespace VRCFaceTracking.Core.Library;
 
@@ -32,6 +33,7 @@ public class UnifiedLibManager : ILibManager
 
     #region Thread
     private Thread _initializeWorker;
+    private VrcftSandboxServer _sandboxServer;
     #endregion
 
     public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
@@ -40,6 +42,7 @@ public class UnifiedLibManager : ILibManager
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
+        _sandboxServer = new VrcftSandboxServer(_loggerFactory);
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadata>();
     }
