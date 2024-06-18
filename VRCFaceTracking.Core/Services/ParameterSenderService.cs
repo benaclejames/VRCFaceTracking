@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking.Core.Services;
@@ -8,10 +9,28 @@ public class ParameterSenderService : BackgroundService
     // We probably don't need a queue since we use osc message bundles, but for now, we're keeping it as
     // we might want to allow a way for the user to specify bundle or single message sends in the future
     private static readonly Queue<OscMessage> SendQueue = new();
- 
+
     private readonly OscSendService _sendService;
-    public static bool AllParametersRelevant;
-    
+
+    public static bool AllParametersRelevantStatic
+    {
+        get; set;
+    }
+    public bool AllParametersRelevant
+    {
+        get => AllParametersRelevantStatic;
+        set
+        {
+            if (AllParametersRelevantStatic == value) return;
+            AllParametersRelevantStatic = value;
+            SendQueue.Clear();
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+            {
+                parameter.ResetParam(Array.Empty<IParameterDefinition>());
+            }
+        }
+    }
+
     public ParameterSenderService(OscSendService sendService)
     {
         _sendService = sendService;
@@ -19,7 +38,7 @@ public class ParameterSenderService : BackgroundService
 
     public static void Enqueue(OscMessage message) => SendQueue.Enqueue(message);
     public static void Clear() => SendQueue.Clear();
-    
+
     protected async override Task ExecuteAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
