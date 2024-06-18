@@ -14,7 +14,7 @@ public class VrcftPacketDecoder
     /// <param name="data">The incoming byte stream</param>
     /// <param name="packet">The output packet, if successfully decoded</param>
     /// <returns>Whether decoding was successful. If it was not, the data stored in packet should be discarded.</returns>
-    public static bool TryDecodePacket(ref byte[] data, out IpcPacket packet)
+    public static bool TryDecodePacket(in byte[] data, out IpcPacket packet)
     {
         packet = new IpcPacket();
 
@@ -36,7 +36,7 @@ public class VrcftPacketDecoder
             // Handshake
             case IpcPacket.PacketType.Handshake:
                 packet = new HandshakePacket();
-                packet.Decode(ref data);
+                packet.Decode(data);
                 break;
 
             // Invalid packet
