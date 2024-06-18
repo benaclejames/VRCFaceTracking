@@ -22,7 +22,10 @@ public class HandshakePacket : IpcPacket
     private bool _isValid = true;
     public bool IsValid => _isValid;
 
+    public override PacketType GetPacketType() => PacketType.Handshake;
+
     // We send a challenge to the vrcft host, and if we receive a reply with the same data, we consider the connection successfully ACKed.
+    // In other words, this packet is the handshake begin and ACK packet.
     public override byte[] GetBytes()
     {
         // Build handshake packet
@@ -40,7 +43,7 @@ public class HandshakePacket : IpcPacket
         return finalDataStream;
     }
 
-    public override void Decode(ref byte[] data)
+    public override void Decode(in byte[] data)
     {
         // Verify handshake challenge
         for ( int i = 0; i < HANDSHAKE_CHALLENGE.Length; i++ )

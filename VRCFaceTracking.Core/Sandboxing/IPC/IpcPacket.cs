@@ -4,7 +4,7 @@ public class IpcPacket
     internal static readonly byte[] HANDSHAKE_MAGIC = { 0xAF, 0xEC, 0x00, 0x8D, };
     internal static int SIZE_PACKET_MAGIC => HANDSHAKE_MAGIC.Length;
     internal static int SIZE_PACKET_TYPE => 4;
-    internal enum PacketType : uint
+    public enum PacketType : uint
     {
         // Core
         Unknown = 0,
@@ -25,6 +25,8 @@ public class IpcPacket
         DebugStreamFrame,
     }
 
+    public virtual PacketType GetPacketType() => PacketType.Unknown;
+
     public virtual byte[] GetBytes()
     {
         byte[] packetTypeBytes = BitConverter.GetBytes((uint)PacketType.Unknown);
@@ -38,7 +40,7 @@ public class IpcPacket
 
         return data;
     }
-    public virtual void Decode(ref byte[] data)
+    public virtual void Decode(in byte[] data)
     {
     }
 }
