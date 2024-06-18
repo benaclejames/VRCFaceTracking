@@ -10,78 +10,60 @@ using System.Text;
 using System.Threading.Tasks;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing.IPC;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Sandboxing;
-public class VrcftSandboxClient
+
+public class VrcftSandboxClient : UdpFullDuplex
 {
-    private UdpClient? _udpClient = null;
-    private IAsyncResult _receiveAsyncResult = null;
-    private IPAddress? _mainProcessIp = null;
-    private IPEndPoint? _mainProcessEndpoint = null;
-    private int _desiredPort = 0;
-    private bool _isConnectionOk = false;
-
-    public VrcftSandboxClient(int portNumber)
+    private int             _port                   = 0;
+    private IPEndPoint      _serverEndpoint;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly ILogger<VrcftSandboxClient> _logger;
+    public VrcftSandboxClient(int portNumber,
+        ILoggerFactory factory
+        ) : base(0, new IPEndPoint(IPAddress.Loopback, portNumber)) // 0 is reserved for the OS to pick for us
     {
-        _desiredPort = portNumber;
+        // Init loggers
+        _loggerFactory = factory;
+        _logger = factory.CreateLogger<VrcftSandboxClient>();
 
-        _mainProcessIp = IPAddress.Parse("127.0.0.1");
-        _mainProcessEndpoint = new IPEndPoint(_mainProcessIp, _desiredPort); // Port 0 is reserved as assign to anything
-        _udpClient = new UdpClient(_mainProcessEndpoint);
+        var addresses = Dns.GetHostAddresses("127.0.0.1");
+        if ( addresses.Length == 0 )
+        {
+            throw new Exception($"Unable to find localhost (how did this even happen??)");
+        }
+
+        _serverEndpoint = new IPEndPoint(addresses[0], portNumber);
+        _port = ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port;
+        
+        _logger.LogInformation($"Starting sandbox process on port {_port}...");
     }
-
-    public bool IsConnected => _udpClient != null && _isConnectionOk;
 
     public void Connect()
     {
-        if ( !IsConnected )
-        {
-            // Create handshake packet
-            _udpClient?.Connect(_mainProcessIp, _desiredPort);
-            _isConnectionOk = VerifyConnection();
-        }
-    }
-
-    private void SendData(ref byte[] data)
-    {
-        _udpClient?.Send(data, data.Length);
-    }
-
-    internal bool VerifyConnection()
-    {
-        // Do handshake, and verify versions
         var handshakePkt = new HandshakePacket();
-
-        var data = handshakePkt.GetBytes();
-        SendData(ref data);
-
-        StartReceive();
-
-        return false;
+        _logger.LogInformation($"Attempting to connect to server...");
+        SendData(handshakePkt, _serverEndpoint);
     }
 
-    private void StartReceive()
+    public override void OnBytesReceived(in byte[] data, in IPEndPoint endpoint)
     {
-        if ( _udpClient == null )
-        {
-            throw new WebException("UDP Client cannot be null.");
-        }
-        _receiveAsyncResult = _udpClient.BeginReceive(ReceiveHandler, new object());
-    }
-
-    private void ReceiveHandler(IAsyncResult asyncResult)
-    {
-        if ( _udpClient == null )
-        {
-            throw new WebException("UDP Client cannot be null.");
-        }
-        IPEndPoint ip = new IPEndPoint(IPAddress.Any, _desiredPort);
-        byte[] bytes = _udpClient.EndReceive(_receiveAsyncResult, ref ip);
-
-        bool decodeResult = VrcftPacketDecoder.TryDecodePacket(ref bytes, out IpcPacket packet);
+        bool decodeResult = VrcftPacketDecoder.TryDecodePacket(data, out IpcPacket packet);
 
         // @TODO: Use packet
+        if ( decodeResult )
+        {
+            if ( packet.GetPacketType() == IpcPacket.PacketType.Handshake )
+            {
+                // Handshake request
+                var handshakePacket = (HandshakePacket) packet;
+                if ( handshakePacket.IsValid )
+                {
+                    _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
+                }
+            }
+        }
 
-        StartReceive();
     }
 }
