@@ -7,6 +7,8 @@ using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 using Windows.System;
+using System.Collections.Specialized;
+using System.Text;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -52,7 +54,7 @@ public class ModuleProcessMain
                 // .AddSentry(o =>
                 //     o.Dsn =
                 //     "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.us.sentry.io/4506152246575104")
-                // .AddProvider(new OutputLogProvider(DispatcherQueue.GetForCurrentThread()))
+                .AddProvider(new ProxyLoggerProvider(DispatcherQueue.GetForCurrentThread()))
                 // .AddProvider(new LogFileProvider())
             )
         .BuildServiceProvider();
@@ -60,19 +62,45 @@ public class ModuleProcessMain
         var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger<ModuleProcessMain>();
 
-        logger.LogInformation($"Module path: {modulePath} ; Got port {serverPortNumber}");
-
         // A module process will connect to a given port number first. We try connecting to the server for 30 seconds, then give up, returning an error code in the process.
-        Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new Stopwatch(); // For timeout
         VrcftSandboxClient client = new VrcftSandboxClient(serverPortNumber, loggerFactory);
-        // Reset the timeout
-        client.OnPacketReceivedCallback += () => {
-            stopwatch.Restart();
+
+        // Bind the log function so that we can forward log messages to VRCFT's main process
+        ProxyLogger.OnLog += (LogLevel level, string msg) =>
+        {
+            var pkt = new EventLogPacket(level, msg);
+            client.SendData(pkt);
         };
+
+        // Try loading the module
+        ModuleAssembly moduleAssembly = new ModuleAssembly(logger, modulePath);
+        moduleAssembly.TryLoadAssembly();
+
+        client.OnPacketReceivedCallback += (in IpcPacket packet) => {
+            // Reset the timeout
+            stopwatch.Restart();
+
+            // Handle packets
+            switch ( packet.GetPacketType() )
+            {
+                case IpcPacket.PacketType.EventInit:
+                    {
+                        var pkt = (EventInitPacket) packet;
+                        var result = moduleAssembly.TrackingModule.Initialize(pkt.eyeAvailable, pkt.expressionAvailable);
+                        logger.LogInformation("Eye: {eye} Expression: {expression}", result.eyeSuccess, result.expressionSuccess);
+                        break;
+                    }
+            }
+
+        };
+        // Start the connection
         client.Connect();
+        logger.LogInformation("Initializing {module}", moduleAssembly.Assembly.ToString());
 
         stopwatch.Start();
         
+        // Loop infinitely while we wait for commands
         while ( true )
         {
             if (stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT)

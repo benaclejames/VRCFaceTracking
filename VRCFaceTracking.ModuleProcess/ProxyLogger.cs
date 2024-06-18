@@ -4,13 +4,16 @@ using Windows.System;
 
 namespace VRCFaceTracking.ModuleProcess;
 
-public class ModuleProcessLogger : ILogger
+public delegate void OnLog(LogLevel level, string msg);
+
+public class ProxyLogger : ILogger
 {
     private readonly string _categoryName;
-    public static readonly ObservableCollection<string> AllLogs = new();
+    // public static readonly ObservableCollection<string> AllLogs = new();
+    public static OnLog OnLog;
     private static DispatcherQueue? _dispatcher;
 
-    public ModuleProcessLogger(string categoryName, DispatcherQueue? queue)
+    public ProxyLogger(string categoryName, DispatcherQueue? queue)
     {
         _categoryName = categoryName;
         _dispatcher = queue;
@@ -27,10 +30,9 @@ public class ModuleProcessLogger : ILogger
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        // Add to the staticLog from the dispatcher thread
-        _dispatcher?.TryEnqueue(() =>
+        if ( OnLog != null )
         {
-            AllLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
-        });
+            OnLog(logLevel, $"[{_categoryName}] {{level}}: {formatter(state, exception)}");
+        }
     }
 }
