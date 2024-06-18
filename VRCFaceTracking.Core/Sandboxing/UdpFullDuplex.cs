@@ -134,10 +134,19 @@ public class UdpFullDuplex : IDisposable
     {
         _receivingUdpClient.Send(message, message.Length, remoteEndpoint);
     }
+    public void SendData(in byte[] message, in int remotePort)
+    {
+        _receivingUdpClient.Send(message, message.Length, new IPEndPoint(IPAddress.Loopback, remotePort));
+    }
 
     public void SendData(in IpcPacket packet, in IPEndPoint remoteEndpoint)
     {
         SendData(packet.GetBytes(), remoteEndpoint);
+    }
+    
+    public void SendData(in IpcPacket packet, in int remotePort)
+    {
+        SendData(packet.GetBytes(), new IPEndPoint(IPAddress.Loopback, remotePort));
     }
 
     public virtual void OnBytesReceived(in byte[] data, in IPEndPoint endpoint)
