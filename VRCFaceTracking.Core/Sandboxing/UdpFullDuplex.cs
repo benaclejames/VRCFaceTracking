@@ -14,7 +14,7 @@ public class UdpFullDuplex : IDisposable
 {
     public int Port
     {
-        get; private set;
+        get; protected set;
     }
 
     private object              _callbackLock;
