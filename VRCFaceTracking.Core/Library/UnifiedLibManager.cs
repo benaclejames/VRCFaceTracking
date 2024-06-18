@@ -54,7 +54,8 @@ public class UnifiedLibManager : ILibManager
             Active = false,
             Name = "Initializing Modules..."
         });
-        _sandboxServer = new VrcftSandboxServer(_loggerFactory);
+
+        _sandboxServer ??= new VrcftSandboxServer(_loggerFactory);
 
         // Start Initialization
         _initializeWorker = new Thread(() =>
