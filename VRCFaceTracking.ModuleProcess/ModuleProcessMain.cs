@@ -12,6 +12,9 @@ namespace VRCFaceTracking.ModuleProcess;
 
 public class ModuleProcessMain
 {
+    // How long in seconds we should wait for a connection to be established before giving up
+    private const int CONNECTION_TIMEOUT = 30;
+
     public static int Main(string[] args)
     {
         if ( args.Length < 1 )
@@ -60,12 +63,24 @@ public class ModuleProcessMain
         logger.LogInformation($"Module path: {modulePath} ; Got port {serverPortNumber}");
 
         // A module process will connect to a given port number first. We try connecting to the server for 30 seconds, then give up, returning an error code in the process.
+        Stopwatch stopwatch = new Stopwatch();
         VrcftSandboxClient client = new VrcftSandboxClient(serverPortNumber, loggerFactory);
+        // Reset the timeout
+        client.OnPacketReceivedCallback += () => {
+            stopwatch.Restart();
+        };
         client.Connect();
 
+        stopwatch.Start();
+        
         while ( true )
         {
-            Thread.Sleep(5);
+            if (stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT)
+            {
+                return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT;
+            }
+
+            Thread.Sleep(1);
         }
 
         return ModuleProcessExitCodes.OK;

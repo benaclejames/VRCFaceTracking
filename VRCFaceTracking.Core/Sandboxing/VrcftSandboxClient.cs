@@ -14,12 +14,16 @@ using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 
+public delegate void OnPacketReceivedCallback();
+
 public class VrcftSandboxClient : UdpFullDuplex
 {
-    private int             _port                   = 0;
-    private IPEndPoint      _serverEndpoint;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<VrcftSandboxClient> _logger;
+    private int                                     _port = 0;
+    private IPEndPoint                              _serverEndpoint;
+    private readonly ILoggerFactory                 _loggerFactory;
+    private readonly ILogger<VrcftSandboxClient>    _logger;
+
+    public OnPacketReceivedCallback OnPacketReceivedCallback = null;
     public VrcftSandboxClient(int portNumber,
         ILoggerFactory factory
         ) : base(0, new IPEndPoint(IPAddress.Loopback, portNumber)) // 0 is reserved for the OS to pick for us
@@ -51,9 +55,14 @@ public class VrcftSandboxClient : UdpFullDuplex
     {
         bool decodeResult = VrcftPacketDecoder.TryDecodePacket(data, out IpcPacket packet);
 
-        // @TODO: Use packet
         if ( decodeResult )
         {
+            // Tell the callback that we've received a packet
+            if ( OnPacketReceivedCallback != null && packet.GetPacketType() != IpcPacket.PacketType.Unknown )
+            {
+                OnPacketReceivedCallback();
+            }
+
             if ( packet.GetPacketType() == IpcPacket.PacketType.Handshake )
             {
                 // Handshake request
@@ -64,6 +73,5 @@ public class VrcftSandboxClient : UdpFullDuplex
                 }
             }
         }
-
     }
 }
