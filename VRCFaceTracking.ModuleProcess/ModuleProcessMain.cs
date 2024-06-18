@@ -46,6 +46,9 @@ public class ModuleProcessMain
 
     static int VrcftMain(string modulePath, int serverPortNumber)
     {
+        // Give the main process enough time to add the module to the list before we begin sending data
+        Thread.Sleep(50);
+
         ServiceProvider serviceProvider = new ServiceCollection()
         .AddLogging((loggingBuilder) => loggingBuilder
                 .ClearProviders()
