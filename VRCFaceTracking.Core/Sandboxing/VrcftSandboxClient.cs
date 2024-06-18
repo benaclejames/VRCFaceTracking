@@ -63,14 +63,18 @@ public class VrcftSandboxClient : UdpFullDuplex
                 OnPacketReceivedCallback();
             }
 
-            if ( packet.GetPacketType() == IpcPacket.PacketType.Handshake )
+            switch ( packet.GetPacketType() )
             {
-                // Handshake request
-                var handshakePacket = (HandshakePacket) packet;
-                if ( handshakePacket.IsValid )
-                {
-                    _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
-                }
+                case IpcPacket.PacketType.Handshake:
+                    {
+                        // Handshake request
+                        var handshakePacket = (HandshakePacket) packet;
+                        if ( handshakePacket.IsValid )
+                        {
+                            _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
+                        }
+                    }
+                    break;
             }
         }
     }
