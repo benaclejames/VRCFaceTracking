@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Models.ParameterDefinition.FileBased;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core;
 
@@ -26,7 +27,7 @@ public class AvatarConfigParser
         }
 
         var paramList = new List<Parameter>();
-            
+
         /*if (newId.StartsWith("local:"))
         {
             foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
@@ -38,13 +39,13 @@ public class AvatarConfigParser
             _lastAvatarId = newId;
             return (new NullAvatarDef(newId.Substring(10), newId), paramList);
         }*/
-            
+
         AvatarConfigFile avatarConfig = null;
         foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory)
                      .Where(folder => Directory.Exists(Path.Combine(folder, "Avatars"))))
         {
             foreach (var avatarFile in Directory.GetFiles(userFolder + "\\Avatars"))
-            {    
+            {
                 var configText = await File.ReadAllTextAsync(avatarFile);
                 var tempConfig = JsonSerializer.Deserialize<AvatarConfigFile>(configText);
                 if (tempConfig == null || tempConfig.id != newId)
@@ -63,14 +64,14 @@ public class AvatarConfigParser
             return null;
         }
 
-        /*_logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
+        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
         ParameterSenderService.Clear();
         var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
         foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
         {
             paramList.AddRange(parameter.ResetParam(parameters));
-        }*/
+        }
 
         //_lastAvatarId = newId;
         return (avatarConfig, paramList);
