@@ -42,7 +42,6 @@ public class UnifiedLibManager : ILibManager
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
-        _sandboxServer = new VrcftSandboxServer(_loggerFactory);
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadata>();
     }
@@ -55,6 +54,7 @@ public class UnifiedLibManager : ILibManager
             Active = false,
             Name = "Initializing Modules..."
         });
+        _sandboxServer = new VrcftSandboxServer(_loggerFactory);
 
         // Start Initialization
         _initializeWorker = new Thread(() =>
