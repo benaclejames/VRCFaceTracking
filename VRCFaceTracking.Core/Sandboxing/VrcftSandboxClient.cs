@@ -14,11 +14,11 @@ using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 
-public delegate void OnPacketReceivedCallback();
+public delegate void OnPacketReceivedCallback(in IpcPacket packet);
 
 public class VrcftSandboxClient : UdpFullDuplex
 {
-    private int                                     _port = 0;
+    // private int                                     _port = 0;
     private IPEndPoint                              _serverEndpoint;
     private readonly ILoggerFactory                 _loggerFactory;
     private readonly ILogger<VrcftSandboxClient>    _logger;
@@ -39,9 +39,9 @@ public class VrcftSandboxClient : UdpFullDuplex
         }
 
         _serverEndpoint = new IPEndPoint(addresses[0], portNumber);
-        _port = ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port;
+        Port = ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port;
         
-        _logger.LogInformation($"Starting sandbox process on port {_port}...");
+        _logger.LogInformation($"Starting sandbox process on port {Port}...");
     }
 
     public void Connect()
@@ -60,22 +60,27 @@ public class VrcftSandboxClient : UdpFullDuplex
             // Tell the callback that we've received a packet
             if ( OnPacketReceivedCallback != null && packet.GetPacketType() != IpcPacket.PacketType.Unknown )
             {
-                OnPacketReceivedCallback();
+                OnPacketReceivedCallback(packet);
             }
 
-            switch ( packet.GetPacketType() )
+            if ( packet.GetPacketType() == IpcPacket.PacketType.Handshake )
             {
-                case IpcPacket.PacketType.Handshake:
-                    {
-                        // Handshake request
-                        var handshakePacket = (HandshakePacket) packet;
-                        if ( handshakePacket.IsValid )
-                        {
-                            _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
-                        }
-                    }
-                    break;
+                // Handshake request
+                var handshakePacket = (HandshakePacket) packet;
+                if ( handshakePacket.IsValid )
+                {
+                    _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
+                }
             }
         }
+    }
+
+    public void SendData(in byte[] message)
+    {
+        _receivingUdpClient.Send(message, message.Length, _serverEndpoint);
+    }
+    public void SendData(in IpcPacket packet)
+    {
+        SendData(packet.GetBytes(), _serverEndpoint);
     }
 }
