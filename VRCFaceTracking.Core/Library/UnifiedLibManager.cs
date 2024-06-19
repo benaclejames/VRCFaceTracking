@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Sandboxing;
+using VRCFaceTracking.Core.Sandboxing.IPC;
 
 namespace VRCFaceTracking.Core.Library;
 
@@ -29,6 +32,9 @@ public class UnifiedLibManager : ILibManager
     private List<Assembly> AvailableModules { get; set; }
     private readonly List<ModuleRuntimeInfo> _moduleThreads = new();
     private readonly IModuleDataService _moduleDataService;
+
+    private string _sandboxProcessPath { get; set; }
+    private List<ModuleRuntimeInfo> AvailableSandboxModules = new ();
     #endregion
 
     #region Thread
@@ -44,6 +50,11 @@ public class UnifiedLibManager : ILibManager
         _moduleDataService = moduleDataService;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadata>();
+        _sandboxProcessPath = Path.GetFullPath("VRCFaceTracking.ModuleProcess.exe");
+        if ( !File.Exists(_sandboxProcessPath) )
+        {
+            // @TODO: Error
+        }
     }
 
     public void Initialize()
@@ -55,7 +66,49 @@ public class UnifiedLibManager : ILibManager
             Name = "Initializing Modules..."
         });
 
-        _sandboxServer ??= new VrcftSandboxServer(_loggerFactory);
+        // Spawn sandbox server if it's null
+        if (_sandboxServer == null )
+        {
+            _sandboxServer = new VrcftSandboxServer(_loggerFactory);
+            _sandboxServer.OnPacketReceived += (in IpcPacket packet, in int port) =>
+            {
+                switch ( packet.GetPacketType() )
+                {
+                    case IpcPacket.PacketType.Handshake:
+                        {
+                            // Look for the PID in the added modules list
+                            var pkt = (HandshakePacket) packet;
+                            lock ( AvailableSandboxModules )
+                            {
+                                for ( int i = 0; i < AvailableSandboxModules.Count; i++ )
+                                {
+                                    if ( AvailableSandboxModules[i].SandboxProcessPID == pkt.PID )
+                                    {
+                                        var structCopy = AvailableSandboxModules[i];
+                                        structCopy.SandboxProcessPort = port;
+                                        AvailableSandboxModules[i] = structCopy;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+
+                    case IpcPacket.PacketType.EventLog:
+                        {
+                            EventLogPacket eventLogPacket = (EventLogPacket) packet;
+                            _logger.Log(eventLogPacket.LogLevel, eventLogPacket.Message);
+                            break;
+                        }
+
+                    case IpcPacket.PacketType.ReplyInit:
+                        {
+                            ReplyInitPacket replyInitPacket = (ReplyInitPacket) packet;
+                            break;
+                        }
+                }
+            };
+        }
 
         // Start Initialization
         _initializeWorker = new Thread(() =>
@@ -67,6 +120,7 @@ public class UnifiedLibManager : ILibManager
             var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
             var modulePaths = modules.Select(m => m.AssemblyLoadPath);
 
+#if false
             // Load all modules
             AvailableModules = LoadAssembliesFromPath(modulePaths.ToArray());
 
@@ -89,6 +143,30 @@ public class UnifiedLibManager : ILibManager
                 });
                 _logger.LogWarning("No modules loaded.");
             }
+#endif
+            // Load all modules
+            AvailableSandboxModules.Clear();
+            InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());
+
+            if ( AvailableSandboxModules != null && AvailableSandboxModules.Count > 0 )
+            {
+                _logger.LogDebug("Initializing requested runtimes...");
+                // InitRequestedRuntimes(AvailableModules);
+            }
+            else
+            {
+                _dispatcherService.Run(() =>
+                {
+                    LoadedModulesMetadata.Clear();
+                    LoadedModulesMetadata.Add(new ModuleMetadata
+                    {
+                        Active = false,
+                        Name = "No Modules Loaded"
+                    });
+                });
+                _logger.LogWarning("No modules loaded.");
+            }
+
         });
         _logger.LogInformation("Starting initialization tracking");
         _initializeWorker.Start();
@@ -116,6 +194,37 @@ public class UnifiedLibManager : ILibManager
         }
 
         return null;
+    }
+
+    private void InitialiseSandboxesBaseOnPaths(IEnumerable<string> paths)
+    {
+        foreach ( var dll in paths )
+        {
+            try
+            {
+                // Start subprocess
+                var sandboxProcess  = Process.Start(new ProcessStartInfo(_sandboxProcessPath, $"--port {_sandboxServer.Port} --module-path \"{dll}\""));
+                var pid             = sandboxProcess.Id;
+
+                // Add the module info into the loaded list
+                ModuleRuntimeInfo runtimeInfo = new ModuleRuntimeInfo()
+                {
+                    SandboxProcessPID   = pid,
+                    SandboxProcessPort  = -1,
+                    SandboxModulePath   = dll,
+                    IsActive            = true,
+                    Process             = sandboxProcess,
+                };
+                lock ( AvailableSandboxModules )
+                {
+                    AvailableSandboxModules.Add(runtimeInfo);
+                }
+            }
+            catch ( Exception e )
+            {
+                _logger.LogWarning("{error} Failed to start sandbox process for {path}. Skipping...", e.Message, dll);
+            }
+        }
     }
 
     private List<Assembly> LoadAssembliesFromPath(IEnumerable<string> path)
@@ -253,6 +362,16 @@ public class UnifiedLibManager : ILibManager
         });
         EnsureModuleThreadStarted(module);
     }
+    private void AttemptSandboxedModuleInitialize(ModuleRuntimeInfo module)
+    {
+        // If PID is valid
+        if ( module.SandboxProcessPID != -1 )
+        {
+            // Tell the sandbox to call the initialize function on the module
+            EventInitPacket eventInitPacket = new EventInitPacket();
+            _sandboxServer.SendData(eventInitPacket, module.SandboxProcessPort);
+        }
+    }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
     {
@@ -288,6 +407,47 @@ public class UnifiedLibManager : ILibManager
             foreach (var pair in _moduleThreads)
             {
                 if (pair.Module.ModuleInformation.Active)
+                {
+                    _logger.LogInformation("Tracking initialized via {module}", pair.Module.ToString());
+                }
+            }
+        }
+    }
+
+    private void InitRequestedRuntimesSandbox(List<ModuleRuntimeInfo> moduleType)
+    {
+        _logger.LogInformation("Initializing runtimes...");
+
+        foreach ( var module in moduleType.TakeWhile(_ => EyeStatus <= ModuleState.Uninitialized || ExpressionStatus <= ModuleState.Uninitialized) )
+        {
+            // _logger.LogInformation("Initializing {module}", module.ToString());
+            // var loadedModule = LoadExternalModule(module);
+            AttemptSandboxedModuleInitialize(module);
+        }
+
+        if ( _moduleThreads.Count == 0 )
+        {
+            _logger.LogWarning("No modules loaded.");
+            _dispatcherService.Run(() =>
+            {
+                LoadedModulesMetadata.Clear();
+                LoadedModulesMetadata.Add(new ModuleMetadata
+                {
+                    Active = false,
+                    Name = "No Modules Loaded"
+                });
+            });
+        }
+        else
+        {
+            _dispatcherService.Run(() =>
+            {
+                // Remove our dummy module
+                LoadedModulesMetadata.RemoveAt(0);
+            });
+            foreach ( var pair in _moduleThreads )
+            {
+                if ( pair.Module.ModuleInformation.Active )
                 {
                     _logger.LogInformation("Tracking initialized via {module}", pair.Module.ToString());
                 }
