@@ -7,22 +7,25 @@ public class IpcPacket
     public enum PacketType : uint
     {
         // Core
-        Unknown = 0,
-        Handshake,
+        Unknown             = 0,
+        Handshake           = 1,
 
         // Data update events
-        MetadataUpdate,
-        LipUpdate,
-        EyeUpdate,
+        MetadataUpdate      = 100,
+        LipUpdate           = 101,
+        EyeUpdate           = 102,
 
         // Events which invoke the actual module functions
-        EventInit,
-        EventTeardown,
-        EventUpdate,
-        EventLog,
+        EventInit           = 200,
+        EventTeardown       = 201,
+        EventUpdate         = 202,
+        EventLog            = 203,
+
+        // Replies to the above events
+        ReplyInit           = 300,
         
         // Debug streams are handled uniquely due to their nature
-        DebugStreamFrame,
+        DebugStreamFrame    = 1000,
     }
 
     public virtual PacketType GetPacketType() => PacketType.Unknown;
