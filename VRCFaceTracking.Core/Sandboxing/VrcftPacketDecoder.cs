@@ -39,6 +39,22 @@ public class VrcftPacketDecoder
                 packet.Decode(data);
                 break;
 
+
+
+            // EventInit
+            case IpcPacket.PacketType.EventInit:
+                packet = new EventInitPacket();
+                packet.Decode(data);
+                break;
+
+            // EventLog
+            case IpcPacket.PacketType.EventLog:
+                packet = new EventLogPacket();
+                packet.Decode(data);
+                break;
+
+
+
             // Invalid packet
             case IpcPacket.PacketType.Unknown:
             default:

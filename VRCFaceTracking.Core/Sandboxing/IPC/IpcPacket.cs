@@ -32,7 +32,7 @@ public class IpcPacket
 
     public virtual byte[] GetBytes()
     {
-        byte[] packetTypeBytes = BitConverter.GetBytes((uint)PacketType.Unknown);
+        byte[] packetTypeBytes = BitConverter.GetBytes((uint)GetPacketType());
 
         int packetSize = SIZE_PACKET_MAGIC + SIZE_PACKET_TYPE;
 
