@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
 namespace VRCFaceTracking.Core.Sandboxing;
@@ -24,13 +17,16 @@ public class UdpFullDuplex : IDisposable
     private Queue<byte[]>       _queue;
     private ManualResetEvent    _closingEvent;
     private bool                _closing             = false;
+    protected bool              _isConnected         = false;
+    protected SimpleEventBus    _eventBus;
 
-    public UdpFullDuplex(int port, IPEndPoint remoteIpEndPoint = null)
+    public UdpFullDuplex(int port, int[] reservedPorts = null, IPEndPoint remoteIpEndPoint = null)
     {
         Port = port;
         _queue = new Queue<byte[]>();
         _closingEvent = new ManualResetEvent(false);
         _callbackLock = new object();
+        _eventBus = new SimpleEventBus();
 
         // try to open the port 10 times, else fail
         for ( int i = 0; i < 10; i++ )
@@ -38,12 +34,29 @@ public class UdpFullDuplex : IDisposable
             try
             {
                 _receivingUdpClient = new UdpClient(port);
+
+                // Blacklist any reserved ports
+                if ( reservedPorts != null )
+                {
+                    for ( int j = 0; j < reservedPorts.Length; j++ )
+                    {
+                        if ( ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port == reservedPorts[j] )
+                        {
+                            _receivingUdpClient.Close();
+                            continue;
+                        }
+                    }
+                }
+
                 break;
-            } catch ( Exception )
+            }
+            catch ( Exception )
             {
                 // Failed in ten tries, throw the exception and give up
                 if ( i >= 9 )
+                {
                     throw;
+                }
 
                 Thread.Sleep(5);
             }
@@ -87,7 +100,9 @@ public class UdpFullDuplex : IDisposable
         }
 
         if ( _closing )
+        {
             _closingEvent.Set();
+        }
         else
         {
             // Setup next async event
@@ -116,7 +131,9 @@ public class UdpFullDuplex : IDisposable
     private byte[] ReceiveBytes()
     {
         if ( _closing )
+        {
             throw new Exception("UDPListener has been closed.");
+        }
 
         lock ( _queue )
         {
@@ -130,23 +147,37 @@ public class UdpFullDuplex : IDisposable
         }
     }
 
-    public void SendData(in byte[] message, in IPEndPoint remoteEndpoint)
+    private void SendData(in byte[] message, in IPEndPoint remoteEndpoint)
     {
         _receivingUdpClient.Send(message, message.Length, remoteEndpoint);
     }
-    public void SendData(in byte[] message, in int remotePort)
+    private void SendData(in byte[] message, in int remotePort)
     {
         _receivingUdpClient.Send(message, message.Length, new IPEndPoint(IPAddress.Loopback, remotePort));
     }
 
     public void SendData(in IpcPacket packet, in IPEndPoint remoteEndpoint)
     {
-        SendData(packet.GetBytes(), remoteEndpoint);
+        if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake )
+        {
+            SendData(packet.GetBytes(), remoteEndpoint);
+        }
+        else
+        {
+            _eventBus.Push(packet);
+        }
     }
     
     public void SendData(in IpcPacket packet, in int remotePort)
     {
-        SendData(packet.GetBytes(), new IPEndPoint(IPAddress.Loopback, remotePort));
+        if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake )
+        {
+            SendData(packet.GetBytes(), new IPEndPoint(IPAddress.Loopback, remotePort));
+        }
+        else
+        {
+            _eventBus.Push(packet);
+        }
     }
 
     public virtual void OnBytesReceived(in byte[] data, in IPEndPoint endpoint)

@@ -22,12 +22,14 @@ public class VrcftSandboxClient : UdpFullDuplex
     private IPEndPoint                              _serverEndpoint;
     private readonly ILoggerFactory                 _loggerFactory;
     private readonly ILogger<VrcftSandboxClient>    _logger;
+    private bool                                    _isConnected;
 
     public OnPacketReceivedCallback OnPacketReceivedCallback = null;
     public VrcftSandboxClient(int portNumber,
         ILoggerFactory factory
-        ) : base(0, new IPEndPoint(IPAddress.Loopback, portNumber)) // 0 is reserved for the OS to pick for us
+        ) : base(0, null, new IPEndPoint(IPAddress.Loopback, portNumber)) // 0 is reserved for the OS to pick for us
     {
+        _isConnected = false;
         // Init loggers
         _loggerFactory = factory;
         _logger = factory.CreateLogger<VrcftSandboxClient>();
@@ -70,17 +72,41 @@ public class VrcftSandboxClient : UdpFullDuplex
                 if ( handshakePacket.IsValid )
                 {
                     _logger.LogInformation($"Received ACK from host on port {endpoint.Port}. Handshake done.");
+                    _isConnected = true;
+                    SendAllPendingPackets();
                 }
             }
         }
     }
 
-    public void SendData(in byte[] message)
+    private void SendData(in byte[] message)
     {
         _receivingUdpClient.Send(message, message.Length, _serverEndpoint);
     }
     public void SendData(in IpcPacket packet)
     {
-        SendData(packet.GetBytes(), _serverEndpoint);
+        if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake)
+        {
+            SendData(packet.GetBytes());
+        }
+        else
+        {
+            _eventBus.Push(packet);
+        }
+    }
+
+    public void SendAllPendingPackets()
+    {
+        if ( _isConnected )
+        {
+            if ( _eventBus.Count > 0 )
+            {
+                while ( _eventBus.Count > 0 )
+                {
+                    IpcPacket pkt = _eventBus.Pop<IpcPacket>();
+                    SendData(pkt);
+                }
+            }
+        }
     }
 }

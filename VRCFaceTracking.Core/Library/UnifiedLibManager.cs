@@ -69,7 +69,9 @@ public class UnifiedLibManager : ILibManager
         // Spawn sandbox server if it's null
         if (_sandboxServer == null )
         {
-            _sandboxServer = new VrcftSandboxServer(_loggerFactory);
+            // @TODO: Figure out an elegant way to ask the GUI for the ports the user assigned to the OSCTarget.
+            int[] reservedPorts = new int[2] { 9000, 9001 };
+            _sandboxServer = new VrcftSandboxServer(_loggerFactory, reservedPorts);
             _sandboxServer.OnPacketReceived += (in IpcPacket packet, in int port) =>
             {
                 switch ( packet.GetPacketType() )

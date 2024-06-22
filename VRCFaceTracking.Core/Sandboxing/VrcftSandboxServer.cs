@@ -24,7 +24,7 @@ public class VrcftSandboxServer : UdpFullDuplex
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<VrcftSandboxServer> _logger;
     public OnPacketReceived OnPacketReceived;
-    public VrcftSandboxServer(ILoggerFactory factory) : base(0) // 0 is reserved for the OS to pick for us
+    public VrcftSandboxServer(ILoggerFactory factory, int[] reservedPorts) : base(0, reservedPorts) // 0 is reserved for the OS to pick for us
     {
         // Init loggers
         _loggerFactory = factory;
@@ -32,6 +32,7 @@ public class VrcftSandboxServer : UdpFullDuplex
 
         Port = ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port;
         _logger.LogInformation($"Starting sandbox host on port {Port}...");
+        _isConnected = true;
     }
 
     public override void OnBytesReceived(in byte[] data, in IPEndPoint endpoint)
