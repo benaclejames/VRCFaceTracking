@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Sandboxing.IPC;
 public class ReplyInitPacket : IpcPacket
 {
-    public bool eyeAvailable        = false;
-    public bool expressionAvailable = false;
+    public bool eyeSuccess                  = false;
+    public bool expressionSuccess           = false;
+    public string ModuleInformationName     = "";
 
     public override PacketType GetPacketType() => PacketType.ReplyInit;
 
@@ -17,18 +19,23 @@ public class ReplyInitPacket : IpcPacket
         // Build init packet
         byte[] packetTypeBytes = BitConverter.GetBytes((uint)GetPacketType());
 
-        int packetSize = SIZE_PACKET_MAGIC + SIZE_PACKET_TYPE + 1;
+        int packedData  = eyeSuccess ? 1 : 0;
+        packedData = packedData | ( expressionSuccess ? 2 : 0 );
 
-        int packedData  = eyeAvailable ? 1 : 0;
-        packedData = packedData | ( expressionAvailable ? 2 : 0 );
+        byte[] moduleInfoStringData = Encoding.UTF8.GetBytes(ModuleInformationName);
+        byte[] moduleInfoSizeBytes  = BitConverter.GetBytes(moduleInfoStringData.Length);
 
         byte packedDataByte = (byte) packedData;
 
+        int packetSize = SIZE_PACKET_MAGIC + SIZE_PACKET_TYPE + 1 + sizeof(int) + moduleInfoStringData.Length;
+
         // Prepare buffer
         byte[] finalDataStream = new byte[packetSize];
-        Buffer.BlockCopy(HANDSHAKE_MAGIC, 0, finalDataStream, 0, SIZE_PACKET_MAGIC);    // Magic
-        Buffer.BlockCopy(packetTypeBytes, 0, finalDataStream, 4, SIZE_PACKET_TYPE);     // Handshake
-        finalDataStream[8] = packedDataByte;                                            // packedDataByte
+        Buffer.BlockCopy(HANDSHAKE_MAGIC, 0, finalDataStream, 0, SIZE_PACKET_MAGIC);                    // Magic
+        Buffer.BlockCopy(packetTypeBytes, 0, finalDataStream, 4, SIZE_PACKET_TYPE);                     // Handshake
+        finalDataStream[8] = packedDataByte;                                                            // packedDataByte
+        Buffer.BlockCopy(moduleInfoSizeBytes,   0, finalDataStream, 9,  sizeof(int));                   // Length
+        Buffer.BlockCopy(moduleInfoStringData,  0, finalDataStream, 13, moduleInfoStringData.Length);   // Data
 
         return finalDataStream;
     }
@@ -37,7 +44,10 @@ public class ReplyInitPacket : IpcPacket
     {
         // Unpack data into booleans
         byte packedData = data[8];
-        this.eyeAvailable = ( packedData & 1 ) == 1;
-        this.expressionAvailable = ( packedData & 2 ) == 2;
+        this.eyeSuccess = ( packedData & 1 ) == 1;
+        this.expressionSuccess = ( packedData & 2 ) == 2;
+
+        int moduleInfoStringLength  = BitConverter.ToInt32(data, 9);
+        ModuleInformationName       = Encoding.UTF8.GetString(data, 13, moduleInfoStringLength);
     }
 }

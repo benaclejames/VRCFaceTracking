@@ -40,6 +40,11 @@ public class VrcftPacketDecoder
                 break;
 
 
+            // EventGetSupported
+            case IpcPacket.PacketType.EventGetSupported:
+                packet = new EventInitGetSupported();
+                packet.Decode(data);
+                break;
 
             // EventInit
             case IpcPacket.PacketType.EventInit:
@@ -54,6 +59,18 @@ public class VrcftPacketDecoder
                 break;
 
 
+
+            // EventGetSupported
+            case IpcPacket.PacketType.ReplyGetSupported:
+                packet = new ReplySupportedPacket();
+                packet.Decode(data);
+                break;
+
+            // ReplyInit
+            case IpcPacket.PacketType.ReplyInit:
+                packet = new ReplyInitPacket();
+                packet.Decode(data);
+                break;
 
             // Invalid packet
             case IpcPacket.PacketType.Unknown:

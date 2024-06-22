@@ -10,6 +10,7 @@ using Windows.System;
 using System.Collections.Specialized;
 using System.Text;
 using VRCFaceTracking.Core.Library;
+using System.Runtime.CompilerServices;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -17,6 +18,7 @@ public class ModuleProcessMain
 {
     // How long in seconds we should wait for a connection to be established before giving up
     private const int CONNECTION_TIMEOUT = 30;
+    public static ModuleAssembly DefModuleAssembly;
 
     public static int Main(string[] args)
     {
@@ -89,8 +91,8 @@ public class ModuleProcessMain
         };
 
         // Try loading the module
-        ModuleAssembly moduleAssembly = new ModuleAssembly(logger, modulePath);
-        moduleAssembly.TryLoadAssembly();
+        DefModuleAssembly = new ModuleAssembly(logger, modulePath);
+        DefModuleAssembly.TryLoadAssembly();
 
         client.OnPacketReceivedCallback += (in IpcPacket packet) => {
             // Reset the timeout
@@ -101,11 +103,44 @@ public class ModuleProcessMain
             // Handle packets
             switch ( packet.GetPacketType() )
             {
+                case IpcPacket.PacketType.EventGetSupported:
+                    {
+                        var result = DefModuleAssembly.TrackingModule.Supported;
+                        logger.LogInformation("Supported: Eye: {eye} Expression: {expression}", result.SupportsEye, result.SupportsExpression);
+                        var pkt = new ReplySupportedPacket()
+                        {
+                            eyeAvailable        = result.SupportsEye,
+                            expressionAvailable = result.SupportsExpression
+                        };
+                        client.SendData(pkt);
+                        break;
+                    }
                 case IpcPacket.PacketType.EventInit:
                     {
                         var pkt = (EventInitPacket) packet;
-                        var result = moduleAssembly.TrackingModule.Initialize(pkt.eyeAvailable, pkt.expressionAvailable);
-                        logger.LogInformation("Eye: {eye} Expression: {expression}", result.eyeSuccess, result.expressionSuccess);
+                        logger.LogInformation("Event Init");
+
+                        bool eyeSuccess, expressionSuccess;
+                        try
+                        {
+                            (eyeSuccess, expressionSuccess) = DefModuleAssembly.TrackingModule.Initialize(pkt.eyeAvailable, pkt.expressionAvailable);
+                        }
+                        catch ( MissingMethodException )
+                        {
+                            logger.LogError("{moduleName} does not properly implement ExtTrackingModule. Skipping.", DefModuleAssembly.GetType().Name);
+                            return;
+                        } catch ( Exception e )
+                        {
+                            logger.LogError("Exception initializing {module}. Skipping. {e}", DefModuleAssembly.GetType().Name, e);
+                            return;
+                        }
+                        var pktNew = new ReplyInitPacket()
+                        {
+                            eyeSuccess              = eyeSuccess,
+                            expressionSuccess       = expressionSuccess,
+                            ModuleInformationName   = DefModuleAssembly.TrackingModule.ModuleInformation.Name,
+                        };
+                        client.SendData(pktNew);
                         break;
                     }
             }
@@ -113,7 +148,7 @@ public class ModuleProcessMain
         };
         // Start the connection
         client.Connect();
-        logger.LogInformation("Initializing {module}", moduleAssembly.Assembly.ToString());
+        logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
 
         stopwatch.Start();
         

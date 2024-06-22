@@ -4,7 +4,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
+using Sentry.Protocol;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -75,8 +78,20 @@ public class UnifiedLibManager : ILibManager
             _sandboxServer = new VrcftSandboxServer(_loggerFactory, reservedPorts);
             _sandboxServer.OnPacketReceived += (in IpcPacket packet, in int port) =>
             {
+                // Get sandbox module internal index
+                int moduleIndex = -1;
+                for ( int i = 0; i < AvailableSandboxModules.Count; i++ )
+                {
+                    if ( AvailableSandboxModules[i].SandboxProcessPort == port )
+                    {
+                        moduleIndex = i;
+                        break;
+                    }
+                }
+
                 switch ( packet.GetPacketType() )
                 {
+                    // @TODO: Move these all into methods to make the code easier to maintain
                     case IpcPacket.PacketType.Handshake:
                         {
                             // Look for the PID in the added modules list
@@ -90,6 +105,10 @@ public class UnifiedLibManager : ILibManager
                                         var structCopy = AvailableSandboxModules[i];
                                         structCopy.SandboxProcessPort = port;
                                         AvailableSandboxModules[i] = structCopy;
+
+                                        _logger.LogInformation("Initializing {module}...", AvailableSandboxModules[i].ModuleClassName.ToString());
+                                        AttemptSandboxedModuleInitialize(AvailableSandboxModules[i]);
+
                                         break;
                                     }
                                 }
@@ -104,9 +123,83 @@ public class UnifiedLibManager : ILibManager
                             break;
                         }
 
+                    case IpcPacket.PacketType.ReplyGetSupported:
+                        {
+                            // We now know whether or not the module supports face or eye tracking
+                            ReplySupportedPacket replySupportedPacket = (ReplySupportedPacket) packet;
+                            // Now tell it to initialise
+                            EventInitPacket eventInitPacket = new EventInitPacket()
+                            {
+                                expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized,
+                                eyeAvailable            = EyeStatus == ModuleState.Uninitialized,
+                            };
+                            _sandboxServer.SendData(eventInitPacket, port);
+                            break;
+                        }
+
                     case IpcPacket.PacketType.ReplyInit:
                         {
                             ReplyInitPacket replyInitPacket = (ReplyInitPacket) packet;
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.Name = replyInitPacket.ModuleInformationName;
+
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.OnActiveChange = state =>
+                                AvailableSandboxModules[moduleIndex].Status = state ? ModuleState.Active : ModuleState.Idle;
+
+                            // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
+                            if ( !replyInitPacket.eyeSuccess && !replyInitPacket.expressionSuccess )
+                            {
+                                break;
+                            }
+
+                            EyeStatus           = replyInitPacket.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
+                            ExpressionStatus    = replyInitPacket.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.Active           = true;
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingEye         = replyInitPacket.eyeSuccess;
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingExpression  = replyInitPacket.expressionSuccess;
+                            
+                            _dispatcherService.Run(() => {
+                                if ( !LoadedModulesMetadata.Contains(AvailableSandboxModules[moduleIndex].ModuleInformation) )
+                                {
+                                    LoadedModulesMetadata.Add(AvailableSandboxModules[moduleIndex].ModuleInformation);
+                                }
+
+
+
+                                if ( LoadedModulesMetadata.Count == 0 )
+                                {
+                                    _logger.LogWarning("No modules loaded.");
+                                    _dispatcherService.Run(() =>
+                                    {
+                                        LoadedModulesMetadata.Clear();
+                                        LoadedModulesMetadata.Add(new ModuleMetadata
+                                        {
+                                            Active = false,
+                                            Name = "No Modules Loaded"
+                                        });
+                                    });
+                                }
+                                else
+                                {
+                                    _dispatcherService.Run(() =>
+                                    {
+                                        // Remove our dummy module
+                                        LoadedModulesMetadata.RemoveAt(0);
+                                    });
+                                    foreach ( var pair in _moduleThreads )
+                                    {
+                                        if ( pair.ModuleInformation.Active )
+                                        {
+                                            _logger.LogInformation("Tracking initialized via {module}", pair.ModuleClassName.ToString());
+                                        }
+                                    }
+                                }
+                            });
+
+                            /*
+                             
+                            @TODO: Move to update thread
+                             */
                             break;
                         }
                 }
@@ -154,7 +247,6 @@ public class UnifiedLibManager : ILibManager
             if ( AvailableSandboxModules != null && AvailableSandboxModules.Count > 0 )
             {
                 _logger.LogDebug("Initializing requested runtimes...");
-                // InitRequestedRuntimes(AvailableModules);
             }
             else
             {
@@ -217,6 +309,9 @@ public class UnifiedLibManager : ILibManager
                     SandboxModulePath   = dll,
                     IsActive            = true,
                     Process             = sandboxProcess,
+                    ModuleClassName     = Path.GetFileNameWithoutExtension(dll),
+                    ModuleInformation   = new (),
+                    EventBus            = new ()
                 };
                 lock ( AvailableSandboxModules )
                 {
@@ -367,12 +462,23 @@ public class UnifiedLibManager : ILibManager
     }
     private void AttemptSandboxedModuleInitialize(ModuleRuntimeInfo module)
     {
-        // If PID is valid
-        if ( module.SandboxProcessPID != -1 )
+        // Tell the sandbox to call the initialize function on the module
+        var eventGetSupportedPacket = new EventInitGetSupported();
+
+        // If PID is valid and we know which port the sandbox process is running on
+        if ( module.SandboxProcessPID != -1 && module.SandboxProcessPort > 0 )
         {
-            // Tell the sandbox to call the initialize function on the module
-            EventInitPacket eventInitPacket = new EventInitPacket();
-            _sandboxServer.SendData(eventInitPacket, module.SandboxProcessPort);
+            _sandboxServer.SendData(eventGetSupportedPacket, module.SandboxProcessPort);
+        }
+        else
+        {
+            // Queue the packet so that we send it after we know which process the sandbox process is running on
+            QueuedPacket queuedPacket = new QueuedPacket()
+            {
+                packet = eventGetSupportedPacket,
+                destinationPort = module.SandboxProcessPort
+            };
+            module.EventBus.Enqueue(queuedPacket);
         }
     }
 
@@ -417,13 +523,13 @@ public class UnifiedLibManager : ILibManager
         }
     }
 
-    private void InitRequestedRuntimesSandbox(List<ModuleRuntimeInfo> moduleType)
+    private void InitRequestedRuntimesSandboxed(List<ModuleRuntimeInfo> moduleType)
     {
         _logger.LogInformation("Initializing runtimes...");
 
         foreach ( var module in moduleType.TakeWhile(_ => EyeStatus <= ModuleState.Uninitialized || ExpressionStatus <= ModuleState.Uninitialized) )
         {
-            // _logger.LogInformation("Initializing {module}", module.ToString());
+            _logger.LogInformation("Initializing {module}", module.ToString());
             // var loadedModule = LoadExternalModule(module);
             AttemptSandboxedModuleInitialize(module);
         }
@@ -485,16 +591,15 @@ public class UnifiedLibManager : ILibManager
     {
         _logger.LogInformation("Tearing down all modules...");
 
-        foreach (var module in _moduleThreads)
+        foreach ( var module in _moduleThreads )
         {
             var success = false;
             try
             {
                 success = TeardownModule(module);
-            }
-            finally
+            } finally
             {
-                if (!success)
+                if ( !success )
                 {
                     _logger.LogWarning($"Module: {module.Module.ModuleInformation.Name} failed to shut down. Killing its thread.");
                     module.UpdateThread.Interrupt();
@@ -503,7 +608,34 @@ public class UnifiedLibManager : ILibManager
         }
 
         _moduleThreads.Clear();
-        
+
+        EyeStatus = ModuleState.Uninitialized;
+        ExpressionStatus = ModuleState.Uninitialized;
+    }
+
+    // Signal all active modules to gracefully shut down their respective runtimes
+    public void TeardownAllAndResetAsyncLegacy()
+    {
+        _logger.LogInformation("Tearing down all modules...");
+
+        foreach ( var module in _moduleThreads )
+        {
+            var success = false;
+            try
+            {
+                success = TeardownModule(module);
+            } finally
+            {
+                if ( !success )
+                {
+                    _logger.LogWarning($"Module: {module.Module.ModuleInformation.Name} failed to shut down. Killing its thread.");
+                    module.UpdateThread.Interrupt();
+                }
+            }
+        }
+
+        _moduleThreads.Clear();
+
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
     }
