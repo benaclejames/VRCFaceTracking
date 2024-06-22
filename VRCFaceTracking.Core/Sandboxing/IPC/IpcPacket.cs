@@ -16,13 +16,15 @@ public class IpcPacket
         EyeUpdate           = 102,
 
         // Events which invoke the actual module functions
-        EventInit           = 200,
-        EventTeardown       = 201,
-        EventUpdate         = 202,
-        EventLog            = 203,
+        EventGetSupported   = 200,
+        EventInit           = 201,
+        EventTeardown       = 202,
+        EventUpdate         = 203,
+        EventLog            = 204,
 
         // Replies to the above events
-        ReplyInit           = 300,
+        ReplyGetSupported   = 300,
+        ReplyInit           = 301,
         
         // Debug streams are handled uniquely due to their nature
         DebugStreamFrame    = 1000,
