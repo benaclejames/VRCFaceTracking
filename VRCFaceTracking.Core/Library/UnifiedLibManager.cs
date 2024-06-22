@@ -53,7 +53,8 @@ public class UnifiedLibManager : ILibManager
         _sandboxProcessPath = Path.GetFullPath("VRCFaceTracking.ModuleProcess.exe");
         if ( !File.Exists(_sandboxProcessPath) )
         {
-            // @TODO: Error
+            // @TODO: Better error handling
+            throw new FileNotFoundException($"Failed to find sandbox process at \"{_sandboxProcessPath}\"!");
         }
     }
 
