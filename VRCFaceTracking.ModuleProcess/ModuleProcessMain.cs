@@ -9,6 +9,7 @@ using VRCFaceTracking.Core.Sandboxing.IPC;
 using Windows.System;
 using System.Collections.Specialized;
 using System.Text;
+using VRCFaceTracking.Core.Library;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -19,29 +20,40 @@ public class ModuleProcessMain
 
     public static int Main(string[] args)
     {
-        if ( args.Length < 1 )
+        try
         {
-            // Not enough arguments
-            return ModuleProcessExitCodes.INVALID_ARGS;
-        }
+            if ( args.Length < 1 )
+            {
+                // Not enough arguments
+                return ModuleProcessExitCodes.INVALID_ARGS;
+            }
 
-        var portOption = new Option<int?>(
+            var portOption = new Option<int?>(
             name: "--port",
             description: "The UDP port the VRCFT server is running on.");
-        var modulePathOption = new Option<string?>(
+            var modulePathOption = new Option<string?>(
             name: "--module-path",
             description: "The path to the module to load.");
 
-        var rootCommand = new RootCommand("VRCFT Sandbox Module");
-        rootCommand.AddOption(portOption);
-        rootCommand.AddOption(modulePathOption);
+            var rootCommand = new RootCommand("VRCFT Sandbox Module");
+            rootCommand.AddOption(portOption);
+            rootCommand.AddOption(modulePathOption);
 
-        rootCommand.SetHandler((modulePath, port) =>
+            rootCommand.SetHandler((modulePath, port) =>
+            {
+                VrcftMain(modulePath!, port ?? 0);
+            }, modulePathOption, portOption);
+
+            return rootCommand.Invoke(args);
+        }
+        catch ( Exception ex )
         {
-            VrcftMain(modulePath!, port ?? 0);
-        }, modulePathOption, portOption);
-
-        return rootCommand.Invoke(args);
+            Console.WriteLine($"{ex.Message}:\n{ex.StackTrace}");
+#if DEBUG
+            Console.ReadKey();
+#endif
+            return ModuleProcessExitCodes.EXCEPTION_CRASH;
+        }
     }
 
     static int VrcftMain(string modulePath, int serverPortNumber)
@@ -83,6 +95,8 @@ public class ModuleProcessMain
         client.OnPacketReceivedCallback += (in IpcPacket packet) => {
             // Reset the timeout
             stopwatch.Restart();
+
+            logger.LogInformation($"Got packet {packet.GetPacketType()}");
 
             // Handle packets
             switch ( packet.GetPacketType() )
