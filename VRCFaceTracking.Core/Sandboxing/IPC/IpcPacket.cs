@@ -20,11 +20,14 @@ public class IpcPacket
         EventInit           = 201,
         EventTeardown       = 202,
         EventUpdate         = 203,
-        EventLog            = 204,
+        EventUpdateStatus   = 204,
+        EventLog            = 205,
 
         // Replies to the above events
         ReplyGetSupported   = 300,
         ReplyInit           = 301,
+        ReplyUpdate         = 302,
+        ReplyTeardown       = 303,
         
         // Debug streams are handled uniquely due to their nature
         DebugStreamFrame    = 1000,
