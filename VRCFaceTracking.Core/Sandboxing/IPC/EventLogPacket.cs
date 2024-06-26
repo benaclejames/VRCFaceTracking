@@ -32,7 +32,7 @@ public class EventLogPacket : IpcPacket
         // Prepare buffer
         byte[] finalDataStream = new byte[packetSize];
         Buffer.BlockCopy(HANDSHAKE_MAGIC,       0, finalDataStream, 0, SIZE_PACKET_MAGIC);              // Magic
-        Buffer.BlockCopy(packetTypeBytes,       0, finalDataStream, 4, SIZE_PACKET_TYPE);               // Handshake
+        Buffer.BlockCopy(packetTypeBytes,       0, finalDataStream, 4, SIZE_PACKET_TYPE);               // Packet Type
         Buffer.BlockCopy(logLevel,              0, finalDataStream, 8, sizeof(int));                    // Log level
         Buffer.BlockCopy(logMessageSizeBytes,   0, finalDataStream, 12, sizeof(int));                   // Length
         Buffer.BlockCopy(logMessageStringData,  0, finalDataStream, 16, logMessageStringData.Length);   // Data

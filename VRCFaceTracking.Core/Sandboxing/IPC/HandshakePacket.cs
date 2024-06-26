@@ -47,8 +47,8 @@ public class HandshakePacket : IpcPacket
         // Prepare buffer
         byte[] finalDataStream = new byte[packetSize];
         Buffer.BlockCopy(HANDSHAKE_MAGIC,       0, finalDataStream, 0, SIZE_PACKET_MAGIC);          // Magic
-        Buffer.BlockCopy(packetTypeBytes,       0, finalDataStream, 4, SIZE_PACKET_TYPE);           // Handshake
-        Buffer.BlockCopy(HANDSHAKE_CHALLENGE,   0, finalDataStream, 8, HANDSHAKE_CHALLENGE.Length); // Challenge
+        Buffer.BlockCopy(packetTypeBytes,       0, finalDataStream, 4, SIZE_PACKET_TYPE);           // Packet Type
+        Buffer.BlockCopy(HANDSHAKE_CHALLENGE,   0, finalDataStream, 8, HANDSHAKE_CHALLENGE.Length); // Handshake Challenge
         Buffer.BlockCopy(pidBytes,              0, finalDataStream, 13, pidBytes.Length);           // PID
 
         return finalDataStream;

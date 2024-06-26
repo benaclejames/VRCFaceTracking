@@ -42,7 +42,8 @@ public class VrcftSandboxClient : UdpFullDuplex
 
         _serverEndpoint = new IPEndPoint(addresses[0], portNumber);
         Port = ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port;
-        
+
+
         _logger.LogInformation($"Starting sandbox process on port {Port}...");
     }
 
