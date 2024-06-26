@@ -1,10 +1,16 @@
 ﻿using System.Net.Sockets;
 using System.Net;
 using VRCFaceTracking.Core.Sandboxing.IPC;
+using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Core.Sandboxing;
+
+public delegate void OnReceiveShouldBeQueued();
+
 public class UdpFullDuplex : IDisposable
 {
+    const int TIMEOUT_SECONDS = 10;
+
     public int Port
     {
         get; protected set;
@@ -16,9 +22,14 @@ public class UdpFullDuplex : IDisposable
     private IPEndPoint          _remoteIpEndPoint;
     private Queue<byte[]>       _queue;
     private ManualResetEvent    _closingEvent;
-    private bool                _closing             = false;
-    protected bool              _isConnected         = false;
+    private bool                _closing                = false;
+    protected bool              _isConnected            = false;
     protected SimpleEventBus    _eventBus;
+    private bool                _isCallbackRegistered   = false;
+    private Thread              _receiveThread;
+    private CancellationTokenSource _cts = new();
+    private CancellationTokenSource _timeoutCts = new(new TimeSpan(0, 0, 0, TIMEOUT_SECONDS));
+    public OnReceiveShouldBeQueued OnReceiveShouldBeQueued;
 
     public UdpFullDuplex(int port, int[] reservedPorts = null, IPEndPoint remoteIpEndPoint = null)
     {
@@ -34,6 +45,7 @@ public class UdpFullDuplex : IDisposable
             try
             {
                 _receivingUdpClient = new UdpClient(port);
+                _receivingUdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
                 // Blacklist any reserved ports
                 if ( reservedPorts != null )
@@ -72,9 +84,80 @@ public class UdpFullDuplex : IDisposable
             _remoteIpEndPoint = remoteIpEndPoint;
         }
 
+        _receivingUdpClient.Client.ReceiveTimeout   = 1;
+        _receivingUdpClient.Client.SendTimeout      = 1;
+
         // setup first async event
-        AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
-        _receivingUdpClient.BeginReceive(callBack, null);
+        // AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
+        // _receivingUdpClient.BeginReceive(callBack, null);
+        Listen();
+    }
+
+    private async void Listen()
+    {
+        while ( !_cts.IsCancellationRequested )
+        {
+            try
+            {
+                var result = await _receivingUdpClient.ReceiveAsync(_cts.Token);
+
+                if ( result.Buffer != null && result.Buffer.Length > 0 )
+                {
+                    OnBytesReceived(result.Buffer, result.RemoteEndPoint);
+                }
+
+            }
+            catch ( OperationCanceledException )
+            {
+                // Cancelled, exit loop
+                break;
+            }
+            catch ( ObjectDisposedException )
+            {
+                // Ignore if disposed. This happens when closing the listener
+            }
+            catch ( SocketException e )
+            {
+                // This happens when a module terminates / crashes / is shut down
+            }
+        }
+    }
+
+    private void ReceiveThread()
+    {
+
+        EndPoint remoteEndpoint = (EndPoint) _remoteIpEndPoint;
+        while ( !_cts.IsCancellationRequested )
+        {
+            byte[] receiveWindow = new byte[4096];
+            int res = 0;
+
+            Monitor.Enter(_callbackLock);
+
+            try
+            {
+                res = _receivingUdpClient.Client.ReceiveFrom(receiveWindow, ref remoteEndpoint);
+            } catch ( ObjectDisposedException )
+            {
+                // Ignore if disposed. This happens when closing the listener
+            } catch ( SocketException )
+            {
+                // This happens when a module terminates / crashes / is shut down
+
+            }
+
+            // Process bytes
+            if ( receiveWindow != null && receiveWindow.Length > 0 )
+            {
+                OnBytesReceived(in receiveWindow, in _remoteIpEndPoint);
+            }
+
+            if ( _closing )
+            {
+                _closingEvent.Set();
+            }
+            Monitor.Exit(_callbackLock);
+        }
     }
 
     private void ReceiveCallback(IAsyncResult result)
@@ -85,13 +168,17 @@ public class UdpFullDuplex : IDisposable
         try
         {
             bytes = _receivingUdpClient.EndReceive(result, ref _remoteIpEndPoint);
-        } catch ( ObjectDisposedException )
+        }
+        catch ( ObjectDisposedException )
         {
             // Ignore if disposed. This happens when closing the listener
-        } catch ( SocketException )
+        }
+        catch ( SocketException )
         {
             // This happens when a module terminates / crashes / is shut down
         }
+
+        _isCallbackRegistered = false;
 
         // Process bytes
         if ( bytes != null && bytes.Length > 0 )
@@ -105,17 +192,31 @@ public class UdpFullDuplex : IDisposable
         }
         else
         {
-            // Setup next async event
-            AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
-            _receivingUdpClient.BeginReceive(callBack, null);
+            if ( OnReceiveShouldBeQueued != null )
+            {
+                OnReceiveShouldBeQueued();
+            }
         }
         Monitor.Exit(_callbackLock);
     }
 
+    public void ReceivePackets()
+    {
+        // Setup next async event
+        AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
+        _receivingUdpClient.BeginReceive(callBack, null);
+        _isCallbackRegistered = true;
+    }
+
     public void Close()
     {
+        _cts.Cancel();
         lock ( _callbackLock )
         {
+            // if ( _receiveThread.IsAlive )
+            // {
+            //     _receiveThread.Join();
+            // }
             _closingEvent.Reset();
             _closing = true;
             _receivingUdpClient.Close();
