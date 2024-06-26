@@ -105,6 +105,9 @@ public class VrcftPacketDecoder
             // Invalid packet
             case IpcPacket.PacketType.Unknown:
             default:
+#if DEBUG
+                throw new NotImplementedException($"No decoder for packet type {packetType} implemented in VrcftPacketDecoder! Packets of this type will be ignored.");
+#endif
                 return false;
         } 
 
