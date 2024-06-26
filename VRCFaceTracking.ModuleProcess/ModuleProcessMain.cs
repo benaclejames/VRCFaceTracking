@@ -11,6 +11,9 @@ using System.Collections.Specialized;
 using System.Text;
 using VRCFaceTracking.Core.Library;
 using System.Runtime.CompilerServices;
+using VRCFaceTracking.Core.Services;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Collections.Concurrent;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -18,7 +21,23 @@ public class ModuleProcessMain
 {
     // How long in seconds we should wait for a connection to be established before giving up
     private const int CONNECTION_TIMEOUT = 30;
+    private static bool WaitForPackets = true;
     public static ModuleAssembly DefModuleAssembly;
+    public static ILoggerFactory? LoggerFactory;
+    public static ILogger<ModuleProcessMain> Logger;
+    public static VrcftSandboxClient Client;
+
+    private static Queue<IpcPacket> _packetsToSend = new ();
+
+    private static object _callbackLock = new ();
+    private static bool _shouldCallReceive = false;
+    public static void QueueReceiveEvent()
+    {
+        lock ( _callbackLock )
+        {
+            _shouldCallReceive = true;
+        }
+    }
 
     public static int Main(string[] args)
     {
@@ -50,11 +69,18 @@ public class ModuleProcessMain
         }
         catch ( Exception ex )
         {
-            Console.WriteLine($"{ex.Message}:\n{ex.StackTrace}");
+            // So that we can catch errors
+            Logger.LogCritical($"{ex.Message}:\n{ex.StackTrace}");
+            Logger.LogCritical($"{ex.Message}");
 #if DEBUG
             Console.ReadKey();
+            Console.ReadLine();
 #endif
             return ModuleProcessExitCodes.EXCEPTION_CRASH;
+        }
+        finally
+        {
+            Client?.Dispose();
         }
     }
 
@@ -72,33 +98,31 @@ public class ModuleProcessMain
                 //     o.Dsn =
                 //     "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.us.sentry.io/4506152246575104")
                 .AddProvider(new ProxyLoggerProvider(DispatcherQueue.GetForCurrentThread()))
-                // .AddProvider(new LogFileProvider())
             )
         .BuildServiceProvider();
 
-        var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger<ModuleProcessMain>();
+        LoggerFactory = serviceProvider.GetService<ILoggerFactory>();
+        Logger = LoggerFactory.CreateLogger<ModuleProcessMain>();
 
         // A module process will connect to a given port number first. We try connecting to the server for 30 seconds, then give up, returning an error code in the process.
         Stopwatch stopwatch = new Stopwatch(); // For timeout
-        VrcftSandboxClient client = new VrcftSandboxClient(serverPortNumber, loggerFactory);
+        Client = new VrcftSandboxClient(serverPortNumber, LoggerFactory);
 
         // Bind the log function so that we can forward log messages to VRCFT's main process
         ProxyLogger.OnLog += (LogLevel level, string msg) =>
         {
             var pkt = new EventLogPacket(level, msg);
-            client.SendData(pkt);
+            Client.SendData(pkt);
         };
 
         // Try loading the module
-        DefModuleAssembly = new ModuleAssembly(logger, modulePath);
+        DefModuleAssembly = new ModuleAssembly(Logger, LoggerFactory, modulePath);
         DefModuleAssembly.TryLoadAssembly();
 
-        client.OnPacketReceivedCallback += (in IpcPacket packet) => {
+        Client.OnReceiveShouldBeQueued += QueueReceiveEvent;
+        Client.OnPacketReceivedCallback += (in IpcPacket packet) => {
             // Reset the timeout
             stopwatch.Restart();
-
-            logger.LogInformation($"Got packet {packet.GetPacketType()}");
 
             // Handle packets
             switch ( packet.GetPacketType() )
@@ -106,19 +130,17 @@ public class ModuleProcessMain
                 case IpcPacket.PacketType.EventGetSupported:
                     {
                         var result = DefModuleAssembly.TrackingModule.Supported;
-                        logger.LogInformation("Supported: Eye: {eye} Expression: {expression}", result.SupportsEye, result.SupportsExpression);
                         var pkt = new ReplySupportedPacket()
                         {
                             eyeAvailable        = result.SupportsEye,
                             expressionAvailable = result.SupportsExpression
                         };
-                        client.SendData(pkt);
+                        _packetsToSend.Enqueue(pkt);
                         break;
                     }
                 case IpcPacket.PacketType.EventInit:
                     {
                         var pkt = (EventInitPacket) packet;
-                        logger.LogInformation("Event Init");
 
                         bool eyeSuccess, expressionSuccess;
                         try
@@ -127,11 +149,11 @@ public class ModuleProcessMain
                         }
                         catch ( MissingMethodException )
                         {
-                            logger.LogError("{moduleName} does not properly implement ExtTrackingModule. Skipping.", DefModuleAssembly.GetType().Name);
+                            Logger.LogError("{moduleName} does not properly implement ExtTrackingModule. Skipping.", DefModuleAssembly.GetType().Name);
                             return;
                         } catch ( Exception e )
                         {
-                            logger.LogError("Exception initializing {module}. Skipping. {e}", DefModuleAssembly.GetType().Name, e);
+                            Logger.LogError("Exception initializing {module}. Skipping. {e}", DefModuleAssembly.GetType().Name, e);
                             return;
                         }
                         var pktNew = new ReplyInitPacket()
@@ -139,25 +161,69 @@ public class ModuleProcessMain
                             eyeSuccess              = eyeSuccess,
                             expressionSuccess       = expressionSuccess,
                             ModuleInformationName   = DefModuleAssembly.TrackingModule.ModuleInformation.Name,
+                            IconDataStreams         = DefModuleAssembly.TrackingModule.ModuleInformation.StaticImages
                         };
-                        client.SendData(pktNew);
+                        _packetsToSend.Enqueue(pktNew);
+                        break;
+                    }
+
+                case IpcPacket.PacketType.EventTeardown:
+                    {
+                        DefModuleAssembly.TrackingModule.Teardown();
+                        
+                        // Tell VRCFT that we have shut down successfully (otherwise VRCFT will terminate this process)
+                        var pkt = new ReplyTeardownPacket();
+                        _packetsToSend.Enqueue(pkt);
+
+                        // Shut down the event loop
+                        WaitForPackets = false;
+                        break;
+                    }
+
+                case IpcPacket.PacketType.EventUpdate:
+                    {
+                        // Logger.LogDebug("EventUpdate");
+                        DefModuleAssembly.TrackingModule.Update();
+                        var pkt = new ReplyUpdatePacket();
+                        _packetsToSend.Enqueue(pkt);
+                        break;
+                    }
+
+                case IpcPacket.PacketType.EventUpdateStatus:
+                    {
+                        var pkt = (EventStatusUpdatePacket) packet;
+                        DefModuleAssembly.TrackingModule.Status = pkt.ModuleState;
+
                         break;
                     }
             }
 
         };
         // Start the connection
-        client.Connect();
-        logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
+        Client.Connect();
+        Logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
 
         stopwatch.Start();
         
         // Loop infinitely while we wait for commands
-        while ( true )
+        while ( WaitForPackets )
         {
             if (stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT)
             {
+                Client.Close();
                 return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT;
+            }
+
+            // Send packets in loop
+            while (_packetsToSend.TryDequeue(out IpcPacket pkt))
+            {
+                Client.SendData(pkt);
+            }
+
+            // Tell the client to receive data
+            if ( _shouldCallReceive )
+            {
+                Client.ReceivePackets();
             }
 
             Thread.Sleep(1);
