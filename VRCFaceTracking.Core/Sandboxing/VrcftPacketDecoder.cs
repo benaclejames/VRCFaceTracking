@@ -52,6 +52,18 @@ public class VrcftPacketDecoder
                 packet.Decode(data);
                 break;
 
+            // EventTeardown
+            case IpcPacket.PacketType.EventTeardown:
+                packet = new EventTeardownPacket();
+                packet.Decode(data);
+                break;
+
+            // EventUpdate
+            case IpcPacket.PacketType.EventUpdate:
+                packet = new EventUpdatePacket();
+                packet.Decode(data);
+                break;
+
             // EventLog
             case IpcPacket.PacketType.EventLog:
                 packet = new EventLogPacket();
@@ -69,6 +81,24 @@ public class VrcftPacketDecoder
             // ReplyInit
             case IpcPacket.PacketType.ReplyInit:
                 packet = new ReplyInitPacket();
+                packet.Decode(data);
+                break;
+
+            // ReplyUpdate
+            case IpcPacket.PacketType.ReplyUpdate:
+                packet = new ReplyUpdatePacket();
+                packet.Decode(data);
+                break;
+
+            // ReplyTeardown
+            case IpcPacket.PacketType.ReplyTeardown:
+                packet = new ReplyTeardownPacket();
+                packet.Decode(data);
+                break;
+
+            // EventUpdateStatus
+            case IpcPacket.PacketType.EventUpdateStatus:
+                packet = new EventStatusUpdatePacket();
                 packet.Decode(data);
                 break;
 
