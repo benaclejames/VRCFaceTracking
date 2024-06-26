@@ -14,9 +14,10 @@ public class ModuleAssembly
     public string ModulePath;
     public bool Loaded;
     private ILogger<ModuleProcessMain> _logger;
+    private ILoggerFactory? _loggerFactory;
     public ExtTrackingModule TrackingModule;
 
-    public ModuleAssembly(ILogger<ModuleProcessMain> logger, string dllPath)
+    public ModuleAssembly(ILogger<ModuleProcessMain> logger, ILoggerFactory loggerFactory, string dllPath)
     {
         if ( !File.Exists(dllPath) )
         {
@@ -27,9 +28,10 @@ public class ModuleAssembly
             throw new ArgumentException($"{dllPath} is not a DLL file and cannot be loaded.");
         }
 
-        _logger     = logger;
-        ModulePath  = dllPath;
-        Loaded      = false;
+        _logger         = logger;
+        _loggerFactory  = loggerFactory;
+        ModulePath      = dllPath;
+        Loaded          = false;
     }
 
     public void TryLoadAssembly()
@@ -98,6 +100,8 @@ public class ModuleAssembly
                 throw new Exception("Failed to get module's ExtTrackingModule impl");
             }
             var moduleObj = (ExtTrackingModule)Activator.CreateInstance(module);
+            var logger = _loggerFactory.CreateLogger(moduleObj.GetType().Name);
+            moduleObj.Logger = logger;
 
             return moduleObj;
         } catch ( Exception e )
