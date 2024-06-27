@@ -52,6 +52,15 @@ public class ModuleRuntimeInfo
     public string ModuleClassName;
 
     /// <summary>
+    /// Whether this module supports eye tracking or not.
+    /// </summary>
+    public bool SupportsEyeTracking;
+    /// <summary>
+    /// Whether this module supports expression tracking or not.
+    /// </summary>
+    public bool SupportsExpressionTracking;
+
+    /// <summary>
     /// Queue of packets to send
     /// </summary>
     public Queue<QueuedPacket> EventBus;

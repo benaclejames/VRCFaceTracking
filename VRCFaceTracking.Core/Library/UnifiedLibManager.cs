@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -128,6 +129,10 @@ public class UnifiedLibManager : ILibManager
                         {
                             // We now know whether or not the module supports face or eye tracking
                             ReplySupportedPacket replySupportedPacket = (ReplySupportedPacket) packet;
+
+                            AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replySupportedPacket.eyeAvailable;
+                            AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replySupportedPacket.expressionAvailable;
+
                             // Now tell it to initialise
                             EventInitPacket eventInitPacket = new EventInitPacket()
                             {
@@ -143,6 +148,16 @@ public class UnifiedLibManager : ILibManager
                             ReplyInitPacket replyInitPacket = (ReplyInitPacket) packet;
                             AvailableSandboxModules[moduleIndex].ModuleInformation.Name = replyInitPacket.ModuleInformationName;
 
+                            // Update support variables
+                            AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replyInitPacket.eyeSuccess;
+                            AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replyInitPacket.expressionSuccess;
+
+                            // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
+                            if ( !replyInitPacket.eyeSuccess && !replyInitPacket.expressionSuccess )
+                            {
+                                break;
+                            }
+
                             int portCopy = port; // So that we can use it in the lambda method
                             AvailableSandboxModules[moduleIndex].ModuleInformation.OnActiveChange = (state) =>
                             {
@@ -153,13 +168,7 @@ public class UnifiedLibManager : ILibManager
                                 _sandboxServer.SendData(statusUpdatePkt, portCopy);
                             };
 
-                            // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
-                            if ( !replyInitPacket.eyeSuccess && !replyInitPacket.expressionSuccess )
-                            {
-                                break;
-                            }
-
-                            EyeStatus           = replyInitPacket.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
+                            EyeStatus = replyInitPacket.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
                             ExpressionStatus    = replyInitPacket.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
                             AvailableSandboxModules[moduleIndex].ModuleInformation.Active           = true;
