@@ -215,8 +215,18 @@ public class UnifiedLibManager : ILibManager
                         {
                             ReplyUpdatePacket replyUpdatePacket = (ReplyUpdatePacket) packet;
 
-                            replyUpdatePacket.UpdateGlobalEyeState();
-                            replyUpdatePacket.UpdateGlobalExpressionState();
+                            if ( AvailableSandboxModules[moduleIndex].Status == ModuleState.Active && AvailableSandboxModules[moduleIndex].ModuleInformation.Active )
+                            {
+
+                                if ( AvailableSandboxModules[moduleIndex].ModuleInformation.UsingEye )
+                                {
+                                    replyUpdatePacket.UpdateGlobalEyeState();
+                                }
+                                if ( AvailableSandboxModules[moduleIndex].ModuleInformation.UsingExpression )
+                                {
+                                    replyUpdatePacket.UpdateGlobalExpressionState();
+                                }
+                            }
 
                             break;
                         }
