@@ -9,7 +9,7 @@ public delegate void OnReceiveShouldBeQueued();
 
 public class UdpFullDuplex : IDisposable
 {
-    const int TIMEOUT_SECONDS = 10;
+    const int TIMEOUT_MILLISECONDS = 10000;
 
     public int Port
     {
@@ -28,7 +28,6 @@ public class UdpFullDuplex : IDisposable
     private bool                _isCallbackRegistered   = false;
     private Thread              _receiveThread;
     private CancellationTokenSource _cts = new();
-    private CancellationTokenSource _timeoutCts = new(new TimeSpan(0, 0, 0, TIMEOUT_SECONDS));
     public OnReceiveShouldBeQueued OnReceiveShouldBeQueued;
 
     public UdpFullDuplex(int port, int[] reservedPorts = null, IPEndPoint remoteIpEndPoint = null)
@@ -99,13 +98,16 @@ public class UdpFullDuplex : IDisposable
         {
             try
             {
-                var result = await _receivingUdpClient.ReceiveAsync(_cts.Token);
+                using CancellationTokenSource internalCancellationTokenSource = new();
+                using CancellationTokenSource linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(internalCancellationTokenSource.Token, _cts.Token);
+
+                internalCancellationTokenSource.CancelAfter(TIMEOUT_MILLISECONDS);
+                var result = await _receivingUdpClient.ReceiveAsync(linkedTokenSource.Token);
 
                 if ( result.Buffer != null && result.Buffer.Length > 0 )
                 {
                     OnBytesReceived(result.Buffer, result.RemoteEndPoint);
                 }
-
             }
             catch ( OperationCanceledException )
             {
