@@ -183,7 +183,7 @@ public class UdpFullDuplex : IDisposable
         _isCallbackRegistered = false;
 
         // Process bytes
-        if ( bytes != null && bytes.Length > 0 )
+        if ( bytes != null && bytes.Length > 0 && _closing  == false )
         {
             OnBytesReceived(in bytes, in _remoteIpEndPoint);
         }
@@ -215,13 +215,10 @@ public class UdpFullDuplex : IDisposable
         _cts.Cancel();
         lock ( _callbackLock )
         {
-            // if ( _receiveThread.IsAlive )
-            // {
-            //     _receiveThread.Join();
-            // }
             _closingEvent.Reset();
             _closing = true;
             _receivingUdpClient.Close();
+            _closingEvent.Set();
         }
         _closingEvent.WaitOne();
     }

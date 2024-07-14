@@ -20,7 +20,7 @@ namespace VRCFaceTracking.ModuleProcess;
 public class ModuleProcessMain
 {
     // How long in seconds we should wait for a connection to be established before giving up
-    private const int CONNECTION_TIMEOUT = 30;
+    private const double CONNECTION_TIMEOUT = 60.0;
     private static bool WaitForPackets = true;
     public static ModuleAssembly DefModuleAssembly;
     public static ILoggerFactory? LoggerFactory;
@@ -208,7 +208,7 @@ public class ModuleProcessMain
         // Loop infinitely while we wait for commands
         while ( WaitForPackets )
         {
-            if (stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT)
+            if ( stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT )
             {
                 Client.Close();
                 return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT;
