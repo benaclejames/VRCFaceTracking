@@ -117,6 +117,14 @@ public class ReplyUpdatePacket : IpcPacket
 
     public void UpdateGlobalEyeState()
     {
+        // If the eye state is valid
+
+        // If dilation parameters are invalid
+        if (_contiguousUnifiedData.Eye_MaxDilation < _contiguousUnifiedData.Eye_MinDilation)
+        {
+            return;
+        }
+
         // Update the unified tracking to match our data structure
         UnifiedTracking.Data.Eye.Left.Gaze.x                = _contiguousUnifiedData.Eye_Left_GazeX;
         UnifiedTracking.Data.Eye.Left.Gaze.y                = _contiguousUnifiedData.Eye_Left_GazeY;
