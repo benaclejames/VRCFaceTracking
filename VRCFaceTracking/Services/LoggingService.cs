@@ -31,11 +31,24 @@ public class OutputPageLogger : ILogger
         // Add to the staticLog from the dispatcher thread
         _dispatcher?.TryEnqueue(() =>
         {
-            AllLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
-            // Filtered is what the user sees, so show Information scope
-            if (logLevel >= LogLevel.Information)
+            if ( _categoryName == "\0VRCFT\0" )
             {
-                FilteredLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
+                // Log events from sub-processes have the unique category name "\0VRCFT\0"
+                AllLogs.Add($"{formatter(state, exception)}");
+                // Filtered is what the user sees, so show Information scope
+                if ( logLevel >= LogLevel.Information )
+                {
+                    FilteredLogs.Add($"{formatter(state, exception)}");
+                }
+            }
+            else
+            {
+                AllLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
+                // Filtered is what the user sees, so show Information scope
+                if ( logLevel >= LogLevel.Information )
+                {
+                    FilteredLogs.Add($"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
+                }
             }
         });
     }

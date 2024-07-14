@@ -32,7 +32,7 @@ public class ProxyLogger : ILogger
     {
         if ( OnLog != null )
         {
-            OnLog(logLevel, $"[{_categoryName}] {{level}}: {formatter(state, exception)}");
+            OnLog(logLevel, $"[{_categoryName}] {logLevel}: {formatter(state, exception)}");
         }
     }
 }

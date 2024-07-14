@@ -18,6 +18,7 @@ public class UnifiedLibManager : ILibManager
 {
     #region Logger
     private readonly ILogger<UnifiedLibManager> _logger;
+    private readonly ILogger _moduleLogger;
     private readonly ILoggerFactory _loggerFactory;
     #endregion
 
@@ -51,6 +52,7 @@ public class UnifiedLibManager : ILibManager
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
+        _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
 
@@ -121,7 +123,7 @@ public class UnifiedLibManager : ILibManager
                     case IpcPacket.PacketType.EventLog:
                         {
                             EventLogPacket eventLogPacket = (EventLogPacket) packet;
-                            _logger.Log(eventLogPacket.LogLevel, eventLogPacket.Message);
+                            _moduleLogger.Log(eventLogPacket.LogLevel, eventLogPacket.Message);
                             break;
                         }
 
@@ -214,10 +216,6 @@ public class UnifiedLibManager : ILibManager
                                 }
                             });
 
-                            /*
-                             
-                            @TODO: Move to update thread
-                             */
                             break;
                         }
                     case IpcPacket.PacketType.ReplyUpdate:
