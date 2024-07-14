@@ -41,7 +41,7 @@ public class ModuleRuntimeInfo
     /// <summary>
     /// The module's retreived metadata
     /// </summary>
-    public ModuleMetadata ModuleInformation;
+    public ModuleMetadataInternal ModuleInformation;
     /// <summary>
     /// Module status
     /// </summary>

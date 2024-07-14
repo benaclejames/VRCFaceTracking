@@ -23,7 +23,7 @@ public class UnifiedLibManager : ILibManager
     #endregion
 
     #region Observables
-    public ObservableCollection<ModuleMetadata> LoadedModulesMetadata { get; set; }
+    public ObservableCollection<ModuleMetadataInternal> LoadedModulesMetadata { get; set; }
     private bool _hasInitializedAtLeastOneModule = false;
     private readonly IDispatcherService _dispatcherService;
     #endregion
@@ -56,19 +56,21 @@ public class UnifiedLibManager : ILibManager
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
 
-        LoadedModulesMetadata = new ObservableCollection<ModuleMetadata>();
+        LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
         _sandboxProcessPath = Path.GetFullPath("VRCFaceTracking.ModuleProcess.exe");
         if ( !File.Exists(_sandboxProcessPath) )
         {
             // @TODO: Better error handling
             throw new FileNotFoundException($"Failed to find sandbox process at \"{_sandboxProcessPath}\"!");
         }
+
+        // @TODO: Kill any lingering sub-modules to eliminate any conflicts
     }
 
     public void Initialize()
     {
         LoadedModulesMetadata.Clear();
-        LoadedModulesMetadata.Add(new ModuleMetadata
+        LoadedModulesMetadata.Add(new ModuleMetadataInternal
         { 
             Active = false,
             Name = "Initializing Modules..."
@@ -164,7 +166,7 @@ public class UnifiedLibManager : ILibManager
                             AvailableSandboxModules[moduleIndex].ModuleInformation.OnActiveChange = (state) =>
                             {
                                 AvailableSandboxModules[moduleIndex].Status = state ? ModuleState.Active : ModuleState.Idle;
-                                // @TODO: Status update packet
+
                                 EventStatusUpdatePacket statusUpdatePkt = new EventStatusUpdatePacket();
                                 statusUpdatePkt.ModuleState = AvailableSandboxModules[moduleIndex].Status;
                                 _sandboxServer.SendData(statusUpdatePkt, portCopy);
@@ -189,7 +191,7 @@ public class UnifiedLibManager : ILibManager
                                 {
                                     _logger.LogWarning("No modules loaded.");
                                     LoadedModulesMetadata.Clear();
-                                    LoadedModulesMetadata.Add(new ModuleMetadata
+                                    LoadedModulesMetadata.Add(new ModuleMetadataInternal
                                     {
                                         Active = false,
                                         Name = "No Modules Loaded"
@@ -288,7 +290,7 @@ public class UnifiedLibManager : ILibManager
                 _dispatcherService.Run(() =>
                 {
                     LoadedModulesMetadata.Clear();
-                    LoadedModulesMetadata.Add(new ModuleMetadata
+                    LoadedModulesMetadata.Add(new ModuleMetadataInternal
                     {
                         Active = false,
                         Name = "No Modules Loaded"
@@ -472,6 +474,7 @@ public class UnifiedLibManager : ILibManager
         _moduleThreads.Add(module);
     }
 
+#if NO_SANDBOXING
     private void AttemptModuleInitialize(ExtTrackingModule module)
     {
         if (module.Supported is { SupportsEye: false, SupportsExpression: false })
@@ -481,12 +484,10 @@ public class UnifiedLibManager : ILibManager
 
         module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
-        var shouldEyeInitialize = EyeStatus == ModuleState.Uninitialized;
-        var shouldExpressionInitialize = ExpressionStatus == ModuleState.Uninitialized;
         bool eyeSuccess, expressionSuccess;
         try
         {
-            (eyeSuccess, expressionSuccess) = module.Initialize(shouldEyeInitialize, shouldExpressionInitialize);
+            (eyeSuccess, expressionSuccess) = module.Initialize(EyeStatus == ModuleState.Uninitialized, ExpressionStatus == ModuleState.Uninitialized);
         }
         catch (MissingMethodException)
         {
@@ -507,48 +508,21 @@ public class UnifiedLibManager : ILibManager
         {
             return;
         }
+
+        EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
-        if (shouldEyeInitialize)
-        {
-            EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-        }
-
-        if (shouldExpressionInitialize)
-        {
-            ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-        }
-
         module.ModuleInformation.Active = true;
-        module.ModuleInformation.UsingEye = shouldEyeInitialize && eyeSuccess;
-        module.ModuleInformation.UsingExpression = shouldExpressionInitialize && expressionSuccess;
-        _dispatcherService.Run(() => { 
-            if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
+        module.ModuleInformation.UsingEye = eyeSuccess;
+        module.ModuleInformation.UsingExpression = expressionSuccess;
+        _dispatcherService.Run(() => {
+            var moduleInternalForm = new ModuleMetadataInternal(module.ModuleInformation);
+            if (!LoadedModulesMetadata.Contains(moduleInternalForm) )
             {
-                LoadedModulesMetadata.Add(module.ModuleInformation);
+                LoadedModulesMetadata.Add(moduleInternalForm);
             }
         });
         EnsureModuleThreadStarted(module);
-    }
-    private void AttemptSandboxedModuleInitialize(ModuleRuntimeInfo module)
-    {
-        // Tell the sandbox to call the initialize function on the module
-        var eventGetSupportedPacket = new EventInitGetSupported();
-
-        // If PID is valid and we know which port the sandbox process is running on
-        if ( module.SandboxProcessPID != -1 && module.SandboxProcessPort > 0 )
-        {
-            _sandboxServer.SendData(eventGetSupportedPacket, module.SandboxProcessPort);
-        }
-        else
-        {
-            // Queue the packet so that we send it after we know which process the sandbox process is running on
-            QueuedPacket queuedPacket = new QueuedPacket()
-            {
-                packet = eventGetSupportedPacket,
-                destinationPort = module.SandboxProcessPort
-            };
-            module.EventBus.Enqueue(queuedPacket);
-        }
     }
 
     private void InitRequestedRuntimes(List<Assembly> moduleType)
@@ -568,7 +542,7 @@ public class UnifiedLibManager : ILibManager
             _dispatcherService.Run(() =>
             {
                 LoadedModulesMetadata.Clear();
-                LoadedModulesMetadata.Add(new ModuleMetadata
+                LoadedModulesMetadata.Add(new ModuleMetadataInternal
                 {
                     Active = false,
                     Name = "No Modules Loaded"
@@ -591,6 +565,29 @@ public class UnifiedLibManager : ILibManager
             }
         }
     }
+#endif
+
+    private void AttemptSandboxedModuleInitialize(ModuleRuntimeInfo module)
+    {
+        // Tell the sandbox to call the initialize function on the module
+        var eventGetSupportedPacket = new EventInitGetSupported();
+
+        // If PID is valid and we know which port the sandbox process is running on
+        if ( module.SandboxProcessPID != -1 && module.SandboxProcessPort > 0 )
+        {
+            _sandboxServer.SendData(eventGetSupportedPacket, module.SandboxProcessPort);
+        }
+        else
+        {
+            // Queue the packet so that we send it after we know which process the sandbox process is running on
+            QueuedPacket queuedPacket = new QueuedPacket()
+            {
+                packet = eventGetSupportedPacket,
+                destinationPort = module.SandboxProcessPort
+            };
+            module.EventBus.Enqueue(queuedPacket);
+        }
+    }
 
     private void InitRequestedRuntimesSandboxed(List<ModuleRuntimeInfo> moduleType)
     {
@@ -609,7 +606,7 @@ public class UnifiedLibManager : ILibManager
             _dispatcherService.Run(() =>
             {
                 LoadedModulesMetadata.Clear();
-                LoadedModulesMetadata.Add(new ModuleMetadata
+                LoadedModulesMetadata.Add(new ModuleMetadataInternal
                 {
                     Active = false,
                     Name = "No Modules Loaded"
@@ -641,12 +638,7 @@ public class UnifiedLibManager : ILibManager
         {
             // Edge case, we wait for the thread to finish before unloading the assembly
             _logger.LogDebug("Waiting for {module}'s thread to join...", module.Module.GetType().Name);
-            // Specify a timeout in milliseconds
-            var timeoutMilliseconds = 1000;
-            if (!module.UpdateThread.Join(timeoutMilliseconds))
-            {
-                _logger.LogWarning("{module}'s thread did not finish within the timeout period.", module.Module.GetType().Name);
-            }
+            module.UpdateThread.Join();
         }
 
         module.Module.Teardown();
