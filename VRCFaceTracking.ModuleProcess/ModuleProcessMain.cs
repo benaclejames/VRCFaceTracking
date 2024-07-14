@@ -20,7 +20,7 @@ namespace VRCFaceTracking.ModuleProcess;
 public class ModuleProcessMain
 {
     // How long in seconds we should wait for a connection to be established before giving up
-    private const double CONNECTION_TIMEOUT = 60.0;
+    private const double CONNECTION_TIMEOUT = 60.0; // This is long because some modules like the Vive Facial Tracker software can take a long time to initialise
     private static bool WaitForPackets = true;
     public static ModuleAssembly DefModuleAssembly;
     public static ILoggerFactory? LoggerFactory;
