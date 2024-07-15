@@ -145,7 +145,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Source="{x:Bind UpperImageSource}" Stretch="Uniform" />
-                        <AppBarSeparator Grid.Column="1" />
+                        <AppBarSeparator x:Name="HardwareDebugSeparator" Grid.Column="1" />
                         <Image Grid.Column="2" Source="{x:Bind LowerImageSource}" Stretch="Uniform" />
                     </Grid>
                 </labs:SettingsCard>

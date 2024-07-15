@@ -61,7 +61,7 @@ public sealed partial class SettingsPage : Page
 
         Loaded += OnPageLoaded;
         
-        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
+        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue?.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
@@ -138,6 +138,15 @@ public sealed partial class SettingsPage : Page
                 _lowerImageStream = null;
                 _lowerStream = null;
             }
+        }
+
+        if ( _lowerStream == null || _upperStream == null )
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Visible;
         }
     }
 
