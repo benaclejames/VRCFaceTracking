@@ -37,15 +37,15 @@ public class ModuleDataService : IModuleDataService
             {
                 return new List<InstallableTrackingModule>();
             }
+            
+            var content = await response.Content.ReadAsStringAsync();
+            return await Json.ToObjectAsync<List<InstallableTrackingModule>>(content);
         }
         catch (Exception e)
         {
             _logger.LogWarning("Exception trying to get modules from module registry: {e}", e.Message);
             return new List<InstallableTrackingModule>();
         }
-
-        var content = await response.Content.ReadAsStringAsync();
-        return await Json.ToObjectAsync<List<InstallableTrackingModule>>(content);
     }
 
     public async Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules()
