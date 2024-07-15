@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>VRCFaceTracking</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>VRCFaceTracking</value>
+  </data>
+  <data name="Shell_Main.Content" xml:space="preserve">
+    <value>ホーム</value>
+  </data>
+  <data name="ListDetails_NoSelection.Text" xml:space="preserve">
+    <value>リストから項目を選択</value>
+  </data>
+  <data name="Shell_ListDetails.Content" xml:space="preserve">
+    <value>リスト詳細</value>
+  </data>
+  <data name="Settings_Personalization.Text" xml:space="preserve">
+    <value>個人用設定</value>
+  </data>
+  <data name="Settings_Theme.Text" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+    <value>ライト</value>
+  </data>
+  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+    <value>ダーク</value>
+  </data>
+  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+    <value>規定の設定</value>
+  </data>
+  <data name="Settings_About.Text" xml:space="preserve">
+    <value>AV3 アバターが目と唇の追跡ランタイムと対話できるようにする VRChat OSC アプリ</value>
+  </data>
+  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+    <value>AV3 アバターが目と唇の追跡ランタイムと対話できるようにする VRChat OSC アプリ</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
+    <value>プライバシーに関する声明</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
+    <value>https://github.com/benaclejames/VRCFaceTracking</value>
+  </data>
+  <data name="AppNotificationSamplePayload" xml:space="preserve">
+    <value>&lt;toast launch="action=ToastClick"&gt;
+  &lt;visual&gt;
+    &lt;binding template="ToastGeneric"&gt;
+      &lt;text&gt;App Notification&lt;/text&gt;
+      &lt;text&gt;&lt;/text&gt;
+      &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
+    &lt;/binding&gt;
+  &lt;/visual&gt;
+  &lt;actions&gt;
+    &lt;action content="Settings" arguments="action=Settings"/&gt;
+  &lt;/actions&gt;
+&lt;/toast&gt;</value>
+  </data>
+  <data name="Shell_Output.Content" xml:space="preserve">
+    <value>デバッグログ</value>
+  </data>
+  <data name="Shell_Parameters.Content" xml:space="preserve">
+    <value>パラメーター</value>
+  </data>
+  <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
+    <value>リストから項目を選択</value>
+  </data>
+  <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
+    <value>モジュール管理</value>
+  </data>
+  <data name="About.Text" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Appearance.Text" xml:space="preserve">
+    <value>アプリケーションライセンス</value>
+  </data>
+  <data name="Author.Text" xml:space="preserve">
+    <value>制作者</value>
+  </data>
+  <data name="AvatarStatus.Text" xml:space="preserve">
+    <value>アバターステータス</value>
+  </data>
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>Local Test Avatar Detected</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>Local Test Avatars are not supported and will cause issues</value>
+  </data>
+  <data name="Copyright.Description" xml:space="preserve">
+    <value>© 2023 VRCFaceTracking. All rights reserved.</value>
+  </data>
+  <data name="Credits.Description" xml:space="preserve">
+    <value>ソフトウエアに貢献してくれた方々</value>
+  </data>
+  <data name="Dependencies.Header" xml:space="preserve">
+    <value>依存関係と参照</value>
+  </data>
+  <data name="Description.Text" xml:space="preserve">
+    <value>概要</value>
+  </data>
+  <data name="Disclaimer.Header" xml:space="preserve">
+    <value>THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.</value>
+  </data>
+  <data name="Downloads.Text" xml:space="preserve">
+    <value>ダウンロード数</value>
+  </data>
+  <data name="EyeTrackingActive.Text" xml:space="preserve">
+    <value>アイトラッキング アクティブ</value>
+  </data>
+  <data name="FaceTrackingActive.Text" xml:space="preserve">
+    <value>フェイストラッキング　アクティブ</value>
+  </data>
+  <data name="BugRequestCard.Header" xml:space="preserve">
+    <value>バグレポートを提出する</value>
+  </data>
+  <data name="LastUpdated.Text" xml:space="preserve">
+    <value>最終更新</value>
+  </data>
+  <data name="LegacyParameters.Text" xml:space="preserve">
+    <value>Legacy Parameters</value>
+  </data>
+  <data name="Listening_on_Port.Text" xml:space="preserve">
+    <value>受信ポート:</value>
+  </data>
+  <data name="ModulePage.Text" xml:space="preserve">
+    <value>モジュールリポジトリ</value>
+  </data>
+  <data name="msIncoming.Text" xml:space="preserve">
+    <value>m/s 受信</value>
+  </data>
+  <data name="msOutgoing.Text" xml:space="preserve">
+    <value>m/s 送信</value>
+  </data>
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
+    <value>モジュールがインストールされていません</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>ここからいくつかインストールしてください！</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>OSC設定が変更されました</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>VRChat で OSC がオフになっていることがわかりました。先ほど有効にしました。これが発生したときにゲームが開いていた場合は、Raidal メニューから手動で有効にする必要がある場合があります。そうでない場合は、大丈夫です。</value>
+  </data>
+  <data name="OSCStatus.Text" xml:space="preserve">
+    <value>OSC ステータス</value>
+  </data>
+  <data name="Parameters.Text" xml:space="preserve">
+    <value>パラメーター</value>
+  </data>
+  <data name="Rating.Text" xml:space="preserve">
+    <value>評価</value>
+  </data>
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="ThemeSettings.Description" xml:space="preserve">
+    <value>表示するアプリのテーマを選択します</value>
+  </data>
+  <data name="Sending_on_Port.Text" xml:space="preserve">
+    <value>送信ポート:</value>
+  </data>
+  <data name="ToggleTracking.Content" xml:space="preserve">
+    <value>トラッキング</value>
+  </data>
+  <data name="CloneRepoCard.Header" xml:space="preserve">
+    <value>このリポジトリのクローンを作成するには</value>
+  </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>ローカルストレージを開く</value>
+  </data>
+  <data name="UsageInstructions.Text" xml:space="preserve">
+    <value>使用上の注意</value>
+  </data>
+  <data name="Version.Text" xml:space="preserve">
+    <value>バージョン</value>
+  </data>
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>OSC アドレス</value>
+  </data>
+  <data name="OscSettings.Description" xml:space="preserve">
+    <value>OSC アドレス設定</value>
+  </data>
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
+    <value>モジュールがインストールされていません</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>キャリブレーション設定</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>トラッキングにズレがある場合ここで調節することができます</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>開発者向け設定</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>正常な動作に支障をきたす場合があるため通常は使わないでください</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>自動起動</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>SteamVRの起動時に自動で起動します</value>
+  </data>
+</root>
