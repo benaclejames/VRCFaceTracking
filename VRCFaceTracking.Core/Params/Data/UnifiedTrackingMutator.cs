@@ -105,6 +105,13 @@ public partial class UnifiedTrackingMutator : ObservableObject
         input.Eye.Right.Gaze = SimpleLerp(input.Eye.Right.Gaze, _trackingDataBuffer.Eye.Right.Gaze, _mutationData.GazeMutationsConfig.SmoothnessMult);
     }
 
+    private void ApplyCorrections(ref UnifiedTrackingData input)
+    {
+        input.Shapes[(int)UnifiedExpressions.MouthClosed].Weight = Math.Min(
+            input.Shapes[(int)UnifiedExpressions.MouthClosed].Weight,
+            input.Shapes[(int)UnifiedExpressions.JawOpen].Weight);
+    }
+    
     /// <summary>
     /// Takes in the latest base expression Weight data from modules and mutates into the Weight data for output parameters.
     /// </summary>
@@ -120,6 +127,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
         ApplyCalibrator(ref _inputBuffer);
         ApplySmoothing(ref _inputBuffer);
+        ApplyCorrections(ref _inputBuffer);
 
         _trackingDataBuffer.CopyPropertiesOf(_inputBuffer);
         return _inputBuffer;
@@ -156,7 +164,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
         _mutationData.GazeMutationsConfig.Name = "Gaze";
         _mutationData.OpennessMutationsConfig.Name = "Openness";
 
-        for (int i = 0; i < _mutationData.ShapeMutations.Length; i++)
+        for (var i = 0; i < _mutationData.ShapeMutations.Length; i++)
         {
             _mutationData.ShapeMutations[i].Name = ((UnifiedExpressions)i).ToString();
             _mutationData.ShapeMutations[i].Ceil = ceiling;
@@ -171,8 +179,10 @@ public partial class UnifiedTrackingMutator : ObservableObject
         _mutationData.GazeMutationsConfig.SmoothnessMult = setValue;
         _mutationData.OpennessMutationsConfig.SmoothnessMult = setValue;
 
-        for (int i = 0; i < _mutationData.ShapeMutations.Length; i++)
+        for (var i = 0; i < _mutationData.ShapeMutations.Length; i++)
+        {
             _mutationData.ShapeMutations[i].SmoothnessMult = setValue;
+        }
     }
 
     public async Task SaveCalibration()
