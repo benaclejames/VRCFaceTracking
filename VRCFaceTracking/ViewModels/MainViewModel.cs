@@ -25,6 +25,8 @@ public partial class MainViewModel : ObservableRecipient
     
     [ObservableProperty] private bool _oscWasDisabled;
 
+    private DispatcherTimer msgCounterTimer;
+
     public MainViewModel(
         ILibManager libManager,
         OscQueryService parameterOutputService,
@@ -47,13 +49,13 @@ public partial class MainViewModel : ObservableRecipient
         NoModulesInstalled = !installedNewModules.Any() && installedLegacyModules == 0;
         
         // Message Timer
-        OscRecvService.OnMessageReceived += _ => { _messagesRecvd++; };
-        OscSendService.OnMessagesDispatched += msgCount => { _messagesSent += msgCount; };
-        var messageTimer = new DispatcherTimer
+        OscRecvService.OnMessageReceived += MessageReceived;
+        OscSendService.OnMessagesDispatched += MessageDispatched;
+        msgCounterTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(1)
         };
-        messageTimer.Tick += (_, _) =>
+        msgCounterTimer.Tick += (_, _) =>
         {
             MessagesInPerSec = _messagesRecvd;
             _messagesRecvd = 0;
@@ -61,6 +63,17 @@ public partial class MainViewModel : ObservableRecipient
             MessagesOutPerSec = _messagesSent;
             _messagesSent = 0;
         };
-        messageTimer.Start();
+        msgCounterTimer.Start();
+    }
+
+    private void MessageReceived(OscMessage msg) => _messagesRecvd++;
+    private void MessageDispatched(int msgCount) => _messagesSent += msgCount;
+
+    ~MainViewModel()
+    {
+        OscRecvService.OnMessageReceived -= MessageReceived;
+        OscSendService.OnMessagesDispatched -= MessageDispatched;
+        
+        msgCounterTimer.Stop();
     }
 }

@@ -17,7 +17,7 @@ public class ModuleDataService : IModuleDataService
     private readonly ILogger<ModuleDataService> _logger;
     private readonly HttpClient _httpClient;
 
-    private const string BaseUrl = "https://rjlk4u22t36tvqz3bvbkwv675a0wbous.lambda-url.us-east-1.on.aws/";
+    private const string BaseUrl = "https://registry.vrcft.io/";
 
     public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger)
     {
@@ -29,15 +29,23 @@ public class ModuleDataService : IModuleDataService
 
     private async Task<IEnumerable<InstallableTrackingModule>> AllModules()
     {
-        // This is where we make the actual request to the API at modules and get the list of modules.
-        var response = await _httpClient.GetAsync("modules");
-        if (!response.IsSuccessStatusCode)
+        try
         {
+            // This is where we make the actual request to the API at modules and get the list of modules.
+            var response = await _httpClient.GetAsync("modules");
+            if (!response.IsSuccessStatusCode)
+            {
+                return new List<InstallableTrackingModule>();
+            }
+            
+            var content = await response.Content.ReadAsStringAsync();
+            return await Json.ToObjectAsync<List<InstallableTrackingModule>>(content);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("Exception trying to get modules from module registry: {e}", e.Message);
             return new List<InstallableTrackingModule>();
         }
-
-        var content = await response.Content.ReadAsStringAsync();
-        return await Json.ToObjectAsync<List<InstallableTrackingModule>>(content);
     }
 
     public async Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules()

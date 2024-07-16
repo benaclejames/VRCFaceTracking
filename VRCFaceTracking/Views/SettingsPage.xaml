@@ -104,13 +104,6 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
                 
-                <labs:SettingsCard x:Uid="AutoStartSettings" IsEnabled="{x:Bind ViewModel.IsOpenVREnabled, Mode=OneWay}">
-                    <labs:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE840;" />
-                    </labs:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"/>
-                </labs:SettingsCard>
-                
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
@@ -132,6 +125,11 @@
                             IsEnabled="False">
                             <Button x:Name="resetVRCFTButton" Click="resetVRCFTButton_OnClick" x:Uid="ResetButton" />
                         </labs:SettingsCard>
+                        <labs:SettingsCard x:Uid="ResetAvatarConfButton"
+                            x:Name="resetAvatarConfig"
+                            IsEnabled="False">
+                            <Button x:Name="resetVRCAvatarConf" Click="resetVRCAvatarConf_OnClick" x:Uid="ResetButton" />
+                        </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
 
@@ -147,7 +145,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Source="{x:Bind UpperImageSource}" Stretch="Uniform" />
-                        <AppBarSeparator Grid.Column="1" />
+                        <AppBarSeparator x:Name="HardwareDebugSeparator" Grid.Column="1" />
                         <Image Grid.Column="2" Source="{x:Bind LowerImageSource}" Stretch="Uniform" />
                     </Grid>
                 </labs:SettingsCard>

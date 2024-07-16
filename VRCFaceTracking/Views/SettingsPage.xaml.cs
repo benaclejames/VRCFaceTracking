@@ -61,7 +61,7 @@ public sealed partial class SettingsPage : Page
 
         Loaded += OnPageLoaded;
         
-        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
+        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue?.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
@@ -139,6 +139,15 @@ public sealed partial class SettingsPage : Page
                 _lowerStream = null;
             }
         }
+
+        if ( _lowerStream == null || _upperStream == null )
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Visible;
+        }
     }
 
     private void OnPageLoaded(object sender, RoutedEventArgs e)
@@ -185,11 +194,13 @@ public sealed partial class SettingsPage : Page
             // Enable cards
             allParamsRelevant.IsEnabled = true;
             resetVRCFT.IsEnabled = true;
+            resetAvatarConfig.IsEnabled = true;
             forceReInit.IsEnabled = true;
 
             // Enable toggles/buttons
             allParamsRelevantToggle.IsEnabled = true;
             resetVRCFTButton.IsEnabled = true;
+            resetVRCAvatarConf.IsEnabled = true;
             forceReInitButton.IsEnabled = true;
         }
         else
@@ -197,12 +208,14 @@ public sealed partial class SettingsPage : Page
             // Disable cards
             allParamsRelevant.IsEnabled = false;
             resetVRCFT.IsEnabled = false;
+            resetAvatarConfig.IsEnabled = false;
             forceReInit.IsEnabled = false;
 
             // Disable toggles/buttons and set them to off
             allParamsRelevantToggle.IsEnabled = false;
             allParamsRelevantToggle.IsOn = false;
             resetVRCFTButton.IsEnabled = false;
+            resetVRCAvatarConf.IsEnabled = false;
             forceReInitButton.IsEnabled = false;
         }
     }
@@ -210,6 +223,8 @@ public sealed partial class SettingsPage : Page
     private void forceReInitButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ForceReInit();
 
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
+
+    private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetAvatarOscManifests();
 
     private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.InitializeCalibration();
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 
 namespace VRCFaceTracking.Core;
@@ -9,6 +10,7 @@ public static class VRChat
         
     public static readonly string VRCOSCDirectory = Path.Combine(VRCData, "OSC");
         
+    [SupportedOSPlatform("windows")]
     public static bool ForceEnableOsc()
     {
         // Set all registry keys containing osc in the name to 1 in Computer\HKEY_CURRENT_USER\Software\VRChat\VRChat
@@ -32,5 +34,5 @@ public static class VRChat
         return wasOscForced;
     }
         
-    public static bool IsVRChatRunning() => Process.GetProcesses().Any(x => x.ProcessName == "VRChat");
+    public static bool IsVrChatRunning() => Process.GetProcesses().Any(x => x.ProcessName == "VRChat");
 }

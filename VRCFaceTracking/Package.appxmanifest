@@ -56,11 +56,7 @@
           </desktop:Extension>
 
           <com:Extension Category="windows.comServer">
-              <com:ComServer>
-                  <com:ExeServer Executable="VRCFaceTracking.exe" Arguments="----AppNotificationActivated:" DisplayName="Toast activator">
-                      <com:Class Id="32c2214e-7dbf-462f-9ee1-74fadd80d026" DisplayName="Toast activator"/>
-                  </com:ExeServer>
-              </com:ComServer>
+              <com:ComServer/>
           </com:Extension>
       </Extensions>
     </Application>

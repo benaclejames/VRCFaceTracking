@@ -19,7 +19,6 @@ using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Models;
-using VRCFaceTracking.Notifications;
 using VRCFaceTracking.Services;
 using VRCFaceTracking.ViewModels;
 using VRCFaceTracking.Views;
@@ -91,15 +90,9 @@ public partial class App : Application
             // Default Activation Handler
             services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
-            // Other Activation Handlers
-            services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
-
-            // Services
-            services.AddSingleton<IAppNotificationService, AppNotificationService>();
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
             services.AddTransient<INavigationViewService, NavigationViewService>();
-            services.AddTransient<GithubService>();
 
             services.AddSingleton<IActivationService, ActivationService>();
             services.AddSingleton<IPageService, PageService>();
@@ -118,9 +111,13 @@ public partial class App : Application
             services.AddTransient<OscQueryConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
-            services.AddTransient<OpenVRService>();
             services.AddSingleton<IOscTarget, OscTarget>();
             services.AddSingleton<HttpHandler>();
+            services.AddSingleton<OscSendService>();
+            services.AddSingleton<OscRecvService>();
+            services.AddSingleton<ParameterSenderService>();
+            services.AddSingleton<UnifiedTrackingMutator>();
+            services.AddTransient<GithubService>();
 
             // Views and ViewModels
             services.AddTransient<ModuleRegistryViewModel>();
@@ -131,16 +128,12 @@ public partial class App : Application
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();
-            services.AddSingleton<UnifiedTrackingMutator>();
-            services.AddSingleton<RiskySettingsViewModel>();
+            services.AddTransient<RiskySettingsViewModel>();
             services.AddTransient<SettingsPage>();
-            services.AddSingleton<MainViewModel>();
+            services.AddTransient<MainViewModel>();
             services.AddTransient<MainPage>();
             services.AddTransient<ShellPage>();
             services.AddTransient<ShellViewModel>();
-            services.AddSingleton<OscSendService>();
-            services.AddSingleton<OscRecvService>();
-            services.AddSingleton<ParameterSenderService>();
             
             services.AddHostedService<ParameterSenderService>(provider => provider.GetService<ParameterSenderService>());
             services.AddHostedService<OscRecvService>(provider => provider.GetService<OscRecvService>());
@@ -152,8 +145,6 @@ public partial class App : Application
         
         var logBuilder = App.GetService<ILoggerFactory>();
         _logger = logBuilder.CreateLogger("App");
-
-        App.GetService<IAppNotificationService>().Initialize();
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
@@ -179,7 +170,6 @@ public partial class App : Application
             o.IsGlobalModeEnabled = true;
         });
         Current.UnhandledException += ExceptionHandler;
-        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         // Kill any other instances of VRCFaceTracking.exe
         foreach (var proc in Process.GetProcessesByName("VRCFaceTracking"))

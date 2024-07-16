@@ -184,9 +184,9 @@ public partial class MulticastDnsService : ObservableObject
         //await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
     }
 
-    private void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
+    public static void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
     {
-        if (!packet.QUERYRESPONSE || (packet.answers.Length > 0 && packet.answers[0].Type != 12))
+        if (!packet.QUERYRESPONSE || packet.answers.Length <= 0 || packet.answers[0].Type != 12)
         {
             return;
         }
@@ -219,8 +219,8 @@ public partial class MulticastDnsService : ObservableObject
             return;
         }
         
-        VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
-        OnVrcClientDiscovered();
+        //VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
+        //OnVrcClientDiscovered();
         //_logger.LogInformation("Resolved VRChat client at "+VrchatClientEndpoint);
     }
         

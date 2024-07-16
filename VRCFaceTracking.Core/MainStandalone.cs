@@ -32,24 +32,28 @@ public class MainStandalone : IMainService
     public async Task Teardown()
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
-        _libManager.TeardownAllAndResetAsync();
-
         await _mutator.SaveCalibration();
         
-        _logger.LogDebug("Resetting our time end period...");
-        Utils.TimeEndPeriod(1);
+        _libManager.TeardownAllAndResetAsync();
         
-        _logger.LogDebug("Teardown successful. Awaiting exit...");
+        _logger.LogDebug("Resetting our time end period...");
+        var timeEndRes = Utils.TimeEndPeriod(1);
+        if (timeEndRes != 0)
+        {
+            _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+        }
+        
+        _logger.LogDebug("Teardown complete. Awaiting exit...");
     }
 
     public Task InitializeAsync()
     {
         // Ensure OSC is enabled
-        if (VRChat.ForceEnableOsc()) // If osc was previously not enabled
+        if (OperatingSystem.IsWindows() && VRChat.ForceEnableOsc()) // If osc was previously not enabled
         {
             _logger.LogWarning("VRCFT detected OSC was disabled and automatically enabled it.");
             // If we were launched after VRChat
-            if (VRChat.IsVRChatRunning())
+            if (VRChat.IsVrChatRunning())
                 _logger.LogError(
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
