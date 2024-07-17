@@ -119,7 +119,11 @@ public static class UnifiedExpressionsParameters
             exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
                 ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
                 : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight),
-        
+
+        new EParam("v2/EyesSquint", exp =>
+            exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
+                : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight),
         #endregion
 
         #region Eyebrows Compacted
