@@ -314,7 +314,13 @@ public class UnifiedLibManager : ILibManager
                 // Start subprocess
                 var sandboxProcess  = Process.Start(new ProcessStartInfo(
                     _sandboxProcessPath, $"--port {_sandboxServer.Port} --module-path \"{dll}\""
-                ));
+                )
+                {
+#if !DEBUG
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+#endif
+                });
 
                 var pid             = sandboxProcess.Id;
 
