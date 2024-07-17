@@ -104,6 +104,8 @@ public class UnifiedLibManager : ILibManager
                             var pkt = (HandshakePacket) packet;
                             lock ( AvailableSandboxModules )
                             {
+                                bool pidRegistered = false;
+                                
                                 for ( int i = 0; i < AvailableSandboxModules.Count; i++ )
                                 {
                                     if ( AvailableSandboxModules[i].SandboxProcessPID == pkt.PID )
@@ -114,9 +116,32 @@ public class UnifiedLibManager : ILibManager
 
                                         _logger.LogInformation("Initializing {module}...", AvailableSandboxModules[i].ModuleClassName.ToString());
                                         AttemptSandboxedModuleInitialize(AvailableSandboxModules[i]);
+                                        pidRegistered = true;
 
                                         break;
                                     }
+                                }
+
+                                if ( pidRegistered == false )
+                                {
+                                    Process sandboxProcess = Process.GetProcessById(pkt.PID);
+
+                                    ModuleRuntimeInfo runtimeInfo = new ModuleRuntimeInfo()
+                                    {
+                                        SandboxProcessPID   = pkt.PID,
+                                        SandboxProcessPort  = port,
+                                        SandboxModulePath   = pkt.ModulePath,
+                                        IsActive            = true,
+                                        Process             = sandboxProcess,
+                                        ModuleClassName     = Path.GetFileNameWithoutExtension(pkt.ModulePath),
+                                        ModuleInformation   = new (),
+                                        EventBus            = new (),
+                                    };
+                                    AvailableSandboxModules.Add(runtimeInfo);
+
+                                    _logger.LogInformation("Initializing {module}...", runtimeInfo.ModuleClassName.ToString());
+                                    AttemptSandboxedModuleInitialize(runtimeInfo);
+                                    pidRegistered = true;
                                 }
                             }
                             break;

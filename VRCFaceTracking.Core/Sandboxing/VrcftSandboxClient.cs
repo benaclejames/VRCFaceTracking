@@ -47,9 +47,10 @@ public class VrcftSandboxClient : UdpFullDuplex
         _logger.LogInformation($"Starting sandbox process on port {Port}...");
     }
 
-    public void Connect()
+    public void Connect(in string modulePath)
     {
         var handshakePkt = new HandshakePacket();
+        handshakePkt.ModulePath = modulePath;
         _logger.LogInformation($"Attempting to connect to server...");
         SendData(handshakePkt, _serverEndpoint);
     }

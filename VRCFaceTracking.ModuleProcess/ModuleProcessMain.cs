@@ -200,7 +200,7 @@ public class ModuleProcessMain
 
         };
         // Start the connection
-        Client.Connect();
+        Client.Connect(modulePath);
         Logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
 
         stopwatch.Start();
