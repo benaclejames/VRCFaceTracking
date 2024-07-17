@@ -115,15 +115,21 @@ public static class UnifiedExpressionsParameters
 
         #region Eyes Squint (Combined)
 
+        new EParam("v2/EyeSquint", exp =>
+            exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
+                ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
+                : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight),
+
         new EParam("v2/EyesSquint", exp =>
             exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight  > exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
                 ? exp.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
                 : exp.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight),
-        
         #endregion
 
         #region Eyebrows Compacted
 
+        new EParam("v2/BrowUp", exp =>
+            GetSimpleShape(exp, UnifiedSimpleExpressions.BrowUpRight) + GetSimpleShape(exp, UnifiedSimpleExpressions.BrowUpLeft)),
         new EParam("v2/BrowDown", exp => 
             GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownRight) + GetSimpleShape(exp, UnifiedSimpleExpressions.BrowDownLeft)),
 
@@ -194,7 +200,8 @@ public static class UnifiedExpressionsParameters
         new EParam("v2/LipFunnel", exp => 
             (exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelUpperLeft].Weight + 
              exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipFunnelLowerLeft].Weight) / 4.0f),
-
+        new EParam("v2/LipPuckerUpper", exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight) / 2.0f),
+        new EParam("v2/LipPuckerLower", exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 2.0f),
         new EParam("v2/LipPuckerRight", exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperRight].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerRight].Weight) / 2.0f),
         new EParam("v2/LipPuckerLeft", exp => (exp.Shapes[(int)UnifiedExpressions.LipPuckerUpperLeft].Weight + exp.Shapes[(int)UnifiedExpressions.LipPuckerLowerLeft].Weight) / 2.0f),
         new EParam("v2/LipPucker", exp => 
