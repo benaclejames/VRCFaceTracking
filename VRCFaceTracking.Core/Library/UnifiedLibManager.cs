@@ -437,8 +437,25 @@ public class UnifiedLibManager : ILibManager
         // Give the module 100ms to kill itself
         Thread.Sleep(100);
 
-        // @Note: Forcefully kill the process
-        module.Process.Kill();
+        // Only bother tearing down a module if it's actually shutdown
+        if ( !module.Process.HasExited )
+        {
+            // @Note: Forcefully kill the process. We'll try to kill it 1000 times and then give up.
+            int tries = 0;
+            while ( tries < 1000 )
+            {
+                try
+                {
+                    tries++;
+                    module.Process.Kill(true);
+                    tries = int.MaxValue;
+                } catch ( Exception ex )
+                {
+                    // Tell the user why we got an exception so that we can hopefully fix it.
+                    _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got exception ({ex.HResult}) {ex.Message}");
+                }
+            }
+        }
 
         return true;
     }
