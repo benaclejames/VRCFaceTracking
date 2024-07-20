@@ -207,7 +207,23 @@ public class UnifiedLibManager : ILibManager
                             EnsureModuleThreadStartedSandboxed(AvailableSandboxModules[moduleIndex]);
 
                             _dispatcherService.Run(() => {
-                                if ( !LoadedModulesMetadata.Contains(AvailableSandboxModules[moduleIndex].ModuleInformation) )
+
+                                // Check if the module is already loaded on the user-facing side. If so, overwrite with the new module if it's unloaded
+                                var isModuleLoaded = false;
+                                for ( var i = 0; i < LoadedModulesMetadata.Count; i++ )
+                                {
+                                    // Look for modules with the same name
+                                    if ( LoadedModulesMetadata[i].Name == AvailableSandboxModules[moduleIndex].ModuleInformation.Name )
+                                    {
+                                        // Update module info
+                                        LoadedModulesMetadata[i] = AvailableSandboxModules[moduleIndex].ModuleInformation;
+                                        isModuleLoaded = true;
+                                        break;
+                                    }
+                                }
+
+                                // Add it to list if it was never loaded
+                                if ( isModuleLoaded == false )
                                 {
                                     LoadedModulesMetadata.Add(AvailableSandboxModules[moduleIndex].ModuleInformation);
                                 }
@@ -233,11 +249,11 @@ public class UnifiedLibManager : ILibManager
                                         LoadedModulesMetadata.RemoveAt(0);
                                     }
 
-                                    foreach ( var pair in _moduleThreads )
+                                    // foreach ( var pair in _moduleThreads )
                                     {
-                                        if ( pair.ModuleInformation.Active )
+                                        if ( AvailableSandboxModules[moduleIndex].ModuleInformation.Active )
                                         {
-                                            _logger.LogInformation("Tracking initialized via {module}", pair.ModuleClassName.ToString());
+                                            _logger.LogInformation("Tracking initialized via {module}", AvailableSandboxModules[moduleIndex].ModuleClassName.ToString());
                                         }
                                     }
                                 }
