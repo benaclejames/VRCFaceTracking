@@ -2,6 +2,8 @@
 using System.Net;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 
@@ -9,6 +11,7 @@ public delegate void OnReceiveShouldBeQueued();
 
 public class UdpFullDuplex : IDisposable
 {
+    const int SIO_UDP_CONNRESET = -1744830452;
     const int TIMEOUT_MILLISECONDS = 10000;
 
     public int Port
@@ -44,6 +47,11 @@ public class UdpFullDuplex : IDisposable
             try
             {
                 _receivingUdpClient = new UdpClient(port);
+                // Disable crash from ICMP messages from modules which crashed. Windows only
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    _receivingUdpClient.Client.IOControl(( IOControlCode )SIO_UDP_CONNRESET, new byte[] { 0, 0, 0, 0 }, null);
+                }
                 _receivingUdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
                 // Blacklist any reserved ports
@@ -83,16 +91,20 @@ public class UdpFullDuplex : IDisposable
             _remoteIpEndPoint = remoteIpEndPoint;
         }
 
-        _receivingUdpClient.Client.ReceiveTimeout   = 1;
-        _receivingUdpClient.Client.SendTimeout      = 1;
+        _receivingUdpClient.Client.ReceiveTimeout   = 10;
+        _receivingUdpClient.Client.SendTimeout      = 10;
 
         // setup first async event
         // AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
         // _receivingUdpClient.BeginReceive(callBack, null);
-        Listen();
+        _receiveThread = new Thread(new ThreadStart(Listen))
+        {
+            IsBackground = true
+        };
+        _receiveThread.Start();
     }
 
-    private async void Listen()
+    private void Listen()
     {
         while ( !_cts.IsCancellationRequested )
         {
@@ -102,7 +114,12 @@ public class UdpFullDuplex : IDisposable
                 using CancellationTokenSource linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(internalCancellationTokenSource.Token, _cts.Token);
 
                 internalCancellationTokenSource.CancelAfter(TIMEOUT_MILLISECONDS);
-                var result = await _receivingUdpClient.ReceiveAsync(linkedTokenSource.Token);
+                var task = _receivingUdpClient.ReceiveAsync(_cts.Token);
+                var index = Task.WaitAny(new [] { task.AsTask() }, TIMEOUT_MILLISECONDS, _cts.Token);
+                if ( index < 0 )
+                    continue;
+
+                var result = task.Result;
 
                 if ( result.Buffer != null && result.Buffer.Length > 0 )
                 {
@@ -219,6 +236,7 @@ public class UdpFullDuplex : IDisposable
             _closing = true;
             _receivingUdpClient.Close();
             _closingEvent.Set();
+            _receiveThread.Join();
         }
         _closingEvent.WaitOne();
     }
