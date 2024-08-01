@@ -197,7 +197,7 @@ public class UnifiedLibManager : ILibManager
                                 _sandboxServer.SendData(statusUpdatePkt, portCopy);
                             };
 
-                            EyeStatus = replyInitPacket.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
+                            EyeStatus           = replyInitPacket.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
                             ExpressionStatus    = replyInitPacket.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
                             AvailableSandboxModules[moduleIndex].ModuleInformation.Active           = true;
@@ -267,7 +267,6 @@ public class UnifiedLibManager : ILibManager
 
                             if ( AvailableSandboxModules[moduleIndex].Status == ModuleState.Active && AvailableSandboxModules[moduleIndex].ModuleInformation.Active )
                             {
-
                                 if ( AvailableSandboxModules[moduleIndex].ModuleInformation.UsingEye )
                                 {
                                     replyUpdatePacket.UpdateGlobalEyeState();
@@ -449,8 +448,10 @@ public class UnifiedLibManager : ILibManager
                     tries++;
                     module.Process.Kill(true);
                     tries = int.MaxValue;
-                } catch ( Exception ex )
-                {
+                } catch ( System.ComponentModel.Win32Exception ex ) {
+                    // Can fail to call OpenProcessEx due to some error such as ACCESS_DENIED (process has higher priveledges, eg Sraniple)
+                    _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got win32 error ({ex.ToString()}");
+                } catch ( Exception ex ) {
                     // Tell the user why we got an exception so that we can hopefully fix it.
                     _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got exception ({ex.HResult}) {ex.Message}");
                 }
