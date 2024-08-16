@@ -8,18 +8,51 @@
     
     <Page.Resources>
         <DataTemplate x:Key="CheckboxTemplate">
-            <CheckBox Content="{Binding Name}" IsChecked="{Binding Value}" Margin="10"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/> <!-- TextBlock -->
+                    <ColumnDefinition Width="Auto"/>   <!-- For spacing between TextBlock and CheckBox -->
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Margin="0" Grid.Column="1"/>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="TextInputTemplate">
-            <TextBox Text="{Binding Value}" Margin="10"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                <TextBox Text="{Binding Value, Mode=TwoWay}" Grid.Column="1"/>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="SliderTemplate">
-            <Slider Minimum="0" Maximum="100" Value="{Binding Value}" Margin="10"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="0.5*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                <Slider Minimum="0" 
+                        TickFrequency="0.25" 
+                        TickPlacement="Outside" 
+                        StepFrequency="0.01"
+                        Maximum="1" 
+                        Value="{Binding Value, Mode=TwoWay}" 
+                        Grid.Column="1"/>
+            </Grid>
         </DataTemplate>
+        <helpers:PropertyTemplateSelector x:Key="MutationPropertyTemplateSelector"
+                                                CheckboxTemplate="{StaticResource CheckboxTemplate}"
+                                                TextInputTemplate="{StaticResource TextInputTemplate}"
+                                                SliderTemplate="{StaticResource SliderTemplate}"/>
+    
     </Page.Resources>
 
+    
     <Grid>
         <ListView x:Name="MutationsListView" ItemsSource="{Binding Mutations}">
             <ListView.ItemTemplate>
@@ -31,19 +64,15 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <CheckBox IsChecked="{Binding IsActive}" Margin="0"/>
-                                <TextBlock FontSize="16" Text="{Binding Name}" VerticalAlignment="Center" Margin="40,0,0,0"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="40,0,0,0"/>
+                                <CheckBox IsChecked="{Binding IsActive, Mode=TwoWay}" Margin="0" HorizontalContentAlignment="Right"/>
+
                             </Grid>
                         </Expander.Header>
                         <StackPanel>
-                            <TextBlock HorizontalAlignment="Left" Text="{Binding Description}" Margin="10" TextWrapping="Wrap"/>
-                            <ItemsControl ItemsSource="{Binding Properties}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="sdk:MutationProperty">
-                                        <TextBlock Text="{Binding Name}" Margin="10"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <TextBlock Text="{Binding Description}" Margin="10" TextWrapping="Wrap"/>
+                            <ItemsControl ItemsSource="{Binding Properties}"
+                                          ItemTemplateSelector="{StaticResource MutationPropertyTemplateSelector}"/>
                         </StackPanel>
                     </Expander>
                 </DataTemplate>

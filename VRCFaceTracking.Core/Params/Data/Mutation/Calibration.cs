@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ public class Calibration : TrackingMutation
         public CalibrationParameter Openness;
         public CalibrationParameter[] Shapes;
         public float CalibrationWeight;
+        public bool ContinuousCalibration;
     }
 
     private CalibrationData calData;
@@ -37,14 +39,17 @@ public class Calibration : TrackingMutation
     public override string Description => "Default VRCFaceTracking calibration that processes raw tracking data into normalized tracking data to better match user expression.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
+
+    MutationProperty continuousCalibration = new()
+    {
+        Name = "Continuous Calibration",
+        Value = false,
+        Type = MutationPropertyType.CheckBox
+    };
+
     public override List<MutationProperty> Properties => new()
     {
-        new MutationProperty 
-        { 
-            Name = "Test Parmeter", 
-            Value = 0.5f,
-            Type = MutationPropertyType.Slider
-        }
+        continuousCalibration,
     };
 
     public async override Task Initialize(UnifiedTrackingData data) =>
@@ -97,7 +102,7 @@ public class Calibration : TrackingMutation
         }
     }
 
-    public async Task InitializeCalibration(int durationMs = 30000)
+    public async Task InitializeCalibration(int durationMs = 3000)
     {
         Logger.LogInformation("Initialized calibration.");
 

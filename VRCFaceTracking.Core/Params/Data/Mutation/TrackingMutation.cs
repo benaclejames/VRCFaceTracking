@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -23,23 +25,59 @@ public enum MutationPropertyType
     TextBox
 }
 
-public class MutationProperty
+public class MutationProperty : INotifyPropertyChanged
 {
+    private object _value;
+
+    public object Value
+    {
+        get => _value;
+        set
+        {
+            if (_value != value)
+            {
+                _value = value;
+                OnPropertyChanged(nameof(Value));
+            }
+        }
+    }
+
     public string Name { get; set; }
-    public object Value { get; set; }
     public MutationPropertyType Type { get; set; }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
-public abstract class TrackingMutation
+public abstract class TrackingMutation : INotifyPropertyChanged
 {
     public abstract string Name { get; }
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
     public abstract List<MutationProperty> Properties { get; }
-    //public virtual bool IsVisible { get; }
     public virtual bool IsSaved { get; }
 
-    public bool IsActive = false;
+    private bool _isActive;
+    public bool IsActive
+    {
+        get => _isActive;
+        set
+        {
+            if (_isActive != value)
+            {
+                _isActive = value;
+                OnPropertyChanged(nameof(IsActive));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public ILogger Logger { get; set; }
     public async virtual Task Initialize(UnifiedTrackingData data) => await Task.CompletedTask;

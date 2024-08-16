@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ public class Smoothing : TrackingMutation
 
     public override bool IsSaved => true;
 
-    public override List<MutationProperty> Properties => new List<MutationProperty>();
+    public override List<MutationProperty> Properties => new();
 
     UnifiedTrackingData _trackingDataBuffer = new();
 
