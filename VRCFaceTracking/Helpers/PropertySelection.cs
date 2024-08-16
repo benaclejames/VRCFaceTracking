@@ -9,7 +9,7 @@ using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Helpers;
 
-public class MutationPropertyTemplateSelector : DataTemplateSelector
+public class PropertyTemplateSelector : DataTemplateSelector
 {
     public DataTemplate CheckboxTemplate { get; set; }
     public DataTemplate TextInputTemplate { get; set; }
