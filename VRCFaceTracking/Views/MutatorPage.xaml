@@ -1,0 +1,53 @@
+﻿<Page
+    x:Class="VRCFaceTracking.Views.MutatorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VRCFaceTracking.Views"
+    xmlns:helpers="using:VRCFaceTracking.Helpers"
+    xmlns:sdk="using:VRCFaceTracking.SDK">
+    
+    <Page.Resources>
+        <DataTemplate x:Key="CheckboxTemplate">
+            <CheckBox Content="{Binding Name}" IsChecked="{Binding Value}" Margin="10"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="TextInputTemplate">
+            <TextBox Text="{Binding Value}" Margin="10"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SliderTemplate">
+            <Slider Minimum="0" Maximum="100" Value="{Binding Value}" Margin="10"/>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <ListView x:Name="MutationsListView" ItemsSource="{Binding Mutations}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="sdk:TrackingMutation">
+                    <Expander IsExpanded="False">
+                        <Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox IsChecked="{Binding IsActive}" Margin="0"/>
+                                <TextBlock FontSize="16" Text="{Binding Name}" VerticalAlignment="Center" Margin="40,0,0,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Description}" Margin="10" TextWrapping="Wrap"/>
+                            <ItemsControl ItemsSource="{Binding Properties}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="sdk:MutationProperty">
+                                        <TextBlock Text="{Binding Name}" Margin="10"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Expander>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>

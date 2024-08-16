@@ -226,5 +226,5 @@ public sealed partial class SettingsPage : Page
 
     private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetAvatarOscManifests();
 
-    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.InitializeCalibration();
+    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.Initialize();
 }

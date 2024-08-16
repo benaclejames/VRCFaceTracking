@@ -386,4 +386,7 @@
   <data name="HardwareDebug.Description" xml:space="preserve">
     <value>Stare at your tongue I guess?</value>
   </data>
+  <data name="Shell_Mutator.Content" xml:space="preserve">
+    <value>Mutator</value>
+  </data>
 </root>
