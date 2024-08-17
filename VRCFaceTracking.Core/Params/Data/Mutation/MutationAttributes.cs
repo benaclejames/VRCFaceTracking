@@ -20,9 +20,21 @@ public class MutationPropertyAttribute : Attribute
 
 public static class MutationPropertyFactory
 {
-    public static List<MutationProperty<object>> CreateProperties(object instance)
+    public static List<MutationProperty> CreateProperties(object instance)
     {
-        var properties = new List<MutationProperty<object>>();
+        var properties = new List<MutationProperty>();
+        var processedObjects = new HashSet<object>();
+        ProcessFields(instance, properties, processedObjects);
+        return properties;
+    }
+
+
+    public static void ProcessFields(object instance, List<MutationProperty> properties, HashSet<object> processedObjects)
+    {
+        if (instance == null || processedObjects.Contains(instance))
+            return;
+
+        processedObjects.Add(instance);
 
         var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -32,17 +44,40 @@ public static class MutationPropertyFactory
             if (attribute != null)
             {
                 var value = field.GetValue(instance);
-                var mutationProperty = new MutationProperty<object> 
-                {
-                    Name = attribute.Name,
-                    Value = value,
-                    Type = DeterminePropertyType(value)
-                };
+                var mutationProperty = new MutationProperty 
+                (
+                    attribute.Name,
+                    value,
+                    DeterminePropertyType(value),
+                    newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType))
+                );
                 properties.Add(mutationProperty);
             }
-        }
 
-        return properties;
+            var fieldType = field.FieldType;
+            if (fieldType.IsClass || fieldType.IsValueType)
+            {
+                if (fieldType.IsArray)
+                {
+                    var array = (Array)field.GetValue(instance);
+                    if (array != null)
+                    {
+                        foreach (var element in array)
+                        {
+                            ProcessFields(element, properties, processedObjects);
+                        }
+                    }
+                }
+                else
+                {
+                    var nestedInstance = field.GetValue(instance);
+                    if (nestedInstance != null)
+                    {
+                        ProcessFields(nestedInstance, properties, processedObjects);
+                    }
+                }
+            }
+        }
     }
 
     private static MutationPropertyType DeterminePropertyType(object value)

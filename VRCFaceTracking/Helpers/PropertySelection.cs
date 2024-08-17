@@ -17,7 +17,7 @@ public class PropertyTemplateSelector : DataTemplateSelector
 
     protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
     {
-        if (item is MutationProperty<object> property)
+        if (item is MutationProperty property)
         {
             return property.Type switch
             {

@@ -26,9 +26,18 @@ public enum MutationPropertyType
     TextBox
 }
 
-public class MutationProperty<T> : INotifyPropertyChanged
+public class MutationProperty : INotifyPropertyChanged
 {
     private object _value;
+    private readonly Action<object> _updateField;
+
+    public MutationProperty(string name, object value, MutationPropertyType type, Action<object> updateField)
+    {
+        Name = name;
+        _value = value;
+        Type = type;
+        _updateField = updateField;
+    }
 
     public object Value
     {
@@ -39,6 +48,7 @@ public class MutationProperty<T> : INotifyPropertyChanged
             {
                 _value = value;
                 OnPropertyChanged(nameof(Value));
+                _updateField?.Invoke(_value);
             }
         }
     }
@@ -62,7 +72,7 @@ public abstract partial class TrackingMutation : ObservableObject
     public abstract string Name { get; }
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
-    public List<MutationProperty<object>> Properties { get; }
+    public List<MutationProperty> Properties { get; }
     public virtual bool IsSaved { get; }
 
     [ObservableProperty]
