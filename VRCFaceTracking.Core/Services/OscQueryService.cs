@@ -171,18 +171,18 @@ public partial class OscQueryService : ObservableObject
         }
     }
 
-    partial void OnAvatarParametersChanged(List<Parameter> discoveredParameters)
+    partial void OnAvatarParametersChanged(List<Parameter> value)
     {
         _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
-        var hasLoadedNative = discoveredParameters.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
+        var hasLoadedNative = value.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
         if (hasLoadedNative)
         {
             _logger.LogWarning("Native tracking parameters detected.");
         }
 
-        var deprecatedParams = discoveredParameters.Where(p => p.Deprecated).ToList();
+        var deprecatedParams = value.Where(p => p.Deprecated).ToList();
 
-        _logger.LogInformation(discoveredParameters.Count + " parameters loaded.");
+        _logger.LogInformation(value.Count + " parameters loaded.");
         if (deprecatedParams.Any())
         {
             _logger.LogWarning(
