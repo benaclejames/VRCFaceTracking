@@ -1,9 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models;
-using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Core.Params.Data;
@@ -20,7 +19,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
     private readonly ILogger<UnifiedTrackingMutator> _logger;
     private readonly ILocalSettingsService _localSettingsService;
     private UnifiedTrackingData _inputBuffer;
-    public TrackingMutation[] _mutations = new TrackingMutation[0];
+    public ObservableCollection<TrackingMutation> _mutations = new();
 
     public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, ILocalSettingsService localSettingsService)
     {
@@ -30,7 +29,6 @@ public partial class UnifiedTrackingMutator : ObservableObject
             
         Enabled = false;
         _inputBuffer = new UnifiedTrackingData();
-        _mutations = TrackingMutation.GetImplementingMutations(true);
     }
 
     /// <summary>
@@ -62,7 +60,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
         foreach (var mutation in _mutations)
         {
             _logger.LogInformation($"Saving {mutation.Name} data.");
-            await mutation.SaveData(_localSettingsService);
+            await _localSettingsService.SaveSettingAsync(mutation.Name, mutation, true);
         }
         _logger.LogDebug("Mutation data saved.");
     }
@@ -85,12 +83,39 @@ public partial class UnifiedTrackingMutator : ObservableObject
     {
         // Try to load config and propogate data into Unified if they exist.
         _logger.LogDebug("Loading mutation data...");
+        var mutations = TrackingMutation.GetImplementingMutations(true);
         await _localSettingsService.Load(this);
-        foreach (var mutation in _mutations)
+
+        for (int i = 0; i < mutations.Length; i++)
         {
-            _logger.LogInformation($"Loading {mutation.Name}");
-            mutation.Logger = _logger;
-            await mutation.LoadData(_localSettingsService);
+            var mutation = mutations[i];
+            try
+            {
+                _logger.LogInformation($"Loading {mutation.Name}");
+
+                Type mutationType = mutation.GetType();
+
+                MethodInfo method = typeof(ILocalSettingsService)
+                    .GetMethod("ReadSettingAsync")
+                    .MakeGenericMethod(mutationType);
+
+                var task = (Task)method.Invoke(_localSettingsService, new object[] { mutation.Name, mutation, true });
+                await task.ConfigureAwait(false);
+
+                PropertyInfo resultProperty = task.GetType().GetProperty("Result");
+                var typedMutation = resultProperty.GetValue(task);
+
+                mutation = (TrackingMutation)typedMutation;
+
+                mutation.Logger = _logger;
+                mutation.CreateProperties();
+                _mutations.Add(mutation);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Creating new mutation data. {ex.Message}");
+                mutation.CreateProperties();
+            }
         }
         _logger.LogDebug("Mutation data loaded.");
     }

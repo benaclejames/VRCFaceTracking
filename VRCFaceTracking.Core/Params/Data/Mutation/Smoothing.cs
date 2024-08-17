@@ -56,9 +56,4 @@ public class Smoothing : TrackingMutation
 
         _trackingDataBuffer = data;
     }
-
-    public async override Task SaveData(ILocalSettingsService localSettingsService) => 
-        await localSettingsService.SaveSettingAsync("VRCFTDefaultSmoothing", smoothingData, true);
-    public async override Task LoadData(ILocalSettingsService localSettingsService) => 
-        await localSettingsService.ReadSettingAsync("VRCFTDefaultSmoothing", smoothingData, true);
 }

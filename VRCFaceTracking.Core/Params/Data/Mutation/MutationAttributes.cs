@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -20,16 +21,16 @@ public class MutationPropertyAttribute : Attribute
 
 public static class MutationPropertyFactory
 {
-    public static List<MutationProperty> CreateProperties(object instance)
+    public static ObservableCollection<MutationProperty> CreateProperties(object instance)
     {
-        var properties = new List<MutationProperty>();
+        var properties = new ObservableCollection<MutationProperty>();
         var processedObjects = new HashSet<object>();
         ProcessFields(instance, properties, processedObjects);
         return properties;
     }
 
 
-    public static void ProcessFields(object instance, List<MutationProperty> properties, HashSet<object> processedObjects)
+    public static void ProcessFields(object instance, ObservableCollection<MutationProperty> properties, HashSet<object> processedObjects)
     {
         if (instance == null || processedObjects.Contains(instance))
             return;
@@ -85,7 +86,7 @@ public static class MutationPropertyFactory
         return value switch
         {
             bool => MutationPropertyType.CheckBox,
-            int => MutationPropertyType.Slider,
+            float => MutationPropertyType.Slider,
             string => MutationPropertyType.TextBox,
             // Add more type checks as needed
             _ => MutationPropertyType.TextBox // default input

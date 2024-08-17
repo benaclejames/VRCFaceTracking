@@ -15,8 +15,6 @@ public class MutatorViewModel : ObservableRecipient
     public MutatorViewModel()
     {
         _trackingMutator = App.GetService<UnifiedTrackingMutator>();
-        Mutations = new ObservableCollection<TrackingMutation>();
-        foreach (var mutation in _trackingMutator._mutations)
-            Mutations.Add(mutation);
+        Mutations = _trackingMutator._mutations;
     }
 }

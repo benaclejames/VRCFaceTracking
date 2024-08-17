@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params.Data;
 
@@ -64,25 +65,22 @@ public class MutationProperty : INotifyPropertyChanged
 
 public abstract partial class TrackingMutation : ObservableObject
 {
-    public TrackingMutation() 
-    {
-        Properties = MutationPropertyFactory.CreateProperties(this);
-    }
-
     public abstract string Name { get; }
+    [JsonIgnore]
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
-    public List<MutationProperty> Properties { get; }
-    public virtual bool IsSaved { get; }
+    [JsonIgnore]
+    public ObservableCollection<MutationProperty> Properties { get; set; }
+    public virtual bool IsSaved { get; } = false;
 
     [ObservableProperty]
     private bool _isActive;
 
+    [JsonIgnore]
     public ILogger Logger { get; set; }
     public async virtual Task Initialize(UnifiedTrackingData data) => await Task.CompletedTask;
     public abstract void MutateData(ref UnifiedTrackingData data);
-    public async virtual Task SaveData(ILocalSettingsService localSettingsService) => await Task.CompletedTask;
-    public async virtual Task LoadData(ILocalSettingsService localSettingsService) => await Task.CompletedTask;
+    public void CreateProperties() => Properties = MutationPropertyFactory.CreateProperties(this);
     public static TrackingMutation[] GetImplementingMutations(bool ordered = true)
     {
         var types = Assembly.GetExecutingAssembly()

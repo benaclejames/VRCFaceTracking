@@ -13,7 +13,7 @@ namespace VRCFaceTracking.Core.Params.Data.Mutation;
 
 public class Calibration : TrackingMutation
 {
-    struct CalibrationParameter
+    public struct CalibrationParameter
     {
         public string Name;
         public float Ceil; // The maximum that the parameter reaches.
@@ -23,18 +23,19 @@ public class Calibration : TrackingMutation
         public float SmoothnessMult; // How much should this parameter be affected by the smoothing function.
     }
 
-    private struct CalibrationData
+    public class CalibrationData
     {
         public CalibrationParameter Pupil;
         public CalibrationParameter Gaze;
         public CalibrationParameter Openness;
         public CalibrationParameter[] Shapes;
+        [MutationProperty("Calibration Weight")]
         public float CalibrationWeight;
         [MutationProperty("Continuous Calibration")]
         public bool ContinuousCalibration;
     }
 
-    private CalibrationData calData;
+    public CalibrationData calData = new();
 
     public override string Name => "Unified Calibration";
     public override string Description => "Default VRCFaceTracking calibration that processes raw tracking data into normalized tracking data to better match user expression.";
@@ -105,9 +106,4 @@ public class Calibration : TrackingMutation
         calData.CalibrationWeight = 0.2f;
         Logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
     }
-
-    public async override Task SaveData(ILocalSettingsService localSettingsService) =>
-        await localSettingsService.SaveSettingAsync("VRCFTDefaultCalibration", calData, true);
-    public async override Task LoadData(ILocalSettingsService localSettingsService) =>
-        await localSettingsService.ReadSettingAsync("VRCFTDefaultCalibration", calData, true);
 }
