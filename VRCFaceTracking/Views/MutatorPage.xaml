@@ -45,9 +45,21 @@
                         Grid.Column="1"/>
             </Grid>
         </DataTemplate>
-        <helpers:PropertyTemplateSelector x:Key="MutationPropertyTemplateSelector"
+        <DataTemplate x:Key="ButtonTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/> <!-- TextBlock -->
+                    <ColumnDefinition Width="Auto"/>   <!-- For spacing between TextBlock and CheckBox -->
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
+                <Button Content="{Binding Name}" Command="{Binding}" Margin="0" Grid.Column="1"/>
+            </Grid>
+        </DataTemplate>
+
+        <helpers:ComponentTemplateSelector x:Key="MutationPropertyTemplateSelector"
                                                 CheckboxTemplate="{StaticResource CheckboxTemplate}"
                                                 TextInputTemplate="{StaticResource TextInputTemplate}"
+                                                ButtonTemplate="{StaticResource ButtonTemplate}"
                                                 SliderTemplate="{StaticResource SliderTemplate}"/>
     
     </Page.Resources>
@@ -71,7 +83,7 @@
                         </Expander.Header>
                         <StackPanel>
                             <TextBlock Text="{Binding Description}" Margin="10" TextWrapping="Wrap"/>
-                            <ItemsControl ItemsSource="{Binding Properties}"
+                            <ItemsControl ItemsSource="{Binding Components}"
                                           ItemTemplateSelector="{StaticResource MutationPropertyTemplateSelector}"/>
                         </StackPanel>
                     </Expander>

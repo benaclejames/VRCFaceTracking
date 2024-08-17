@@ -20,49 +20,6 @@ public enum MutationPriority
     Postprocessor 
 }
 
-public enum MutationPropertyType
-{
-    CheckBox,
-    Slider,
-    TextBox
-}
-
-public class MutationProperty : INotifyPropertyChanged
-{
-    private object _value;
-    private readonly Action<object> _updateField;
-
-    public MutationProperty(string name, object value, MutationPropertyType type, Action<object> updateField)
-    {
-        Name = name;
-        _value = value;
-        Type = type;
-        _updateField = updateField;
-    }
-
-    public object Value
-    {
-        get => _value;
-        set
-        {
-            if (_value != value)
-            {
-                _value = value;
-                OnPropertyChanged(nameof(Value));
-                _updateField?.Invoke(_value);
-            }
-        }
-    }
-
-    public string Name { get; set; }
-    public MutationPropertyType Type { get; set; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged(string propertyName) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-}
-
 public abstract partial class TrackingMutation : ObservableObject
 {
     public abstract string Name { get; }
@@ -70,7 +27,7 @@ public abstract partial class TrackingMutation : ObservableObject
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
     [JsonIgnore]
-    public ObservableCollection<MutationProperty> Properties { get; set; }
+    public ObservableCollection<IMutationComponent> Components { get; set; }
     public virtual bool IsSaved { get; } = false;
 
     [ObservableProperty]
@@ -80,7 +37,7 @@ public abstract partial class TrackingMutation : ObservableObject
     public ILogger Logger { get; set; }
     public async virtual Task Initialize(UnifiedTrackingData data) => await Task.CompletedTask;
     public abstract void MutateData(ref UnifiedTrackingData data);
-    public void CreateProperties() => Properties = MutationPropertyFactory.CreateProperties(this);
+    public void CreateProperties() => Components = MutationComponentFactory.CreateComponents(this);
     public static TrackingMutation[] GetImplementingMutations(bool ordered = true)
     {
         var types = Assembly.GetExecutingAssembly()

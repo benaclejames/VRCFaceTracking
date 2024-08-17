@@ -5,15 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Helpers;
 
-public class PropertyTemplateSelector : DataTemplateSelector
+public class ComponentTemplateSelector : DataTemplateSelector
 {
     public DataTemplate CheckboxTemplate { get; set; }
     public DataTemplate TextInputTemplate { get; set; }
     public DataTemplate SliderTemplate { get; set; }
+    public DataTemplate ButtonTemplate { get; set; }
 
     protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
     {
@@ -27,6 +29,11 @@ public class PropertyTemplateSelector : DataTemplateSelector
                 _ => base.SelectTemplateCore(item, container)
             };
         }
+        if (item is MutationAction)
+        {
+            return ButtonTemplate;
+        }
+
         return base.SelectTemplateCore(item, container);
     }
 }

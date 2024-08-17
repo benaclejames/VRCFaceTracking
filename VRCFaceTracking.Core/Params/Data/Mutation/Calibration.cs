@@ -42,8 +42,6 @@ public class Calibration : TrackingMutation
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
 
-    public async override Task Initialize(UnifiedTrackingData data) =>
-        await InitializeCalibration();
     public override void MutateData(ref UnifiedTrackingData data)
     {
         for (var i = 0; i < (int)UnifiedExpressions.Max; i++)
@@ -92,7 +90,10 @@ public class Calibration : TrackingMutation
         }
     }
 
-    public async Task InitializeCalibration(int durationMs = 3000)
+    private int durationMs = 30000;
+
+    [MutationButton("Initialize Calibration")]
+    public void InitializeCalibration()
     {
         Logger.LogInformation("Initialized calibration.");
 
@@ -100,8 +101,8 @@ public class Calibration : TrackingMutation
 
         calData.CalibrationWeight = 0.75f;
 
-        Logger.LogInformation("Calibrating deep normalization for {durationSec}s.", durationMs / 100);
-        await Task.Delay(durationMs);
+        Logger.LogInformation("Calibrating deep normalization for {durationSec}s.", durationMs / 1000);
+        Thread.Sleep(durationMs);
 
         calData.CalibrationWeight = 0.2f;
         Logger.LogInformation("Fine-tuning normalization. Values will be saved on exit.");
