@@ -30,8 +30,6 @@ public class Smoothing : TrackingMutation
 
     public override bool IsSaved => true;
 
-    public override List<MutationProperty> Properties => new();
-
     UnifiedTrackingData _trackingDataBuffer = new();
 
     static T SimpleLerp<T>(T input, T previousInput, float value) => (dynamic)input * (1.0f - value) + (dynamic)previousInput * value;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params.Data;
@@ -25,7 +26,7 @@ public enum MutationPropertyType
     TextBox
 }
 
-public class MutationProperty : INotifyPropertyChanged
+public class MutationProperty<T> : INotifyPropertyChanged
 {
     private object _value;
 
@@ -51,33 +52,21 @@ public class MutationProperty : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
-public abstract class TrackingMutation : INotifyPropertyChanged
+public abstract partial class TrackingMutation : ObservableObject
 {
+    public TrackingMutation() 
+    {
+        Properties = MutationPropertyFactory.CreateProperties(this);
+    }
+
     public abstract string Name { get; }
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
-    public abstract List<MutationProperty> Properties { get; }
+    public List<MutationProperty<object>> Properties { get; }
     public virtual bool IsSaved { get; }
 
+    [ObservableProperty]
     private bool _isActive;
-    public bool IsActive
-    {
-        get => _isActive;
-        set
-        {
-            if (_isActive != value)
-            {
-                _isActive = value;
-                OnPropertyChanged(nameof(IsActive));
-            }
-        }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     public ILogger Logger { get; set; }
     public async virtual Task Initialize(UnifiedTrackingData data) => await Task.CompletedTask;

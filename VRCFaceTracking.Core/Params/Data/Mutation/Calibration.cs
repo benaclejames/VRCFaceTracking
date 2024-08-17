@@ -30,6 +30,7 @@ public class Calibration : TrackingMutation
         public CalibrationParameter Openness;
         public CalibrationParameter[] Shapes;
         public float CalibrationWeight;
+        [MutationProperty("Continuous Calibration")]
         public bool ContinuousCalibration;
     }
 
@@ -39,18 +40,6 @@ public class Calibration : TrackingMutation
     public override string Description => "Default VRCFaceTracking calibration that processes raw tracking data into normalized tracking data to better match user expression.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
-
-    MutationProperty continuousCalibration = new()
-    {
-        Name = "Continuous Calibration",
-        Value = false,
-        Type = MutationPropertyType.CheckBox
-    };
-
-    public override List<MutationProperty> Properties => new()
-    {
-        continuousCalibration,
-    };
 
     public async override Task Initialize(UnifiedTrackingData data) =>
         await InitializeCalibration();
