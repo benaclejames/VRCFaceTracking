@@ -20,7 +20,7 @@ public enum MutationPriority
     Postprocessor 
 }
 
-public abstract partial class TrackingMutation : ObservableObject
+public abstract partial class TrackingMutation
 {
     public abstract string Name { get; }
     [JsonIgnore]
@@ -30,8 +30,7 @@ public abstract partial class TrackingMutation : ObservableObject
     public ObservableCollection<IMutationComponent> Components { get; set; }
     public virtual bool IsSaved { get; } = false;
 
-    [ObservableProperty]
-    private bool _isActive;
+    public virtual bool IsActive { get; set; }
 
     [JsonIgnore]
     public ILogger Logger { get; set; }
