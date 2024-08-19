@@ -83,21 +83,6 @@
                     </Grid>
                 </labs:SettingsCard>
                 
-                <labs:SettingsExpander x:Uid="CalibrationSettings">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xEC49;"/>
-                    </labs:SettingsExpander.HeaderIcon>
-                    
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="CalibrationEnabledToggle">
-                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.Enabled, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="TrackingCalibrateButton">
-                            <Button Style="{StaticResource AccentButtonStyle}" Click="ButtonBase_OnClick" x:Uid="CalibrateButton" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-                
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE7BA;" />
