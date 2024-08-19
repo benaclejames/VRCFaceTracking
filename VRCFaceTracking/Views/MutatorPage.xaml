@@ -4,91 +4,149 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:VRCFaceTracking.Views"
     xmlns:helpers="using:VRCFaceTracking.Helpers"
-    xmlns:sdk="using:VRCFaceTracking.SDK">
-    
+    xmlns:sdk="using:VRCFaceTracking.SDK"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls">
+
     <Page.Resources>
+        <helpers:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter"/>
+
+        <!-- Data Templates -->
         <DataTemplate x:Key="CheckboxTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/> <!-- TextBlock -->
-                    <ColumnDefinition Width="Auto"/>   <!-- For spacing between TextBlock and CheckBox -->
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
-                <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Margin="0" Grid.Column="1"/>
-            </Grid>
+            <Border Background="#08ffffff" 
+                    CornerRadius="2" 
+                    Padding="10" 
+                    Margin="0,5,0,5">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="4*" />
+                        <!-- Automatically fills available space -->
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,50,0"/>
+                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Margin="0" Grid.Column="2" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
         </DataTemplate>
 
         <DataTemplate x:Key="TextInputTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
-                <TextBox Text="{Binding Value, Mode=TwoWay}" Grid.Column="1"/>
-            </Grid>
+            <Border Background="#08ffffff" 
+                    CornerRadius="2" 
+                    Padding="10" 
+                    Margin="0,1,0,1">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="4*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="20,0,20,0"/>
+                    <TextBox Text="{Binding Value, Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
         </DataTemplate>
 
         <DataTemplate x:Key="SliderTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="0.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name, Mode=TwoWay}" VerticalAlignment="Center" Margin="10,0,10,0"/>
-                <Slider Minimum="0" 
+            <Border Background="#08ffffff" 
+                    CornerRadius="2" 
+                    Padding="10" 
+                    Margin="0,1,0,1">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="6*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,20,0"/>
+                    <Slider Minimum="{Binding Min}" 
                         TickFrequency="0.25" 
                         TickPlacement="Outside" 
                         StepFrequency="0.01"
-                        Maximum="1" 
+                        Maximum="{Binding Max}" 
                         Value="{Binding Value, Mode=TwoWay}" 
-                        Grid.Column="1"/>
-            </Grid>
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"/>
+                </Grid>
+            </Border>
         </DataTemplate>
+
         <DataTemplate x:Key="ButtonTemplate">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/> <!-- TextBlock -->
-                    <ColumnDefinition Width="Auto"/>   <!-- For spacing between TextBlock and CheckBox -->
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,10,0"/>
-                <Button Content="{Binding Name}" Command="{Binding}" Margin="0" Grid.Column="1"/>
-            </Grid>
+            <Border Background="#08ffffff" 
+                    CornerRadius="2" 
+                    Padding="10" 
+                    Margin="0,1,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="20,0,20,0"/>
+                    <Button Content="{Binding Name}" MinWidth="0" Command="{Binding}" Margin="0" HorizontalAlignment="Right" Grid.Column="2"/>
+                </Grid>
+            </Border>
         </DataTemplate>
 
         <helpers:ComponentTemplateSelector x:Key="MutationPropertyTemplateSelector"
-                                                CheckboxTemplate="{StaticResource CheckboxTemplate}"
-                                                TextInputTemplate="{StaticResource TextInputTemplate}"
-                                                ButtonTemplate="{StaticResource ButtonTemplate}"
-                                                SliderTemplate="{StaticResource SliderTemplate}"/>
-    
+                                          CheckboxTemplate="{StaticResource CheckboxTemplate}"
+                                          TextInputTemplate="{StaticResource TextInputTemplate}"
+                                          ButtonTemplate="{StaticResource ButtonTemplate}"
+                                          SliderTemplate="{StaticResource SliderTemplate}"/>
     </Page.Resources>
 
-    
+    <!-- Main Content -->
     <Grid>
-        <ListView x:Name="MutationsListView" ItemsSource="{Binding Mutations}">
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="sdk:TrackingMutation">
-                    <Expander IsExpanded="False">
-                        <Expander.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="40,0,0,0"/>
-                                <CheckBox IsChecked="{Binding IsActive, Mode=TwoWay}" Margin="0" HorizontalContentAlignment="Right"/>
-
-                            </Grid>
-                        </Expander.Header>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Description}" Margin="10" TextWrapping="Wrap"/>
+        <ScrollViewer>
+            <ItemsRepeater x:Name="MutationsListView" ItemsSource="{Binding Mutations}" Margin="10">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="sdk:TrackingMutation">
+                        <Expander IsExpanded="False" 
+                              VerticalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch"
+                              HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ToggleSwitch IsOn="{Binding IsActive, Mode=TwoWay}" 
+                                              OffContent=""
+                                              OnContent="" 
+                                              Padding="0" 
+                                              Margin="0"
+                                              HorizontalAlignment="Left"
+                                              HorizontalContentAlignment="Left"
+                                              Grid.Column="0"/>
+                                    <Grid Margin="20,20,20,20" Grid.Column="1" VerticalAlignment="Stretch">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="0"/>
+                                        <TextBlock Text="{Binding Description}" Foreground="LightGray" Margin="0" TextWrapping="Wrap" Grid.Row="1"/>
+                                    </Grid>
+                                </Grid>
+                            </Expander.Header>
                             <ItemsControl ItemsSource="{Binding Components}"
-                                          ItemTemplateSelector="{StaticResource MutationPropertyTemplateSelector}"/>
-                        </StackPanel>
-                    </Expander>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                                      ItemTemplateSelector="{StaticResource MutationPropertyTemplateSelector}"
+                                      Margin="0"
+                                      HorizontalAlignment="Stretch"
+                                      HorizontalContentAlignment="Stretch"
+                                      VerticalAlignment="Stretch">
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Margin" Value="0,0,0,0"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                            </ItemsControl>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
     </Grid>
 </Page>
