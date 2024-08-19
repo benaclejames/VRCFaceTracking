@@ -13,6 +13,7 @@ public class Correctors : TrackingMutation
     public override string Name => "Unified Correctors";
     public override string Description => "Processes data to conform to Unified Expressions better.";
     public override MutationPriority Step => MutationPriority.Postprocessor;
+    public override bool IsActive { get; set; } = true;
 
     public override void MutateData(ref UnifiedTrackingData data)
     {
