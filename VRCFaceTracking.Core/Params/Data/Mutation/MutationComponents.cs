@@ -25,13 +25,23 @@ public class MutationProperty : IMutationComponent, INotifyPropertyChanged
     private object _value;
     private readonly Action<object> _updateField;
 
-    public MutationProperty(string name, object value, MutationPropertyType type, Action<object> updateField)
+    public MutationProperty(string name, 
+                            object value, 
+                            MutationPropertyType type, 
+                            Action<object> updateField, 
+                            float min, 
+                            float max)
     {
         Name = name;
         _value = value;
         Type = type;
         _updateField = updateField;
+        Min = min;
+        Max = max;
     }
+
+    public float Min { get; }
+    public float Max { get; }
 
     public object Value
     {

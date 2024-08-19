@@ -12,10 +12,14 @@ namespace VRCFaceTracking.SDK;
 public class MutationPropertyAttribute : Attribute
 {
     public string Name { get; }
+    public float Min { get; }
+    public float Max { get; }
 
-    public MutationPropertyAttribute(string name)
+    public MutationPropertyAttribute(string name, float min = 0f, float max = 1f)
     {
         Name = name;
+        Min = min;
+        Max = max;
     }
 }
 

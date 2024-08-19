@@ -25,7 +25,7 @@ public static class MutationComponentFactory
 
         processedObjects.Add(instance);
 
-        var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        var fields = instance.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
         foreach (var field in fields)
         {
@@ -33,12 +33,14 @@ public static class MutationComponentFactory
             if (attribute != null)
             {
                 var value = field.GetValue(instance);
-                var mutationProperty = new MutationProperty 
+                var mutationProperty = new MutationProperty
                 (
                     attribute.Name,
                     value,
                     DeterminePropertyType(value),
-                    newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType))
+                    newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType)),
+                    attribute.Min,
+                    attribute.Max
                 );
                 components.Add(mutationProperty);
             }
@@ -73,7 +75,7 @@ public static class MutationComponentFactory
 
     public static void ProcessMethods(object instance, ObservableCollection<IMutationComponent> components, HashSet<object> processedObjects)
     {
-        var methods = instance.GetType().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        var methods = instance.GetType().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
         foreach (var method in methods)
         {
