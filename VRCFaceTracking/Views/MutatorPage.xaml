@@ -5,7 +5,7 @@
     xmlns:local="using:VRCFaceTracking.Views"
     xmlns:helpers="using:VRCFaceTracking.Helpers"
     xmlns:sdk="using:VRCFaceTracking.SDK"
-    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls">
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls">
 
     <Page.Resources>
         <helpers:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter"/>
@@ -14,18 +14,23 @@
         <DataTemplate x:Key="CheckboxTemplate">
             <Border Background="#08ffffff" 
                     CornerRadius="2" 
-                    Padding="10" 
-                    Margin="0,5,0,5">
+                    Padding="20,10,20,10" 
+                    Margin="0,1,0,1">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="4*" />
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
                         <!-- Automatically fills available space -->
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,50,0"/>
-                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Margin="0" Grid.Column="2" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" 
+                              Margin="10,0,-98,0" 
+                              Grid.Column="2" 
+                              Padding="0,0,0,0"
+                              HorizontalContentAlignment="Center" 
+                              HorizontalAlignment="Center"/>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -33,17 +38,20 @@
         <DataTemplate x:Key="TextInputTemplate">
             <Border Background="#08ffffff" 
                     CornerRadius="2" 
-                    Padding="10" 
+                    Padding="20,10,20,10" 
                     Margin="0,1,0,1">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="4*" />
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="6*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="20,0,20,0"/>
-                    <TextBox Text="{Binding Value, Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBox Text="{Binding Value, Mode=TwoWay}" 
+                             Grid.Column="2" 
+                             HorizontalAlignment="Right"
+                             Margin="0,0,0,0"/>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -51,24 +59,30 @@
         <DataTemplate x:Key="SliderTemplate">
             <Border Background="#08ffffff" 
                     CornerRadius="2" 
-                    Padding="10" 
+                    Padding="20,10,20,10" 
                     Margin="0,1,0,1">
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="5*" />
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="6*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,20,0"/>
-                    <Slider Minimum="{Binding Min}" 
-                        TickFrequency="0.25" 
-                        TickPlacement="Outside" 
-                        StepFrequency="0.01"
-                        Maximum="{Binding Max}" 
-                        Value="{Binding Value, Mode=TwoWay}" 
-                        Grid.Column="2"
-                        HorizontalAlignment="Stretch"/>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Grid Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" MinWidth="90"/>
+                            <ColumnDefinition Width="6*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Value}" TextAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,20,0"/>
+                        <Slider Minimum="{Binding Min}" 
+                                TickPlacement="None"
+                                StepFrequency="0.01"
+                                Maximum="{Binding Max}" 
+                                Value="{Binding Value, Mode=TwoWay}" 
+                                Grid.Column="2"
+                                HorizontalAlignment="Stretch"/>
+                    </Grid>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -76,16 +90,47 @@
         <DataTemplate x:Key="ButtonTemplate">
             <Border Background="#08ffffff" 
                     CornerRadius="2" 
-                    Padding="10" 
+                    Padding="20,10,20,10" 
                     Margin="0,1,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="6*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="20,0,20,0"/>
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                     <Button Content="{Binding Name}" MinWidth="0" Command="{Binding}" Margin="0" HorizontalAlignment="Right" Grid.Column="2"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="RangeTemplate">
+            <Border Background="#08ffffff" 
+                    CornerRadius="2" 
+                    Padding="20,10,20,10" 
+                    Margin="0,1,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="6*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Grid Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" MinWidth="40"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="Auto" MinWidth="40"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Item1}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="0,0,20,0" HorizontalAlignment="Right"/>
+                        <toolkit:RangeSelector Minimum="0"
+                                           Maximum="1"
+                                           RangeStart="{Binding Item1, Mode=TwoWay}"
+                                           RangeEnd="{Binding Item2, Mode=TwoWay}"
+                                           StepFrequency="0.01"
+                                           Grid.Column="1"/>
+                        <TextBlock Text="{Binding Item2}" TextWrapping="Wrap"  VerticalAlignment="Center" Margin="20,0,0,0" Grid.Column="2"/>
+                    </Grid>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -94,6 +139,7 @@
                                           CheckboxTemplate="{StaticResource CheckboxTemplate}"
                                           TextInputTemplate="{StaticResource TextInputTemplate}"
                                           ButtonTemplate="{StaticResource ButtonTemplate}"
+                                          RangeTemplate="{StaticResource RangeTemplate}"
                                           SliderTemplate="{StaticResource SliderTemplate}"/>
     </Page.Resources>
 

@@ -66,6 +66,75 @@ public class MutationProperty : IMutationComponent, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
+public class MutationRangeProperty : IMutationComponent, INotifyPropertyChanged
+{
+    private float _item1;
+    private float _item2;
+    private readonly Action<(float, float)> _updateField;
+
+    public MutationRangeProperty(string name,
+                                 float item1,
+                                 float item2,
+                                 Action<(float, float)> updateField,
+                                 float min,
+                                 float max)
+    {
+        Name = name;
+        _item1 = item1;
+        _item2 = item2;
+        _updateField = updateField;
+        Min = min;
+        Max = max;
+    }
+
+    public float Min
+    {
+        get;
+    }
+    public float Max
+    {
+        get;
+    }
+
+    public float Item1
+    {
+        get => _item1;
+        set
+        {
+            if (_item1 != value)
+            {
+                _item1 = value;
+                OnPropertyChanged(nameof(Item1));
+                _updateField?.Invoke((_item1, _item2));
+            }
+        }
+    }
+
+    public float Item2
+    {
+        get => _item2;
+        set
+        {
+            if (_item2 != value)
+            {
+                _item2 = value;
+                OnPropertyChanged(nameof(Item2));
+                _updateField?.Invoke((_item1, _item2));
+            }
+        }
+    }
+
+    public string Name
+    {
+        get;
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+}
+
 public class MutationAction : IMutationComponent, ICommand
 {
     public string Name { get; }

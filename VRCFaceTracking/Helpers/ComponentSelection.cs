@@ -16,11 +16,11 @@ public class ComponentTemplateSelector : DataTemplateSelector
     public DataTemplate TextInputTemplate { get; set; }
     public DataTemplate SliderTemplate { get; set; }
     public DataTemplate ButtonTemplate { get; set; }
+    public DataTemplate RangeTemplate { get; set; }
 
     protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
     {
         if (item is MutationProperty property)
-        {
             return property.Type switch
             {
                 MutationPropertyType.CheckBox => CheckboxTemplate,
@@ -28,11 +28,10 @@ public class ComponentTemplateSelector : DataTemplateSelector
                 MutationPropertyType.Slider => SliderTemplate,
                 _ => base.SelectTemplateCore(item, container)
             };
-        }
+        if (item is MutationRangeProperty)
+            return RangeTemplate;
         if (item is MutationAction)
-        {
             return ButtonTemplate;
-        }
 
         return base.SelectTemplateCore(item, container);
     }
