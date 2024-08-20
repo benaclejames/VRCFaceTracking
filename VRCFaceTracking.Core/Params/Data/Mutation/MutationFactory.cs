@@ -17,6 +17,42 @@ public static class MutationComponentFactory
         return components;
     }
 
+    public static void CreateComponent(
+        string name,
+        float min,
+        float max,
+        object instance, 
+        object value, 
+        FieldInfo field,
+        ObservableCollection<IMutationComponent> components)
+    {
+        if (value is ValueTuple || value.GetType().IsGenericType && value.GetType().GetGenericTypeDefinition() == typeof(ValueTuple<,>))
+        {
+            var mutationRange = new MutationRangeProperty
+            (
+                name,
+                (((float, float))value).Item1,
+                (((float, float))value).Item2,
+                newValue => field.SetValue(instance, newValue),
+                min,
+                max
+            );
+            components.Add(mutationRange);
+        }
+        else
+        {
+            var mutationProperty = new MutationProperty
+            (
+                name,
+                value,
+                DeterminePropertyType(value),
+                newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType)),
+                min,
+                max
+            );
+            components.Add(mutationProperty);
+        }
+    }
 
     public static void ProcessFields(object instance, ObservableCollection<IMutationComponent> components, HashSet<object> processedObjects)
     {
@@ -30,42 +66,32 @@ public static class MutationComponentFactory
         foreach (var field in fields)
         {
             var attribute = field.GetCustomAttribute<MutationPropertyAttribute>();
+
             if (attribute != null)
             {
                 var value = field.GetValue(instance);
-                var mutationProperty = new MutationProperty
-                (
-                    attribute.Name,
-                    value,
-                    DeterminePropertyType(value),
-                    newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType)),
-                    attribute.Min,
-                    attribute.Max
-                );
-                components.Add(mutationProperty);
+                if (field.FieldType.IsArray)
+                {
+                    var valueArray = value as Array;
+                    Type enumType = attribute.EnumType;
+                    
+                    for (int i = 0; i < valueArray.Length; i++)
+                    {
+                        var name = Enum.GetName(enumType, i);
+                        if (name == null) break;
+                        CreateComponent(name, attribute.Min, attribute.Max, instance, valueArray.GetValue(i), field, components);
+                    }
+                    processedObjects.Add(valueArray);
+                }
+                else CreateComponent(attribute.Name, attribute.Min, attribute.Max, instance, value, field, components);
             }
 
-            var fieldType = field.FieldType;
-            if (fieldType.IsClass || fieldType.IsValueType)
+            if (field.FieldType.IsClass || field.FieldType.IsValueType)
             {
-                if (fieldType.IsArray)
+                var nestedInstance = field.GetValue(instance);
+                if (nestedInstance != null)
                 {
-                    var array = (Array)field.GetValue(instance);
-                    if (array != null)
-                    {
-                        foreach (var element in array)
-                        {
-                            ProcessFields(element, components, processedObjects);
-                        }
-                    }
-                }
-                else
-                {
-                    var nestedInstance = field.GetValue(instance);
-                    if (nestedInstance != null)
-                    {
-                        ProcessFields(nestedInstance, components, processedObjects);
-                    }
+                    ProcessFields(nestedInstance, components, processedObjects);
                 }
             }
         }
