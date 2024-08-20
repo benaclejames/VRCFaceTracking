@@ -15,119 +15,126 @@ namespace VRCFaceTracking.Core.Params.Data.Mutation;
 
 public class Calibration : TrackingMutation
 {
-    [MutationProperty("Calibration Data Points")]
+#if DEBUG
+    [MutationProperty("Data Points")]
+#endif
     public static int points = 256;
+#if DEBUG
     [MutationProperty("Delta")]
-    public static float delta = 0.05f;
-    [MutationProperty("Confidence Bias")]
+#endif
+    public static float delta = 0.02f;
+#if DEBUG
+    [MutationProperty("Confidence Bias", 0.5f, 2f)]
+#endif
     public static float confidenceBias = 1f;
-    [MutationProperty("Confidence Lerp")]
-    public static float confidenceLerp = 0.2f;
+    [MutationProperty("Deviation Bias", 0f, 5f)]
+    public static float deviationBias = 2f;
     [MutationProperty("Calibration Weight")]
     public static float weight = 0.6f;
+#if DEBUG
     [MutationProperty("Maximum Timeout", 1, 1000)]
+#endif
     public static int timeoutValue = 1000;
+    [MutationProperty("Clear Data Upon Calibration")]
+    public static bool resetCalibration = false;
 
     public class CalibrationParameter
     {
-        public int _localIndex;
-        public int timeout = timeoutValue;
+        private int _localIndex;
         public bool finished;
-        public float[] dataPoints;
-        public float _delta;
-        public float mean;
-        public float stdDev = 1f;
+        public float timeout = timeoutValue;
+        private float[] dataPoints = new float[points];
+        public float mean = 0.5f;
+        public float stdDev = 0.5f;
         public float confidence = 0f;
         private float _lastRecordedValue;
 
-        public CalibrationParameter(int maxDataPoints, float delta)
+        public CalibrationParameter()
         {
-            dataPoints = new float[maxDataPoints];
-            _delta = delta;
-            _lastRecordedValue = float.NaN; // Indicates no value recorded yet
         }
 
         public void UpdateCalibration(float currentValue, ILogger logger, int index)
         {
             if (finished) return;
+            if (dataPoints == null)
+                dataPoints = new float[points];
 
-            if ((float.IsNaN(_lastRecordedValue) || Math.Abs(currentValue - _lastRecordedValue) >= _delta))
+            if ((float.IsNaN(_lastRecordedValue) || Math.Abs(currentValue - _lastRecordedValue) >= delta))
             {
                 timeout++;
                 if (_localIndex < dataPoints.Length)
                 {
                     dataPoints[_localIndex++] = currentValue;
-                    var newConfidence = 1f-(float)Math.Pow(stdDev, confidenceBias);
-                    confidence *= (1 - confidenceLerp) + confidenceLerp * newConfidence;
                 }
                 else
                 {
                     logger.LogInformation($"Finalized calibrating parameter: {(UnifiedExpressions)index}.");
-                    confidence = 1f;
                     finished = true;
                 }
+                confidence = 1f - (float)Math.Pow(stdDev, confidenceBias) * ((float)_localIndex / dataPoints.Length);
                 _lastRecordedValue = currentValue;
             }
-            else if (timeout > 0)
-            {
-                timeout--;
-            }
-            else if (timeout == 0)
-            {
-                logger.LogInformation($"Timeout occured on parameter: {(UnifiedExpressions)index}.");
-                finished = true;
-            }
+            else timeout--;
         }
 
         // Calculate mean and standard deviation
         public void CalculateStats()
         {
-            mean = dataPoints.Where(v => !float.IsNaN(v)).Average();
+            var _mean = dataPoints.Where(v => !float.IsNaN(v)).Average();
+            mean = _mean;
             stdDev = (float)Math.Sqrt(dataPoints.Where(v => !float.IsNaN(v))
-                                     .Select(v => Math.Pow(v - mean, 2))
+                                     .Select(v => Math.Pow(v - _mean, 2))
                                      .Average());
+        }
+
+        public float CalculateParameter(float currentValue, float k)
+        {
+            float upperBound = mean + k * stdDev;
+            float scaledValue = currentValue / upperBound;
+            return confidence * Math.Clamp(scaledValue, 0.0f, 1.0f) + (1f-confidence) * currentValue;
+        }
+
+        public bool IsFinished() => finished;
+
+        public void Reset()
+        {
+            mean = 0f;
+            stdDev = 1f;
+            confidence = 0f;
+            timeout = timeoutValue;
+            finished = false;
+            dataPoints = new float[points];
+            _localIndex = 0;
+        }
+
+        public void Reinstate()
+        {
+            timeout = timeoutValue;
+            finished = false;
+            confidence = 0f;
         }
     }
 
     public class CalibrationData
     {
-        public CalibrationParameter[] Shapes;
-
-        public CalibrationData(int maxParameters)
-        {
-            Shapes = new CalibrationParameter[maxParameters];
-            for (int i = 0; i < maxParameters; i++)
-            {
-                Shapes[i] = new CalibrationParameter(points, delta);
-            }
-        }
+        public CalibrationParameter[] Shapes = new CalibrationParameter[(int)UnifiedExpressions.Max];
 
         public void RecordData(float[] values, ILogger logger)
         {
             for (int i = 0; i < Shapes.Length; i++)
-                Shapes[i].UpdateCalibration(values[i], logger, i);
-        }
-
-        public void FinalizeCalibration()
-        {
-            foreach (var parameter in Shapes)
             {
-                parameter.CalculateStats();
-                // e.g., adjust curvePower, biasStrength, or any other parameters
+                if (Shapes[i] == null)
+                    Shapes[i] = new CalibrationParameter();
+                Shapes[i].UpdateCalibration(values[i], logger, i);
+                Shapes[i].CalculateStats();
             }
         }
+
         public void Clear()
         {
             for (int i = 0; i < Shapes.Length; i++)
             {
-                Shapes[i].timeout = timeoutValue;
-                Shapes[i].mean = 0f;
-                Shapes[i].stdDev = 1f;
-                Shapes[i].confidence = 0f;
-                Shapes[i].finished = false;
-                Shapes[i].dataPoints = new float[points];
-                Shapes[i]._localIndex = 0;
-                Shapes[i]._delta = delta;
+                Shapes[i].Reset();
             }
         }
 
@@ -135,14 +142,23 @@ public class Calibration : TrackingMutation
         {
             foreach (var shape in Shapes)
             {
-                if (!shape.finished)
+                if (!shape.IsFinished())
                     return true;
             }
             return false;
         }
+        public void Reinstate()
+        {
+            for (int i = 0; i < Shapes.Length; i++)
+            {
+                if (Shapes[i] == null)
+                    Shapes[i] = new CalibrationParameter();
+                Shapes[i].Reinstate();
+            }
+        }
     }
 
-    public CalibrationData calData = new((int)UnifiedExpressions.Max);
+    public CalibrationData calData = new();
 
     public override string Name => "Calibration";
     public override string Description => "Default VRCFaceTracking calibration that processes raw tracking data into normalized tracking data to better match user expression.";
@@ -154,14 +170,14 @@ public class Calibration : TrackingMutation
     {
         for (var i = 0; i < (int)UnifiedExpressions.Max; i++)
         {
+            if (calData.Shapes[i] == null)
+                calData.Shapes[i] = new CalibrationParameter();
             if (data.Shapes[i].Weight <= 0.0f)
             {
                 continue;
             }
 
-            var calShape = calData.Shapes[i];
-            var newShape = data.Shapes[i].Weight * (1-calShape.confidence) + (calShape.confidence) * (data.Shapes[i].Weight / calShape.stdDev);
-            data.Shapes[i].Weight = data.Shapes[i].Weight * (1 - weight) + weight * newShape;
+            data.Shapes[i].Weight = calData.Shapes[i].CalculateParameter(data.Shapes[i].Weight, deviationBias);
         }
     }
 
@@ -173,6 +189,19 @@ public class Calibration : TrackingMutation
         Logger.LogInformation("Calibration finalized.");
     }
 
+#if DEBUG
+    [MutationButton("Read Values")]
+    public void ReadValues()
+    {
+        for (int i = 0; i < calData.Shapes.Length; i++)
+            {
+                Logger.LogInformation($"{(UnifiedExpressions)i}" +
+                                      $"\n         mean: {calData.Shapes[i].mean }" +
+                                      $"\n         stdDev: {calData.Shapes[i].stdDev}" +
+                                      $"\n         confidence: {calData.Shapes[i].stdDev}");
+            }
+    }
+#endif
     private float[] GetLiveValues()
     {
         // Access the live data from UnifiedTracking.Data.Shapes
@@ -189,17 +218,14 @@ public class Calibration : TrackingMutation
 
     private void StartCalibration()
     {
-        calData.Clear();
-
+        if (resetCalibration)
+            calData.Clear();
+        else calData.Reinstate();
         while (calData.Calibrating())
         {
             var simulatedValues = GetLiveValues();
             calData.RecordData(simulatedValues, Logger);
-            calData.FinalizeCalibration();
-
             Thread.Sleep(100);
         }
-
-        calData.FinalizeCalibration();
     }
 }
