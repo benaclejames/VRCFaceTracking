@@ -28,7 +28,7 @@ public class ParameterAdjustment : TrackingMutation
     public (float, float)[] ranges = new (float, float)[(int)UnifiedExpressions.Max];
     public override string Name => "Parameter Adjustment";
 
-    public override string Description => "Adjust VRCFaceTracking Parameters";
+    public override string Description => "Adjust VRCFaceTracking Parameters.";
 
     public override MutationPriority Step => MutationPriority.None;
 

@@ -161,7 +161,7 @@ public class Calibration : TrackingMutation
     public CalibrationData calData = new();
 
     public override string Name => "Calibration";
-    public override string Description => "Default VRCFaceTracking calibration that processes raw tracking data into normalized tracking data to better match user expression.";
+    public override string Description => "Processes tracking data to better match user expression.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
     public override bool IsActive { get; set; } = false;

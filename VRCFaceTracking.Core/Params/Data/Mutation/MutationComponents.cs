@@ -72,11 +72,11 @@ public class MutationRangeProperty : IMutationComponent, INotifyPropertyChanged
     private float _item2;
     private readonly Action<(float, float)> _updateField;
 
-    public MutationRangeProperty(string name,
-                                 float item1,
-                                 float item2,
-                                 Action<(float, float)> updateField,
-                                 float min,
+    public MutationRangeProperty(string name, 
+                                 float item1, 
+                                 float item2, 
+                                 Action<(float, float)> updateField, 
+                                 float min, 
                                  float max)
     {
         Name = name;
@@ -87,14 +87,8 @@ public class MutationRangeProperty : IMutationComponent, INotifyPropertyChanged
         Max = max;
     }
 
-    public float Min
-    {
-        get;
-    }
-    public float Max
-    {
-        get;
-    }
+    public float Min { get; }
+    public float Max { get; }
 
     public float Item1
     {
@@ -124,10 +118,7 @@ public class MutationRangeProperty : IMutationComponent, INotifyPropertyChanged
         }
     }
 
-    public string Name
-    {
-        get;
-    }
+    public string Name { get; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
