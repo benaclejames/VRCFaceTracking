@@ -163,7 +163,7 @@
                                               OffContent=""
                                               OnContent="" 
                                               Padding="0" 
-                                              Margin="0"
+                                              Margin="10,0,0,0"
                                               HorizontalAlignment="Left"
                                               HorizontalContentAlignment="Left"
                                               Grid.Column="0"/>
