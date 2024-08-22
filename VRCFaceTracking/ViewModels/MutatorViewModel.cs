@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Data;
 using VRCFaceTracking.Core.Params.Data;
-using VRCFaceTracking.SDK;
+using VRCFaceTracking.Core.Params.Data.Mutation;
 
 namespace VRCFaceTracking.ViewModels;
 

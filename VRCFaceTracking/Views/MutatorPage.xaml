@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:VRCFaceTracking.Views"
     xmlns:helpers="using:VRCFaceTracking.Helpers"
-    xmlns:sdk="using:VRCFaceTracking.SDK"
+    xmlns:mutator="using:VRCFaceTracking.Core.Params.Data.Mutation"
     xmlns:toolkit="using:CommunityToolkit.WinUI.Controls">
 
     <Page.Resources>
@@ -148,7 +148,7 @@
         <ScrollViewer>
             <ItemsRepeater x:Name="MutationsListView" ItemsSource="{Binding Mutations}" Margin="10">
                 <ItemsRepeater.ItemTemplate>
-                    <DataTemplate x:DataType="sdk:TrackingMutation">
+                    <DataTemplate x:DataType="mutator:TrackingMutation">
                         <Expander IsExpanded="False" 
                               VerticalAlignment="Stretch"
                               HorizontalContentAlignment="Stretch"

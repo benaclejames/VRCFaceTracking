@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using VRCFaceTracking.SDK;
+using VRCFaceTracking.Core.Params.Data.Mutation;
 
 namespace VRCFaceTracking.Helpers;
 

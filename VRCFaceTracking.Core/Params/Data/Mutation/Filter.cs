@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params.Expressions;
-using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class Filter : TrackingMutation

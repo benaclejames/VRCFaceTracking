@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Params.Expressions;
-using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class ParameterAdjustment : TrackingMutation
@@ -24,6 +23,7 @@ public class ParameterAdjustment : TrackingMutation
     [MutationProperty("Cheek")] public (float, float) cheekPuffSuck = new(0, 1);
     [MutationProperty("Cheek Squint")] public (float, float) cheekSquint = new(0, 1);
     [MutationProperty("Jaw")] public (float, float) jawOpen = new(0, 1);
+    [MutationProperty("MouthClosed")] public (float, float) mouthClosed = new(0, 1);
     [MutationProperty("Jaw Sideways")] public (float, float) jawX = new(0, 1);
     [MutationProperty("Lip Funnel")] public (float, float) lipFunnel = new(0, 1);
     [MutationProperty("Lip Suck")] public (float, float) lipSuck = new(0, 1);
@@ -85,7 +85,8 @@ public class ParameterAdjustment : TrackingMutation
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawMandibleRaise], jawOpen);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawOpen], jawOpen);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawOpen], jawOpen);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthClosed], jawOpen);
+
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthClosed], mouthClosed);
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawLeft], jawX);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawRight], jawX);

@@ -3,7 +3,7 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.SDK;
+using VRCFaceTracking.Core.Params.Data.Mutation;
 
 namespace VRCFaceTracking.Core.Params.Data;
 

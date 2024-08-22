@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VRCFaceTracking.SDK;
+namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public static class MutationComponentFactory
 {
     public static ObservableCollection<IMutationComponent> CreateComponents(object instance)

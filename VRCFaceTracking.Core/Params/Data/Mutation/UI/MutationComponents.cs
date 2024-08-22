@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace VRCFaceTracking.SDK;
+namespace VRCFaceTracking.Core.Params.Data.Mutation;
 
 public enum MutationPropertyType
 {

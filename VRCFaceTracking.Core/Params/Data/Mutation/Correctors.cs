@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRCFaceTracking.Core.Params.Expressions;
-using VRCFaceTracking.SDK;
 
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class Correctors : TrackingMutation
 {
-    public override string Name => "Unified Corrector";
+    public override string Name => "Unified Correctors";
     public override string Description => "Processes data to conform to Unified Expressions.";
     public override MutationPriority Step => MutationPriority.Postprocessor;
     public override bool IsActive { get; set; } = true;

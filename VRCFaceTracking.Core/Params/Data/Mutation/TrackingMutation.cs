@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Params.Data;
 
-namespace VRCFaceTracking.SDK;
+namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public enum MutationPriority
 {
     Preprocessor, 
