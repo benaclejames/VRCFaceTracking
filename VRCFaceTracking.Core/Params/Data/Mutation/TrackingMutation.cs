@@ -52,7 +52,7 @@ public abstract partial class TrackingMutation
 
         if (ordered)
         {
-            mutations.OrderBy(m => m.Step);
+            mutations.Sort((a, b) => a.Step.CompareTo(b.Step));
         }
 
         return mutations.ToArray();
