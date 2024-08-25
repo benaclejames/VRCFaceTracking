@@ -15,11 +15,11 @@ namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class Calibration : TrackingMutation
 {
 #if DEBUG
-    [MutationProperty("Data Points")]
+    [MutationProperty("[DEBUG] Data Points")]
 #endif
     public static int points = 512; // amount of data. higher is better.
 #if DEBUG
-    [MutationProperty("Delta")]
+    [MutationProperty("[DEBUG] Delta")]
 #endif
     public static float delta = 0.1f; // prevents noisy or unintended data from being included in data set
     [MutationProperty("Calibration Deviation", -1f, 1f)]
@@ -193,8 +193,8 @@ public class Calibration : TrackingMutation
     }
 
 #if DEBUG
-    [MutationButton("Read Values")]
-    public void ReadValues()
+    [MutationButton("[DEBUG] Log Data")]
+    public void LogData()
     {
         for (int i = 0; i < calData.Shapes.Length; i++)
         {
