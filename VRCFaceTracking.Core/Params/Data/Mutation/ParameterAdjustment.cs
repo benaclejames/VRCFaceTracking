@@ -17,7 +17,8 @@ public class ParameterAdjustment : TrackingMutation
         }
     }
 
-    [MutationProperty("Eyebrow")] public (float, float) eyeBrows = new(0, 1);
+    [MutationProperty("Eyebrow Raiser")] public (float, float) eyeBrowRaiser = new(0, 1);
+    [MutationProperty("Eyebrow Lowerer")] public (float, float) eyeBrowLower = new(0, 1);
     [MutationProperty("Eye Squint")] public (float, float) eyeSquint = new(0, 1);
     [MutationProperty("Eye Wide")] public (float, float) eyeWide = new(0, 1);
     [MutationProperty("Cheek")] public (float, float) cheekPuffSuck = new(0, 1);
@@ -25,6 +26,7 @@ public class ParameterAdjustment : TrackingMutation
     [MutationProperty("Jaw")] public (float, float) jawOpen = new(0, 1);
     [MutationProperty("MouthClosed")] public (float, float) mouthClosed = new(0, 1);
     [MutationProperty("Jaw Sideways")] public (float, float) jawX = new(0, 1);
+    [MutationProperty("Jaw Forward / Backward")] public (float, float) jawZ = new(0, 1);
     [MutationProperty("Lip Funnel")] public (float, float) lipFunnel = new(0, 1);
     [MutationProperty("Lip Suck")] public (float, float) lipSuck = new(0, 1);
     [MutationProperty("Lip Pucker")] public (float, float) lipPucker = new(0, 1);
@@ -55,14 +57,15 @@ public class ParameterAdjustment : TrackingMutation
 
     public override void MutateData(ref UnifiedTrackingData data)
     {
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowInnerUpRight], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowOuterUpRight], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowLowererLeft], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowLowererRight], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowPinchLeft], eyeBrows);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowPinchRight], eyeBrows);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowInnerUpLeft], eyeBrowRaiser);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowInnerUpRight], eyeBrowRaiser);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft], eyeBrowRaiser);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowOuterUpRight], eyeBrowRaiser);
+
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowLowererLeft], eyeBrowLower);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowLowererRight], eyeBrowLower);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowPinchLeft], eyeBrowLower);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.BrowPinchRight], eyeBrowLower);
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.CheekPuffLeft], cheekPuffSuck);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.CheekPuffRight], cheekPuffSuck);
@@ -78,12 +81,11 @@ public class ParameterAdjustment : TrackingMutation
         SetRange(ref data.Shapes[(int)UnifiedExpressions.EyeWideLeft], eyeWide);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.EyeWideRight], eyeWide);
 
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.JawBackward], eyeWide);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.JawForward], eyeWide);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.JawBackward], jawZ);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.JawForward], jawZ);
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawClench], jawOpen);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawMandibleRaise], jawOpen);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.JawOpen], jawOpen);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.JawOpen], jawOpen);
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthClosed], mouthClosed);
