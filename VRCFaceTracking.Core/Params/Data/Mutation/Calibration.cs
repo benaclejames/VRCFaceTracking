@@ -23,7 +23,7 @@ public class Calibration : TrackingMutation
 #endif
     public static float delta = 0.1f; // prevents noisy or unintended data from being included in data set
     [MutationProperty("Calibration Deviation", -1f, 1f)]
-    public static float deviationBias = 0f;
+    public float deviationBias = 0f;
 
     public class CalibrationParameter
     {
@@ -48,9 +48,6 @@ public class Calibration : TrackingMutation
 
         public void UpdateCalibration(float currentValue, ILogger logger, float dT)
         {
-            if (dataPoints == null)
-                dataPoints = new float[points];
-
             var difference = Math.Abs(currentValue - _currentStep);
             if ((float.IsNaN(_currentStep) || difference >= delta * dT))
             {
@@ -68,10 +65,10 @@ public class Calibration : TrackingMutation
                 _localIndex = (_localIndex + 1) % dataPoints.Length;
                 CalculateStats();
             }
-            _currentStep = ClampStep(currentValue);
+            _currentStep = ClampStep(currentValue, delta);
         }
 
-        private float ClampStep(float value) => (float)Math.Floor(value / delta) * delta; 
+        private float ClampStep(float value, float factor) => (float)Math.Floor(value / factor) * factor; 
 
         private float StdDev(float[] data, float mean) =>
         (float)Math.Sqrt(data.Take((int)(_fixedIndex - 1)).Where(v => !float.IsNaN(v))
@@ -123,20 +120,23 @@ public class Calibration : TrackingMutation
             var curvedValue = (float)Math.Pow(currentValue, CurveAdjustedRange(adjustedMax));
             return confidence * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - confidence) * currentValue;
         }
-
-        public bool IsFinished() => finished;
     }
 
     public class CalibrationData
     {
         public CalibrationParameter[] Shapes = new CalibrationParameter[(int)UnifiedExpressions.Max];
 
+        public CalibrationData()
+        {
+            for (int i = 0; i < Shapes.Length; i++)
+                if (Shapes[i] == null)
+                    Shapes[i] = new CalibrationParameter(((UnifiedExpressions)i).ToString());
+        }
+
         public void RecordData(float[] values, ILogger logger, int ms)
         {
             for (int i = 0; i < Shapes.Length; i++)
             {
-                if (Shapes[i] == null)
-                    Shapes[i] = new CalibrationParameter(((UnifiedExpressions)i).ToString());
                 Shapes[i].UpdateCalibration(values[i], logger, ms/1000f);
             }
         }
@@ -147,16 +147,6 @@ public class Calibration : TrackingMutation
             {
                 Shapes[i] = new CalibrationParameter(((UnifiedExpressions)i).ToString());
             }
-        }
-
-        public bool Calibrating()
-        {
-            foreach (var shape in Shapes)
-            {
-                if (!shape.IsFinished())
-                    return true;
-            }
-            return false;
         }
     }
 
@@ -172,13 +162,6 @@ public class Calibration : TrackingMutation
     {
         for (var i = 0; i < (int)UnifiedExpressions.Max; i++)
         {
-            if (calData.Shapes[i] == null)
-                calData.Shapes[i] = new CalibrationParameter(((UnifiedExpressions)i).ToString());
-            if (data.Shapes[i].Weight <= 0.0f)
-            {
-                continue;
-            }
-
             data.Shapes[i].Weight = calData.Shapes[i].CalculateParameter(data.Shapes[i].Weight, deviationBias);
         }
     }
@@ -189,13 +172,17 @@ public class Calibration : TrackingMutation
         Logger.LogInformation("Initializing calibration.");
         calData.Clear();
         StartCalibration();
-            Logger.LogInformation("Calibration finalized.");
+        Logger.LogInformation("Calibration finalized.");
     }
 
 #if DEBUG
     [MutationButton("[DEBUG] Log Data")]
     public void LogData()
     {
+        Logger.LogInformation("Logging Calibration data:" +
+                             $" delta: {delta}" + 
+                             $" points: {points}" + 
+                             $" devationBias: {deviationBias}");
         for (int i = 0; i < calData.Shapes.Length; i++)
         {
             Logger.LogInformation($"{(UnifiedExpressions)i}" +
@@ -223,11 +210,11 @@ public class Calibration : TrackingMutation
         return values;
     }
 
-    readonly int updateMs = 10;
+    readonly int updateMs = 100;
 
     private void StartCalibration()
     {
-        while (calData.Calibrating())
+        while (true)
         {
             var simulatedValues = GetLiveValues();
             calData.RecordData(simulatedValues, Logger, updateMs);
