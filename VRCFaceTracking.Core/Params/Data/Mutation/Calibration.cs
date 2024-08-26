@@ -101,8 +101,8 @@ public class Calibration : TrackingMutation
                 var _stdDev = StdDev(dataPoints, _mean);
                 var _variance = (_stdDev / _mean);
                 var _varianceConf = 1f - Math.Abs((_variance) - 1f);
-                var _minimumStdMean = (float)Math.Pow(6.8f * _mean * _stdDev, 0.35f);
-                var _confidence = ZConfidence(dataPoints, _mean, _stdDev) * progress * _varianceConf * _minimumStdMean;
+                var _minimumStdMean = Math.Min(1f, (float)Math.Pow(1.3f * _mean + (1f/1.3f) * _stdDev * _mean, 0.25f));
+                var _confidence = Math.Max(0f, Math.Min(1f, ZConfidence(dataPoints, _mean, _stdDev) * progress * _varianceConf * _minimumStdMean));
                 if (_confidence > confidence)
                 {
                     if (!float.IsNaN(_mean))
