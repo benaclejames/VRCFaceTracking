@@ -17,7 +17,7 @@ public class Calibration : TrackingMutation
 #if DEBUG
     [MutationProperty("[DEBUG] Data Points")]
 #endif
-    public static int points = 512; // amount of data. higher is better.
+    public static int points = 64; // amount of data. higher is better.
 #if DEBUG
     [MutationProperty("[DEBUG] Delta")]
 #endif
@@ -102,14 +102,15 @@ public class Calibration : TrackingMutation
                 var _confidence = Math.Max(0f, Math.Min(1f, ZConfidence(dataPoints, _mean, _stdDev) * progress * _varianceConf * _minimumStdMean));
                 if (_confidence > confidence)
                 {
+                    var _lerp = 1f - (float)Math.Pow(confidence, 2f); // weighs new stats less the more confident we are.
                     if (!float.IsNaN(_mean))
-                        mean = _mean;
+                        mean = _mean * _lerp + stdDev * (1f-_lerp);
                     if (!float.IsNaN(_stdDev))
-                        stdDev = _stdDev;
+                        stdDev = _stdDev * _lerp + stdDev * (1f-_lerp);
                     if (!float.IsNaN(_confidence))
-                        confidence = _confidence;
+                        confidence = _confidence * _lerp + confidence * (1f-_lerp);
                     if (!float.IsNaN(_variance))
-                        variance = _variance;
+                        variance = _variance * _lerp + variance * (1f - _lerp);
                 }
             }
         }
@@ -118,7 +119,8 @@ public class Calibration : TrackingMutation
         {
             var adjustedMax = mean + k * stdDev;
             var curvedValue = (float)Math.Pow(currentValue, CurveAdjustedRange(adjustedMax));
-            return confidence * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - confidence) * currentValue;
+            var lerp = (float)(confidence * (1f / (1f + Math.Pow(2, -200f * currentValue + 7f))));
+            return lerp * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - lerp) * currentValue;
         }
     }
 
