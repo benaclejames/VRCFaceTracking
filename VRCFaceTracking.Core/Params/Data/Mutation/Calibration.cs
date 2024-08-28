@@ -104,7 +104,7 @@ public class Calibration : TrackingMutation
                 {
                     var _lerp = 1f - (float)Math.Pow(confidence, 2f); // weighs new stats less the more confident we are.
                     if (!float.IsNaN(_mean))
-                        mean = _mean * _lerp + stdDev * (1f-_lerp);
+                        mean = _mean * _lerp + mean * (1f-_lerp);
                     if (!float.IsNaN(_stdDev))
                         stdDev = _stdDev * _lerp + stdDev * (1f-_lerp);
                     if (!float.IsNaN(_confidence))
