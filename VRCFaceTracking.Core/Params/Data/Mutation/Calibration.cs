@@ -119,7 +119,7 @@ public class Calibration : TrackingMutation
         {
             var adjustedMax = mean + k * stdDev;
             var curvedValue = (float)Math.Pow(currentValue, CurveAdjustedRange(adjustedMax));
-            var lerp = (float)(confidence * (1f / (1f + Math.Pow(2, -200f * currentValue + 7f))));
+            var lerp = (float)(confidence * (1f / (1f + Math.Pow(2, -200f * currentValue + 7f)) * (float)Math.Max(0f, Math.Pow(Math.Abs(3.34f*stdDev-1f), 0.2f))));
             return lerp * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - lerp) * currentValue;
         }
     }
@@ -164,17 +164,9 @@ public class Calibration : TrackingMutation
     {
         for (var i = 0; i < (int)UnifiedExpressions.Max; i++)
         {
+            calData.Shapes[i].UpdateCalibration(data.Shapes[i].Weight, Logger, 100f/1000f);
             data.Shapes[i].Weight = calData.Shapes[i].CalculateParameter(data.Shapes[i].Weight, deviationBias);
         }
-    }
-
-    [MutationButton("Initialize Calibration")]
-    public void InitializeCalibration()
-    {
-        Logger.LogInformation("Initializing calibration.");
-        calData.Clear();
-        StartCalibration();
-        Logger.LogInformation("Calibration finalized.");
     }
 
 #if DEBUG
@@ -199,28 +191,6 @@ public class Calibration : TrackingMutation
     }
 #endif
 
-    private float[] GetLiveValues()
-    {
-        var shapes = UnifiedTracking.Data.Shapes;
-        float[] values = new float[shapes.Length];
-        
-        for (int i = 0; i < shapes.Length; i++)
-        {
-            values[i] = shapes[i].Weight;
-        }
-        
-        return values;
-    }
-
-    readonly int updateMs = 100;
-
-    private void StartCalibration()
-    {
-        while (true)
-        {
-            var simulatedValues = GetLiveValues();
-            calData.RecordData(simulatedValues, Logger, updateMs);
-            Thread.Sleep(updateMs);
-        }
-    }
+    [MutationButton("Clear Calibration")]
+    public void ClearData() => calData.Clear();
 }
