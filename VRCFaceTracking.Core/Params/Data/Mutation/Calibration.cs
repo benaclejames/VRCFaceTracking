@@ -17,18 +17,26 @@ public class Calibration : TrackingMutation
 #if DEBUG
     [MutationProperty("[DEBUG] Data Points")]
 #endif
-    public static int points = 64; // amount of data. higher is better.
+    public static int points = 256;
+    #if DEBUG
+    [MutationProperty("[DEBUG] Data Window")]
+#endif
+    public static int window = 32;
 #if DEBUG
     [MutationProperty("[DEBUG] Delta")]
 #endif
-    public static float delta = 0.1f; // prevents noisy or unintended data from being included in data set
+    public static float delta = 0.4f; // prevents noisy or unintended data from being included in data set
+#if DEBUG
+    [MutationProperty("[DEBUG] Calibration Delta")]
+#endif
+    public static float cDelta = 0.1f; // prevents noisy or unintended data from being included in data set
     [MutationProperty("Calibration Deviation", -1f, 1f)]
     public float deviationBias = 0f;
 
     public class CalibrationParameter
     {
         public string name;
-        private int _localIndex;
+        private int _rollingIndex;
         private int _fixedIndex;
         private bool finished;
         private float[] dataPoints = new float[points];
@@ -37,6 +45,7 @@ public class Calibration : TrackingMutation
         public float stdDev = 0f;
         public float variance = 0f;
         public float confidence = 0f;
+        public float maxConfidence = 0f;
         public float progress;
         private float _currentStep;
         public float max;
@@ -53,19 +62,23 @@ public class Calibration : TrackingMutation
             {
                 if (_fixedIndex < dataPoints.Length)
                 {
+                    if (_fixedIndex <= window)
+                    {
+                        progress = _fixedIndex / (float)window;
+                    }
+                    else if (!finished)
+                    {
+                        logger.LogInformation($"Data saturated window: {name}.");
+                        finished = true;
+                    }
                     _fixedIndex++;
-                    progress = _fixedIndex / (float)dataPoints.Length;
+
                 }
-                else if (!finished)
-                {
-                    logger.LogInformation($"Data fully saturated: {name}.");
-                    finished = true;
-                }
-                dataPoints[_localIndex] = currentValue;
-                _localIndex = (_localIndex + 1) % dataPoints.Length;
+                dataPoints[_rollingIndex] = currentValue;
+                _rollingIndex = (_rollingIndex + 1) % dataPoints.Length;
                 CalculateStats();
             }
-            _currentStep = ClampStep(currentValue, delta);
+            _currentStep = ClampStep(currentValue, delta * dT);
         }
 
         private float ClampStep(float value, float factor) => (float)Math.Floor(value / factor) * factor; 
@@ -96,11 +109,18 @@ public class Calibration : TrackingMutation
             {
                 var _mean = Mean(dataPoints);
                 var _stdDev = StdDev(dataPoints, _mean);
-                var _variance = (_stdDev / _mean);
-                var _varianceConf = 1f - Math.Abs((_variance) - 1f);
-                var _minimumStdMean = Math.Min(1f, (float)Math.Pow(1.3f * _mean + (1f/1.3f) * _stdDev * _mean, 0.25f));
-                var _confidence = Math.Max(0f, Math.Min(1f, ZConfidence(dataPoints, _mean, _stdDev) * progress * _varianceConf * _minimumStdMean));
-                if (_confidence > confidence)
+                var recentData = dataPoints.Skip(Math.Max(0, _rollingIndex - window)).Take(window).ToArray();
+                var recentRange = Math.Abs(recentData.Max() - recentData.Min());
+                
+                var _confidence = (float)Math.Max(0f, Math.Min(1f, 
+                    (1f-(float)Math.Abs(3.448f*_stdDev-1f)) *
+                    (1f - Math.Max(0, _stdDev - 0.29f)) *
+                    (1f - Math.Max(0, _mean - 0.5f)) *
+                    (1f - Math.Pow(Math.Abs(_mean-0.25f), 3f)) *
+                    Math.Pow(recentRange, 0.25f)
+                ));
+
+                if (_confidence >= maxConfidence - cDelta)
                 {
                     var _lerp = 1f - (float)Math.Pow(confidence, 2f); // weighs new stats less the more confident we are.
                     if (!float.IsNaN(_mean))
@@ -109,18 +129,25 @@ public class Calibration : TrackingMutation
                         stdDev = _stdDev * _lerp + stdDev * (1f-_lerp);
                     if (!float.IsNaN(_confidence))
                         confidence = _confidence * _lerp + confidence * (1f-_lerp);
-                    if (!float.IsNaN(_variance))
-                        variance = _variance * _lerp + variance * (1f - _lerp);
+                    if (confidence > maxConfidence)
+                        maxConfidence = maxConfidence * _lerp + confidence * (1f-_lerp);
+                    //if (!float.IsNaN(_variance))
+                    //    variance = _variance * _lerp + variance * (1f - _lerp);
                 }
             }
         }
 
         public float CalculateParameter(float currentValue, float k)
         {
+            if (float.IsNaN(currentValue)) 
+                return currentValue;
             var adjustedMax = mean + k * stdDev;
             var curvedValue = (float)Math.Pow(currentValue, CurveAdjustedRange(adjustedMax));
             var lerp = (float)(confidence * (1f / (1f + Math.Pow(2, -200f * currentValue + 7f)) * (float)Math.Max(0f, Math.Pow(Math.Abs(3.34f*stdDev-1f), 0.2f))));
-            return lerp * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - lerp) * currentValue;
+            var adjustedValue = lerp * Math.Clamp(curvedValue, 0.0f, 1.0f) + (1f - lerp) * currentValue;
+            if (float.IsNaN(adjustedValue))
+                return currentValue;
+            return adjustedValue;
         }
     }
 
@@ -184,6 +211,7 @@ public class Calibration : TrackingMutation
                                   $"\n  mean: {calData.Shapes[i].mean}" +
                                   $"\n  stdDev: {calData.Shapes[i].stdDev}" +
                                   $"\n  confidence: {calData.Shapes[i].confidence}" +
+                                  $"\n  maxConfidence: {calData.Shapes[i].maxConfidence}" +
                                   $"\n  variance: {calData.Shapes[i].variance}" +
                                   $"\n  raw value: {UnifiedTracking.Data.Shapes[i].Weight}" +
                                   $"\n  weighted value: {calData.Shapes[i].CalculateParameter(UnifiedTracking.Data.Shapes[i].Weight, deviationBias)}");
