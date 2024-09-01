@@ -21,6 +21,7 @@ namespace VRCFaceTracking.Core.Params.Data
     {
         public UnifiedSingleEyeData Left, Right;
         public float _maxDilation, _minDilation = 999f;
+        public float _leftDiameter, _rightDiameter;
 
         /// <summary>
         /// Creates relevant data that combines the Left and Right single eye datas into a combined single eye data.
@@ -33,17 +34,27 @@ namespace VRCFaceTracking.Core.Params.Data
         /// </remarks>
         public UnifiedSingleEyeData Combined()
         {
-            if ((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f < _minDilation)
-                _minDilation = (Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f;
+            var averageDilation = (Left.PupilDiameter_MM + Right.PupilDiameter_MM) / 2.0f;
+            var leftDiff = Math.Abs(_leftDiameter - Left.PupilDiameter_MM) > 0f;
+            var rightDiff = Math.Abs(_rightDiameter - Right.PupilDiameter_MM) > 0f;
 
-            if ((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f > _maxDilation)
-                _maxDilation = (Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f;
+            if (leftDiff || rightDiff)
+            {
+                if (averageDilation > _maxDilation)
+                    _maxDilation = averageDilation;
+                if (averageDilation < _minDilation)
+                    _minDilation = averageDilation;
+            }
+            if (leftDiff)
+                _leftDiameter = Left.PupilDiameter_MM;
+            if (rightDiff)
+                _rightDiameter = Right.PupilDiameter_MM;
 
             return new UnifiedSingleEyeData
             {
                 Gaze = (Left.Gaze + Right.Gaze) / 2.0f,
                 Openness = (Left.Openness + Right.Openness) / 2.0f,
-                PupilDiameter_MM = (((Left.PupilDiameter_MM + Left.PupilDiameter_MM) / 2.0f) - _minDilation) / (_maxDilation - _minDilation),
+                PupilDiameter_MM = (averageDilation - _minDilation) / (_maxDilation - _minDilation),
             };
         }
         public void CopyPropertiesOf(UnifiedEyeData data)
