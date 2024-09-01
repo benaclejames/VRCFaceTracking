@@ -42,7 +42,7 @@ namespace VRCFaceTracking.Core.Params.Data
             {
                 if (averageDilation > _maxDilation)
                     _maxDilation = averageDilation;
-                if (averageDilation < _minDilation)
+                else if (averageDilation < _minDilation)
                     _minDilation = averageDilation;
             }
             if (leftDiff)
@@ -50,11 +50,13 @@ namespace VRCFaceTracking.Core.Params.Data
             if (rightDiff)
                 _rightDiameter = Right.PupilDiameter_MM;
 
+            var normalizedDilation = (averageDilation - _minDilation) / (_maxDilation - _minDilation);
+
             return new UnifiedSingleEyeData
             {
                 Gaze = (Left.Gaze + Right.Gaze) / 2.0f,
                 Openness = (Left.Openness + Right.Openness) / 2.0f,
-                PupilDiameter_MM = (averageDilation - _minDilation) / (_maxDilation - _minDilation),
+                PupilDiameter_MM = float.IsNaN(normalizedDilation) ? 0.5f : normalizedDilation,
             };
         }
         public void CopyPropertiesOf(UnifiedEyeData data)
