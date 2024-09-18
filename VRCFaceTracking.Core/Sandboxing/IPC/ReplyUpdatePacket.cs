@@ -11,6 +11,7 @@ namespace VRCFaceTracking.Core.Sandboxing.IPC;
 public class ReplyUpdatePacket : IpcPacket
 {
     const int EXPRESSION_COUNT = (int)UnifiedExpressions.Max + 1;
+    const float INVALID_FLOAT = 0xFFFFFFFF;
 
     [StructLayout(LayoutKind.Sequential)]
     internal class UpdateDataContiguous
@@ -120,24 +121,36 @@ public class ReplyUpdatePacket : IpcPacket
         // If the eye state is valid
 
         // If dilation parameters are invalid
-        if (_contiguousUnifiedData.Eye_MaxDilation < _contiguousUnifiedData.Eye_MinDilation)
+        if ( _contiguousUnifiedData.Eye_MaxDilation != INVALID_FLOAT &&
+            _contiguousUnifiedData.Eye_MinDilation != INVALID_FLOAT &&
+            _contiguousUnifiedData.Eye_MaxDilation < _contiguousUnifiedData.Eye_MinDilation )
         {
             return;
         }
 
         // Update the unified tracking to match our data structure
-        UnifiedTracking.Data.Eye.Left.Gaze.x                = _contiguousUnifiedData.Eye_Left_GazeX;
-        UnifiedTracking.Data.Eye.Left.Gaze.y                = _contiguousUnifiedData.Eye_Left_GazeY;
-        UnifiedTracking.Data.Eye.Left.PupilDiameter_MM      = _contiguousUnifiedData.Eye_Left_PupilDiameter_MM;
-        UnifiedTracking.Data.Eye.Left.Openness              = _contiguousUnifiedData.Eye_Left_Openness;
-        
-        UnifiedTracking.Data.Eye.Right.Gaze.x               = _contiguousUnifiedData.Eye_Right_GazeX;
-        UnifiedTracking.Data.Eye.Right.Gaze.y               = _contiguousUnifiedData.Eye_Right_GazeY;
-        UnifiedTracking.Data.Eye.Right.PupilDiameter_MM     = _contiguousUnifiedData.Eye_Right_PupilDiameter_MM;
-        UnifiedTracking.Data.Eye.Right.Openness             = _contiguousUnifiedData.Eye_Right_Openness;
+        if ( _contiguousUnifiedData.Eye_Left_GazeX != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Left.Gaze.x = _contiguousUnifiedData.Eye_Left_GazeX;
+        if ( _contiguousUnifiedData.Eye_Left_GazeY != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Left.Gaze.y = _contiguousUnifiedData.Eye_Left_GazeY;
+        if ( _contiguousUnifiedData.Eye_Left_PupilDiameter_MM != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Left.PupilDiameter_MM = _contiguousUnifiedData.Eye_Left_PupilDiameter_MM;
+        if ( _contiguousUnifiedData.Eye_Left_Openness != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Left.Openness = _contiguousUnifiedData.Eye_Left_Openness;
 
-        UnifiedTracking.Data.Eye._maxDilation               = _contiguousUnifiedData.Eye_MaxDilation;
-        UnifiedTracking.Data.Eye._minDilation               = _contiguousUnifiedData.Eye_MinDilation;
+        if ( _contiguousUnifiedData.Eye_Right_GazeX != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Right.Gaze.x = _contiguousUnifiedData.Eye_Right_GazeX;
+        if ( _contiguousUnifiedData.Eye_Right_GazeY != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Right.Gaze.y = _contiguousUnifiedData.Eye_Right_GazeY;
+        if ( _contiguousUnifiedData.Eye_Right_PupilDiameter_MM != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Right.PupilDiameter_MM = _contiguousUnifiedData.Eye_Right_PupilDiameter_MM;
+        if ( _contiguousUnifiedData.Eye_Right_Openness != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye.Right.Openness = _contiguousUnifiedData.Eye_Right_Openness;
+
+        if ( _contiguousUnifiedData.Eye_MaxDilation != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye._maxDilation = _contiguousUnifiedData.Eye_MaxDilation;
+        if ( _contiguousUnifiedData.Eye_MinDilation != INVALID_FLOAT )
+            UnifiedTracking.Data.Eye._minDilation = _contiguousUnifiedData.Eye_MinDilation;
     }
 
     public void UpdateGlobalExpressionState()
@@ -145,7 +158,8 @@ public class ReplyUpdatePacket : IpcPacket
         // Copy face tracking
         for ( int i = 0; i < _contiguousUnifiedData.Expression_Shapes.Length; i++ )
         {
-            UnifiedTracking.Data.Shapes[i].Weight = _contiguousUnifiedData.Expression_Shapes[i];
+            if ( _contiguousUnifiedData.Expression_Shapes[i] != INVALID_FLOAT)
+                UnifiedTracking.Data.Shapes[i].Weight = _contiguousUnifiedData.Expression_Shapes[i];
         }
     }
 }

@@ -1,19 +1,13 @@
 ﻿using System.CommandLine;
 using System.Diagnostics;
-using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 using Windows.System;
-using System.Collections.Specialized;
-using System.Text;
-using VRCFaceTracking.Core.Library;
-using System.Runtime.CompilerServices;
-using VRCFaceTracking.Core.Services;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.Collections.Concurrent;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -118,6 +112,31 @@ public class ModuleProcessMain
         // Try loading the module
         DefModuleAssembly = new ModuleAssembly(Logger, LoggerFactory, modulePath);
         DefModuleAssembly.TryLoadAssembly();
+
+        // Initialise to invalid state
+        UnifiedTracking.Data = new() {
+            Eye = new()
+            {
+                Left = new()
+                {
+                    Gaze = new(0xFFFFFFFF, 0xFFFFFFFF),
+                    Openness = 0xFFFFFFFF,
+                    PupilDiameter_MM = 0xFFFFFFFF
+                },
+                Right = new()
+                {
+                    Gaze = new(0xFFFFFFFF, 0xFFFFFFFF),
+                    Openness = 0xFFFFFFFF,
+                    PupilDiameter_MM = 0xFFFFFFFF
+                },
+                _maxDilation = 0xFFFFFFFF,
+                _minDilation = 0xFFFFFFFF,
+            }
+        };
+        for ( int i = 0; i < ( int )UnifiedExpressions.Max + 1; i++ )
+        {
+            UnifiedTracking.Data.Shapes[i].Weight = 0xFFFFFFFF;
+        }
 
         Client.OnReceiveShouldBeQueued += QueueReceiveEvent;
         Client.OnPacketReceivedCallback += (in IpcPacket packet) => {
