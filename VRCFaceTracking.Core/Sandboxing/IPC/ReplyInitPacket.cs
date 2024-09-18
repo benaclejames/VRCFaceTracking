@@ -29,10 +29,7 @@ public class ReplyInitPacket : IpcPacket
 
         byte packedDataByte = (byte) packedData;
 
-        IconDataStreams.Clear();
-
         byte[] streamCountBytes = BitConverter.GetBytes(IconDataStreams.Count);
-
 
         // Packet size
         int packetSize = SIZE_PACKET_MAGIC + SIZE_PACKET_TYPE + 1 + sizeof(int) + moduleInfoStringData.Length +
@@ -88,16 +85,16 @@ public class ReplyInitPacket : IpcPacket
 
         int offset = 13 + moduleInfoStringLength + 4;
 
-        // for (int i = 0; i < streamCount; i++ )
-        // {
-        //     int imageStreamSize = BitConverter.ToInt32(data, offset);
-        // 
-        //     MemoryStream imageStream = new MemoryStream();
-        //     imageStream.Write(data, offset + 4, imageStreamSize);
-        //     imageStream.Position = 0;
-        // 
-        //     IconDataStreams.Add(imageStream);
-        // }
+        for (int i = 0; i < streamCount; i++ )
+        {
+            int imageStreamSize = BitConverter.ToInt32(data, offset);
+        
+            MemoryStream imageStream = new MemoryStream();
+            imageStream.Write(data, offset + 4, imageStreamSize);
+            imageStream.Position = 0;
+        
+            IconDataStreams.Add(imageStream);
+        }
     }
 
     private static byte[] ReadStreamDataEntirely(Stream input)
