@@ -168,6 +168,10 @@ public class UnifiedLibManager : ILibManager
                                 expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized,
                                 eyeAvailable            = EyeStatus == ModuleState.Uninitialized,
                             };
+                            _logger.LogInformation("Got supported for module {module}. Expr: {} Eye: {}...",
+                                AvailableSandboxModules[moduleIndex].ModuleClassName,
+                                eventInitPacket.expressionAvailable,
+                                eventInitPacket.eyeAvailable);
                             _sandboxServer.SendData(eventInitPacket, port);
                             break;
                         }
@@ -180,6 +184,11 @@ public class UnifiedLibManager : ILibManager
                             // Update support variables
                             AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replyInitPacket.eyeSuccess;
                             AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replyInitPacket.expressionSuccess;
+
+                            _logger.LogInformation("Got init for module {module}. Eye: {eye} Expr: {expr}...",
+                                AvailableSandboxModules[moduleIndex].ModuleClassName,
+                                replyInitPacket.eyeSuccess,
+                                replyInitPacket.eyeSuccess);
 
                             // Skip any modules that don't succeed, otherwise set UnifiedLib to have these states active and add module to module list.
                             if ( !replyInitPacket.eyeSuccess && !replyInitPacket.expressionSuccess )
@@ -334,8 +343,23 @@ public class UnifiedLibManager : ILibManager
 #if !DEBUG
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden,
+#else
+                    // In debug mode we connect stdout and stderr
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
 #endif
                 });
+
+#if DEBUG
+                // Start a thread to copy stderr and stdout to debug
+                new Thread(() =>
+                {
+                    string output = sandboxProcess.StandardOutput.ReadToEnd();
+                    output = output + sandboxProcess.StandardError.ReadToEnd();
+                    sandboxProcess.WaitForExit();
+                    Debug.WriteLine(output);
+                }).Start();
+#endif
 
                 var pid             = sandboxProcess.Id;
 
