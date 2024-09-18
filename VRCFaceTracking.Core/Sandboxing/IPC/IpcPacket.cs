@@ -9,6 +9,7 @@ public class IpcPacket
         // Core
         Unknown             = 0,
         Handshake           = 1,
+        SplitPacketChunk    = 2, // Split packet primitive => gets resent as a full packet later
 
         // Data update events
         MetadataUpdate      = 100,
@@ -31,6 +32,7 @@ public class IpcPacket
         
         // Debug streams are handled uniquely due to their nature
         DebugStreamFrame    = 1000,
+
     }
 
     public virtual PacketType GetPacketType() => PacketType.Unknown;

@@ -4,6 +4,7 @@ using VRCFaceTracking.Core.Sandboxing.IPC;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 
@@ -12,6 +13,7 @@ public delegate void OnReceiveShouldBeQueued();
 public class UdpFullDuplex : IDisposable
 {
     const int SIO_UDP_CONNRESET = -1744830452;
+    const int ETHERNET_FRAME_SIZE = 1500;
     const int TIMEOUT_MILLISECONDS = 10000;
 
     public int Port
@@ -30,8 +32,10 @@ public class UdpFullDuplex : IDisposable
     protected SimpleEventBus    _eventBus;
     private bool                _isCallbackRegistered   = false;
     private Thread              _receiveThread;
+    private int                 _maximumTransferUnit = ETHERNET_FRAME_SIZE;
     private CancellationTokenSource _cts = new();
     public OnReceiveShouldBeQueued OnReceiveShouldBeQueued;
+    public int MTU => _maximumTransferUnit;
 
     public UdpFullDuplex(int port, int[] reservedPorts = null, IPEndPoint remoteIpEndPoint = null)
     {
@@ -93,7 +97,8 @@ public class UdpFullDuplex : IDisposable
 
         _receivingUdpClient.Client.ReceiveTimeout   = 10;
         _receivingUdpClient.Client.SendTimeout      = 10;
-
+        _maximumTransferUnit = Math.Min(_receivingUdpClient.Client.ReceiveBufferSize, _receivingUdpClient.Client.SendBufferSize);
+        
         // setup first async event
         // AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
         // _receivingUdpClient.BeginReceive(callBack, null);
@@ -278,7 +283,20 @@ public class UdpFullDuplex : IDisposable
     {
         if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake )
         {
-            SendData(packet.GetBytes(), remoteEndpoint);
+            byte[] packetData = packet.GetBytes();
+            if ( packetData.Length > _maximumTransferUnit )
+            {
+                // @TODO: Split packet into chunks
+                byte[][] packetChunkBytes = PartialPacket.SplitPacketIntoChunks(packetData, _maximumTransferUnit);
+                foreach ( var packetChunk in packetChunkBytes )
+                {
+                    SendData(packetChunk, remoteEndpoint);
+                }
+            }
+            else
+            {
+                SendData(packetData, remoteEndpoint);
+            }
         }
         else
         {
@@ -290,7 +308,20 @@ public class UdpFullDuplex : IDisposable
     {
         if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake )
         {
-            SendData(packet.GetBytes(), new IPEndPoint(IPAddress.Loopback, remotePort));
+            byte[] packetData = packet.GetBytes();
+            if ( packetData.Length > _maximumTransferUnit )
+            {
+                // @TODO: Split packet into chunks
+                byte[][] packetChunkBytes = PartialPacket.SplitPacketIntoChunks(packetData, _maximumTransferUnit);
+                foreach ( var packetChunk in packetChunkBytes )
+                {
+                    SendData(packetChunk, new IPEndPoint(IPAddress.Loopback, remotePort));
+                }
+            }
+            else
+            {
+                SendData(packetData, new IPEndPoint(IPAddress.Loopback, remotePort));
+            }
         }
         else
         {

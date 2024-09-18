@@ -23,6 +23,7 @@ public class VrcftSandboxClient : UdpFullDuplex
     private readonly ILoggerFactory                 _loggerFactory;
     private readonly ILogger<VrcftSandboxClient>    _logger;
     private bool                                    _isConnected;
+    private int                                     _maxPacketSizeBytes;
 
     public OnPacketReceivedCallback OnPacketReceivedCallback = null;
     public VrcftSandboxClient(int portNumber,
@@ -53,6 +54,8 @@ public class VrcftSandboxClient : UdpFullDuplex
         handshakePkt.ModulePath = modulePath;
         _logger.LogInformation($"Attempting to connect to server...");
         SendData(handshakePkt, _serverEndpoint);
+        // Take the lower bound of packet rate we can fit through the network
+        _maxPacketSizeBytes = Math.Min(_receivingUdpClient.Client.ReceiveBufferSize, _receivingUdpClient.Client.SendBufferSize);
     }
 
     public override void OnBytesReceived(in byte[] data, in IPEndPoint endpoint)
@@ -64,7 +67,18 @@ public class VrcftSandboxClient : UdpFullDuplex
             // Tell the callback that we've received a packet
             if ( OnPacketReceivedCallback != null && packet.GetPacketType() != IpcPacket.PacketType.Unknown )
             {
-                OnPacketReceivedCallback(packet);
+                if ( packet.GetPacketType() == IpcPacket.PacketType.SplitPacketChunk )
+                {
+                    PartialPacket.DecodePacket(data, out var combinedData);
+                    if ( combinedData.Length > 0 )
+                    {
+                        OnBytesReceived(combinedData, endpoint);
+                    }
+                }
+                else
+                {
+                    OnPacketReceivedCallback(packet);
+                }
             }
 
             if ( packet.GetPacketType() == IpcPacket.PacketType.Handshake )
@@ -83,13 +97,27 @@ public class VrcftSandboxClient : UdpFullDuplex
 
     private void SendData(in byte[] message)
     {
+        // @TODO: Check packet size, if too big, convert to partial packet, and send partial packets
         _receivingUdpClient.Send(message, message.Length, _serverEndpoint);
     }
     public void SendData(in IpcPacket packet)
     {
         if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake)
         {
-            SendData(packet.GetBytes());
+            byte[] packetData = packet.GetBytes();
+            if ( packetData.Length > MTU )
+            {
+                // @TODO: Split packet into chunks
+                byte[][] packetChunkBytes = PartialPacket.SplitPacketIntoChunks(packetData, MTU);
+                foreach ( var packetChunk in packetChunkBytes )
+                {
+                    SendData(packetChunk);
+                }
+            }
+            else
+            {
+                SendData(packetData);
+            }
         }
         else
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VRCFaceTracking.Core.Sandboxing.IPC;
+﻿using VRCFaceTracking.Core.Sandboxing.IPC;
 
 namespace VRCFaceTracking.Core.Sandboxing;
 public class VrcftPacketDecoder
@@ -36,6 +31,12 @@ public class VrcftPacketDecoder
             // Handshake
             case IpcPacket.PacketType.Handshake:
                 packet = new HandshakePacket();
+                packet.Decode(data);
+                break;
+
+            // SplitPacketChunk
+            case IpcPacket.PacketType.SplitPacketChunk:
+                packet = new PartialPacket();
                 packet.Decode(data);
                 break;
 
@@ -107,8 +108,9 @@ public class VrcftPacketDecoder
             default:
 #if DEBUG
                 throw new NotImplementedException($"No decoder for packet type {packetType} implemented in VrcftPacketDecoder! Packets of this type will be ignored.");
-#endif
+#else
                 return false;
+#endif
         } 
 
         return true;

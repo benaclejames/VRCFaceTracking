@@ -56,7 +56,18 @@ public class VrcftSandboxServer : UdpFullDuplex
             }
             if ( OnPacketReceived != null )
             {
-                OnPacketReceived(packet, endpoint.Port);
+                if ( packet.GetPacketType() == IpcPacket.PacketType.SplitPacketChunk )
+                {
+                    PartialPacket.DecodePacket(data, out var combinedData);
+                    if ( combinedData.Length > 0 )
+                    {
+                        OnBytesReceived(combinedData, endpoint);
+                    }
+                }
+                else
+                {
+                    OnPacketReceived(packet, endpoint.Port);
+                }
             }
         }
 
