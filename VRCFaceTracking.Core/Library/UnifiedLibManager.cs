@@ -139,7 +139,7 @@ public class UnifiedLibManager : ILibManager
                                     };
                                     AvailableSandboxModules.Add(runtimeInfo);
 
-                                    _logger.LogInformation("Initializing {module}...", runtimeInfo.ModuleClassName.ToString());
+                                    _logger.LogInformation("Initializing {module}...", runtimeInfo.ModuleClassName);
                                     AttemptSandboxedModuleInitialize(runtimeInfo);
                                     pidRegistered = true;
                                 }
@@ -446,10 +446,15 @@ public class UnifiedLibManager : ILibManager
                 try
                 {
                     tries++;
-                    module.Process.Kill(true);
-                    tries = int.MaxValue;
+                    if ( !module.Process.HasExited )
+                        module.Process.Kill();
+                    if ( module.Process.HasExited )
+                    {
+                        tries = int.MaxValue;
+                        break;
+                    }
                 } catch ( System.ComponentModel.Win32Exception ex ) {
-                    // Can fail to call OpenProcessEx due to some error such as ACCESS_DENIED (process has higher priveledges, eg Sraniple)
+                    // Can fail to call OpenProcessEx due to some error such as ACCESS_DENIED (process has higher priveleges, eg Sraniple)
                     _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got win32 error ({ex.ToString()}");
                 } catch ( Exception ex ) {
                     // Tell the user why we got an exception so that we can hopefully fix it.

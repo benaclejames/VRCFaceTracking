@@ -173,10 +173,11 @@ public class ModuleProcessMain
                         
                         // Tell VRCFT that we have shut down successfully (otherwise VRCFT will terminate this process)
                         var pkt = new ReplyTeardownPacket();
-                        _packetsToSend.Enqueue(pkt);
+                        // Tell VRCFT we have shutdown immediately
+                        Client.SendData(pkt);
 
                         // Shut down the event loop
-                        WaitForPackets = false;
+                        Environment.Exit(ModuleProcessExitCodes.OK);
                         break;
                     }
 
