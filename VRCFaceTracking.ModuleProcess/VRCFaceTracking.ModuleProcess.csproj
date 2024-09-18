@@ -12,8 +12,13 @@
     <Nullable>enable</Nullable>
     <AssemblyVersion>5.2.3.0</AssemblyVersion>
     <SelfContained>true</SelfContained>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
