@@ -119,20 +119,14 @@ public class ActivationService : IActivationService
         var outdatedModules = remoteModules.Where(rm => localModules.Any(lm =>
         {
             if (rm.ModuleId != lm.ModuleId) 
-            {
                 return false;
-            }
 
-            var remoteVersSplit = rm.Version.Split(".");
-            var localVersSplit = lm.Version.Split(".");
+            var remoteVersion = new Version(rm.Version);
+            var localVersion = new Version(lm.Version);
 
-            for (int i = 0; i < localVersSplit.Length; i++)
-            {
-                if (i > remoteVersSplit.Length) 
-                    return false;
-                if (int.Parse(localVersSplit[i]) < int.Parse(remoteVersSplit[i]))
-                    return true;
-            }
+            var result = remoteVersion.CompareTo(localVersion);
+            if (result > 0) // remote module version is higher than registry
+                return true;
 
             return false;
         }));
