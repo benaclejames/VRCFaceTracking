@@ -28,6 +28,10 @@ public class Filter : TrackingMutation
 
         public float Filter(float x)
         {
+            if (float.IsNaN(x))
+            {
+                return 0f;
+            }
             var dx = (x - xPrev) * hz;
 
             var edx = LowPass(ref dxPrev, dx, Alpha(hz, dCutoff));
