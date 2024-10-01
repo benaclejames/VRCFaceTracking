@@ -116,7 +116,26 @@ public class ActivationService : IActivationService
         _logger.LogInformation("Checking for updates for installed modules...");
         var localModules = _moduleDataService.GetInstalledModules().Where(m => m.ModuleId != Guid.Empty);
         var remoteModules = await _moduleDataService.GetRemoteModules();
-        var outdatedModules = remoteModules.Where(rm => localModules.Any(lm => rm.ModuleId == lm.ModuleId && rm.Version != lm.Version));
+        var outdatedModules = remoteModules.Where(rm => localModules.Any(lm =>
+        {
+            if (rm.ModuleId != lm.ModuleId) 
+            {
+                return false;
+            }
+
+            var remoteVersSplit = rm.Version.Split(".");
+            var localVersSplit = lm.Version.Split(".");
+
+            for (int i = 0; i < localVersSplit.Length; i++)
+            {
+                if (i > remoteVersSplit.Length) 
+                    return false;
+                if (int.Parse(localVersSplit[i]) < int.Parse(remoteVersSplit[i]))
+                    return true;
+            }
+
+            return false;
+        }));
         foreach (var outdatedModule in outdatedModules)
         {
             _logger.LogInformation($"Updating {outdatedModule.ModuleName} from {localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version} to {outdatedModule.Version}");
