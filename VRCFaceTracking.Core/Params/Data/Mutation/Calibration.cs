@@ -17,15 +17,11 @@ public class Calibration : TrackingMutation
 #if DEBUG
     [MutationProperty("[DEBUG] Data Points")]
 #endif
-    public static int points = 256;
-    #if DEBUG
-    [MutationProperty("[DEBUG] Data Window")]
-#endif
-    public static int window = 32;
+    public static int points = 64;
 #if DEBUG
     [MutationProperty("[DEBUG] Delta")]
 #endif
-    public static float delta = 0.4f; // prevents noisy or unintended data from being included in data set
+    public static float delta = 0.15f; // prevents noisy or unintended data from being included in data set
 #if DEBUG
     [MutationProperty("[DEBUG] Calibration Delta")]
 #endif
@@ -62,17 +58,13 @@ public class Calibration : TrackingMutation
             {
                 if (_fixedIndex < dataPoints.Length)
                 {
-                    if (_fixedIndex <= window)
-                    {
-                        progress = _fixedIndex / (float)window;
-                    }
-                    else if (!finished)
-                    {
-                        logger.LogInformation($"Data saturated window: {name}.");
-                        finished = true;
-                    }
                     _fixedIndex++;
-
+                    progress = _fixedIndex / (float)dataPoints.Length;
+                }
+                else if (!finished)
+                {
+                    logger.LogInformation($"Data saturated window: {name}.");
+                    finished = true;
                 }
                 dataPoints[_rollingIndex] = currentValue;
                 _rollingIndex = (_rollingIndex + 1) % dataPoints.Length;
@@ -109,17 +101,18 @@ public class Calibration : TrackingMutation
             {
                 var _mean = Mean(dataPoints);
                 var _stdDev = StdDev(dataPoints, _mean);
-                var recentData = dataPoints.Skip(Math.Max(0, _rollingIndex - window)).Take(window).ToArray();
-                var recentRange = Math.Abs(recentData.Max() - recentData.Min());
+                var _variance = (float)Math.Pow(Math.Max(0f, 1f - (float)Math.Abs((1.7241379310337f * _stdDev) - _mean)), 1f);
+                var _stdDevLimit = Math.Pow(1f - Math.Max(0, _stdDev - 0.29f),3f);
+                var _meanLimit = 1f - Math.Max(0, _mean - 0.5f);
+                var _meanPusher = Math.Pow(2*_mean, 0.2f);
                 
                 var _confidence = (float)Math.Max(0f, Math.Min(1f, 
-                    (1f-(float)Math.Abs(3.448f*_stdDev-1f)) *
-                    (1f - Math.Max(0, _stdDev - 0.29f)) *
-                    (1f - Math.Max(0, _mean - 0.5f)) *
-                    (1f - Math.Pow(Math.Abs(_mean-0.25f), 3f)) *
-                    Math.Pow(recentRange, 0.25f)
+                    _variance *
+                    _stdDevLimit *
+                    _meanLimit *
+                    _meanPusher
                 ));
-
+                
                 if (_confidence >= maxConfidence - cDelta)
                 {
                     var _lerp = 1f - (float)Math.Pow(confidence, 2f); // weighs new stats less the more confident we are.
@@ -131,8 +124,8 @@ public class Calibration : TrackingMutation
                         confidence = _confidence * _lerp + confidence * (1f-_lerp);
                     if (confidence > maxConfidence)
                         maxConfidence = maxConfidence * _lerp + confidence * (1f-_lerp);
-                    //if (!float.IsNaN(_variance))
-                    //    variance = _variance * _lerp + variance * (1f - _lerp);
+                    if (!float.IsNaN(_variance))
+                        variance = _variance * _lerp + variance * (1f - _lerp);
                 }
             }
         }
