@@ -124,11 +124,7 @@ public class ActivationService : IActivationService
             var remoteVersion = new Version(rm.Version);
             var localVersion = new Version(lm.Version);
 
-            var result = remoteVersion.CompareTo(localVersion);
-            if (result > 0) // remote module version is higher than registry
-                return true;
-
-            return false;
+            return remoteVersion.CompareTo(localVersion) > 0;
         }));
         foreach (var outdatedModule in outdatedModules)
         {
