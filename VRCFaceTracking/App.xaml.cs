@@ -125,6 +125,8 @@ public partial class App : Application
             services.AddTransient<ParameterViewModel>();
             services.AddTransient<ParametersViewModel>();
             services.AddTransient<ParametersPage>();
+            services.AddTransient<MutatorViewModel>();
+            services.AddTransient<MutatorPage>();
             services.AddTransient<OutputViewModel>();
             services.AddTransient<OutputPage>();
             services.AddTransient<SettingsViewModel>();

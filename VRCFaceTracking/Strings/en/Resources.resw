@@ -386,4 +386,7 @@
   <data name="HardwareDebug.Description" xml:space="preserve">
     <value>Stare at your tongue I guess?</value>
   </data>
+  <data name="Shell_TrackingSettings.Content" xml:space="preserve">
+    <value>Tracking Settings</value>
+  </data>
 </root>

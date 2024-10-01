@@ -53,6 +53,11 @@
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE9E9;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>-->
+                <NavigationViewItem x:Uid="Shell_TrackingSettings" helpers:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.MutatorViewModel">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE70F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem x:Uid="Shell_Output" helpers:NavigationHelper.NavigateTo="VRCFaceTracking.ViewModels.OutputViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;"/>
