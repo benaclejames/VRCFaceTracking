@@ -11,7 +11,9 @@ namespace VRCFaceTracking.Core.Params.Data
         // Eye data.
         public Vector2 Gaze;
         public float PupilDiameter_MM;
-        public float Openness;
+        public float Openness = 1.0f;
+
+        public UnifiedSingleEyeData() {}
     }
 
     /// <summary>
@@ -19,7 +21,7 @@ namespace VRCFaceTracking.Core.Params.Data
     /// </summary>
     public class UnifiedEyeData
     {
-        public UnifiedSingleEyeData Left, Right;
+        public UnifiedSingleEyeData Left = new (), Right = new ();
         public float _maxDilation, _minDilation = 999f;
 
         /// <summary>
