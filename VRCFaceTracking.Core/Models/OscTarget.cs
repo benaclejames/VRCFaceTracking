@@ -24,8 +24,6 @@ public partial class OscTarget : ObservableObject, IOscTarget
     private string _destinationAddress;
 
     private const string DefaultAddress = "127.0.0.1";
-    private const int DefaultInPort = 9001;
-    private const int DefaultOutPort = 9000;
     private bool _isReverting = false;
 
     public OscTarget(ILocalSettingsService localSettingsService)
@@ -54,50 +52,8 @@ public partial class OscTarget : ObservableObject, IOscTarget
         _isReverting = false;
     }
 
-    /// Called after the InPort property has changed.
-    /// It checks if the InPort is valid and reverts to the default if it's invalid (less than 1).
-    partial void OnInPortChanged(int oldValue, int newValue)
-    {
-        if (newValue < 1)
-        {
-            InPort = DefaultInPort;
-        }
-    }
-
-    /// Called after the OutPort property has changed.
-    /// It checks if the OutPort is valid and reverts to the default if it's invalid (less than 1).
-    partial void OnOutPortChanged(int oldValue, int newValue)
-    {
-        if (newValue < 1)
-        {
-            OutPort = DefaultOutPort;
-        }
-    }
-
     /// Validates whether the provided address is a valid IP address or resolvable hostname.
-    private static bool IsValidAddress(string address)
-    {
-        if (string.IsNullOrWhiteSpace(address))
-        {
-            return false;
-        }
-
-        // Check if it's a valid IP address
-        if (IPAddress.TryParse(address, out _))
-        {
-            return true;
-        }
-
-        // Check if it's a resolvable hostname
-        try
-        {
-            var hostEntry = Dns.GetHostEntry(address);
-            return true;
-        }
-        catch
-        {
-            // DNS resolution failed
-            return false;
-        }
-    }
+    private static bool IsValidAddress(string address) =>
+        !string.IsNullOrWhiteSpace(address) &&
+        IPAddress.TryParse(address, out _);
 }
