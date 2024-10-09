@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,9 +42,20 @@ public class OscRecvService : BackgroundService
                 return;
             }
 
+            // Maybe remove the IsNullOrEmpty check since that is now being handeled by the Validator
             if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.InPort == default)
             {
                 return;
+            }
+
+            var validationResults = new List<ValidationResult>();
+            var context = new ValidationContext(oscTarget);
+
+            if (!Validator.TryValidateObject(oscTarget, context, validationResults, true))
+            {
+                var errorMessages = string.Join(Environment.NewLine, validationResults.Select(vr => vr.ErrorMessage));
+                _logger.LogWarning($"{errorMessages} Reverting to default.");
+                oscTarget.DestinationAddress = "127.0.0.1";
             }
 
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.InPort));
