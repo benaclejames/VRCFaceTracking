@@ -10,6 +10,13 @@ public class ValidIpAddressAttribute : ValidationAttribute
     {
         if (value is string ipString)
         {
+
+            // Check for empty string
+            if (string.IsNullOrWhiteSpace(ipString))
+            {
+                return false;
+            }
+
             // Attempt to parse the IP address
             return IPAddress.TryParse(ipString, out _);
         }
