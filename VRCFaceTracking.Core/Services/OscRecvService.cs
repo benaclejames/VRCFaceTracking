@@ -42,8 +42,7 @@ public class OscRecvService : BackgroundService
                 return;
             }
 
-            // Maybe remove the IsNullOrEmpty check since that is now being handeled by the Validator
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.InPort == default)
+            if (_oscTarget.InPort == default)
             {
                 return;
             }

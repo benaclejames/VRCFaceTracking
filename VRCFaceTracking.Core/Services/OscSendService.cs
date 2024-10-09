@@ -38,8 +38,7 @@ public class OscSendService
                 return;
             }
 
-            // Maybe remove the IsNullOrEmpty check since that is now being handeled by the Validator
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.OutPort == default)
+            if (_oscTarget.OutPort == default)
             {
                 return;
             }
