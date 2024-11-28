@@ -61,14 +61,15 @@ namespace VRCFaceTracking.Core.Params.Data
         }
         public void CopyPropertiesOf(UnifiedEyeData data)
         {
-            this.Left.Gaze = data.Left.Gaze;
-            this.Left.Openness = data.Left.Openness;
-            this.Left.PupilDiameter_MM = data.Left.PupilDiameter_MM;
-            this.Right.Gaze = data.Right.Gaze;
-            this.Right.Openness = data.Right.Openness;
+            data.Combined();
+
+            this.Left = data.Left;
+            this.Right = data.Right;
             this.Right.PupilDiameter_MM = data.Right.PupilDiameter_MM;
             this._maxDilation = data._maxDilation;
             this._minDilation = data._minDilation;
+            this._rightDiameter = data._rightDiameter;
+            this._leftDiameter = data._leftDiameter;
         }
     }
 
@@ -107,9 +108,9 @@ namespace VRCFaceTracking.Core.Params.Data
 
         public void CopyPropertiesOf(UnifiedTrackingData data)
         {
-            this.Eye.CopyPropertiesOf(data.Eye);
+            Eye.CopyPropertiesOf(data.Eye);
             for (int i = 0; i < Shapes.Length; i++)
-                this.Shapes[i].Weight = data.Shapes[i].Weight;
+                Shapes[i].Weight = data.Shapes[i].Weight;
         }
     }
 }
