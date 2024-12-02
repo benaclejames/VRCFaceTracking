@@ -65,7 +65,6 @@ namespace VRCFaceTracking.Core.Params.Data
 
             this.Left = data.Left;
             this.Right = data.Right;
-            this.Right.PupilDiameter_MM = data.Right.PupilDiameter_MM;
             this._maxDilation = data._maxDilation;
             this._minDilation = data._minDilation;
             this._rightDiameter = data._rightDiameter;
