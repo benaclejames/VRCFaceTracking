@@ -20,6 +20,8 @@ public partial class OscQueryService : ObservableObject
     private readonly ILogger _logger;
     private readonly OscQueryConfigParser _oscQueryConfigParser;
     private readonly MulticastDnsService _multicastDnsService;
+    private readonly AvatarConfigParser _configParser;
+    private readonly ParameterSenderService _parameterSenderService;
     private static readonly Random Random = new ();
     
     [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
@@ -35,6 +37,8 @@ public partial class OscQueryService : ObservableObject
     public OscQueryService(
         ILogger<OscQueryService> logger,
         OscQueryConfigParser oscQueryConfigParser,
+        AvatarConfigParser avatarConfigParser,
+        ParameterSenderService parameterSenderService,
         IOscTarget oscTarget,
         MulticastDnsService multicastDnsService,
         OscRecvService recvService,
@@ -43,6 +47,8 @@ public partial class OscQueryService : ObservableObject
     )
     {
         _oscQueryConfigParser = oscQueryConfigParser;
+        _configParser = avatarConfigParser;
+        _parameterSenderService = parameterSenderService;
         _logger = logger;
         _recvService = recvService;
         _recvService.OnMessageReceived = HandleNewMessage;
@@ -80,7 +86,7 @@ public partial class OscQueryService : ObservableObject
         _logger.LogInformation("OSCQuery detected. Setting port negotiation to autopilot.");
         
         var randomStr = new string(Enumerable.Repeat(k_chars, 6).Select(s => s[Random.Next(s.Length)]).ToArray());
-        _httpHandler.OnHostInfoQueried += HandleNewAvatar;
+        _httpHandler.OnHostInfoQueried += HandleNewAvatarWrapper;
         
         var recvEndpoint = _recvService.UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), 0));
         if (recvEndpoint == null)
@@ -104,10 +110,19 @@ public partial class OscQueryService : ObservableObject
         HandleNewAvatar();
     }
 
-    private async void HandleNewAvatar()
+    private async void HandleNewAvatar(string newId = null)
     {
-        _httpHandler.OnHostInfoQueried -= HandleNewAvatar;
-        var newAvatar = await _oscQueryConfigParser.ParseAvatar("");
+        var newAvatar = default((IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?);
+        if (newId == null)
+        {
+            _httpHandler.OnHostInfoQueried -= HandleNewAvatarWrapper;
+            newAvatar = await _oscQueryConfigParser.ParseAvatar("");
+        }
+        else
+        {
+            // handle normal osc
+            newAvatar = await _configParser.ParseAvatar(newId);
+        }
         if (newAvatar.HasValue)
         {
             AvatarInfo = newAvatar.Value.avatarInfo;
@@ -115,17 +130,22 @@ public partial class OscQueryService : ObservableObject
         }
     }
         
+    private void HandleNewAvatarWrapper()
+    {
+        HandleNewAvatar();
+    }
+
     private void HandleNewMessage(OscMessage msg)
     {
         switch (msg.Address)
         {
             case "/avatar/change":
-                HandleNewAvatar();
+                HandleNewAvatar(msg.Value as string);
                 break;
             case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                 if (msg.Value is bool relevancy)
                 {
-                    ParameterSenderService.AllParametersRelevant = relevancy;
+                    _parameterSenderService.AllParametersRelevant = relevancy;
                 }
 
                 break;

@@ -86,7 +86,7 @@ public class BaseParam<T> : Parameter where T : struct
 
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
-        if (ParameterSenderService.AllParametersRelevant)
+        if (ParameterSenderService.AllParametersRelevantStatic)
         {
             Relevant = true;
             OscMessage.Address = DefaultPrefix + _paramName;

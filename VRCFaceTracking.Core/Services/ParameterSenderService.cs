@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC;
 
 namespace VRCFaceTracking.Core.Services;
@@ -10,7 +11,25 @@ public class ParameterSenderService : BackgroundService
     private static readonly Queue<OscMessage> SendQueue = new();
  
     private readonly OscSendService _sendService;
-    public static bool AllParametersRelevant;
+
+    public static bool AllParametersRelevantStatic
+    {
+        get; set;
+    }
+    public bool AllParametersRelevant
+    {
+        get => AllParametersRelevantStatic;
+        set
+        {
+            if (AllParametersRelevantStatic == value) return;
+            AllParametersRelevantStatic = value;
+            SendQueue.Clear();
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+            {
+                parameter.ResetParam(Array.Empty<IParameterDefinition>());
+            }
+        }
+    }
     
     public ParameterSenderService(OscSendService sendService)
     {
