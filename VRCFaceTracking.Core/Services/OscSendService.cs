@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
@@ -37,9 +38,19 @@ public class OscSendService
                 return;
             }
 
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.OutPort == default)
+            if (_oscTarget.OutPort == default)
             {
                 return;
+            }
+
+            var validationResults = new List<ValidationResult>();
+            var context = new ValidationContext(oscTarget);
+            
+            if (!Validator.TryValidateObject(oscTarget, context, validationResults, true))
+            {
+                var errorMessages = string.Join(Environment.NewLine, validationResults.Select(vr => vr.ErrorMessage));
+                _logger.LogWarning($"{errorMessages} reverting to default.");
+                oscTarget.DestinationAddress = "127.0.0.1";
             }
             
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.OutPort));
