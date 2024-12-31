@@ -65,18 +65,16 @@ public partial class UnifiedTrackingMutator : ObservableObject
         _logger.LogDebug("Mutation data saved.");
     }
 
-    public async Task<Task> Initialize()
+    public void Initialize()
     {
         // Try to load config and propogate data into Unified if they exist.
         _logger.LogDebug("Initializing mutations...");
         foreach (var mutation in _mutations)
         {
             _logger.LogInformation($"Initializing {mutation.Name}");
-            await mutation.Initialize(UnifiedTracking.Data);
-            mutation.IsActive = true;
+            mutation.Initialize(UnifiedTracking.Data);
         }
         _logger.LogDebug("Mutations initialized successfully.");
-        return Task.CompletedTask;
     }
 
     public async void Load()
@@ -118,5 +116,6 @@ public partial class UnifiedTrackingMutator : ObservableObject
             }
         }
         _logger.LogDebug("Mutation data loaded.");
+        Initialize();
     }
 }

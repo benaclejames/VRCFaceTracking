@@ -34,7 +34,7 @@ public abstract partial class TrackingMutation
 
     [JsonIgnore]
     public ILogger Logger { get; set; }
-    public async virtual Task Initialize(UnifiedTrackingData data) => await Task.CompletedTask;
+    public virtual void Initialize(UnifiedTrackingData data) { }
     public abstract void MutateData(ref UnifiedTrackingData data);
     public void CreateProperties() => Components = MutationComponentFactory.CreateComponents(this);
     public static TrackingMutation[] GetImplementingMutations(bool ordered = true)

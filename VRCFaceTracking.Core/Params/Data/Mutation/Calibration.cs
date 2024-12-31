@@ -19,9 +19,9 @@ public class Calibration : TrackingMutation
 #endif
     public static int points = 64;
 #if DEBUG
-    [MutationProperty("[DEBUG] Delta")]
+    [MutationProperty("[DEBUG] Step Delta")]
 #endif
-    public static float delta = 0.15f; // prevents noisy or unintended data from being included in data set
+    public static float sDelta = 0.15f; // prevents noisy or unintended data from being included in data set
 #if DEBUG
     [MutationProperty("[DEBUG] Calibration Delta")]
 #endif
@@ -54,7 +54,7 @@ public class Calibration : TrackingMutation
         public void UpdateCalibration(float currentValue, ILogger logger, float dT)
         {
             var difference = Math.Abs(currentValue - _currentStep);
-            if ((float.IsNaN(_currentStep) || difference >= delta * dT))
+            if ((float.IsNaN(_currentStep) || difference >= sDelta * dT))
             {
                 if (_fixedIndex < dataPoints.Length)
                 {
@@ -70,7 +70,7 @@ public class Calibration : TrackingMutation
                 _rollingIndex = (_rollingIndex + 1) % dataPoints.Length;
                 CalculateStats();
             }
-            _currentStep = ClampStep(currentValue, delta * dT);
+            _currentStep = ClampStep(currentValue, sDelta * dT);
         }
 
         private float ClampStep(float value, float factor) => (float)Math.Floor(value / factor) * factor; 
@@ -146,10 +146,11 @@ public class Calibration : TrackingMutation
 
     public class CalibrationData
     {
-        public CalibrationParameter[] Shapes = new CalibrationParameter[(int)UnifiedExpressions.Max];
+        public CalibrationParameter[] Shapes;
 
         public CalibrationData()
         {
+            Shapes ??= new CalibrationParameter[(int)UnifiedExpressions.Max];
             for (int i = 0; i < Shapes.Length; i++)
                 if (Shapes[i] == null)
                     Shapes[i] = new CalibrationParameter(((UnifiedExpressions)i).ToString());
@@ -172,13 +173,15 @@ public class Calibration : TrackingMutation
         }
     }
 
-    public CalibrationData calData = new();
+    public CalibrationData calData;
 
     public override string Name => "Calibration";
     public override string Description => "Processes tracking data to better match user expression.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
     public override bool IsActive { get; set; } = false;
+
+    public override void Initialize(UnifiedTrackingData data) => calData ??= new();
 
     public override void MutateData(ref UnifiedTrackingData data)
     {
@@ -194,7 +197,7 @@ public class Calibration : TrackingMutation
     public void LogData()
     {
         Logger.LogInformation("Logging Calibration data:" +
-                             $" delta: {delta}" + 
+                             $" delta: {sDelta}" + 
                              $" points: {points}" + 
                              $" devationBias: {deviationBias}");
         for (int i = 0; i < calData.Shapes.Length; i++)
