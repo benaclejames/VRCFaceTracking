@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Models.ParameterDefinition.FileBased;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core;
 
@@ -63,14 +64,14 @@ public class AvatarConfigParser
             return null;
         }
 
-        /*_logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
+        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
         ParameterSenderService.Clear();
         var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
         foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
         {
             paramList.AddRange(parameter.ResetParam(parameters));
-        }*/
+        }
 
         //_lastAvatarId = newId;
         return (avatarConfig, paramList);
