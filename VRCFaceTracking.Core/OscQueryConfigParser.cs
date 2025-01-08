@@ -52,7 +52,7 @@ public class OscQueryConfigParser
 
             // Reset all parameters
             var paramList = new List<Parameter>();
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1)
+            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).Concat(UnifiedTracking.HeadParameters)
                          .ToArray())
             {
                 paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters));

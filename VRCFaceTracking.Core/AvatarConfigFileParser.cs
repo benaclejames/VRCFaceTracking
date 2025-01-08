@@ -68,7 +68,7 @@ public class AvatarConfigParser
         ParameterSenderService.Clear();
         var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
 
-        foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToArray())
+        foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).Concat(UnifiedTracking.HeadParameters).ToArray())
         {
             paramList.AddRange(parameter.ResetParam(parameters));
         }

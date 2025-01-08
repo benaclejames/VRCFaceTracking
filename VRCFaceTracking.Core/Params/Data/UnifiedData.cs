@@ -83,6 +83,22 @@ namespace VRCFaceTracking.Core.Params.Data
         public float Weight;
     }
 
+    public struct UnifiedHeadData
+    {
+        /// <summary>
+        /// Contains head rotation and position data.
+        /// Head rotation values should be normalized to a [-1, 1] range representing -90d to 90d rotation
+        /// Head position values should be normalized / capped to a [-1, 1] range and represent deviation from user origin point
+        /// </summary>
+        public float HeadYaw;
+        public float HeadPitch;
+        public float HeadRoll;
+
+        public float HeadPosX;
+        public float HeadPosY;
+        public float HeadPosZ;
+    }
+
     /// <summary>
     /// All data that is accessible by modules and is output to parameters.
     /// </summary>
@@ -97,7 +113,7 @@ namespace VRCFaceTracking.Core.Params.Data
         /// Container of all Unified Expression expression data. 
         /// </summary>
         /// <remarks>
-        /// Example of useage:
+        /// Example of usage:
         /// <code>
         /// // Update JawOpen shape in Expression Data.
         /// Shapes[(int)UnifiedExpression.JawOpen].Weight = JawOpen;
@@ -105,11 +121,23 @@ namespace VRCFaceTracking.Core.Params.Data
         /// </remarks>
         public UnifiedExpressionShape[] Shapes = new UnifiedExpressionShape[(int)UnifiedExpressions.Max + 1];
 
+        /// <summary>
+        /// Container of head pose data.
+        /// </summary>
+        public UnifiedHeadData Head = new UnifiedHeadData();
+
         public void CopyPropertiesOf(UnifiedTrackingData data)
         {
             Eye.CopyPropertiesOf(data.Eye);
             for (int i = 0; i < Shapes.Length; i++)
                 Shapes[i].Weight = data.Shapes[i].Weight;
+            
+            Head.HeadYaw   = data.Head.HeadYaw;
+            Head.HeadPitch = data.Head.HeadPitch;
+            Head.HeadRoll  = data.Head.HeadRoll;
+            Head.HeadPosX  = data.Head.HeadPosX;
+            Head.HeadPosY  = data.Head.HeadPosY;
+            Head.HeadPosZ  = data.Head.HeadPosZ; 
         }
     }
 }
