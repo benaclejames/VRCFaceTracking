@@ -45,6 +45,13 @@ public class ParameterAdjustment : TrackingMutation
     [MutationProperty("Tongue Directions")] public (float, float) tongueMove = new(0, 1);
     [MutationProperty("Tongue Miscellaneous")] public (float, float) tongueOther = new(0, 1);
 
+    [MutationProperty("Head Rotation (Side-to-Side)")] public (float, float) headRotationYaw = new(0, 1);
+    [MutationProperty("Head Rotation (Up-Down Tilt)")] public (float, float) headRotationPitch = new(0, 1);
+    [MutationProperty("Head Rotation (Side Tilt)")] public (float, float) headRotationRoll = new(0, 1);
+    [MutationProperty("Head Position (Side-to-Side)")] public (float, float) headPositionX = new(0, 1);
+    [MutationProperty("Head Position (Up-Down)")] public (float, float) headPositionY = new(0, 1);
+    [MutationProperty("Head Position (Forward-Back)")] public (float, float) headPositionZ = new(0, 1);
+
     public override string Name => "Parameter Adjustment";
 
     public override string Description => "Adjust VRCFaceTracking Parameters.";
@@ -54,6 +61,8 @@ public class ParameterAdjustment : TrackingMutation
     float Range(float value, float floor, float ceil) => (value - floor) / (ceil - floor);
 
     float SetRange(ref UnifiedExpressionShape shape, (float, float) ranges) => shape.Weight = Range(shape.Weight, ranges.Item1, ranges.Item2);
+    float SetRange(ref float value, (float, float) ranges) => value = Range(value, ranges.Item1, ranges.Item2);
+
 
     public override void MutateData(ref UnifiedTrackingData data)
     {
@@ -168,5 +177,13 @@ public class ParameterAdjustment : TrackingMutation
         SetRange(ref data.Shapes[(int)UnifiedExpressions.TongueFlat], tongueOther);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.TongueSquish], tongueOther);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.TongueRoll], tongueOther);
+
+        SetRange(ref data.Head.HeadYaw, headRotationYaw);
+        SetRange(ref data.Head.HeadPitch, headRotationPitch);
+        SetRange(ref data.Head.HeadRoll, headRotationRoll);
+
+        SetRange(ref data.Head.HeadPosX, headPositionX);
+        SetRange(ref data.Head.HeadPosY, headPositionY);
+        SetRange(ref data.Head.HeadPosZ, headPositionZ);
     }
 }

@@ -65,6 +65,13 @@ public class Filter : TrackingMutation
     EuroFilter opennessLeft;
     EuroFilter opennessRight;
 
+    EuroFilter headYaw;
+    EuroFilter headPitch;
+    EuroFilter headRoll;
+    EuroFilter headPosX;
+    EuroFilter headPosY;
+    EuroFilter headPosZ;
+
     public override string Name => "Data Filter";
 
     public override string Description => "Default data filtering for VRCFaceTracking expressions.";
@@ -85,6 +92,12 @@ public class Filter : TrackingMutation
         pupilRight = new();
         opennessLeft = new();
         opennessRight = new();
+        headYaw = new();
+        headPitch = new();
+        headRoll = new();
+        headPosX = new();
+        headPosY = new();
+        headPosZ = new();
 
         for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
         {
@@ -106,5 +119,12 @@ public class Filter : TrackingMutation
         data.Eye.Right.PupilDiameter_MM = pupilRight.Filter(data.Eye.Right.PupilDiameter_MM);
         data.Eye.Right.Gaze.x = gazeRightX.Filter(data.Eye.Right.Gaze.x);
         data.Eye.Right.Gaze.y = gazeRightY.Filter(data.Eye.Right.Gaze.y);
+
+        data.Head.HeadYaw = headYaw.Filter(data.Head.HeadYaw);
+        data.Head.HeadPitch = headPitch.Filter(data.Head.HeadPitch);
+        data.Head.HeadRoll = headRoll.Filter(data.Head.HeadRoll);
+        data.Head.HeadPosX = headPosX.Filter(data.Head.HeadPosX);
+        data.Head.HeadPosY = headPosY.Filter(data.Head.HeadPosY);
+        data.Head.HeadPosZ = headPosZ.Filter(data.Head.HeadPosZ);
     }
 }
