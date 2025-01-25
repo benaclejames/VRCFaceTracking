@@ -87,8 +87,11 @@ namespace VRCFaceTracking.Core.Params.Data
     {
         /// <summary>
         /// Contains head rotation and position data.
-        /// Head rotation values should be normalized to a [-1, 1] range representing -90d to 90d rotation
-        /// Head position values should be normalized / capped to a [-1, 1] range and represent deviation from user origin point
+        /// Head rotation values should be normalized to a [-1, 1] range representing -90d to 90d rotation (0 meaning facing directly forwards)
+        /// Head position values should be normalized / capped to a [-1, 1] range and represent deviation from a set user origin point in meters
+        ///     The normalized values should be *approximately* represent a 1x1x1 meter movement region about the user's origin point 
+        ///     Head position coordinates should be *LEFT handed, Y-up* (matching Unity coordinate system)
+        ///     (i.e. HeadPosX = 1 means the user is 0.5m to their right from their starting point, HeadPosX = -1 the user is 0.5m to their left)
         /// </summary>
         public float HeadYaw;
         public float HeadPitch;

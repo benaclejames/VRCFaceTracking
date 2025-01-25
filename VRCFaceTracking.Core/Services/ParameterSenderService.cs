@@ -24,7 +24,7 @@ public class ParameterSenderService : BackgroundService
             if (AllParametersRelevantStatic == value) return;
             AllParametersRelevantStatic = value;
             SendQueue.Clear();
-            foreach (var parameter in UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).Concat(UnifiedTracking.HeadParameters).ToArray())
+            foreach (var parameter in UnifiedTracking.AllParameters)
             {
                 parameter.ResetParam(Array.Empty<IParameterDefinition>());
             }

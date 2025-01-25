@@ -49,6 +49,11 @@ namespace VRCFaceTracking
         /// Head tracking parameters
         /// </summary>
         public static readonly Parameter[] HeadParameters = UnifiedHeadParameters.HeadParameters;
+
+        /// <summary> 
+        /// The collection of EVERY possible output parameter
+        /// </summary>
+        public static readonly Parameter[] AllParameters = AllParameters_v2.Concat(AllParameters_v1).Concat(HeadParameters).ToArray();
 #pragma warning restore CS0618
 
         /// <summary>
