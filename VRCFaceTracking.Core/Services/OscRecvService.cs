@@ -112,7 +112,7 @@ public class OscRecvService : BackgroundService
             {
                 var bytesReceived = await _recvSocket.ReceiveAsync(_recvBuffer, _linkedToken.Token);
                 var offset = 0;
-                var newMsg = await Task.Run(() => OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset), stoppingToken);
+                var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
                 if (newMsg == null)
                 {
                     continue;

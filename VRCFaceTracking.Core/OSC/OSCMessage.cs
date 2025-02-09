@@ -98,8 +98,19 @@ public class OscMessage
         _metaPtr = fti_osc.parse_osc(bytes, len, ref messageIndex);
         if (_metaPtr != IntPtr.Zero)
         {
-            _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
+            //var meta1 = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
+            ParseToOscMessageMeta(_metaPtr);
         }
+    }
+    private void ParseToOscMessageMeta(IntPtr ptr)
+    {
+        _meta.Address = Marshal.PtrToStringAnsi(Marshal.ReadIntPtr(ptr));
+        ptr += IntPtr.Size;
+
+        _meta.ValueLength = Marshal.ReadInt32(ptr);
+        ptr += IntPtr.Size;
+
+        _meta.Value = Marshal.ReadIntPtr(ptr);
     }
 
     /// <summary>
