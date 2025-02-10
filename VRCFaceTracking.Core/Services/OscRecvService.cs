@@ -16,7 +16,7 @@ public class OscRecvService : BackgroundService
     private readonly ILocalSettingsService _settingsService;
     
     private Socket _recvSocket;
-    private readonly byte[] _recvBuffer = new byte[4096];
+    private readonly byte[] _recvBuffer = new byte[64];
     
     private CancellationTokenSource _cts, _linkedToken;
     private CancellationToken _stoppingToken;
