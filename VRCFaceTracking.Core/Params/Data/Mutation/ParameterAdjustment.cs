@@ -121,9 +121,9 @@ public class ParameterAdjustment : TrackingMutation
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthUpperDeepenLeft], mouthOpener);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthUpperDeepenRight], mouthOpener);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthUpperUpRight], mouthOpener);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthUpperUpLeft], mouthOpener);
-        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthLowerDownRight], mouthOpener);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthUpperUpRight], mouthOpener);
+        SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthLowerDownLeft], mouthOpener);
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthLowerDownRight], mouthOpener);
 
         SetRange(ref data.Shapes[(int)UnifiedExpressions.MouthCornerPullLeft], mouthSmile);
