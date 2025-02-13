@@ -59,7 +59,15 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
+           <ItemsControl ItemsSource="{x:Bind HomeLogs}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="localModels:LoggingContext">
+                    <StackPanel>
+                        <views:WarningBlock IsVisible="{Binding Visible, Mode=TwoWay}" Title="{Binding Context}" Description="{Binding Logs}" ButtonText="Visit VRCFaceTracking Documentation" LinkClickHandler="ModuleWikiLink_Click"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+           </ItemsControl> 
             <views:WarningBlock IsVisible="{x:Bind ViewModel.NoModulesInstalled, Mode=OneWay}" LinkClickHandler="NoModuleButton_Click" x:Uid="no_modules_installed_warning" />
             <!-- views:WarningBlock IsVisible="{x:Bind ViewModel.OscWasDisabled, Mode=OneWay}" x:Uid="osc_was_disabled_warning"/-->
             
