@@ -16,12 +16,12 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" Grid.Column="0">
-                <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;" FontSize="20"/>
+                <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE783;" FontSize="17"/>
                 <StackPanel Margin="20, 4" Orientation="Vertical">
-                    <TextBlock FontSize="20" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind Title}" />
+                    <TextBlock FontSize="14" Style="{ThemeResource SubtitleTextBlockStyle}" Text="{x:Bind Title}" />
                     <!-- Ensure this text box spills onto multiple lines -->
-                    <TextBlock FontSize="17" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Description}" TextWrapping="WrapWholeWords" MaxWidth="450" />
-                    <HyperlinkButton FontSize="17" Padding="0" Content="{x:Bind ButtonText}" Click="HyperlinkButton_OnClick"/>
+                    <TextBlock FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Description}" TextWrapping="WrapWholeWords" MaxWidth="600" />
+                    <HyperlinkButton FontSize="14" Padding="0" Content="{x:Bind ButtonText}" Click="HyperlinkButton_OnClick"/>
                 </StackPanel>
             </StackPanel>
             
