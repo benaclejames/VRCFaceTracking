@@ -31,5 +31,5 @@ public class Utils
     public static readonly string PersistentDataDirectory =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
 
-    public static readonly string CustomLibsDirectory = PersistentDataDirectory + "\\CustomLibs";
+    public static readonly string CustomLibsDirectory = Path.Combine(PersistentDataDirectory, "CustomLibs");
 }

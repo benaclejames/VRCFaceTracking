@@ -245,10 +245,13 @@ public class ModuleInstaller
                 return null;
             }
 
-            // Remove zone identifiers (unblock dlls)
-            foreach (var dll in Directory.GetFiles(moduleDirectory, "*.dll", SearchOption.AllDirectories))
+            // Remove zone identifiers (unblock dlls) on Windows
+            if (OperatingSystem.IsWindows())
             {
-                RemoveZoneIdentifier(dll);
+                foreach (var dll in Directory.GetFiles(moduleDirectory, "*.dll", SearchOption.AllDirectories))
+                {
+                    RemoveZoneIdentifier(dll);
+                }
             }
             
             // We need to ensure a .dll name is valid in the RemoteTrackingModule model

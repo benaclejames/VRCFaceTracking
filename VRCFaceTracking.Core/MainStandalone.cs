@@ -35,12 +35,15 @@ public class MainStandalone : IMainService
         await _mutator.Save();
         
         _libManager.TeardownAllAndResetAsync();
-        
-        _logger.LogDebug("Resetting our time end period...");
-        var timeEndRes = Utils.TimeEndPeriod(1);
-        if (timeEndRes != 0)
+
+        if (OperatingSystem.IsWindows())
         {
-            _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+            _logger.LogDebug("Resetting our time end period...");
+            var timeEndRes = Utils.TimeEndPeriod(1);
+            if (timeEndRes != 0)
+            {
+                _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+            }
         }
         
         _logger.LogDebug("Teardown complete. Awaiting exit...");
@@ -63,7 +66,12 @@ public class MainStandalone : IMainService
         
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
-        Utils.TimeBeginPeriod(1);
+
+        if (OperatingSystem.IsWindows())
+        {
+            Utils.TimeBeginPeriod(1);
+        }
+
         return Task.CompletedTask;
     }
 }
