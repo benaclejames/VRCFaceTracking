@@ -108,7 +108,6 @@ public partial class App : Application
                     provider.GetRequiredService<IMainService>(),
                     provider.GetRequiredService<ILibManager>(),
                     provider.GetRequiredService<HttpHandler>(),
-                    provider.GetRequiredService<OscQueryService>(),
                     provider.GetRequiredService<ParameterSenderService>(),
                     provider.GetRequiredService<OscRecvService>()));
 

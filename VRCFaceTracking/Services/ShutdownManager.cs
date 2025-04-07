@@ -16,7 +16,6 @@ public class ShutdownManager : IShutdownManager
     private readonly ILibManager _libManager;
     private readonly ILogger<ShutdownManager> _logger;
     private readonly IMainService _mainService;
-    private readonly OscQueryService _oscQueryService;
     private readonly OscRecvService _oscRecvService;
     private readonly ParameterSenderService _parameterSenderService;
     private readonly SemaphoreSlim _shutdownLock = new(1, 1);
@@ -28,7 +27,6 @@ public class ShutdownManager : IShutdownManager
         IMainService mainService,
         ILibManager libManager,
         HttpHandler httpHandler,
-        OscQueryService oscQueryService,
         ParameterSenderService parameterSenderService,
         OscRecvService oscRecvService)
     {
@@ -36,7 +34,6 @@ public class ShutdownManager : IShutdownManager
         _mainService = mainService;
         _libManager = libManager;
         _httpHandler = httpHandler;
-        _oscQueryService = oscQueryService;
         _parameterSenderService = parameterSenderService;
         _oscRecvService = oscRecvService;
     }
