@@ -3,7 +3,7 @@
 Provides eye tracking and lip tracking in VRChat by providing a bridge between your tracking hardware and VRChat's OSC server.
 ## [Get started here!](https://docs.vrcft.io/docs/intro/getting-started)
 
-[![Discord](https://discord.com/api/guilds/849300336128032789/widget.png)](https://discord.gg/Fh4FNehzKn)
+[![Discord](https://discord.com/api/guilds/849300336128032789/widget.png)](https://discord.com/invite/vrcft)
 
 ## 🎥 Demo
 

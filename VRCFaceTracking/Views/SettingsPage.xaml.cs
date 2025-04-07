@@ -32,11 +32,6 @@ public sealed partial class SettingsPage : Page
         get;
     }
     
-    public UnifiedTrackingMutator CalibrationSettings
-    {
-        get;
-    }
-    
     public RiskySettingsViewModel RiskySettingsViewModel
     {
         get;
@@ -51,7 +46,6 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();
-        CalibrationSettings = App.GetService<UnifiedTrackingMutator>();
         RiskySettingsViewModel = App.GetService<RiskySettingsViewModel>();
         OscTarget = App.GetService<IOscTarget>();
 
@@ -61,7 +55,7 @@ public sealed partial class SettingsPage : Page
 
         Loaded += OnPageLoaded;
         
-        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue.TryEnqueue(OnTrackingDataUpdated);
+        UnifiedTracking.OnUnifiedDataUpdated += _ => DispatcherQueue?.TryEnqueue(OnTrackingDataUpdated);
         InitializeComponent();
     }
 
@@ -138,6 +132,15 @@ public sealed partial class SettingsPage : Page
                 _lowerImageStream = null;
                 _lowerStream = null;
             }
+        }
+
+        if ( _lowerStream == null || _upperStream == null )
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            HardwareDebugSeparator.Visibility = Visibility.Visible;
         }
     }
 
@@ -216,6 +219,4 @@ public sealed partial class SettingsPage : Page
     private void resetVRCFTButton_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetVRCFT();
 
     private void resetVRCAvatarConf_OnClick(object sender, RoutedEventArgs e) => RiskySettingsViewModel.ResetAvatarOscManifests();
-
-    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e) => await CalibrationSettings.InitializeCalibration();
 }

@@ -275,4 +275,7 @@
   <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
     <value>Parece que no tienes ningún módulo instalado.</value>
   </data>
+  <data name="Shell_TrackingSettings.Content" xml:space="preserve">
+    <value>Configuración de Seguimiento</value>
+  </data>
 </root>

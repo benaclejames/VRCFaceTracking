@@ -32,7 +32,7 @@ public class MainStandalone : IMainService
     public async Task Teardown()
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
-        await _mutator.SaveCalibration();
+        await _mutator.Save();
         
         _libManager.TeardownAllAndResetAsync();
         
@@ -59,7 +59,7 @@ public class MainStandalone : IMainService
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
         
-        _mutator.LoadCalibration();
+        _mutator.Load();
         
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");

@@ -61,7 +61,7 @@
                                 SmallChange="1"
                                 LargeChange="10"
                                 Margin="15, 0, 15, 0"
-                                Minimum="0"
+                                Minimum="1"
                                 Maximum="65535"
                                 Value="{x:Bind OscTarget.InPort, Mode=TwoWay}"/>
                             
@@ -75,34 +75,13 @@
                                 SpinButtonPlacementMode="Inline"
                                 SmallChange="1"
                                 LargeChange="10" 
-                                Minimum="0"
+                                Minimum="1"
                                 Maximum="65535"
                                 Margin="15, 0, 15, 0"
                                 Value="{x:Bind OscTarget.OutPort, Mode=TwoWay}"/>
                         </StackPanel>
                     </Grid>
                 </labs:SettingsCard>
-                
-                <labs:SettingsExpander x:Uid="CalibrationSettings">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xEC49;"/>
-                    </labs:SettingsExpander.HeaderIcon>
-                    
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Uid="CalibrationEnabledToggle">
-                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.Enabled, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="ContCalibrationToggle">
-                            <ToggleSwitch IsOn="{x:Bind CalibrationSettings.ContinuousCalibration, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="TrackingCalibrateButton">
-                            <Button Style="{StaticResource AccentButtonStyle}" Click="ButtonBase_OnClick" x:Uid="CalibrateButton" />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard x:Uid="CalibrationInfluenceSlider">
-                            <Slider Width="200" Minimum="0.00" Maximum="1.00" StepFrequency="0.01" SnapsTo="StepValues" Value="{x:Bind CalibrationSettings.CalibrationWeight, Mode=TwoWay}" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
                 
                 <labs:SettingsExpander x:Uid="RiskySettings">
                     <labs:SettingsExpander.HeaderIcon>
@@ -145,7 +124,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Source="{x:Bind UpperImageSource}" Stretch="Uniform" />
-                        <AppBarSeparator Grid.Column="1" />
+                        <AppBarSeparator x:Name="HardwareDebugSeparator" Grid.Column="1" />
                         <Image Grid.Column="2" Source="{x:Bind LowerImageSource}" Stretch="Uniform" />
                     </Grid>
                 </labs:SettingsCard>
