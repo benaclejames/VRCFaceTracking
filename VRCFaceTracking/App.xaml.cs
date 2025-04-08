@@ -99,6 +99,19 @@ public partial class App : Application
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDispatcherService, DispatcherService>();
 
+            // Add lifecycle and shutdown services
+            services.AddSingleton<IApplicationLifecycleService, ApplicationLifecycleService>();
+            services.AddSingleton<IShutdownManager, ShutdownManager>();
+            services.AddSingleton<ShutdownManager>(provider =>
+                new ShutdownManager(
+                    provider.GetRequiredService<ILogger<ShutdownManager>>(),
+                    provider.GetRequiredService<IMainService>(),
+                    provider.GetRequiredService<ILibManager>(),
+                    provider.GetRequiredService<HttpHandler>(),
+                    provider.GetRequiredService<OscQueryService>(),
+                    provider.GetRequiredService<ParameterSenderService>(),
+                    provider.GetRequiredService<OscRecvService>()));
+
             // Core Services
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddSingleton<ModuleInstaller>();
