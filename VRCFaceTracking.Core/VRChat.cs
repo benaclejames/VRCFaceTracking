@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Versioning;
-using Gameloop.Vdf;
-using Gameloop.Vdf.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace VRCFaceTracking.Core;
@@ -46,23 +45,18 @@ public static class VRChat
 
             // 3) Inside the steam install directory, find the file steamPath/steamapps/libraryfolders.vdf
             // This is a special file that tells us where on a users computer their steam libraries are
-            var steamLibrariesPaths = Path.Combine(steamPath!, "steamapps", "libraryfolders.vdf");
-            dynamic volvo = VdfConvert.Deserialize(File.ReadAllText(steamLibrariesPaths));
+            var steamLibrariesPath = Path.Combine(steamPath!, "steamapps", "libraryfolders.vdf");
+
+            // Parse the VDF file manually instead of using Gameloop.Vdf
+            var libraryFolders = ParseLibraryFoldersVdf(File.ReadAllText(steamLibrariesPath));
 
             var vrchatPath = string.Empty;
-            foreach (var library in volvo.Value)
+            foreach (var library in libraryFolders)
             {
-                if (library.Value["path"] != null && library.Value["apps"] != null)
+                if (library.HasVRChat)
                 {
-                    string libraryPath = library.Value["path"].ToString();
-                    VObject apps = library.Value["apps"];
-
-                    // From this, determine which of all the libraries has the VRChat install via its AppID (438100)
-                    if (apps != null && apps.ContainsKey("438100"))
-                    {
-                        vrchatPath = libraryPath;
-                        break;
-                    }
+                    vrchatPath = library.Path;
+                    break;
                 }
             }
 
@@ -78,7 +72,81 @@ public static class VRChat
         }
     }
 
-    public static string VRCOSCDirectory { get;  private set; }
+    public static string VRCOSCDirectory
+    {
+        get; private set;
+    }
+
+    /// <summary>
+    /// Parse the Steam libraryfolders.vdf file to extract library paths and installed apps
+    /// </summary>
+    /// <param name="vdfContent">Content of the libraryfolders.vdf file</param>
+    /// <returns>List of parsed library folders</returns>
+    private static List<LibraryFolder> ParseLibraryFoldersVdf(string vdfContent)
+    {
+        var result = new List<LibraryFolder>();
+
+        // Define regex patterns for key components
+        var libraryBlockPattern = @"\""\d+\""[\s\n\r]*{(.*?)}";
+        var pathPattern = @"\""path\""[\s\n\r]*\""(.*?)\""";
+        var appsBlockPattern = @"\""apps\""[\s\n\r]*{(.*?)}";
+        var appEntryPattern = @"\""(\d+)\""[\s\n\r]*\"".*?\""";
+
+        // Find all library blocks
+        var libraryMatches = Regex.Matches(vdfContent, libraryBlockPattern,
+            RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+        foreach (Match libraryMatch in libraryMatches)
+        {
+            var libraryContent = libraryMatch.Groups[1].Value;
+
+            // Extract path
+            var pathMatch = Regex.Match(libraryContent, pathPattern, RegexOptions.Singleline);
+            if (!pathMatch.Success) continue;
+
+            var libraryPath = pathMatch.Groups[1].Value.Replace(@"\\", @"\"); // Fix escaped backslashes
+
+            // Extract apps block
+            var appsMatch = Regex.Match(libraryContent, appsBlockPattern, RegexOptions.Singleline);
+            var hasVRChat = false;
+
+            if (appsMatch.Success)
+            {
+                var appsContent = appsMatch.Groups[1].Value;
+                var appMatches = Regex.Matches(appsContent, appEntryPattern);
+
+                foreach (Match appMatch in appMatches)
+                {
+                    var appId = appMatch.Groups[1].Value;
+                    if (appId == "438100") // VRChat's AppID
+                    {
+                        hasVRChat = true;
+                        break;
+                    }
+                }
+            }
+
+            result.Add(new LibraryFolder
+            {
+                Path = libraryPath,
+                HasVRChat = hasVRChat
+            });
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Simple class to store Steam library folder information
+    /// </summary>
+    private class LibraryFolder
+    {
+        public string Path { get; set; } = string.Empty;
+        public bool HasVRChat
+        {
+            get; set;
+        }
+    }
 
     [SupportedOSPlatform("windows")]
     public static bool ForceEnableOsc()
@@ -87,13 +155,13 @@ public static class VRChat
         var regKey = Registry.CurrentUser.OpenSubKey("Software\\VRChat\\VRChat", true);
         if (regKey == null)
             return true;    // Assume we already have osc enabled
-            
+
         var keys = regKey.GetValueNames().Where(x => x.StartsWith("VRC_INPUT_OSC") || x.StartsWith("UI.Settings.Osc"));
 
         var wasOscForced = false;
         foreach (var key in keys)
         {
-            if ((int) regKey.GetValue(key) == 0)
+            if ((int)regKey.GetValue(key) == 0)
             {
                 // Osc is likely not enabled
                 regKey.SetValue(key, 1);
@@ -103,6 +171,6 @@ public static class VRChat
 
         return wasOscForced;
     }
-        
+
     public static bool IsVrChatRunning() => Process.GetProcesses().Any(x => x.ProcessName == "VRChat");
 }

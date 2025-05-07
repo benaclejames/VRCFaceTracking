@@ -42,16 +42,6 @@ public class OscSendService
             {
                 return;
             }
-
-            var validationResults = new List<ValidationResult>();
-            var context = new ValidationContext(oscTarget);
-            
-            if (!Validator.TryValidateObject(oscTarget, context, validationResults, true))
-            {
-                var errorMessages = string.Join(Environment.NewLine, validationResults.Select(vr => vr.ErrorMessage));
-                _logger.LogWarning($"{errorMessages} reverting to default.");
-                oscTarget.DestinationAddress = "127.0.0.1";
-            }
             
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.OutPort));
         };
