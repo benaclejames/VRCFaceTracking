@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Versioning;
-using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace VRCFaceTracking.Core;
 
 public static class VRChat
 {
-    static VRChat()
+    public static void EnsureVRCOSCDirectory()
     {
         if (OperatingSystem.IsWindows())
         {
@@ -47,16 +46,32 @@ public static class VRChat
             // This is a special file that tells us where on a users computer their steam libraries are
             var steamLibrariesPath = Path.Combine(steamPath!, "steamapps", "libraryfolders.vdf");
 
-            // Parse the VDF file manually instead of using Gameloop.Vdf
-            var libraryFolders = ParseLibraryFoldersVdf(File.ReadAllText(steamLibrariesPath));
+            // Parse the VDF file without using Gameloop.Vdf
+            var libraryFolders = ParseVdfFile(File.ReadAllText(steamLibrariesPath));
 
+            // From libraryFolders, find the one containing VRChat
             var vrchatPath = string.Empty;
-            foreach (var library in libraryFolders)
+
+            // libraryFolders should have a root "libraryfolders" dictionary
+            if (libraryFolders.TryGetValue("libraryfolders", out var libraryFoldersDict) &&
+                libraryFoldersDict is Dictionary<string, object> libraries)
             {
-                if (library.HasVRChat)
+                // Each library is indexed by a number (0, 1, 2, etc.)
+                foreach (var library in libraries)
                 {
-                    vrchatPath = library.Path;
-                    break;
+                    if (library.Value is Dictionary<string, object> libraryData &&
+                        libraryData.TryGetValue("path", out var pathObj) &&
+                        libraryData.TryGetValue("apps", out var appsObj))
+                    {
+                        string libraryPath = pathObj.ToString();
+
+                        // Check if VRChat is in the apps dictionary
+                        if (appsObj is Dictionary<string, object> apps && apps.ContainsKey("438100"))
+                        {
+                            vrchatPath = libraryPath;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -72,79 +87,141 @@ public static class VRChat
         }
     }
 
-    public static string VRCOSCDirectory
+    public static string VRCOSCDirectory { get; private set; }
+
+    /// <summary>
+    /// Parse a VDF file into a dictionary structure
+    /// </summary>
+    /// <param name="vdfContent">Content of the VDF file</param>
+    /// <returns>Dictionary representing the VDF structure</returns>
+    private static Dictionary<string, object> ParseVdfFile(string vdfContent)
     {
-        get; private set;
+        var parser = new VdfParser(vdfContent);
+        return parser.Parse();
     }
 
     /// <summary>
-    /// Parse the Steam libraryfolders.vdf file to extract library paths and installed apps
+    /// A simple parser for Valve's VDF format
     /// </summary>
-    /// <param name="vdfContent">Content of the libraryfolders.vdf file</param>
-    /// <returns>List of parsed library folders</returns>
-    private static List<LibraryFolder> ParseLibraryFoldersVdf(string vdfContent)
+    private class VdfParser
     {
-        var result = new List<LibraryFolder>();
+        private readonly string _content;
+        private int _position;
 
-        // Define regex patterns for key components
-        var libraryBlockPattern = @"\""\d+\""[\s\n\r]*{(.*?)}";
-        var pathPattern = @"\""path\""[\s\n\r]*\""(.*?)\""";
-        var appsBlockPattern = @"\""apps\""[\s\n\r]*{(.*?)}";
-        var appEntryPattern = @"\""(\d+)\""[\s\n\r]*\"".*?\""";
-
-        // Find all library blocks
-        var libraryMatches = Regex.Matches(vdfContent, libraryBlockPattern,
-            RegexOptions.Singleline | RegexOptions.IgnoreCase);
-
-        foreach (Match libraryMatch in libraryMatches)
+        public VdfParser(string content)
         {
-            var libraryContent = libraryMatch.Groups[1].Value;
+            _content = content;
+            _position = 0;
+        }
 
-            // Extract path
-            var pathMatch = Regex.Match(libraryContent, pathPattern, RegexOptions.Singleline);
-            if (!pathMatch.Success) continue;
+        public Dictionary<string, object> Parse()
+        {
+            SkipWhitespace();
+            return ParseObject();
+        }
 
-            var libraryPath = pathMatch.Groups[1].Value.Replace(@"\\", @"\"); // Fix escaped backslashes
+        private Dictionary<string, object> ParseObject()
+        {
+            var result = new Dictionary<string, object>();
 
-            // Extract apps block
-            var appsMatch = Regex.Match(libraryContent, appsBlockPattern, RegexOptions.Singleline);
-            var hasVRChat = false;
-
-            if (appsMatch.Success)
+            while (_position < _content.Length)
             {
-                var appsContent = appsMatch.Groups[1].Value;
-                var appMatches = Regex.Matches(appsContent, appEntryPattern);
+                SkipWhitespace();
 
-                foreach (Match appMatch in appMatches)
+                // Check for end of object
+                if (_position < _content.Length && _content[_position] == '}')
                 {
-                    var appId = appMatch.Groups[1].Value;
-                    if (appId == "438100") // VRChat's AppID
+                    _position++; // Skip the closing brace
+                    break;
+                }
+
+                // Parse key
+                string key = ParseString();
+                if (string.IsNullOrEmpty(key))
+                    break;
+
+                SkipWhitespace();
+
+                // Parse value
+                object value;
+
+                // Check if the value is an object
+                if (_position < _content.Length && _content[_position] == '{')
+                {
+                    _position++; // Skip the opening brace
+                    value = ParseObject();
+                }
+                else
+                {
+                    value = ParseString();
+                }
+
+                result[key] = value;
+            }
+
+            return result;
+        }
+
+        private string ParseString()
+        {
+            SkipWhitespace();
+
+            // Check for quoted string
+            if (_position < _content.Length && _content[_position] == '"')
+            {
+                _position++; // Skip opening quote
+
+                var startPos = _position;
+
+                // Find the closing quote
+                while (_position < _content.Length && _content[_position] != '"')
+                {
+                    // Handle escaped characters
+                    if (_content[_position] == '\\' && _position + 1 < _content.Length)
                     {
-                        hasVRChat = true;
-                        break;
+                        _position += 2; // Skip the escape sequence
                     }
+                    else
+                    {
+                        _position++;
+                    }
+                }
+
+                if (_position < _content.Length)
+                {
+                    var result = _content.Substring(startPos, _position - startPos);
+                    _position++; // Skip closing quote
+                    return result;
                 }
             }
 
-            result.Add(new LibraryFolder
-            {
-                Path = libraryPath,
-                HasVRChat = hasVRChat
-            });
+            return string.Empty;
         }
 
-        return result;
-    }
-
-    /// <summary>
-    /// Simple class to store Steam library folder information
-    /// </summary>
-    private class LibraryFolder
-    {
-        public string Path { get; set; } = string.Empty;
-        public bool HasVRChat
+        private void SkipWhitespace()
         {
-            get; set;
+            while (_position < _content.Length)
+            {
+                char c = _content[_position];
+
+                if (char.IsWhiteSpace(c) || c == '\r' || c == '\n' || c == '\t')
+                {
+                    _position++;
+                }
+                else if (c == '/' && _position + 1 < _content.Length && _content[_position + 1] == '/')
+                {
+                    // Skip single line comments
+                    _position += 2;
+                    while (_position < _content.Length && _content[_position] != '\n')
+                    {
+                        _position++;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
     }
 
@@ -161,7 +238,7 @@ public static class VRChat
         var wasOscForced = false;
         foreach (var key in keys)
         {
-            if ((int)regKey.GetValue(key) == 0)
+            if ((int) regKey.GetValue(key) == 0)
             {
                 // Osc is likely not enabled
                 regKey.SetValue(key, 1);

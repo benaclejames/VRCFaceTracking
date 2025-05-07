@@ -51,6 +51,8 @@ public class MainStandalone : IMainService
 
     public Task InitializeAsync()
     {
+        VRChat.EnsureVRCOSCDirectory();
+
         // Ensure OSC is enabled
         var isWindows = OperatingSystem.IsWindows();
 

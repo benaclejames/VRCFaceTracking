@@ -46,6 +46,11 @@ public class OscRecvService : BackgroundService
                 return;
             }
 
+            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
+            {
+                _oscTarget.DestinationAddress = "127.0.0.1";
+            }
+
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.InPort));
         };
     }
