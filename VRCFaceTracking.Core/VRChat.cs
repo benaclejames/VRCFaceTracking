@@ -14,8 +14,7 @@ public static class VRChat
                 $"{Environment.GetEnvironmentVariable("localappdata")}Low", "VRChat", "VRChat", "OSC"
             );
         }
-
-        if (OperatingSystem.IsLinux())
+        else
         {
             /* On macOS/Linux, things are a little different. The above points to a non-existent folder
              * Thankfully, we can make some assumptions based on the fact VRChat on Linux runs through Proton
