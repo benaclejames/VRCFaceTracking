@@ -4,9 +4,9 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Data;
 
-[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
-[assembly:TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
-[assembly:TypeForwardedTo(typeof(ModuleState))]
+[assembly: TypeForwardedTo(typeof(VRCFaceTracking.ExtTrackingModule))]
+[assembly: TypeForwardedTo(typeof(VRCFaceTracking.ModuleMetadata))]
+[assembly: TypeForwardedTo(typeof(ModuleState))]
 
 namespace VRCFaceTracking.Core;
 
@@ -19,7 +19,7 @@ public class MainStandalone : IMainService
     public Action<string, float> ParameterUpdate { get; set; } = (_, _) => { };
 
     public MainStandalone(
-        ILogger<MainStandalone> logger, 
+        ILogger<MainStandalone> logger,
         ILibManager libManager,
         UnifiedTrackingMutator mutator
         )
@@ -33,23 +33,30 @@ public class MainStandalone : IMainService
     {
         _logger.LogInformation("VRCFT Standalone Exiting!");
         await _mutator.Save();
-        
+
         _libManager.TeardownAllAndResetAsync();
-        
-        _logger.LogDebug("Resetting our time end period...");
-        var timeEndRes = Utils.TimeEndPeriod(1);
-        if (timeEndRes != 0)
+
+        if (OperatingSystem.IsWindows())
         {
-            _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+            _logger.LogDebug("Resetting our time end period...");
+            var timeEndRes = Utils.TimeEndPeriod(1);
+            if (timeEndRes != 0)
+            {
+                _logger.LogWarning($"TimeEndPeriod failed with HRESULT {timeEndRes}");
+            }
         }
-        
+
         _logger.LogDebug("Teardown complete. Awaiting exit...");
     }
 
     public Task InitializeAsync()
     {
+        VRChat.EnsureVRCOSCDirectory();
+
         // Ensure OSC is enabled
-        if (OperatingSystem.IsWindows() && VRChat.ForceEnableOsc()) // If osc was previously not enabled
+        var isWindows = OperatingSystem.IsWindows();
+
+        if (isWindows && VRChat.ForceEnableOsc()) // If osc was previously not enabled
         {
             _logger.LogWarning("VRCFT detected OSC was disabled and automatically enabled it.");
             // If we were launched after VRChat
@@ -58,12 +65,17 @@ public class MainStandalone : IMainService
                     "However, VRChat was running while this change was made.\n" +
                     "If parameters do not update, please restart VRChat or manually enable OSC yourself in your avatar's expressions menu.");
         }
-        
+
         _mutator.Load();
-        
+
         // Begin main OSC update loop
         _logger.LogDebug("Starting OSC update loop...");
-        Utils.TimeBeginPeriod(1);
+
+        if (isWindows)
+        {
+            Utils.TimeBeginPeriod(1);
+        }
+
         return Task.CompletedTask;
     }
 }

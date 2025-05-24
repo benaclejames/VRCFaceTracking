@@ -44,8 +44,8 @@ public class AvatarConfigParser
         foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory)
                      .Where(folder => Directory.Exists(Path.Combine(folder, "Avatars"))))
         {
-            foreach (var avatarFile in Directory.GetFiles(userFolder + "\\Avatars"))
-            {    
+            foreach (var avatarFile in Directory.GetFiles(Path.Combine(userFolder, "Avatars")))
+            {
                 var configText = await File.ReadAllTextAsync(avatarFile);
                 var tempConfig = JsonSerializer.Deserialize<AvatarConfigFile>(configText);
                 if (tempConfig == null || tempConfig.id != newId)

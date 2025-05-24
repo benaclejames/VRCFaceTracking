@@ -14,10 +14,10 @@ public class OscSendService
 {
     private readonly ILogger<OscSendService> _logger;
     private readonly IOscTarget _oscTarget;
-    
+
     private Socket _sendSocket;
     private readonly byte[] _sendBuffer = new byte[4096];
-    
+
     private CancellationTokenSource _cts;
     public Action<int> OnMessagesDispatched = _ => { };
 
@@ -43,26 +43,21 @@ public class OscSendService
                 return;
             }
 
-            var validationResults = new List<ValidationResult>();
-            var context = new ValidationContext(oscTarget);
-            
-            if (!Validator.TryValidateObject(oscTarget, context, validationResults, true))
+            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
             {
-                var errorMessages = string.Join(Environment.NewLine, validationResults.Select(vr => vr.ErrorMessage));
-                _logger.LogWarning($"{errorMessages} reverting to default.");
-                oscTarget.DestinationAddress = "127.0.0.1";
+                _oscTarget.DestinationAddress = "127.0.0.1";
             }
-            
+
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.OutPort));
         };
     }
-    
+
     private void UpdateTarget(IPEndPoint endpoint)
     {
         _cts.Cancel();
         _sendSocket?.Close();
         _oscTarget.IsConnected = false;
-        
+
         _sendSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
         try
@@ -79,7 +74,7 @@ public class OscSendService
             _cts = new CancellationTokenSource();
         }
     }
-    
+
     public async Task Send(OscMessage message, CancellationToken ct)
     {
         var nextByteIndex =await  message.Encode(_sendBuffer, ct);
