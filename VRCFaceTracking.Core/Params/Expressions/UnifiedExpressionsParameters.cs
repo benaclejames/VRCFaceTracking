@@ -30,7 +30,7 @@ public static class UnifiedExpressionsParameters
         new EParam("v2/EyeRight", exp => exp.Eye.Right.Gaze),
         
         // Use when tracking interface is sending verbose gaze data.
-        new NativeParameter<Vector2>(exp =>
+        /*new NativeParameter<Vector2>(exp =>
             new Vector2(exp.Eye.Combined().Gaze.ToPitch(), 
                         exp.Eye.Combined().Gaze.ToYaw()),
             param => 
@@ -42,23 +42,23 @@ public static class UnifiedExpressionsParameters
                 )
                 .Length == 0,
             "/tracking/eye/CenterPitchYaw"
-            ),
-        /*
+            ),*/
+        
         // Use when tracking interface is sending combined gaze data.
         new NativeParameter<Vector4>(exp =>
-            new Vector4(exp.Eye.Right.Gaze.ToPitch(), 
-                        exp.Eye.Right.Gaze.ToYaw(), 
-                        exp.Eye.Left.Gaze.ToPitch(), 
-                        exp.Eye.Left.Gaze.ToYaw()),
+            new Vector4(exp.Eye.Left.Gaze.ToPitch(), 
+                        exp.Eye.Left.Gaze.ToYaw(), 
+                        exp.Eye.Right.Gaze.ToPitch(), 
+                        exp.Eye.Right.Gaze.ToYaw()),
             param => 
                 IsEyeParameter(
                 param.Where(p =>
-                    p.name.Contains("Eye") &&
-                    (p.name.Contains('X') || p.name.Contains('Y'))).ToArray())
+                    p.Name.Contains("Eye") &&
+                    (p.Name.Contains('X') || p.Name.Contains('Y'))).ToArray())
                     .Length == 0,
-            "/tracking/eye/LeftRightPitchYaw" // THE INPUT IS BACKWARDSSSSS
+            "/tracking/eye/LeftRightPitchYaw"
         ),
-        */
+        
 
         new NativeParameter<float>(
             exp => 1 - exp.Eye.Combined().Openness,
