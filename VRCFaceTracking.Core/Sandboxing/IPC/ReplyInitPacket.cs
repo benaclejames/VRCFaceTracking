@@ -29,7 +29,8 @@ public class ReplyInitPacket : IpcPacket
 
         byte packedDataByte = (byte) packedData;
 
-        byte[] streamCountBytes = BitConverter.GetBytes(IconDataStreams.Count);
+        var streamCountCorrected = IconDataStreams != null ? IconDataStreams.Count : 0;
+        byte[] streamCountBytes = BitConverter.GetBytes(streamCountCorrected);
 
         // Packet size
         int packetSize = SIZE_PACKET_MAGIC + SIZE_PACKET_TYPE + 1 + sizeof(int) + moduleInfoStringData.Length +
@@ -39,7 +40,7 @@ public class ReplyInitPacket : IpcPacket
         // We can consider a single stream as a byte[].
         List<byte[]> streamDataBytes = new ();
 
-        for ( int i = 0; i < IconDataStreams.Count; i++ )
+        for ( int i = 0; i < streamCountCorrected; i++ )
         {
             var currStreamData = ReadStreamDataEntirely(IconDataStreams[i]);
             streamDataBytes.Add(currStreamData);
