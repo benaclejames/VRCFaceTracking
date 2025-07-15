@@ -3,10 +3,11 @@
 on:
   push:
     branches: [ master ]
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: windows-latest
     steps:
       - name: Checkout code
@@ -25,12 +26,29 @@ jobs:
 
       - name: Publish
         run: dotnet publish --configuration Release --output ./publish /p:EnableWindowsTargeting=true
+          
+      - name: Upload publish folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-folder
+          path: publish/**
 
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-folder
+          path: publish
+            
       - name: Package build as ZIP
-        shell: pwsh
-        run: Compress-Archive -Path publish\* -DestinationPath build.zip
-
-      - name: Upload build artifact
+        run: |
+          zip -r build.zip publish
+          
+      - name: Upload zipped build (optional)
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ github.sha }}
@@ -43,12 +61,15 @@ jobs:
           file: VRCFaceTracking/VRCFaceTracking.csproj
           xpath: //PropertyGroup/AssemblyVersion
           regex: '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)$'
-
-      - uses: wilg/steam-deploy@steam-fix-windows
+          
+        # Skip Steam upload if not configured. Likely within a fork
+      - name: Deploy to Steam
+        if: ${{ secrets.STEAM_USERNAME != '' && secrets.STEAM_CONFIG_VDF != '' }}
+        uses: game-ci/steam-deploy@v3
         with:
           username: ${{ secrets.STEAM_USERNAME }}
-          configVdf: ${{ secrets.STEAM_CONFIG_VDF}}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
           appId: 3329480
           buildDescription: ${{ steps.package_version.outputs.version }}
-          depot1Path: publish
+          depot1Path: publish 
           releaseBranch: development
