@@ -64,7 +64,10 @@ jobs:
           
         # Skip Steam upload if not configured. Likely within a fork
       - name: Deploy to Steam
-        if: ${{ secrets.STEAM_USERNAME != '' && secrets.STEAM_CONFIG_VDF != '' }}
+        env:
+          steam_username: ${{ secrets.STEAM_USERNAME }}
+          steam_config_vdf: ${{ secrets.STEAM_CONFIG_VDF }}
+        if: ${{ env.STEAM_USERNAME != '' && env.STEAM_CONFIG_VDF != '' }}
         uses: game-ci/steam-deploy@v3
         with:
           username: ${{ secrets.STEAM_USERNAME }}
