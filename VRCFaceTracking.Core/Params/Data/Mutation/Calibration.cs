@@ -179,7 +179,7 @@ public class Calibration : TrackingMutation
     public override string Description => "Processes tracking data to better match user expression.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
-    public override bool IsActive { get; set; } = false;
+    public override bool IsActive { get; set; } = true;
 
     public override void Initialize(UnifiedTrackingData data) => calData ??= new();
 
