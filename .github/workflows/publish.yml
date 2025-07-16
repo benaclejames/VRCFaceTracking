@@ -1,0 +1,70 @@
+﻿name: Steam Publish
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.package_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true
+
+      - name: Publish
+        run: dotnet publish --configuration Release --output ./publish /p:EnableWindowsTargeting=true
+          
+      - name: Upload publish folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-folder
+          path: publish/**
+          
+      - name: Get version
+        id: package_version
+        uses: KageKirin/get-csproj-version@v1.0.0
+        with:
+          file: VRCFaceTracking/VRCFaceTracking.csproj
+          xpath: //PropertyGroup/AssemblyVersion
+          regex: '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)$'
+
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-folder
+          path: publish
+          
+        # Skip Steam upload if not configured. Likely within a fork
+      - name: Deploy to Steam
+        env:
+          steam_username: ${{ secrets.STEAM_USERNAME }}
+          steam_config_vdf: ${{ secrets.STEAM_CONFIG_VDF }}
+        if: ${{ env.steam_username != '' && env.steam_config_vdf != '' }}
+        uses: game-ci/steam-deploy@v3
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: 3329480
+          buildDescription: ${{ needs.build.outputs.version }}
+          depot1Path: publish 
+          releaseBranch: development
