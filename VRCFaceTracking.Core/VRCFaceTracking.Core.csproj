@@ -6,6 +6,7 @@
 		<Platforms>x86;x64;arm64;AnyCPU</Platforms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AssemblyVersion>5.2.3.0</AssemblyVersion>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
