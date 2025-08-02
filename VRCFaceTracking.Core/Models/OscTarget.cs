@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Validation;
@@ -9,19 +10,19 @@ public partial class OscTarget : ObservableValidator, IOscTarget
 {
     [ObservableProperty] private bool _isConnected;
 
-    [ObservableProperty] [property: SavedSetting("OSCInPort", 9001)]
-
+    [ObservableProperty]
+    [Range(1, 25535)]
+    [property: SavedSetting("OSCInPort", 9001)]
     private int _inPort;
 
-    [ObservableProperty] [property: SavedSetting("OSCOutPort", 9000)]
-
+    [ObservableProperty]
+    [Range(1, 25535)]
+    [property: SavedSetting("OSCOutPort", 9000)]
     private int _outPort;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(InPort))] [NotifyPropertyChangedFor(nameof(OutPort))]
-
-    [property: SavedSetting("OSCAddress", "127.0.0.1")]
     [ValidIpAddress]
+    [property: SavedSetting("OSCAddress", "127.0.0.1")]
     private string _destinationAddress;
 
     public OscTarget(ILocalSettingsService localSettingsService)

@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
 
@@ -39,4 +41,20 @@ public static class Utils
     public static readonly string UserAccessibleDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VRCFaceTracking");
     public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
     public static readonly string CustomLibsDirectory = Path.Combine(PersistentDataDirectory, "CustomLibs");
+    
+    public static int GetRandomFreePort()
+    {
+        // Uses TcpListener to bind to a random port by attempting to bind to port zero and letting the OS assign one.
+        var listener = new TcpListener(IPAddress.Any, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+
+        return port;
+    }
+
+    private const string K_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static readonly Random Random = new();
+
+    public static string GetRandomChars(int num) => new string(Enumerable.Repeat(K_CHARS, num).Select(s => s[Random.Next(s.Length)]).ToArray());
 }

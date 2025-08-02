@@ -22,7 +22,7 @@ public partial class MulticastDnsService : ObservableObject
     public Action OnVrcClientDiscovered = () => { };
 
     [ObservableProperty] private IPEndPoint? _vrchatClientEndpoint;
-        
+
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
             net.OperationalStatus == OperationalStatus.Up &&
@@ -34,37 +34,36 @@ public partial class MulticastDnsService : ObservableObject
         .UnicastAddresses
         .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
         .Select(addr => addr.Address);
-        
+
     public MulticastDnsService(ILogger<MulticastDnsService> logger)
     {
         _logger = logger;
-        
+
+        _localIpAddresses = GetIpv4NetInterfaces().SelectMany(GetIpv4Addresses).Where(addr => addr.AddressFamily == AddressFamily.InterNetwork).ToList();
+
         // Create listeners for all interfaces
+        var cts = new CancellationTokenSource();
         var receiver = new UdpClient(AddressFamily.InterNetwork);
+        receiver.Client.ExclusiveAddressUse = false;
         receiver.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
         receiver.Client.Bind(new IPEndPoint(IPAddress.Any, MulticastPost));
-        Receivers.Add(receiver, new CancellationToken());
+        Receivers.Add(receiver, cts.Token);
 
-        // For each ip address, create a sender udp client to respond to multicast requests
-        var interfaces = GetIpv4NetInterfaces();
-        _localIpAddresses = interfaces
-            .SelectMany(GetIpv4Addresses)
-            .Where(addr => addr.AddressFamily == AddressFamily.InterNetwork).ToList();
-            
+
         // For every ipv4 address discovered in the network interfaces, create a sender udp client set up grouping
         foreach (var ipAddress in _localIpAddresses)
         {
-            var sender = new UdpClient(ipAddress.AddressFamily);
-                
             // Add the local ip address to our multicast group
             receiver.JoinMulticastGroup(MulticastIp, ipAddress);
-                
+
+            var sender = new UdpClient(ipAddress.AddressFamily);
+            sender.Client.ExclusiveAddressUse = false;
             sender.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             sender.Client.Bind(new IPEndPoint(ipAddress, MulticastPost));    // Bind to the local ip address
-            sender.JoinMulticastGroup(MulticastIp);                           // Join the multicast group
+            sender.JoinMulticastGroup(MulticastIp, ipAddress);                           // Join the multicast group
             sender.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastLoopback, true);
-                
-            //Receivers.Add(sender, new CancellationToken());
+
+            Receivers.Add(sender, cts.Token);
             Senders.Add(ipAddress, sender);
         }
 
@@ -88,7 +87,7 @@ public partial class MulticastDnsService : ObservableObject
             // Ensure the question has three labels. First for service name, second for protocol, third for domain
             // Ensure the question is for local domain
             // Ensure the question is for the _osc._udp service
-            if (question.Labels.Count != 3 
+            if (question.Labels.Count != 3
                 || question.Labels[2] != "local"
                 || !Services.TryGetValue($"{question.Labels[0]}.{question.Labels[1]}", out var service))
             {
@@ -111,10 +110,10 @@ public partial class MulticastDnsService : ObservableObject
                     question.Labels[0].Trim('_'),
                     question.Labels[1].Trim('_')
                 };
-                            
+
                 var txt = new TXTRecord { Text = new List<string> { "txtvers=1" } };
-                var srv = new SRVRecord { 
-                    Port = (ushort)service.Port, 
+                var srv = new SRVRecord {
+                    Port = (ushort)service.Port,
                     Target = serviceName
                 };
                 var aRecord = new ARecord { Address = service.Address };
@@ -122,7 +121,7 @@ public partial class MulticastDnsService : ObservableObject
                 {
                     DomainLabels = qualifiedServiceName
                 };
-                            
+
                 var additionalRecords = new List<DnsResource>
                 {
                     new (txt, qualifiedServiceName),
@@ -179,12 +178,12 @@ public partial class MulticastDnsService : ObservableObject
         {
             await sender.Value.SendAsync(bytes, bytes.Length, MdnsEndpointIp4);
         }
-        
+
         //var unicastClientIp4 = new UdpClient(AddressFamily.InterNetwork);
         //await unicastClientIp4.SendAsync(bytes, bytes.Length, remoteEndpoint);
     }
 
-    public static void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
+    public void ResolveVrChatClient(DnsPacket packet, IPEndPoint remoteEndpoint)
     {
         if (!packet.QUERYRESPONSE || packet.answers.Length <= 0 || packet.answers[0].Type != 12)
         {
@@ -218,12 +217,21 @@ public partial class MulticastDnsService : ObservableObject
         {
             return;
         }
-        
-        //VrchatClientEndpoint = new IPEndPoint(vrChatClientIp.Address, vrChatClientPort.Port);
-        //OnVrcClientDiscovered();
-        //_logger.LogInformation("Resolved VRChat client at "+VrchatClientEndpoint);
+
+        var hostAddress = vrChatClientIp.Address;
+
+        // If the host address is a loopback address (127.0.0.1) but isn't our local machine,
+        // manually set the correspondence address to where we heard the mdns response come from
+        // This is due to VRC ALWAYS using 127.0.0.1 as the A record address
+        if (IPAddress.IsLoopback(hostAddress) && !_localIpAddresses.Contains(remoteEndpoint.Address))
+        {
+            hostAddress = remoteEndpoint.Address;
+        }
+
+        VrchatClientEndpoint = new IPEndPoint(hostAddress, vrChatClientPort.Port);
+        OnVrcClientDiscovered();
     }
-        
+
     private async void Listen(UdpClient client, CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -236,7 +244,7 @@ public partial class MulticastDnsService : ObservableObject
                 // (On second thought, that'd be pretty funny)
                 continue;
             }
-            
+
             try
             {
                 var reader = new BigReader(result.Buffer);
@@ -252,19 +260,11 @@ public partial class MulticastDnsService : ObservableObject
             }
         }
     }
-    
-    public void Advertise(string serviceName, string instanceName, int port, IPAddress address)
+
+    public void Advertise(string serviceName, AdvertisedService advertisement)
     {
-        // If we're already advertising on this service, we can just update it
-        if (Services.ContainsKey(serviceName))
-        {
-            Services[serviceName] = new AdvertisedService(instanceName, port, address);
-        }
-        else
-        {
-            Services.Add(serviceName, new AdvertisedService(instanceName, port, address));
-        }
-        
-        _logger.LogDebug($"Advertising service: {serviceName}, instance: {instanceName}, port: {port}, address: {address}");
+        _logger.LogDebug($"Advertising service {serviceName} with advertisement {advertisement}");
+
+        Services[serviceName] = advertisement;
     }
 }
