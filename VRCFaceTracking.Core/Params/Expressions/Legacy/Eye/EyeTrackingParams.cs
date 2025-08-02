@@ -34,7 +34,7 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             #region Dilation
             
             new EParam("EyesDilation", exp => exp.Eye.Combined().PupilDiameter_MM),
-            new EParam("EyesPupilDiameter", exp => (exp.Eye.Left.PupilDiameter_MM + exp.Eye.Left.PupilDiameter_MM) / 2.0f),
+            new EParam("EyesPupilDiameter", exp => (exp.Eye.Left.PupilDiameter_MM + exp.Eye.Right.PupilDiameter_MM) * .5f),
             
             #endregion
             
@@ -50,8 +50,10 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             
             new EParam("LeftEyeLidExpanded", exp => exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * 0.2f + exp.Eye.Left.Openness * 0.8f, 0.5f, true),
             new EParam("RightEyeLidExpanded", exp => exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * 0.2f + exp.Eye.Right.Openness * 0.8f, 0.5f, true),
-            new EParam("EyeLidExpanded", exp => ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight) / 2.0f) * 0.2f +
-                                              (exp.Eye.Right.Openness + exp.Eye.Right.Openness) / 2.0f * 0.8f, 0.5f, true),
+            new EParam("EyeLidExpanded", exp =>
+                (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight +
+                 exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight) * .1f +
+                (exp.Eye.Left.Openness + exp.Eye.Right.Openness) * .4f, 0.5f, true),
 
             #endregion
 
@@ -64,9 +66,10 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
                 exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .2f + exp.Eye.Right.Openness * .8f -
                 Squeeze(exp, 1), 0.5f, true),
             new EParam("EyeLidExpandedSqueeze", exp =>
-                (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) + 
-                (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                Squeeze(exp, 2), 0.5f, true),
+                ((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight +
+                  exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight) * .2f +
+                 (exp.Eye.Left.Openness + exp.Eye.Right.Openness) * .8f -
+                 Squeeze(exp, 0) - Squeeze(exp, 1)) * .5f, 0.5f, true),
 
             #endregion
             
@@ -120,14 +123,19 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             
             new BinaryBaseParameter("CombinedEyeLidExpandedSqueeze", exp =>
             {
-                var eyeLid = (((exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f) +
-                    (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .2f + exp.Eye.Left.Openness * .8f)) / 2.0f) -
-                    Squeeze(exp, 2);
-                if (eyeLid > .8f)
-                    return (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f;
-                if (eyeLid >= 0)
-                    return exp.Eye.Combined().Openness;
-                return Squeeze(exp, 1);
+                var eyeLid = (
+                    (exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight +
+                     exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight) * .2f +
+                    (exp.Eye.Left.Openness + exp.Eye.Right.Openness) * .8f -
+                    Squeeze(exp, 0) - Squeeze(exp, 1)) * .5f;
+                
+                return eyeLid switch
+                {
+                    > .8f => (exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight +
+                              exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) * .5f,
+                    >= 0 => exp.Eye.Combined().Openness,
+                    _ => (Squeeze(exp, 0) + Squeeze(exp, 1)) * .5f
+                };
             }),
             
             #endregion
@@ -211,21 +219,20 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             new EParam("NoseSneerLeft", exp => exp.Shapes[(int)UnifiedExpressions.NoseSneerLeft].Weight),
             new EParam("NoseSneerRight", exp => exp.Shapes[(int)UnifiedExpressions.NoseSneerRight].Weight),
 
-            new EParam("BrowDownLeft", exp => (exp.Shapes[(int)UnifiedExpressions.BrowPinchLeft].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight) / 2.0f),
-            new EParam("BrowDownRight", exp => (exp.Shapes[(int)UnifiedExpressions.BrowPinchRight].Weight + exp.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight) / 2.0f)
-
             #endregion
         };
 
-        // Brain Hurty
-        private static float NormalizeFloat(float minInput, float maxInput, float minOutput, float maxOutput,
-            float value) => (maxOutput - minOutput) / (maxInput - minInput) * (value - maxInput) + maxOutput;
+        // eyeIndex: 0 == Left, 1 == Right
+        private static float Squeeze(UnifiedTrackingData data, int eyeIndex)
+        {
+            if (eyeIndex == 0)
+            {
+                return (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .15)) *
+                       data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight;
+            }
 
-        // eyeIndex: 0 == Left, 1 == Right, 2 == avg Both
-        private static float Squeeze(UnifiedTrackingData data, int eyeIndex) =>
-            eyeIndex == 0 ? (float)(1.0f - Math.Pow(data.Eye.Left.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight
-            : eyeIndex == 1 ? (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .15)) * data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight
-            : eyeIndex == 2 ? (float)(1.0f - Math.Pow(data.Eye.Combined().Openness, .15)) * (data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight + data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight) / 2.0f 
-            : 0.0f;
+            return (float)(1.0f - Math.Pow(data.Eye.Right.Openness, .15)) *
+                   data.Shapes[(int)UnifiedExpressions.EyeSquintRight].Weight;
+        }
     }
 }
