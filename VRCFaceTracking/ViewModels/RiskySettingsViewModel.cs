@@ -10,22 +10,25 @@ public partial class RiskySettingsViewModel : ObservableObject
 {
     private readonly IMainService _mainService;
     private readonly ILogger<RiskySettingsViewModel> _logger;
+    private readonly ParameterSenderService _parameterSenderService;
 
     [ObservableProperty] private bool _enabled;
 
     public bool AllRelevantDebug
     {
-        get => ParameterSenderService.AllParametersRelevant;
-        set => ParameterSenderService.AllParametersRelevant = value;
+        get => _parameterSenderService.AllParametersRelevant;
+        set => _parameterSenderService.AllParametersRelevant = value;
     }
 
     public RiskySettingsViewModel(
         IMainService mainService,
-        ILogger<RiskySettingsViewModel> logger
+        ILogger<RiskySettingsViewModel> logger,
+        ParameterSenderService parameterSenderService
         )
     {
         _mainService = mainService;
         _logger = logger;
+        _parameterSenderService = parameterSenderService;
     }
 
     /// <summary>

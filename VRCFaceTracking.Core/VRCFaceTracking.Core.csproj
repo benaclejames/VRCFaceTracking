@@ -1,30 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>VRCFaceTracking.Core</RootNamespace>
-    <Platforms>AnyCPU;x64;x86</Platforms>
-    <Platforms>x86;x64;arm64;AnyCPU</Platforms>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>5.2.3.0</AssemblyVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="C:\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Sentry" Version="4.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\VRCFaceTracking.SDK\VRCFaceTracking.SDK.csproj" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<RootNamespace>VRCFaceTracking.Core</RootNamespace>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+		<Platforms>x86;x64;arm64;AnyCPU</Platforms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<AssemblyVersion>5.2.3.0</AssemblyVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
+		<PackageReference Include="Gameloop.Vdf" Version="0.6.2"/>
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0"/>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1"/>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+		<PackageReference Include="Sentry" Version="4.4.0"/>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\VRCFaceTracking.SDK\VRCFaceTracking.SDK.csproj"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<Content Include="C:\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<Content Include="..\fti_osc.dll" Link="fti_osc.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' Or '$(RuntimeIdentifier)' == 'osx-arm64'">
+		<Content Include="../fti_osc.dylib" Link="fti_osc.dylib">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or '$(RuntimeIdentifier)' == 'linux-arm64'">
+		<Content Include="../fti_osc.so" Link="fti_osc.so">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

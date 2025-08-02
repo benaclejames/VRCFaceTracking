@@ -13,13 +13,13 @@ public class OscRecvService : BackgroundService
     private readonly ILogger<OscRecvService> _logger;
     private readonly IOscTarget _oscTarget;
     private readonly ILocalSettingsService _settingsService;
-    
+
     private Socket _recvSocket;
     private readonly byte[] _recvBuffer = new byte[4096];
-    
+
     private CancellationTokenSource _cts, _linkedToken;
     private CancellationToken _stoppingToken;
-    
+
     public Action<OscMessage> OnMessageReceived = _ => { };
 
     public OscRecvService(
@@ -33,7 +33,7 @@ public class OscRecvService : BackgroundService
 
         _oscTarget = oscTarget;
         _settingsService = settingsService;
-        
+
         _oscTarget.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName is not nameof(IOscTarget.InPort))
@@ -41,9 +41,14 @@ public class OscRecvService : BackgroundService
                 return;
             }
 
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || _oscTarget.InPort == default)
+            if (_oscTarget.InPort == default)
             {
                 return;
+            }
+
+            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
+            {
+                _oscTarget.DestinationAddress = "127.0.0.1";
             }
 
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.InPort));
@@ -53,7 +58,7 @@ public class OscRecvService : BackgroundService
     public async override Task StartAsync(CancellationToken cancellationToken)
     {
         await _settingsService.Load(_oscTarget);
-        
+
         await base.StartAsync(cancellationToken);
     }
 
@@ -64,7 +69,7 @@ public class OscRecvService : BackgroundService
         _oscTarget.IsConnected = false;
 
         _recvSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        
+
         try
         {
             _recvSocket.Bind(endpoint);
@@ -83,13 +88,13 @@ public class OscRecvService : BackgroundService
 
         return null;
     }
-    
+
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _stoppingToken = stoppingToken;
-        
+
         _linkedToken = CancellationTokenSource.CreateLinkedTokenSource(_stoppingToken, _cts.Token);
-        
+
         while (!_stoppingToken.IsCancellationRequested)
         {
             if (_linkedToken.IsCancellationRequested || _recvSocket is not { IsBound: true })
@@ -116,7 +121,7 @@ public class OscRecvService : BackgroundService
                 {
                     continue;
                 }
-                
+
                 _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
                 SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
             }

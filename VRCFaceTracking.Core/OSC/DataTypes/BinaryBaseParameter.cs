@@ -21,7 +21,7 @@ public class BinaryBaseParameter : Parameter
         if (!_negativeParam.Relevant &&
             value < 0) // If the negative parameter isn't set, cut the negative values
             return false;
-        var adjustedValue = Math.Abs(value);
+        var adjustedValue = Math.Abs(value) + (1f / _maxPossibleBinaryInt);
         var bigValue = (int)(adjustedValue * (_maxPossibleBinaryInt - 1));
         return ((bigValue >> binaryIndex) & 1) == 1;
     }
