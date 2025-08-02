@@ -290,7 +290,12 @@ public class UnifiedLibManager : ILibManager
         {
             // Edge case, we wait for the thread to finish before unloading the assembly
             _logger.LogDebug("Waiting for {module}'s thread to join...", module.Module.GetType().Name);
-            module.UpdateThread.Join();
+            // Specify a timeout in milliseconds
+            var timeoutMilliseconds = 1000;
+            if (!module.UpdateThread.Join(timeoutMilliseconds))
+            {
+                _logger.LogWarning("{module}'s thread did not finish within the timeout period.", module.Module.GetType().Name);
+            }
         }
 
         module.Module.Teardown();
