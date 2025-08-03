@@ -4,23 +4,15 @@ using VRCFaceTracking.Core.Contracts;
 
 namespace VRCFaceTracking.Core.OSC.Query.mDNS;
 
-public class HttpHandler : IDisposable
+public class HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger) : IDisposable
 {
     private readonly HttpListener _listener = new();
     private IAsyncResult _contextListenerResult;
-    private readonly IOscTarget _oscTarget;
-    private readonly ILogger<HttpHandler> _logger;
     private string _appName = "VRCFT";
     private int _oscPort = 9001;
 
     public Action OnHostInfoQueried = () => { };
 
-    public HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger)
-    {
-        _oscTarget = oscTarget;
-        _logger = logger;
-    }
-    
     public void BindTo(string uri, int oscPort)
     {
         _oscPort = oscPort;
@@ -50,12 +42,12 @@ public class HttpHandler : IDisposable
             var hostInfo = new OscQueryHostInfo
             {
                 name = _appName,
-                oscIP = _oscTarget.DestinationAddress,
+                oscIP = oscTarget.DestinationAddress,
                 oscPort = _oscPort
             };
             respStr = hostInfo.ToString();
             OnHostInfoQueried();
-            _logger.LogDebug($"Responding to oscquery host info request with {respStr}");
+            logger.LogDebug($"Responding to oscquery host info request with {respStr}");
         }
         else
         {
@@ -63,7 +55,7 @@ public class HttpHandler : IDisposable
             {
                 return; // Not properly implementing oscquery protocol because I'm unemployed and not being paid to
             }
-            
+
             var rootNode = new OscQueryRoot();
             rootNode.AddNode(new OscQueryNode("/avatar/change", AccessValues.WriteOnly, "s"));
 
