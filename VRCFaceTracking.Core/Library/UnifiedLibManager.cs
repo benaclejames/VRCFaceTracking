@@ -201,10 +201,12 @@ public class UnifiedLibManager : ILibManager
 
         module.Logger = _loggerFactory.CreateLogger(module.GetType().Name);
 
+        var shouldEyeInitialize = EyeStatus == ModuleState.Uninitialized;
+        var shouldExpressionInitialize = ExpressionStatus == ModuleState.Uninitialized;
         bool eyeSuccess, expressionSuccess;
         try
         {
-            (eyeSuccess, expressionSuccess) = module.Initialize(EyeStatus == ModuleState.Uninitialized, ExpressionStatus == ModuleState.Uninitialized);
+            (eyeSuccess, expressionSuccess) = module.Initialize(shouldEyeInitialize, shouldExpressionInitialize);
         }
         catch (MissingMethodException)
         {
@@ -225,13 +227,20 @@ public class UnifiedLibManager : ILibManager
         {
             return;
         }
-
-        EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
-        ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
         
+        if (shouldEyeInitialize)
+        {
+            EyeStatus = eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        }
+
+        if (shouldExpressionInitialize)
+        {
+            ExpressionStatus = expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        }
+
         module.ModuleInformation.Active = true;
-        module.ModuleInformation.UsingEye = eyeSuccess;
-        module.ModuleInformation.UsingExpression = expressionSuccess;
+        module.ModuleInformation.UsingEye = shouldEyeInitialize && eyeSuccess;
+        module.ModuleInformation.UsingExpression = shouldExpressionInitialize && expressionSuccess;
         _dispatcherService.Run(() => { 
             if (!LoadedModulesMetadata.Contains(module.ModuleInformation))
             {
