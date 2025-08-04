@@ -24,6 +24,7 @@ public class ActivationService : IActivationService
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly ILogger<ActivationService> _logger;
+    private readonly OpenVRService _openVrService;
     private UIElement? _shell;
 
     public ActivationService(
@@ -35,7 +36,8 @@ public class ActivationService : IActivationService
         IModuleDataService moduleDataService, 
         ModuleInstaller moduleInstaller, 
         ILibManager libManager,
-        ILogger<ActivationService> logger)
+        ILogger<ActivationService> logger,
+        OpenVRService openVrService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -46,6 +48,7 @@ public class ActivationService : IActivationService
         _moduleInstaller = moduleInstaller;
         _libManager = libManager;
         _logger = logger;
+        _openVrService = openVrService;
     }
 
     public async Task ActivateAsync(object activationArgs)
@@ -103,6 +106,12 @@ public class ActivationService : IActivationService
 
         _logger.LogInformation("Initializing main service...");
         await _mainService.InitializeAsync().ConfigureAwait(false);
+        
+        _logger.LogInformation("Initializing OpenVR...");
+        if (!_openVrService.Initialize())
+        {
+            _logger.LogWarning("Failed to initialize OpenVR during ActivationService startup. Skipping.");
+        }
 
         // Before we initialize, we need to delete pending restart modules and check for updates for all our installed modules
         _logger.LogDebug("Checking for deletion requests for installed modules...");

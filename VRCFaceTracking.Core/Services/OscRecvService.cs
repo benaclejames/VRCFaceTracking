@@ -113,28 +113,35 @@ public class OscRecvService : BackgroundService
                 continue;
             }
 
-            try
+            if (_recvSocket.Available > 0)
             {
-                var bytesReceived = await _recvSocket.ReceiveAsync(_recvBuffer, _linkedToken.Token);
-                var offset = 0;
-                var newMsg = await Task.Run(() => OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset), stoppingToken);
-                if (newMsg == null)
+                try
                 {
-                    continue;
-                }
+                    var bytesReceived = await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
+                    var offset = 0;
+                    var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
+                    if (newMsg == null)
+                    {
+                        continue;
+                    }
 
-                OnMessageReceived(newMsg);
+                    OnMessageReceived(newMsg);
+                }
+                catch (Exception e)
+                {
+                    // We don't care about operation cancellations as they're intentional and carefully controlled
+                    if (e.GetType() == typeof(OperationCanceledException))
+                    {
+                        continue;
+                    }
+
+                    _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
+                    SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
+                }
             }
-            catch (Exception e)
+            else
             {
-                // We don't care about operation cancellations as they're intentional and carefully controlled
-                if (e.GetType() == typeof(OperationCanceledException))
-                {
-                    continue;
-                }
-
-                _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
-                SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
+                await Task.Delay(100, _linkedToken.Token);
             }
         }
     }

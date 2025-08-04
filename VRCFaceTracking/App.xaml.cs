@@ -111,6 +111,7 @@ public partial class App : Application
             services.AddTransient<OscQueryConfigParser>();
             services.AddSingleton<UnifiedTracking>();
             services.AddSingleton<ILibManager, UnifiedLibManager>();
+            services.AddSingleton<OpenVRService>();
             services.AddSingleton<IOscTarget, OscTarget>();
             services.AddSingleton<HttpHandler>();
             services.AddSingleton<OscSendService>();

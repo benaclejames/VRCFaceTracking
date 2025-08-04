@@ -44,6 +44,12 @@
     <Compile Remove="VRCFaceTracking\MainPage.xaml.cs" />
     <Page Remove="VRCFaceTracking\MainPage.xaml" />
     <None Remove="OpenVR\openvr_api.dll" />
+    <Content Include="OpenVR\openvr_api.dll" Link="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="OpenVR\app.vrmanifest" Link="app.vrmanifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Remove="solution-config.props.sample" />
     <None Remove="global.json" />
     <None Remove="VRCFaceTracking\ReadMe.md" />
