@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using VRCFaceTracking.Core.Helpers;
@@ -52,11 +53,23 @@ public class ModuleInstaller
         Directory.Delete(source, true);
     }
 
-    private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath)
+    private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath, string md5Hash = null)
     {
         using var client = new HttpClient();
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
         var content = await response.Content.ReadAsByteArrayAsync();
+        if (!string.IsNullOrEmpty(md5Hash))
+        {
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(content);
+            var hashStr = BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
+
+            if (!string.Equals(hashStr, md5Hash.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidDataException($"MD5 hash mismatch. Expected {md5Hash}, got {hashStr}");
+            }
+        }
+        
         await File.WriteAllBytesAsync(filePath, content);
         await Task.CompletedTask;
     }
@@ -214,7 +227,7 @@ public class ModuleInstaller
             try
             {
                 tempZipPath = Path.Combine(tempDirectory, "module.zip");
-                await DownloadModuleToFile(moduleMetadata, tempZipPath);
+                await DownloadModuleToFile(moduleMetadata, tempZipPath, moduleMetadata.FileHash);
             }
             catch (Exception e)
             {
@@ -280,7 +293,15 @@ public class ModuleInstaller
             }
             Directory.CreateDirectory(moduleDirectory);
 
-            await DownloadModuleToFile(moduleMetadata, dllPath);
+            try
+            {
+                await DownloadModuleToFile(moduleMetadata, dllPath, moduleMetadata.FileHash);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to download module data for {moduleMetadata.ModuleName}. {e}");
+                return null;
+            }
 
             _logger.LogDebug("Downloaded module {module} to {dllPath}", moduleMetadata.ModuleId, dllPath);
         }

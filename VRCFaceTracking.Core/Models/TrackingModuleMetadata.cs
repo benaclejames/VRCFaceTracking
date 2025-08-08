@@ -70,4 +70,9 @@ public class TrackingModuleMetadata
     {
         get; set;
     } = "(No DLL provided)";
+    
+    public string FileHash
+    {
+        get; set;
+    }
 }
