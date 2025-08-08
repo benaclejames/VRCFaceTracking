@@ -113,11 +113,12 @@ public class OscRecvService : BackgroundService
                 continue;
             }
 
-            if (_recvSocket.Available > 0)
+            try
             {
-                try
+                if (_recvSocket.Available > 0)
                 {
-                    var bytesReceived = await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
+                    var bytesReceived =
+                        await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
                     var offset = 0;
                     var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
                     if (newMsg == null)
@@ -127,21 +128,21 @@ public class OscRecvService : BackgroundService
 
                     OnMessageReceived(newMsg);
                 }
-                catch (Exception e)
+                else
                 {
-                    // We don't care about operation cancellations as they're intentional and carefully controlled
-                    if (e.GetType() == typeof(OperationCanceledException))
-                    {
-                        continue;
-                    }
-
-                    _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
-                    SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
+                    await Task.Delay(100, _linkedToken.Token);
                 }
             }
-            else
+            catch (Exception e)
             {
-                await Task.Delay(100, _linkedToken.Token);
+                // We don't care about operation cancellations as they're intentional and carefully controlled
+                if (e.GetType() == typeof(OperationCanceledException) || e.GetType() == typeof(TaskCanceledException))
+                {
+                    continue;
+                }
+
+                _logger.LogError("Error encountered in OSC Receive thread: {e}", e);
+                SentrySdk.CaptureException(e, scope => scope.SetExtra("recvBuffer", _recvBuffer));
             }
         }
     }
