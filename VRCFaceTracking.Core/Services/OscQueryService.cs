@@ -21,21 +21,16 @@ public partial class OscQueryService(
     MulticastDnsService multicastDnsService,
     OscRecvService recvService,
     ILocalSettingsService settingsService,
-    HttpHandler httpHandler)
+    HttpHandler httpHandler,
+    IDispatcherService dispatcherService)
     : ObservableObject
 {
-
-    // Services
-    private readonly ILogger _logger = logger;
-
     [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
     [ObservableProperty] private List<Parameter> _avatarParameters;
 
-    // Local vars
-
     public async Task InitializeAsync()
     {
-        _logger.LogDebug("OSC Service Initializing");
+        logger.LogDebug("OSC Service Initializing");
 
         recvService.OnMessageReceived = HandleNewMessage;
 
@@ -52,7 +47,7 @@ public partial class OscQueryService(
 
         multicastDnsService.SendQuery("_oscjson._tcp.local");
 
-        _logger.LogDebug("OSC Service Initialized with result {0}", result);
+        logger.LogDebug("OSC Service Initialized with result {0}", result);
         await Task.CompletedTask;
     }
 
@@ -60,14 +55,14 @@ public partial class OscQueryService(
     {
         multicastDnsService.OnVrcClientDiscovered -= FirstClientDiscovered;
 
-        _logger.LogInformation($"OSCQuery detected at {multicastDnsService.VrchatClientEndpoint}. Setting port negotiation to autopilot.");
+        logger.LogInformation($"OSCQuery detected at {multicastDnsService.VrchatClientEndpoint}. Setting port negotiation to autopilot.");
 
         httpHandler.OnHostInfoQueried += HandleNewAvatarWrapper;
 
         var recvEndpoint = recvService.UpdateTarget(new IPEndPoint(IPAddress.Parse(oscTarget.DestinationAddress), 0));
         if (recvEndpoint == null)
         {
-            _logger.LogError("Very strange. We were unable to bind to a random port.");
+            logger.LogError("Very strange. We were unable to bind to a random port.");
             recvEndpoint = new IPEndPoint(IPAddress.Parse(oscTarget.DestinationAddress), oscTarget.InPort);
         }
 
@@ -85,10 +80,9 @@ public partial class OscQueryService(
 
     private async void HandleNewAvatar(string newId = null)
     {
-        var newAvatar = default((IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?);
+        (IAvatarInfo avatarInfo, List<Parameter> relevantParameters)? newAvatar;
         if (newId == null)
         {
-            httpHandler.OnHostInfoQueried -= HandleNewAvatarWrapper;
             newAvatar = await oscQueryConfigParser.ParseAvatar("");
         }
         else
@@ -96,17 +90,23 @@ public partial class OscQueryService(
             // handle normal osc
             newAvatar = await avatarConfigParser.ParseAvatar(newId);
         }
-        if (newAvatar.HasValue)
+
+        if (!newAvatar.HasValue)
+        {
+            return;
+        }
+
+        // Parsing success. Deregister callback and update values
+        httpHandler.OnHostInfoQueried -= HandleNewAvatarWrapper;
+        dispatcherService.Run(() =>
         {
             AvatarInfo = newAvatar.Value.avatarInfo;
             AvatarParameters = newAvatar.Value.relevantParameters;
-        }
+        });
     }
 
-    private void HandleNewAvatarWrapper()
-    {
-        HandleNewAvatar();
-    }
+    private void HandleNewAvatarWrapper() => HandleNewAvatar(); // Helper func used in callbacks
+    
 
     private void HandleNewMessage(OscMessage msg)
     {
@@ -146,23 +146,23 @@ public partial class OscQueryService(
 
     partial void OnAvatarParametersChanged(List<Parameter> value)
     {
-        _logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
+        logger.LogDebug("Configuration loaded. Checking for native tracking parameters...");
         var hasLoadedNative = value.Any(p => p.GetParamNames().Any(t => t.paramName.StartsWith("/tracking/")));
         if (hasLoadedNative)
         {
-            _logger.LogWarning("Native tracking parameters detected.");
+            logger.LogWarning("Native tracking parameters detected.");
         }
 
         var deprecatedParams = value.Where(p => p.Deprecated).ToList();
 
-        _logger.LogInformation(value.Count + " parameters loaded.");
+        logger.LogInformation(value.Count + " parameters loaded.");
         if (deprecatedParams.Any())
         {
-            _logger.LogWarning(
+            logger.LogWarning(
                 deprecatedParams.Count +
                 " Legacy parameters detected. " +
                 "Please consider updating the avatar to use the latest documented parameters.");
-            _logger.LogDebug($"Loaded deprecated parameters: {string.Join(", ", deprecatedParams.SelectMany(x => x.GetParamNames()).Select(y => y.paramName))}");
+            logger.LogDebug($"Loaded deprecated parameters: {string.Join(", ", deprecatedParams.SelectMany(x => x.GetParamNames()).Select(y => y.paramName))}");
         }
     }
 }
