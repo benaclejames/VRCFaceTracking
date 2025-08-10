@@ -42,6 +42,14 @@ public class OpenVRService
         IsInitialized = true;
         return IsInitialized;
     }
+
+    public void InitIfNotAlready()
+    {
+        if (!IsInitialized)
+        {
+            Initialize();
+        }
+    }
     
     public bool IsInitialized { get; private set; }
 
