@@ -67,7 +67,8 @@ public partial class SettingsViewModel : ObservableRecipient
                     await _themeSelectorService.SetThemeAsync(param);
                 }
             });
-        
+
+        OpenVRService.InitIfNotAlready();
         LoadContributors();
     }
 }
