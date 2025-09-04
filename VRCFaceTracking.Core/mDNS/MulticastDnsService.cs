@@ -26,20 +26,22 @@ public partial class MulticastDnsService : ObservableObject
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
             net.OperationalStatus == OperationalStatus.Up &&
-            net.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+            net.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+            net.SupportsMulticast &&
+            net.GetIPProperties().MulticastAddresses.Any())
         .ToList();
 
-    // Get all ipv4 addresses from a specific network interface
-    private static IEnumerable<IPAddress> GetIpv4Addresses(NetworkInterface net) => net.GetIPProperties()
+    // Get the first ipv4 address from a specific network interface
+    private static IPAddress? GetIpv4Address(NetworkInterface net) => net.GetIPProperties()
         .UnicastAddresses
-        .Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
-        .Select(addr => addr.Address);
+        .Select(addr => addr.Address)
+        .FirstOrDefault(addr => addr.AddressFamily == AddressFamily.InterNetwork);
 
     public MulticastDnsService(ILogger<MulticastDnsService> logger)
     {
         _logger = logger;
 
-        _localIpAddresses = GetIpv4NetInterfaces().SelectMany(GetIpv4Addresses).Where(addr => addr.AddressFamily == AddressFamily.InterNetwork).ToList();
+        _localIpAddresses = GetIpv4NetInterfaces().Select(GetIpv4Address).Where(addr => addr != null).ToList();
 
         // Create listeners for all interfaces
         var cts = new CancellationTokenSource();
