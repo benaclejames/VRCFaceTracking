@@ -57,17 +57,7 @@ public class ModuleInstaller
 
     private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath, string md5Hash = null)
     {
-        using var client = new HttpClient(new SocketsHttpHandler()
-        {
-            ConnectCallback = async (context, cancellationToken) =>
-            {
-                var ipv4 = await Dns.GetHostEntryAsync(context.DnsEndPoint.Host, AddressFamily.InterNetwork, cancellationToken);
-
-                var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                await socket.ConnectAsync(ipv4.AddressList, context.DnsEndPoint.Port, cancellationToken);
-                return new NetworkStream(socket, ownsSocket: true);
-            }
-        });
+        using var client = HappyEyeballsHttp.CreateHttpClient();
 
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
         var content = await response.Content.ReadAsByteArrayAsync();

@@ -20,24 +20,11 @@ public class ModuleDataService : IModuleDataService
 
     private const string BaseUrl = "https://registry.vrcft.io/";
 
-    // HttpClient does not failover to IPv4, which breaks on systems with improperly configured IPv6. This forces IPv4.
-    private readonly SocketsHttpHandler socketHandler = new()
-    {
-        ConnectCallback = async (context, cancellationToken) =>
-        {
-            var ipv4 = await Dns.GetHostEntryAsync(context.DnsEndPoint.Host, AddressFamily.InterNetwork, cancellationToken);
-
-            var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            await socket.ConnectAsync(ipv4.AddressList, context.DnsEndPoint.Port, cancellationToken);
-            return new NetworkStream(socket, ownsSocket: true);
-        }
-    };
-
     public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger)
     {
         _identityService = identityService;
         _logger = logger;
-        _httpClient = new HttpClient(socketHandler);
+        _httpClient = HappyEyeballsHttp.CreateHttpClient();
         _httpClient.BaseAddress = new Uri(BaseUrl);
     }
 
