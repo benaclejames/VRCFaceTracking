@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
+using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Models;
 
 namespace VRCFaceTracking.Services;
@@ -8,7 +9,7 @@ public class GithubService
 {
     public async Task<List<GithubContributor>> GetContributors(string repo)
     {
-        var client = new HttpClient();
+        var client = HappyEyeballsHttp.CreateHttpClient();
         client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("VRCFaceTracking", "1.0"));
         var response = await client.GetAsync($"https://api.github.com/repos/{repo}/contributors");
         if (!response.IsSuccessStatusCode)
