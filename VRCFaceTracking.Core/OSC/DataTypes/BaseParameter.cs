@@ -57,7 +57,7 @@ public class BaseParam<T> : Parameter where T : struct
 
     public T ParamValue
     {
-        get => (T)OscMessage.Value;
+        get => (T)OscMessages[0].Value;
         set
         {
             if (value.Equals(_lastValue))
@@ -65,48 +65,79 @@ public class BaseParam<T> : Parameter where T : struct
                 return;
             }
 
-            OscMessage.Value = value;
+            foreach (var msg in OscMessages)
+            {
+                msg.Value = value;
+            }
             _lastValue = value;
             Enqueue();
         }
     }
 
-    private void Enqueue() => ParameterSenderService.Enqueue(OscMessage);
+    private void Enqueue()
+    {
+        foreach (var msg in OscMessages)
+        {
+            ParameterSenderService.Enqueue(msg);
+        }
+    }
 
-    protected readonly OscMessage OscMessage;
+    protected readonly List<OscMessage> OscMessages = new();
 
     public BaseParam(string name, Func<UnifiedTrackingData, T> getValueFunc, bool sendOnLoad = false)
     {
         _paramName = name;
         _regex = new Regex(@"(?<!(v\d+))(/" + _paramName + ")$|^(" + _paramName + ")$");
         _getValueFunc = getValueFunc;
-        OscMessage = new OscMessage(DefaultPrefix + name, typeof(T));
+        OscMessages.Add(new OscMessage(DefaultPrefix + name, typeof(T)));
         _sendOnLoad = sendOnLoad;
     }
 
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
+        OscMessages.Clear();
+        OscMessages.Add(new OscMessage(DefaultPrefix + _paramName, typeof(T)));
+
         if (ParameterSenderService.AllParametersRelevantStatic)
         {
             Relevant = true;
-            OscMessage.Address = DefaultPrefix + _paramName;
-
             return new Parameter[] { this };
         }
 
-        var compatibleParam = newParams.FirstOrDefault(param =>
+        var compatibleParams = newParams.Where(param =>
             _regex.IsMatch(param.Address)
-            && param.Type == typeof(T));
+            && param.Type == typeof(T)).ToArray();
 
-        if (compatibleParam != null)
+
+        // Ensures that the FT prefix is always included, if it's not already there
+        // Messages will be sent to two addresses in cases where the param uses a non-FT prefix: the default, and the FT prefix
+        // Params that aren't used at all won't be sent even to the default FT address
+        if (compatibleParams.Length > 0)
         {
+            OscMessages.Clear();
+
+            var hasFTPrefix = false;
+            foreach (var param in compatibleParams)
+            {
+                OscMessages.Add(new OscMessage(param.Address, typeof(T)));
+
+                if (param.Address.Contains("/FT/"))
+                {
+                    hasFTPrefix = true;
+                }
+            }
+
+            if (!hasFTPrefix)
+            {
+                var ftAddress = DefaultPrefix + "FT/" + _paramName;
+                OscMessages.Add(new OscMessage(ftAddress, typeof(T)));
+            }
+
             Relevant = true;
-            OscMessage.Address = compatibleParam.Address;
         }
         else
         {
             Relevant = false;
-            OscMessage.Address = DefaultPrefix + _paramName;
         }
 
         return Relevant ? new Parameter[] { this } : Array.Empty<Parameter>();
