@@ -1,4 +1,6 @@
 ﻿using System.IO.Compression;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
@@ -55,7 +57,8 @@ public class ModuleInstaller
 
     private static async Task DownloadModuleToFile(TrackingModuleMetadata moduleMetadata, string filePath, string md5Hash = null)
     {
-        using var client = new HttpClient();
+        using var client = HappyEyeballsHttp.CreateHttpClient();
+
         var response = await client.GetAsync(moduleMetadata.DownloadUrl);
         var content = await response.Content.ReadAsByteArrayAsync();
         if (!string.IsNullOrEmpty(md5Hash))
