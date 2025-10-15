@@ -23,6 +23,7 @@ public class HttpHandler(IOscTarget oscTarget, ILogger<HttpHandler> logger) : ID
         _listener.Stop();
         _listener.Prefixes.Clear();
         _listener.Prefixes.Add(uri);
+        _listener.Prefixes.Add(uri.Replace("localhost", "127.0.0.1"));
         _listener.Start();
         _contextListenerResult = _listener.BeginGetContext(HttpListenerLoop, _listener);
     }
