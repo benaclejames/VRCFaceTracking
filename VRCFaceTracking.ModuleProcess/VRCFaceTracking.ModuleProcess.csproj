@@ -29,4 +29,9 @@
     <ProjectReference Include="..\VRCFaceTracking.SDK\VRCFaceTracking.SDK.csproj" />
   </ItemGroup>
 
+    <Target Name="CopyExecutable" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)VRCFaceTracking.ModuleProcess.exe"
+              DestinationFolder="..\VRCFaceTracking\"
+              SkipUnchangedFiles="true" />
+    </Target>
 </Project>

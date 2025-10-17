@@ -103,4 +103,10 @@
       <FrameworkSdkReference Remove="@(FrameworkSdkReference)" Condition="$([System.String]::Copy('%(FrameworkSdkReference.SDKName)').StartsWith('Microsoft.WindowsAppRuntime.'))" />
     </ItemGroup>
   </Target>
+    
+    <Target Name="CopyToMainProject" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)VRCFaceTracking.ModuleProcess.exe"
+              DestinationFolder="..\VRCFaceTracking\bin\$(Platform)\$(Configuration)\$(TargetFramework)\win10-$(Platform)\"
+              SkipUnchangedFiles="true" />
+    </Target>
 </Project>
