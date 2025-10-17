@@ -237,6 +237,7 @@ public class ModuleProcessMain
             // Send packets in loop
             while (_packetsToSend.TryDequeue(out IpcPacket pkt))
             {
+                if (pkt == null) continue;  // Ignore your IDE. This can and will be null at some point as we're not locking
                 Client.SendData(pkt);
             }
 
