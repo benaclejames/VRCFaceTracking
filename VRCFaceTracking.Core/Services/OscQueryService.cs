@@ -69,7 +69,7 @@ public partial class OscQueryService(
         var randomServiceSuffix = Utils.GetRandomChars(6);
         var httpPort = Utils.GetRandomFreePort();
         httpHandler.SetAppName("VRCFT-" + randomServiceSuffix);
-        httpHandler.BindTo($"http://localhost:{httpPort}/", recvEndpoint.Port);
+        httpHandler.BindTo($"http://127.0.0.1:{httpPort}/", recvEndpoint.Port);
 
         // Advertise our OSC JSON and OSC endpoints (OSC JSON to display the silly lil popup in-game)
         multicastDnsService.Advertise("_oscjson._tcp", new AdvertisedService("VRCFT-"+randomServiceSuffix, httpPort, IPAddress.Loopback));
