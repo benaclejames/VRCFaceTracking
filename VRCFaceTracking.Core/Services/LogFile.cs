@@ -28,7 +28,15 @@ public class LogFileLogger : ILogger
         Mutex.WaitOne(); // Wait for the semaphore to be released
         try
         {
-            _file.Write($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
+            // Log events from sub-processes have the unique category name "\0VRCFT\0"
+            if ( _categoryName == "\0VRCFT\0" )
+            {
+                _file.Write($"{formatter(state, exception)}\n");
+            }
+            else
+            {
+                _file.Write($"[{_categoryName}] {logLevel}: {formatter(state, exception)}\n");
+            }
             _file.Flush();
         }
         catch

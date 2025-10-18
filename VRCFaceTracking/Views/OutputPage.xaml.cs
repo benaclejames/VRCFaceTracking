@@ -19,8 +19,8 @@ public sealed partial class OutputPage : Page
         get;
     }
 
-    public ObservableCollection<string> FilteredLog => OutputPageLogger.FilteredLogs;
-    public ObservableCollection<string> AllLog => OutputPageLogger.AllLogs;
+    public ObservableCollection<LogLine> FilteredLog => OutputPageLogger.FilteredLogs;
+    public ObservableCollection<LogLine> AllLog => OutputPageLogger.AllLogs;
 
     public OutputPage()
     {
