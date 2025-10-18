@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:VRCFaceTracking.Helpers"
     xmlns:models="using:VRCFaceTracking"
+    xmlns:localModels="using:VRCFaceTracking.Models"
     xmlns:views="using:VRCFaceTracking.Views"
     mc:Ignorable="d">
 
