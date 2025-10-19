@@ -227,6 +227,12 @@
   <data name="FaceTrackingActive.Text" xml:space="preserve">
     <value>Śledzenie twarzy aktywne</value>
   </data>
+  <data name="EyeTrackingInactive.Text" xml:space="preserve">
+    <value>Eye Tracking Inactive</value>
+  </data>
+  <data name="FaceTrackingInactive.Text" xml:space="preserve">
+    <value>Face Tracking Inactive</value>
+  </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
     <value>Zgłoś błąd</value>
   </data>

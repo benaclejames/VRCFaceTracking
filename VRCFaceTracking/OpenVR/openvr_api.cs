@@ -4,6 +4,7 @@
 // This file is auto-generated, do not edit it.
 //
 //=============================================================================
+#nullable disable
 #if !OPENVR_XR_API
 
 using System;

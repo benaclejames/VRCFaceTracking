@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -23,7 +24,7 @@ public class ModuleDataService : IModuleDataService
     {
         _identityService = identityService;
         _logger = logger;
-        _httpClient = new HttpClient();
+        _httpClient = HappyEyeballsHttp.CreateHttpClient();
         _httpClient.BaseAddress = new Uri(BaseUrl);
     }
 
