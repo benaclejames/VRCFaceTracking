@@ -97,37 +97,27 @@ public class BaseParam<T> : Parameter where T : struct
     {
         OscMessages.Clear();
         OscMessages.Add(new OscMessage(DefaultPrefix + _paramName, typeof(T)));
-
+        
+        // If we're forcing all parameter relevant, ignore these checks entirely and assume relevancy of the default address for this param.
         if (ParameterSenderService.AllParametersRelevantStatic)
         {
             Relevant = true;
             return new Parameter[] { this };
         }
-
+        
         var compatibleParams = newParams.Where(param =>
             _regex.IsMatch(param.Address)
-            && param.Type == typeof(T)).ToArray();
-
-
+            && param.Type == typeof(T)).ToList();
+        
         // Ensures that the FT prefix is always included, if it's not already there
         // Messages will be sent to two addresses in cases where the param uses a non-FT prefix: the default, and the FT prefix
         // Params that aren't used at all won't be sent even to the default FT address
-        if (compatibleParams.Length > 0)
+        if (compatibleParams.Any())
         {
             OscMessages.Clear();
+            OscMessages.AddRange(compatibleParams.Select(p => new OscMessage(p.Address, typeof(T))));
 
-            var hasFTPrefix = false;
-            foreach (var param in compatibleParams)
-            {
-                OscMessages.Add(new OscMessage(param.Address, typeof(T)));
-
-                if (param.Address.Contains("/FT/"))
-                {
-                    hasFTPrefix = true;
-                }
-            }
-
-            if (!hasFTPrefix)
+            if (!compatibleParams.Any(param => param.Address.Contains("/FT/")))
             {
                 var ftAddress = DefaultPrefix + "FT/" + _paramName;
                 OscMessages.Add(new OscMessage(ftAddress, typeof(T)));
