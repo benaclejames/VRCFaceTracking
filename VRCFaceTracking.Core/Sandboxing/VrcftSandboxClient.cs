@@ -112,6 +112,7 @@ public class VrcftSandboxClient : UdpFullDuplex
                 foreach ( var packetChunk in packetChunkBytes )
                 {
                     SendData(packetChunk);
+                    Thread.Sleep(1);    //TODO: Potentially switch to ACK based chunking system
                 }
             }
             else
