@@ -219,6 +219,11 @@ public class ModuleProcessMain
             }
 
         };
+        if (OperatingSystem.IsWindows())
+        {
+            Core.Utils.TimeBeginPeriod(1);
+        }
+        
         // Start the connection
         Client.Connect(modulePath);
         Logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
@@ -250,6 +255,7 @@ public class ModuleProcessMain
             Thread.Sleep(1);
         }
 
+        if (OperatingSystem.IsWindows()) Core.Utils.TimeEndPeriod(1);
         return ModuleProcessExitCodes.OK;
     }
 }
