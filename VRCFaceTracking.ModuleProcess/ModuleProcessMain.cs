@@ -255,7 +255,11 @@ public class ModuleProcessMain
             Thread.Sleep(1);
         }
 
-        if (OperatingSystem.IsWindows()) Core.Utils.TimeEndPeriod(1);
+        if (OperatingSystem.IsWindows())
+        {
+            Core.Utils.TimeEndPeriod(1);
+        }
+
         return ModuleProcessExitCodes.OK;
     }
 }

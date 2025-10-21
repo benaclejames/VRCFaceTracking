@@ -31,7 +31,7 @@ public class UdpFullDuplex : IDisposable
     protected bool              _isConnected            = false;
     protected SimpleEventBus    _eventBus;
     private bool                _isCallbackRegistered   = false;
-    private Thread              _receiveThread;
+    private Task                _receiveThread;
     private int                 _maximumTransferUnit = ETHERNET_FRAME_SIZE;
     private CancellationTokenSource _cts = new();
     public OnReceiveShouldBeQueued OnReceiveShouldBeQueued;
@@ -102,45 +102,32 @@ public class UdpFullDuplex : IDisposable
         // setup first async event
         // AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
         // _receivingUdpClient.BeginReceive(callBack, null);
-        _receiveThread = new Thread(new ThreadStart(Listen))
-        {
-            IsBackground = true
-        };
-        _receiveThread.Start();
+        _receiveThread = Task.Run(ListenAsync, _cts.Token);
     }
 
-    private void Listen()
+    private async Task ListenAsync()
     {
-        while ( !_cts.IsCancellationRequested )
+        while (!_cts.IsCancellationRequested)
         {
             try
             {
-                using CancellationTokenSource internalCancellationTokenSource = new();
-                using CancellationTokenSource linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(internalCancellationTokenSource.Token, _cts.Token);
-
-                internalCancellationTokenSource.CancelAfter(TIMEOUT_MILLISECONDS);
-                var task = _receivingUdpClient.ReceiveAsync(_cts.Token);
-                var index = Task.WaitAny(new [] { task.AsTask() }, TIMEOUT_MILLISECONDS, _cts.Token);
-                if ( index < 0 )
-                    continue;
-
-                var result = task.Result;
-
-                if ( result.Buffer != null && result.Buffer.Length > 0 )
+                var result = await _receivingUdpClient.ReceiveAsync(_cts.Token);
+            
+                if (result.Buffer != null && result.Buffer.Length > 0)
                 {
                     OnBytesReceived(result.Buffer, result.RemoteEndPoint);
                 }
             }
-            catch ( OperationCanceledException )
+            catch (OperationCanceledException)
             {
                 // Cancelled, exit loop
                 break;
             }
-            catch ( ObjectDisposedException )
+            catch (ObjectDisposedException)
             {
                 // Ignore if disposed. This happens when closing the listener
             }
-            catch ( SocketException e )
+            catch (SocketException e)
             {
                 // This happens when a module terminates / crashes / is shut down
             }
@@ -241,7 +228,6 @@ public class UdpFullDuplex : IDisposable
             _closing = true;
             _receivingUdpClient.Close();
             _closingEvent.Set();
-            _receiveThread.Join();
         }
         _closingEvent.WaitOne();
     }
