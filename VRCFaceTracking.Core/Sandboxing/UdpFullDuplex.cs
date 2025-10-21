@@ -98,6 +98,7 @@ public class UdpFullDuplex : IDisposable
         _receivingUdpClient.Client.ReceiveTimeout   = 10;
         _receivingUdpClient.Client.SendTimeout      = 10;
         _maximumTransferUnit = Math.Min(_receivingUdpClient.Client.ReceiveBufferSize, _receivingUdpClient.Client.SendBufferSize);
+        _receivingUdpClient.Client.ReceiveBufferSize = 1024 * 1024;
         
         // setup first async event
         // AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
