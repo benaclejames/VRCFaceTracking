@@ -81,7 +81,7 @@ public partial class OscQueryService(
     private async void HandleNewAvatar(string newId = null)
     {
         (IAvatarInfo avatarInfo, List<Parameter> relevantParameters)? newAvatar;
-        if (newId == null)
+        if (multicastDnsService.VrchatClientEndpoint != null)
         {
             newAvatar = await oscQueryConfigParser.ParseAvatar("");
         }
