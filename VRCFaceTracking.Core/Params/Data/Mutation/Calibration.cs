@@ -63,7 +63,7 @@ public class Calibration : TrackingMutation
                 }
                 else if (!finished)
                 {
-                    logger.LogInformation($"Data saturated window: {name}.");
+                    logger.LogDebug($"Data saturated window: {name}.");
                     finished = true;
                 }
                 dataPoints[_rollingIndex] = currentValue;
