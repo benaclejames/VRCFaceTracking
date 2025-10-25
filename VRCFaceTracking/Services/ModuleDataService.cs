@@ -96,51 +96,73 @@ public class ModuleDataService : IModuleDataService
 
     public async Task<int?> GetMyRatingAsync(TrackingModuleMetadata moduleMetadata)
     {
-        if (_ratingCache.TryGetValue(moduleMetadata.ModuleId, out var async))
+        try
         {
-            _logger.LogDebug("Rating for {ModuleId} was cached as {Rating}", moduleMetadata.ModuleId, async);
-            return async;
-        }
+            if (_ratingCache.TryGetValue(moduleMetadata.ModuleId, out var async))
+            {
+                _logger.LogDebug("Rating for {ModuleId} was cached as {Rating}", moduleMetadata.ModuleId, async);
+                return async;
+            }
 
-        var rating = new RatingObject
-            { UserId = _identityService.GetUniqueUserId(), ModuleId = moduleMetadata.ModuleId.ToString() };
-        var response = await _httpClient.SendAsync(new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri("rating", UriKind.Relative),
-            Content = new StringContent(JsonConvert.SerializeObject(rating), Encoding.UTF8, "application/json"),
-        });
+            var rating = new RatingObject
+                { UserId = _identityService.GetUniqueUserId(), ModuleId = moduleMetadata.ModuleId.ToString() };
         
-        
-        // Deserialize the input content but extract the Rating property. Be careful though, we might 404 if the user hasn't rated the module yet.
-        if (response.StatusCode != HttpStatusCode.OK)
+            var response = await _httpClient.SendAsync(new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("rating", UriKind.Relative),
+                Content = new StringContent(JsonConvert.SerializeObject(rating), Encoding.UTF8, "application/json"),
+            });
+
+            // Deserialize the input content but extract the Rating property. Be careful though, we might 404 if the user hasn't rated the module yet.
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogDebug("Failed to get user rating for module {ModuleId}", moduleMetadata.ModuleId);
+                return null;
+            }
+
+            var ratingResponse = await Json.ToObjectAsync<RatingObject>(await response.Content.ReadAsStringAsync());
+            
+            _logger.LogDebug("Rating for {ModuleId} was {Rating}. Caching...", moduleMetadata.ModuleId, ratingResponse.Rating);
+            _ratingCache[moduleMetadata.ModuleId] = ratingResponse.Rating;
+            return ratingResponse.Rating;
+        }
+        catch (Exception e)
         {
-            _logger.LogDebug("Failed to get user rating for module {ModuleId}", moduleMetadata.ModuleId);
+            _logger.LogWarning("Failed to get user rating for module {ModuleId}. Exception: {Exception}", moduleMetadata.ModuleId, e.Message);
             return null;
         }
-
-        var ratingResponse = await Json.ToObjectAsync<RatingObject>(await response.Content.ReadAsStringAsync());
-        
-        _logger.LogDebug("Rating for {ModuleId} was {Rating}. Caching...", moduleMetadata.ModuleId, ratingResponse.Rating);
-        _ratingCache[moduleMetadata.ModuleId] = ratingResponse.Rating;
-        return ratingResponse.Rating;
     }
 
     public async Task SetMyRatingAsync(TrackingModuleMetadata moduleMetadata, int rating)
     {
-        // Same format as get but we PUT this time
-        var ratingObject = new RatingObject{UserId = _identityService.GetUniqueUserId(), ModuleId = moduleMetadata.ModuleId.ToString(), Rating = rating};
-        
-        var content = new StringContent(JsonConvert.SerializeObject(ratingObject), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync("rating", content);
-        
-        if (response.StatusCode != HttpStatusCode.OK)
+        try
         {
-            _logger.LogError("Failed to set rating for {ModuleId} to {Rating}. Status code: {StatusCode}", moduleMetadata.ModuleId, rating, response.StatusCode);
-            return;
+            // Same format as get but we PUT this time
+            var ratingObject = new RatingObject
+            {
+                UserId = _identityService.GetUniqueUserId(), ModuleId = moduleMetadata.ModuleId.ToString(),
+                Rating = rating
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(ratingObject), Encoding.UTF8,
+                "application/json");
+            var response = await _httpClient.PutAsync("rating", content);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError("Failed to set rating for {ModuleId} to {Rating}. Status code: {StatusCode}",
+                    moduleMetadata.ModuleId, rating, response.StatusCode);
+                return;
+            }
+
+            _logger.LogDebug("Rating for {ModuleId} was set to {Rating}. Caching...", moduleMetadata.ModuleId, rating);
+            _ratingCache[moduleMetadata.ModuleId] = rating;
         }
-        _logger.LogDebug("Rating for {ModuleId} was set to {Rating}. Caching...", moduleMetadata.ModuleId, rating);
-        _ratingCache[moduleMetadata.ModuleId] = rating;
+        catch (Exception e)
+        {
+            _logger.LogWarning("Failed to set rating for module {ModuleId}. Exception: {Exception}", moduleMetadata.ModuleId, e.Message);
+        }
     }
 
     public IEnumerable<InstallableTrackingModule> GetInstalledModules()
