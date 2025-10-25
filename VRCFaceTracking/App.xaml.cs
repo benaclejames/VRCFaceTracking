@@ -174,23 +174,9 @@ public partial class App : Application
         });
         Current.UnhandledException += ExceptionHandler;
 
-        // Kill any other instances of VRCFaceTracking.exe
-        foreach (var proc in Process.GetProcessesByName("VRCFaceTracking"))
-        {
-            if (proc.Id == Environment.ProcessId)
-            {
-                continue;
-            }
-
-            try
-            {
-                proc.Kill();
-            }
-            catch
-            {
-                _logger?.LogWarning($"Unable to kill PID: {proc.Id}.");
-            }
-        }
+        // Kill any other instances of VRCFaceTracking.exe and our module processes
+        Core.Utils.KillAllProcessesOfName("VRCFaceTracking");
+        Core.Utils.KillAllProcessesOfName("VRCFaceTracking.ModuleProcess");
         
         await App.GetService<IActivationService>().ActivateAsync(args);
         await Host.StartAsync();
