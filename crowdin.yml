@@ -1,0 +1,5 @@
+﻿project_id: "843158"
+
+files:
+  - source: /VRCFaceTracking/Strings/en-US/Resources.resw
+    translation: /VRCFaceTracking/Strings/%locale%/Resources.resw
