@@ -175,6 +175,17 @@ public class ModuleProcessMain
                             Logger.LogError("Exception initializing {module}. Skipping. {e}", DefModuleAssembly.GetType().Name, e);
                             return;
                         }
+                        
+                        DefModuleAssembly._updateCts = new CancellationTokenSource();
+                        var thread = new Thread(() =>
+                        {
+                            while (!DefModuleAssembly._updateCts.IsCancellationRequested)
+                            {
+                                DefModuleAssembly.TrackingModule.Update();
+                            }
+                        });
+                        thread.Start();
+                        
                         var pktNew = new ReplyInitPacket()
                         {
                             eyeSuccess              = eyeSuccess,
@@ -188,6 +199,7 @@ public class ModuleProcessMain
 
                 case IpcPacket.PacketType.EventTeardown:
                     {
+                        DefModuleAssembly._updateCts?.Cancel();
                         DefModuleAssembly.TrackingModule.Teardown();
                         
                         // Tell VRCFT that we have shut down successfully (otherwise VRCFT will terminate this process)
@@ -203,7 +215,6 @@ public class ModuleProcessMain
                 case IpcPacket.PacketType.EventUpdate:
                     {
                         // Logger.LogDebug("EventUpdate");
-                        DefModuleAssembly.TrackingModule.Update();
                         var pkt = new ReplyUpdatePacket();
                         _packetsToSend.Enqueue(pkt);
                         break;

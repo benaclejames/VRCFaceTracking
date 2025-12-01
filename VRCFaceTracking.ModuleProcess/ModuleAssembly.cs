@@ -16,6 +16,7 @@ public class ModuleAssembly
     private ILogger<ModuleProcessMain> _logger;
     private ILoggerFactory? _loggerFactory;
     public ExtTrackingModule TrackingModule;
+    public CancellationTokenSource _updateCts;
 
     public ModuleAssembly(ILogger<ModuleProcessMain> logger, ILoggerFactory loggerFactory, string dllPath)
     {
