@@ -95,6 +95,7 @@ public class ReplyInitPacket : IpcPacket
             imageStream.Position = 0;
         
             IconDataStreams.Add(imageStream);
+            offset += 4 + imageStreamSize;
         }
     }
 
