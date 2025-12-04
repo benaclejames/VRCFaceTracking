@@ -64,7 +64,7 @@ public class BinaryBaseParameter : Parameter
         {
             var tempName = param.Name;
             if (!int.TryParse(
-                    String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber)
+                    string.Concat(tempName.Replace(_paramName, "").Reverse().TakeWhile(char.IsNumber)
                         .Reverse()), out var index)) continue;
             // Get the shift steps
             var binaryIndex = GetBinarySteps(index);
