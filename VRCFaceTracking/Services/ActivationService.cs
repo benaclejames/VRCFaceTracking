@@ -130,10 +130,18 @@ public class ActivationService : IActivationService
             if (rm.ModuleId != lm.ModuleId) 
                 return false;
 
-            var remoteVersion = new Version(rm.Version);
-            var localVersion = new Version(lm.Version);
+            try
+            {
+                var remoteVersion = new Version(rm.Version);
+                var localVersion = new Version(lm.Version);
 
-            return remoteVersion.CompareTo(localVersion) > 0;
+                return remoteVersion.CompareTo(localVersion) > 0;
+            }
+            catch
+            {
+                // Fall back to just string matching
+                return string.CompareOrdinal(rm.Version, lm.Version) > 0;
+            }
         }));
         foreach (var outdatedModule in outdatedModules)
         {

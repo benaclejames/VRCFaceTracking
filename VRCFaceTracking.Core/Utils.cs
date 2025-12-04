@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -57,4 +58,23 @@ public static class Utils
     private static readonly Random Random = new();
 
     public static string GetRandomChars(int num) => new string(Enumerable.Repeat(K_CHARS, num).Select(s => s[Random.Next(s.Length)]).ToArray());
+
+    public static void KillAllProcessesOfName(string name)
+    {
+        foreach (var proc in Process.GetProcessesByName(name))
+        {
+            if (proc.Id == Environment.ProcessId)
+            {
+                continue;
+            }
+
+            try
+            {
+                proc.Kill();
+            }
+            catch
+            {
+            }
+        }
+    }
 }

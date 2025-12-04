@@ -1,5 +1,4 @@
 ﻿name: Steam Publish
-
 on:
   push:
     branches: [ master ]
@@ -15,6 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Crowdin CLI
+        run: npm install -g @crowdin/cli
+
+      - name: Download latest translations
+        run: crowdin download
+        env:
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -28,13 +35,13 @@ jobs:
 
       - name: Publish
         run: dotnet publish --configuration Release --output ./publish /p:EnableWindowsTargeting=true
-          
+
       - name: Upload publish folder
         uses: actions/upload-artifact@v4
         with:
           name: publish-folder
           path: publish/**
-          
+
       - name: Get version
         id: package_version
         uses: KageKirin/get-csproj-version@v1.0.0
@@ -42,7 +49,7 @@ jobs:
           file: VRCFaceTracking/VRCFaceTracking.csproj
           xpath: //PropertyGroup/AssemblyVersion
           regex: '^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)\.(?<build>0|[1-9]\d*)$'
-
+  
   deploy:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -53,8 +60,7 @@ jobs:
         with:
           name: publish-folder
           path: publish
-          
-        # Skip Steam upload if not configured. Likely within a fork
+
       - name: Deploy to Steam
         env:
           steam_username: ${{ secrets.STEAM_USERNAME }}
@@ -66,5 +72,5 @@ jobs:
           configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
           appId: 3329480
           buildDescription: ${{ needs.build.outputs.version }}
-          depot1Path: publish 
+          depot1Path: publish
           releaseBranch: development

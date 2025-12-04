@@ -84,30 +84,29 @@ public partial class UnifiedTrackingMutator : ObservableObject
         var mutations = TrackingMutation.GetImplementingMutations(true);
         await _localSettingsService.Load(this);
 
-        for (int i = 0; i < mutations.Length; i++)
+        foreach (var mutation in mutations)
         {
-            var mutation = mutations[i];
             try
             {
                 _logger.LogInformation($"Loading {mutation.Name}");
 
                 Type mutationType = mutation.GetType();
 
-                MethodInfo method = typeof(ILocalSettingsService)
+                MethodInfo readSettingMethod = typeof(ILocalSettingsService)
                     .GetMethod("ReadSettingAsync")
                     .MakeGenericMethod(mutationType);
 
-                var task = (Task)method.Invoke(_localSettingsService, new object[] { mutation.Name, mutation, true });
+                var task = (Task)readSettingMethod.Invoke(_localSettingsService, new object[] { mutation.Name, mutation, true });
                 await task.ConfigureAwait(false);
 
                 PropertyInfo resultProperty = task.GetType().GetProperty("Result");
                 var typedMutation = resultProperty.GetValue(task);
 
-                mutation = (TrackingMutation)typedMutation;
+                var trackingMutation = (TrackingMutation)typedMutation;
 
-                mutation.Logger = _logger;
-                mutation.CreateProperties();
-                _mutations.Add(mutation);
+                trackingMutation.Logger = _logger;
+                trackingMutation.CreateProperties();
+                _mutations.Add(trackingMutation);
             }
             catch (Exception ex)
             {

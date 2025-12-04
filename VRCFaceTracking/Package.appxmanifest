@@ -13,7 +13,7 @@
   <Identity
     Name="96ba052f-0948-44d8-86c4-a0212e4ae047"
     Publisher="CN=&quot;Open Source Developer, Benjamin Thomas&quot;, O=Open Source Developer, L=Gloucester, S=Gloucestershire, C=GB"
-    Version="5.2.3.0" />
+    Version="5.4.0.1" />
     
   <mp:PhoneIdentity PhoneProductId="96ba052f-0948-44d8-86c4-a0212e4ae047" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
@@ -31,10 +31,11 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="en"/>
+    <Resource Language="en-US"/>
     <Resource Language="zh-CN"/>
-    <Resource Language="pl"/>
-    <Resource Language="es"/>
+    <Resource Language="pl-PL"/>
+    <Resource Language="es-ES"/>
+    <Resource Language="ja-JP"/>
   </Resources>
 
   <Applications>
