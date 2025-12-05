@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
@@ -21,7 +22,7 @@ public class BinaryBaseParameter : Parameter
         if (!_negativeParam.Relevant &&
             value < 0) // If the negative parameter isn't set, cut the negative values
             return false;
-        
+
         value = Math.Abs(value);
 
         if (value > 0.99999f)
@@ -63,7 +64,7 @@ public class BinaryBaseParameter : Parameter
         {
             var tempName = param.Name;
             if (!int.TryParse(
-                    String.Concat(tempName.Replace(_paramName, "").ToArray().Reverse().TakeWhile(char.IsNumber)
+                    string.Concat(tempName.Replace(_paramName, "").Reverse().TakeWhile(char.IsNumber)
                         .Reverse()), out var index)) continue;
             // Get the shift steps
             var binaryIndex = GetBinarySteps(index);
