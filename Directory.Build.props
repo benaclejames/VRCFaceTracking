@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <AssemblyVersion>5.4.0.2</AssemblyVersion>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x86;x64;arm64;AnyCPU</Platforms>
+  </PropertyGroup>
+</Project>
