@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <VftTargetFramework>net10.0</VftTargetFramework>
+    <VftUiTargetFramework>net10.0-windows10.0.22621.0</VftUiTargetFramework>
+    <VftTargetPlatformVersion>10.0.22621.0</VftTargetPlatformVersion>
+    <VftTargetPlatformMinVersion>10.0.17763.0</VftTargetPlatformMinVersion>
+    <AssemblyVersion>5.4.0.2</AssemblyVersion>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x86;x64;arm64;AnyCPU</Platforms>
+  </PropertyGroup>
+</Project>
