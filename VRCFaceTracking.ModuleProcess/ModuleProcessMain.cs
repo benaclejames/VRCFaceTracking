@@ -270,6 +270,8 @@ public class ModuleProcessMain
 
             Thread.Sleep(1);
         }
+        
+        DefModuleAssembly._updateCts.Cancel();
 
         if (OperatingSystem.IsWindows())
         {
