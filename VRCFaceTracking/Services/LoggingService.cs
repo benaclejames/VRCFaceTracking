@@ -14,6 +14,8 @@ public struct LogLine
         Message = message;
         Level = level;
     }
+
+    public override string ToString() => Message;
 }    
 
 public class OutputPageLogger : ILogger
