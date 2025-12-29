@@ -12,11 +12,8 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <CreatePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreatePackageMakeAppxParameters>
     <CreateResourcePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreateResourcePackageMakeAppxParameters>
-    <PackageCertificateThumbprint>7EDB400AE163AD281DF9747BAFEAA097579AA178</PackageCertificateThumbprint>
-    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
