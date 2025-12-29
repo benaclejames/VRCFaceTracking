@@ -271,6 +271,7 @@ public class ModuleProcessMain
             Core.Utils.TimeEndPeriod(1);
         }
 
+        Environment.Exit(ModuleProcessExitCodes.OK);
         return ModuleProcessExitCodes.OK;
     }
 }

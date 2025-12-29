@@ -248,5 +248,4 @@ public static class VRChat
         return wasOscForced;
     }
 
-    public static bool IsVrChatRunning() => Process.GetProcesses().Any(x => x.ProcessName == "VRChat");
-}
+    public static bool IsVrChatRunning() => Process.GetProcesses().Any(x => x.ProcessName is "VRChat.exe" or "VRChat");}
