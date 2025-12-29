@@ -43,23 +43,28 @@ public class ModuleProcessMain
                 return ModuleProcessExitCodes.INVALID_ARGS;
             }
 
-            var portOption = new Option<int?>(
-            name: "--port",
-            description: "The UDP port the VRCFT server is running on.");
-            var modulePathOption = new Option<string?>(
-            name: "--module-path",
-            description: "The path to the module to load.");
+            var portOption = new Option<int?>("--port")
+            {
+                Description = "The UDP port the VRCFT server is running on."
+            };
+            var modulePathOption = new Option<string?>("--module-path")
+            {
+                Description = "The path to the module to load."
+            };
 
             var rootCommand = new RootCommand("VRCFT Sandbox Module");
-            rootCommand.AddOption(portOption);
-            rootCommand.AddOption(modulePathOption);
+            rootCommand.Options.Add(portOption);
+            rootCommand.Options.Add(modulePathOption);
 
-            rootCommand.SetHandler((modulePath, port) =>
+            rootCommand.SetAction(parseResult =>
             {
+                var modulePath = parseResult.GetValue(modulePathOption);
+                var port = parseResult.GetValue(portOption);
                 VrcftMain(modulePath!, port ?? 0);
-            }, modulePathOption, portOption);
+                return 0;
+            });
 
-            return rootCommand.Invoke(args);
+            return rootCommand.Parse(args).Invoke();
         }
         catch ( Exception ex )
         {

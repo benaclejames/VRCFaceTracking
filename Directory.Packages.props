@@ -6,20 +6,20 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Controls.RangeSelector" Version="8.0.240109" />
-    <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="8.0.240109" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Controls.RangeSelector" Version="8.2.251219" />
+    <PackageVersion Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
     <PackageVersion Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
     <PackageVersion Include="CommunityToolkit.WinUI.UI.Controls.Layout" Version="7.1.2" />
     <PackageVersion Include="Gameloop.Vdf" Version="0.6.2" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.5.240404000" />
-    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="Sentry" Version="4.4.0" />
-    <PackageVersion Include="Sentry.Extensions.Logging" Version="4.4.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageVersion Include="WinUIEx" Version="2.3.4" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
+    <PackageVersion Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="Sentry" Version="6.0.0" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="6.0.0" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.1" />
+    <PackageVersion Include="WinUIEx" Version="2.9.0" />
   </ItemGroup>
 </Project>
