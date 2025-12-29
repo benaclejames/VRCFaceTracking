@@ -71,6 +71,9 @@
     <PackageReference Include="Sentry" />
     <PackageReference Include="Sentry.Extensions.Logging" />
     <PackageReference Include="WinUIEx" />
+    <PackageReference Include="System.Net.Http" />
+    <PackageReference Include="System.Private.Uri" />
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />

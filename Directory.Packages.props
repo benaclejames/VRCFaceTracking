@@ -20,6 +20,9 @@
     <PackageVersion Include="Sentry" Version="6.0.0" />
     <PackageVersion Include="Sentry.Extensions.Logging" Version="6.0.0" />
     <PackageVersion Include="System.CommandLine" Version="2.0.1" />
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageVersion Include="WinUIEx" Version="2.9.0" />
   </ItemGroup>
 </Project>
