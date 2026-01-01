@@ -12,7 +12,7 @@ public class AlwaysRelevantParameter<T> : BaseParam<T> where T : struct
         string paramAddress)
         : base(CurrentVersionPrefix, getValueFunc)
     {
-        OscMessages[0].Address = paramAddress;
+        OscMessage.Address = paramAddress;
         Relevant = true;
     }
         
