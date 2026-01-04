@@ -463,6 +463,7 @@ public class UnifiedLibManager : ILibManager
         // Only bother tearing down a module if it's actually shutdown
         if ( !module.Process.HasExited )
         {
+            _logger.LogDebug("Module process has not yet exited");
             // @Note: Forcefully kill the process. We'll try to kill it 1000 times and then give up.
             int tries = 0;
             while ( tries < 1000 )

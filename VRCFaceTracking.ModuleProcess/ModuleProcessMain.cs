@@ -204,13 +204,26 @@ public class ModuleProcessMain
 
                 case IpcPacket.PacketType.EventTeardown:
                     {
+                        Logger.LogInformation("Received Teardown packet");
                         DefModuleAssembly._updateCts?.Cancel();
-                        DefModuleAssembly.TrackingModule.Teardown();
+                        try
+                        {
+                            DefModuleAssembly.TrackingModule.Teardown();
+                        }
+                        catch(Exception e)
+                        {
+                            Logger.LogWarning("Tracking module failed to cleanly shut down.");
+                            Logger.LogError(e.ToString());
+                        }
+
+                        Logger.LogInformation("Cancelled Update Threads");
                         
                         // Tell VRCFT that we have shut down successfully (otherwise VRCFT will terminate this process)
                         var pkt = new ReplyTeardownPacket();
                         // Tell VRCFT we have shutdown immediately
                         Client.SendData(pkt);
+                        
+                        Logger.LogInformation("Sent teardown ACK");
 
                         // Shut down the event loop
                         Environment.Exit(ModuleProcessExitCodes.OK);
