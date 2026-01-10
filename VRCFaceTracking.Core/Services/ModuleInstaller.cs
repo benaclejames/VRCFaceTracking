@@ -165,6 +165,7 @@ public class ModuleInstaller
             Directory.Delete(tempDirectory, true);
             return null;
         }
+        moduleMetadata.IsLocal = true;
 
         // Now we move to a directory named after the module id and delete the temp directory
         var moduleDirectory = Path.Combine(Utils.CustomLibsDirectory, moduleMetadata.ModuleId.ToString());
