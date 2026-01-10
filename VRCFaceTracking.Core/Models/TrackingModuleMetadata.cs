@@ -19,6 +19,11 @@ public class TrackingModuleMetadata
         get;
         set;
     } = "Unknown";
+
+    public bool IsLocal
+    {
+        get; set;
+    }
     
     public int Downloads
     {
