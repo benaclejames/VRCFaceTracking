@@ -7,7 +7,6 @@ using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
-using Windows.System;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -96,7 +95,7 @@ public class ModuleProcessMain
                 // .AddSentry(o =>
                 //     o.Dsn =
                 //     "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.us.sentry.io/4506152246575104")
-                .AddProvider(new ProxyLoggerProvider(DispatcherQueue.GetForCurrentThread()))
+                .AddProvider(new ProxyLoggerProvider(SynchronizationContext.Current))
             )
         .BuildServiceProvider();
 

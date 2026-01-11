@@ -1,22 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Threading;
 using Microsoft.Extensions.Logging;
-using Windows.System;
 
 namespace VRCFaceTracking.ModuleProcess;
-public class ProxyLoggerProvider : ILoggerProvider
+
+public class ProxyLoggerProvider(SynchronizationContext? syncContext = null) : ILoggerProvider
 {
-    private readonly ConcurrentDictionary<string, ProxyLogger> _loggers =
-        new(StringComparer.OrdinalIgnoreCase);
-
-    private readonly DispatcherQueue _dispatcher;
-
-    public ProxyLoggerProvider(DispatcherQueue dispatcher)
+    public ILogger CreateLogger(string categoryName)
     {
-        _dispatcher = dispatcher;
+        return new ProxyLogger(categoryName, syncContext);
     }
 
-    public ILogger CreateLogger(string categoryName) =>
-        _loggers.GetOrAdd(categoryName, name => new ProxyLogger(name, _dispatcher));
-
-    public void Dispose() => _loggers.Clear();
+    public void Dispose() { }
 }
