@@ -127,9 +127,9 @@ public class ActivationService : IActivationService
         var remoteModules = await _moduleDataService.GetRemoteModules();
         var outdatedModules = remoteModules.Where(rm => localModules.Any(lm =>
         {
-            if (rm.ModuleId != lm.ModuleId) 
+            if (rm.ModuleId != lm.ModuleId || lm.IsLocal) 
                 return false;
-
+            
             try
             {
                 var remoteVersion = new Version(rm.Version);
