@@ -20,6 +20,7 @@ public class ModuleProcessMain
     public static ILoggerFactory? LoggerFactory;
     public static ILogger<ModuleProcessMain> Logger;
     public static VrcftSandboxClient Client;
+    public static CancellationTokenSource cts = new();
 
     private static Queue<IpcPacket> _packetsToSend = new ();
 
@@ -35,6 +36,15 @@ public class ModuleProcessMain
 
     public static int Main(string[] args)
     {
+        AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+        {
+            Logger.LogInformation("Received SIGTERM");
+            WaitForPackets = false;
+            DefModuleAssembly._updateCts.Cancel();
+            cts.Cancel();
+            cts.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(5));
+        };
+        
         try
         {
             if ( args.Length < 1 )
@@ -260,7 +270,7 @@ public class ModuleProcessMain
         stopwatch.Start();
         
         // Loop infinitely while we wait for commands
-        while ( WaitForPackets )
+        while ( WaitForPackets && !cts.IsCancellationRequested)
         {
             if ( stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT )
             {
