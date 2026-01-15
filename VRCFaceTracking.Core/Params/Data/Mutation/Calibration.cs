@@ -26,10 +26,10 @@ public class Calibration : TrackingMutation
     [MutationProperty("[DEBUG] Calibration Delta")]
 #endif
     public static float cDelta = 0.1f; // prevents noisy or unintended data from being included in data set
-    [MutationProperty("Calibration Blend", 0f, 1f)]
+    [MutationProperty("Calibration Blend", true)]
     public float calibrationBlend = 1f;
 
-    [MutationProperty("Continuous Calibration")]
+    [MutationProperty("Continuous Calibration", true)]
     public bool continuousCalibration = false;
 
     public class CalibrationParameter

@@ -76,6 +76,40 @@ public partial class UnifiedTrackingMutator : ObservableObject
         }
         _logger.LogDebug("Mutations initialized successfully.");
     }
+    
+    private async void CreateMutation(TrackingMutation mutation) 
+    {
+        try
+        {
+            _logger.LogInformation($"Loading {mutation.Name}");
+
+            Type mutationType = mutation.GetType();
+
+            MethodInfo readSettingMethod = typeof(ILocalSettingsService)
+                .GetMethod("ReadSettingAsync")
+                .MakeGenericMethod(mutationType);
+
+            var task = (Task)readSettingMethod.Invoke(_localSettingsService, new object[] { mutation.Name, mutation, true });
+            await task.ConfigureAwait(false);
+
+            PropertyInfo resultProperty = task.GetType().GetProperty("Result");
+            var typedMutation = resultProperty.GetValue(task);
+
+            mutation = (TrackingMutation)typedMutation;
+
+            mutation.Logger = _logger;
+            mutation.LocalSettingsService =  _localSettingsService;
+            mutation.CreateProperties();
+            _mutations.Add(mutation);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Creating new mutation data. {ex.Message}");
+            mutation.Logger = _logger;
+            mutation.LocalSettingsService =  _localSettingsService;
+            mutation.CreateProperties();
+        }
+    }
 
     public async void Load()
     {
@@ -86,34 +120,9 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
         foreach (var mutation in mutations)
         {
-            try
-            {
-                _logger.LogInformation($"Loading {mutation.Name}");
-
-                Type mutationType = mutation.GetType();
-
-                MethodInfo readSettingMethod = typeof(ILocalSettingsService)
-                    .GetMethod("ReadSettingAsync")
-                    .MakeGenericMethod(mutationType);
-
-                var task = (Task)readSettingMethod.Invoke(_localSettingsService, new object[] { mutation.Name, mutation, true });
-                await task.ConfigureAwait(false);
-
-                PropertyInfo resultProperty = task.GetType().GetProperty("Result");
-                var typedMutation = resultProperty.GetValue(task);
-
-                var trackingMutation = (TrackingMutation)typedMutation;
-
-                trackingMutation.Logger = _logger;
-                trackingMutation.CreateProperties();
-                _mutations.Add(trackingMutation);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Creating new mutation data. {ex.Message}");
-                mutation.CreateProperties();
-            }
+            CreateMutation(mutation);
         }
+
         _logger.LogDebug("Mutation data loaded.");
         Initialize();
     }

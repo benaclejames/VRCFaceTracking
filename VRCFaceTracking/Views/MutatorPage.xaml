@@ -159,7 +159,8 @@
                                         <ColumnDefinition Width="60"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <ToggleSwitch IsOn="{Binding IsActive, Mode=TwoWay}" 
+                                    <ToggleSwitch IsOn="{Binding IsActive, Mode=TwoWay}"
+                                              Toggled="ToggleSwitch_OnToggled"
                                               OffContent=""
                                               OnContent="" 
                                               Padding="0" 

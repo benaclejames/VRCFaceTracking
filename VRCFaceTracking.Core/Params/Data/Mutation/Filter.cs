@@ -11,11 +11,11 @@ using VRCFaceTracking.Core.Params.Expressions;
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class Filter : TrackingMutation
 {
-    [MutationProperty("Minimum Cutoff", 0f, 2f)]
+    [MutationProperty("Minimum Cutoff", true, 0f, 2f)]
     public static float minCutoff = 1f;
-    [MutationProperty("Beta", 0f, 1f)]
+    [MutationProperty("Beta", true)]
     public static float beta = 0.5f;
-    [MutationProperty("Derivative Cutoff")]
+    [MutationProperty("Derivative Cutoff", true)]
     public static float dCutoff = 0.1f;
     private const float hz = 10f;
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using VRCFaceTracking.Core.Contracts.Services;
 
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public static class MutationComponentFactory
@@ -24,7 +25,8 @@ public static class MutationComponentFactory
         object instance, 
         object value, 
         FieldInfo field,
-        ObservableCollection<IMutationComponent> components)
+        ObservableCollection<IMutationComponent> components,
+        Action? updateField = null)
     {
         if (value is ValueTuple || value.GetType().IsGenericType && value.GetType().GetGenericTypeDefinition() == typeof(ValueTuple<,>))
         {
@@ -33,7 +35,11 @@ public static class MutationComponentFactory
                 name,
                 (((float, float))value).Item1,
                 (((float, float))value).Item2,
-                newValue => field.SetValue(instance, newValue),
+                newValue =>
+                {
+                    field.SetValue(instance, newValue);
+                    updateField?.Invoke();
+                },
                 min,
                 max
             );
@@ -46,7 +52,11 @@ public static class MutationComponentFactory
                 name,
                 value,
                 DeterminePropertyType(value),
-                newValue => field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType)),
+                newValue =>
+                {
+                    field.SetValue(instance, Convert.ChangeType(newValue, field.FieldType));
+                    updateField?.Invoke();
+                },
                 min,
                 max
             );
@@ -79,11 +89,30 @@ public static class MutationComponentFactory
                     {
                         var name = Enum.GetName(enumType, i);
                         if (name == null) break;
-                        CreateComponent(name, attribute.Min, attribute.Max, instance, valueArray.GetValue(i), field, components);
+                        CreateComponent(name, attribute.Min, attribute.Max, instance, valueArray.GetValue(i), field, components,
+                            async () =>
+                            {
+                                if (!attribute.SavedImmediate)
+                                {
+                                    return;
+                                }
+                                
+                                var typedMutation = (TrackingMutation)instance;
+                                await typedMutation.Save();
+                            });
                     }
                     processedObjects.Add(valueArray);
                 }
-                else CreateComponent(attribute.Name, attribute.Min, attribute.Max, instance, value, field, components);
+                else CreateComponent(attribute.Name, attribute.Min, attribute.Max, instance, value, field, components, async () =>
+                {
+                    if (!attribute.SavedImmediate)
+                    {
+                        return;
+                    }
+                    
+                    var typedMutation = (TrackingMutation)instance;
+                    await typedMutation.Save();
+                });
             }
 
             if (field.FieldType.IsClass || field.FieldType.IsValueType)
