@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
-using Windows.System;
 
 namespace VRCFaceTracking.ModuleProcess;
 
@@ -11,12 +10,12 @@ public class ProxyLogger : ILogger
     private readonly string _categoryName;
     // public static readonly ObservableCollection<string> AllLogs = new();
     public static OnLog OnLog;
-    private static DispatcherQueue? _dispatcher;
+    private static SynchronizationContext? _syncContext;
 
-    public ProxyLogger(string categoryName, DispatcherQueue? queue)
+    public ProxyLogger(string categoryName, SynchronizationContext? syncContext = null)
     {
         _categoryName = categoryName;
-        _dispatcher = queue;
+        _syncContext = syncContext ?? SynchronizationContext.Current;
     }
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
