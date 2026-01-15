@@ -14,9 +14,9 @@ public class Correctors : TrackingMutation
     public override MutationPriority Step => MutationPriority.Postprocessor;
     public override bool IsActive { get; set; } = true;
 
-    [MutationProperty("MouthClosed/JawOpen Clamp")]
+    [MutationProperty("MouthClosed/JawOpen Clamp", true)]
     public bool mouthClosedFix = true;
-    [MutationProperty("LipSuck Limiter")]
+    [MutationProperty("LipSuck Limiter", true)]
     public bool lipSuckFix = true;
 
     public override void MutateData(ref UnifiedTrackingData data)

@@ -34,6 +34,8 @@ public abstract partial class TrackingMutation
 
     [JsonIgnore]
     public ILogger Logger { get; set; }
+    [JsonIgnore]
+    public ILocalSettingsService LocalSettingsService { get; set; }
     public virtual void Initialize(UnifiedTrackingData data) { }
     public abstract void MutateData(ref UnifiedTrackingData data);
     public void CreateProperties() => Components = MutationComponentFactory.CreateComponents(this);
@@ -56,5 +58,10 @@ public abstract partial class TrackingMutation
         }
 
         return mutations.ToArray();
+    }
+
+    public async Task Save()
+    {
+        await LocalSettingsService.SaveSettingAsync(Name, this, true);
     }
 }
