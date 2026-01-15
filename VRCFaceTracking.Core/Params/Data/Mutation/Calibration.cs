@@ -88,13 +88,13 @@ public class Calibration : TrackingMutation
 
         public float CalculateParameter(float currentValue, float k)
         {
-            if (float.IsNaN(currentValue)) 
+            if (float.IsNaN(currentValue) || max == 0f) 
                 return currentValue;
 
             var confidence = k * progress;
             var adjustedValue = confidence * Normalize(currentValue) + (1 - confidence) * currentValue;
 
-            if (float.IsNaN(adjustedValue))
+            if (float.IsNaN(adjustedValue) || float.IsInfinity(adjustedValue))
                 return currentValue;
 
             return adjustedValue;
