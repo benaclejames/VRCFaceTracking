@@ -210,8 +210,8 @@ public class UnifiedLibManager : ILibManager
                             ExpressionStatus    = replyInitPacket.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
                             AvailableSandboxModules[moduleIndex].ModuleInformation.Active           = true;
-                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingEye         = replyInitPacket.eyeSuccess;
-                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingExpression  = replyInitPacket.expressionSuccess;
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingEye         = !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye) && replyInitPacket.eyeSuccess;
+                            AvailableSandboxModules[moduleIndex].ModuleInformation.UsingExpression  = !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && replyInitPacket.expressionSuccess;
                             AvailableSandboxModules[moduleIndex].ModuleInformation.StaticImages     = replyInitPacket.IconDataStreams;
                             EnsureModuleThreadStartedSandboxed(AvailableSandboxModules[moduleIndex]);
 
