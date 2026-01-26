@@ -377,6 +377,7 @@ public class UnifiedLibManager : ILibManager
                 };
                 lock ( AvailableSandboxModules )
                 {
+                    _logger.LogDebug("Started sandbox process with dll {dllPath}", dll);
                     AvailableSandboxModules.Add(runtimeInfo);
                 }
             }

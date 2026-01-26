@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC;
+using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Core.Services;
 
@@ -11,6 +12,7 @@ public class ParameterSenderService : BackgroundService
     private static readonly Queue<OscMessage> SendQueue = new();
  
     private readonly OscSendService _sendService;
+    private readonly UnifiedTrackingMutator _mutator; // We don't use this but we do want DI to run its constructor
 
     public static bool AllParametersRelevantStatic
     {
@@ -31,9 +33,10 @@ public class ParameterSenderService : BackgroundService
         }
     }
     
-    public ParameterSenderService(OscSendService sendService)
+    public ParameterSenderService(OscSendService sendService, UnifiedTrackingMutator mutator)
     {
         _sendService = sendService;
+        _mutator = mutator;
     }
 
     public static void Enqueue(OscMessage message) => SendQueue.Enqueue(message);

@@ -31,7 +31,7 @@ namespace VRCFaceTracking
         /// Container of all features and functions that mutates the incoming expression data into output data suitable for driving Unified Expressions.
         /// </summary>
         /// <remarks> Mutates data on update. </remarks>
-        public static UnifiedTrackingMutator Mutator;
+        public static UnifiedTrackingMutator Mutator = null!;
 
 #pragma warning disable CS0618
         /// <summary>

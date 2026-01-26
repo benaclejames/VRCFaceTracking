@@ -18,6 +18,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly object _mutationsLock = new();
     private UnifiedTrackingData _inputBuffer;
     public ObservableCollection<TrackingMutation> _mutations = new();
 
@@ -44,10 +45,12 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
         _inputBuffer.CopyPropertiesOf(input);
 
-        foreach (var mutator in _mutations) 
-        { 
-            if (mutator.IsActive)
+        lock (_mutationsLock)
+        {
+            foreach (var mutator in _mutations.Where(m => m.IsActive))
+            {
                 mutator.MutateData(ref _inputBuffer);
+            }
         }
 
         return _inputBuffer;
@@ -57,11 +60,20 @@ public partial class UnifiedTrackingMutator : ObservableObject
     {
         _logger.LogDebug("Saving mutation configuration...");
         await _localSettingsService.Save(this);
-        foreach (var mutation in _mutations)
+
+        // This is cringe but since the collection can change mid-save, we'll just make a quick copy of em
+        List<TrackingMutation> mutationsToSave;
+        lock (_mutationsLock)
+        {
+            mutationsToSave = _mutations.ToList();
+        }
+
+        foreach (var mutation in mutationsToSave)
         {
             _logger.LogInformation($"Saving {mutation.Name} data.");
             await _localSettingsService.SaveSettingAsync(mutation.Name, mutation, true);
         }
+
         _logger.LogDebug("Mutation data saved.");
     }
 
@@ -69,11 +81,15 @@ public partial class UnifiedTrackingMutator : ObservableObject
     {
         // Try to load config and propogate data into Unified if they exist.
         _logger.LogDebug("Initializing mutations...");
-        foreach (var mutation in _mutations)
+        lock (_mutationsLock)
         {
-            _logger.LogInformation($"Initializing {mutation.Name}");
-            mutation.Initialize(UnifiedTracking.Data);
+            foreach (var mutation in _mutations)
+            {
+                _logger.LogInformation($"Initializing {mutation.Name}");
+                mutation.Initialize(UnifiedTracking.Data);
+            }
         }
+
         _logger.LogDebug("Mutations initialized successfully.");
     }
     
@@ -118,9 +134,12 @@ public partial class UnifiedTrackingMutator : ObservableObject
         var mutations = TrackingMutation.GetImplementingMutations(true);
         await _localSettingsService.Load(this);
 
-        foreach (var mutation in mutations)
+        lock (_mutationsLock)
         {
-            CreateMutation(mutation);
+            foreach (var mutation in mutations)
+            {
+                CreateMutation(mutation);
+            }
         }
 
         _logger.LogDebug("Mutation data loaded.");
