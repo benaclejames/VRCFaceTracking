@@ -23,9 +23,4 @@ public class ValidIpAddressAttribute : ValidationAttribute
 
         return false; // Return false if the value is not a string
     }
-
-    public override string FormatErrorMessage(string name)
-    {
-        return $"{name} must be a valid IP address.";
-    }
 }

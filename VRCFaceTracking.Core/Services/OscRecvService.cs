@@ -46,7 +46,7 @@ public class OscRecvService : BackgroundService
             if (!Validator.TryValidateObject(_oscTarget, context, validationResults, validateAllProperties: true))
             {
                 var errorMessages = string.Join(Environment.NewLine, validationResults.Select(v => v.ErrorMessage));
-                _logger.LogWarning($"{errorMessages} Reverting to default.");
+                //_logger.LogWarning($"{errorMessages} Reverting to default.");
                 if (_oscTarget.DestinationAddress != "127.0.0.1")
                 {
                     _oscTarget.DestinationAddress = "127.0.0.1";
