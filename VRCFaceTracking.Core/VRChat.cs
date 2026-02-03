@@ -49,7 +49,7 @@ public static class VRChat
             var libraryFolders = ParseVdfFile(File.ReadAllText(steamLibrariesPath));
 
             // From libraryFolders, find the one containing VRChat
-            var vrchatPath = string.Empty;
+            var vrchatPaths = new List<string>();
 
             // libraryFolders should have a root "libraryfolders" dictionary
             if (libraryFolders.TryGetValue("libraryfolders", out var libraryFoldersDict) &&
@@ -62,27 +62,36 @@ public static class VRChat
                         libraryData.TryGetValue("path", out var pathObj) &&
                         libraryData.TryGetValue("apps", out var appsObj))
                     {
-                        string libraryPath = pathObj.ToString();
-
                         // Check if VRChat is in the apps dictionary
-                        if (appsObj is Dictionary<string, object> apps && apps.ContainsKey("438100"))
+                        if (appsObj is not Dictionary<string, object> apps || !apps.ContainsKey("438100"))
                         {
-                            vrchatPath = libraryPath;
-                            break;
+                            continue;
                         }
+
+                        var libraryPath = pathObj.ToString();
+                        vrchatPaths.Add(libraryPath);
+                        break;
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(vrchatPath))
+            if (!vrchatPaths.Any())
             {
                 throw new InvalidProgramException(
                     "Steam was detected, but VRChat was not detected on this system! Is it installed?");
             }
 
-            // 4) Finally, construct the path to the user's VRChat install
-            VRCOSCDirectory = Path.Combine(vrchatPath, "steamapps", "compatdata", "438100", "pfx", "drive_c",
-                "users", "steamuser", "AppData", "LocalLow", "VRChat", "VRChat", "OSC");
+            // 4) Finally, construct the path to the user's VRChat install, check it exists and try the next path if not
+            foreach (var vrchatPath in vrchatPaths)
+            {
+                VRCOSCDirectory = Path.Combine(vrchatPath, "steamapps", "compatdata", "438100", "pfx", "drive_c",
+                    "users", "steamuser", "AppData", "LocalLow", "VRChat", "VRChat", "OSC");
+
+                if (Directory.Exists(VRCOSCDirectory))
+                {
+                    break;
+                }
+            }
         }
     }
 
