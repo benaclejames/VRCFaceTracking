@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
@@ -26,9 +27,9 @@ public partial class MulticastDnsService : ObservableObject
     private static List<NetworkInterface> GetIpv4NetInterfaces() => NetworkInterface.GetAllNetworkInterfaces()
         .Where(net =>
             net.OperationalStatus == OperationalStatus.Up &&
-            net.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+            net.NetworkInterfaceType != NetworkInterfaceType.Loopback && (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || ( 
             net.SupportsMulticast &&
-            net.GetIPProperties().MulticastAddresses.Any())
+            net.GetIPProperties().MulticastAddresses.Count != 0)))
         .ToList();
 
     // Get the first ipv4 address from a specific network interface

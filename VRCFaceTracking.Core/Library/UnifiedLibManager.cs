@@ -1,14 +1,9 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
-using System.Runtime.Loader;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using Sentry.Protocol;
-using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -57,7 +52,7 @@ public class UnifiedLibManager : ILibManager
         _moduleDataService = moduleDataService;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
-        _sandboxProcessPath = Path.GetFullPath("VRCFaceTracking.ModuleProcess.exe");
+        _sandboxProcessPath = Path.GetFullPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "VRCFaceTracking.ModuleProcess.exe" : "VRCFaceTracking.ModuleProcess");
         if ( !File.Exists(_sandboxProcessPath) )
         {
             // @TODO: Better error handling
