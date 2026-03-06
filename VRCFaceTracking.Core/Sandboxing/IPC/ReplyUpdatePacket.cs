@@ -29,6 +29,14 @@ public class ReplyUpdatePacket : IpcPacket
         internal float Eye_Right_PupilDiameter_MM;
         internal float Eye_Right_Openness;
 
+        internal float Head_Yaw;
+        internal float Head_Pitch;
+        internal float Head_Roll;
+
+        internal float Head_PosX;
+        internal float Head_PosY;
+        internal float Head_PosZ;
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = EXPRESSION_COUNT)]
         internal float[] Expression_Shapes;
     }
@@ -63,6 +71,14 @@ public class ReplyUpdatePacket : IpcPacket
 
         _contiguousUnifiedData.Eye_MaxDilation              = UnifiedTracking.Data.Eye._maxDilation;
         _contiguousUnifiedData.Eye_MinDilation              = UnifiedTracking.Data.Eye._minDilation;
+
+        _contiguousUnifiedData.Head_Yaw                     = UnifiedTracking.Data.Head.HeadPitch;
+        _contiguousUnifiedData.Head_Pitch                   = UnifiedTracking.Data.Head.HeadRoll;
+        _contiguousUnifiedData.Head_Roll                    = UnifiedTracking.Data.Head.HeadYaw;
+
+        _contiguousUnifiedData.Head_PosX                    = UnifiedTracking.Data.Head.HeadPosX;
+        _contiguousUnifiedData.Head_PosY                    = UnifiedTracking.Data.Head.HeadPosY;
+        _contiguousUnifiedData.Head_PosZ                    = UnifiedTracking.Data.Head.HeadPosZ;
 
         // Copy face tracking
         for ( int i = 0; i < _contiguousUnifiedData.Expression_Shapes.Length; i++ )
@@ -151,6 +167,23 @@ public class ReplyUpdatePacket : IpcPacket
             UnifiedTracking.Data.Eye._maxDilation = _contiguousUnifiedData.Eye_MaxDilation;
         if ( _contiguousUnifiedData.Eye_MinDilation != INVALID_FLOAT )
             UnifiedTracking.Data.Eye._minDilation = _contiguousUnifiedData.Eye_MinDilation;
+    }
+
+    public void UpdateHeadState()
+    {
+        if ( _contiguousUnifiedData.Head_Yaw != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadYaw = _contiguousUnifiedData.Head_Yaw;
+        if ( _contiguousUnifiedData.Head_Pitch != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadPitch = _contiguousUnifiedData.Head_Pitch;
+        if ( _contiguousUnifiedData.Head_Roll != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadRoll = _contiguousUnifiedData.Head_Roll;
+            
+        if ( _contiguousUnifiedData.Head_PosX != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadPosX = _contiguousUnifiedData.Head_PosX;
+        if ( _contiguousUnifiedData.Head_PosY != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadPosY = _contiguousUnifiedData.Head_PosY;
+        if ( _contiguousUnifiedData.Head_PosZ != INVALID_FLOAT )
+            UnifiedTracking.Data.Head.HeadPosZ = _contiguousUnifiedData.Head_PosZ;
     }
 
     public void UpdateGlobalExpressionState()

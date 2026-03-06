@@ -279,6 +279,7 @@ public class UnifiedLibManager : ILibManager
                                 {
                                     replyUpdatePacket.UpdateGlobalExpressionState();
                                 }
+                                replyUpdatePacket.UpdateHeadState();
                             }
 
                             break;
