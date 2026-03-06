@@ -45,12 +45,12 @@ public class ParameterAdjustment : TrackingMutation
     [MutationProperty("Tongue Directions")] public (float, float) tongueMove = new(0, 1);
     [MutationProperty("Tongue Miscellaneous")] public (float, float) tongueOther = new(0, 1);
 
-    [MutationProperty("Head Rotation (Side-to-Side)")] public (float, float) headRotationYaw = new(0, 1);
-    [MutationProperty("Head Rotation (Up-Down Tilt)")] public (float, float) headRotationPitch = new(0, 1);
-    [MutationProperty("Head Rotation (Side Tilt)")] public (float, float) headRotationRoll = new(0, 1);
-    [MutationProperty("Head Position (Side-to-Side)")] public (float, float) headPositionX = new(0, 1);
-    [MutationProperty("Head Position (Up-Down)")] public (float, float) headPositionY = new(0, 1);
-    [MutationProperty("Head Position (Forward-Back)")] public (float, float) headPositionZ = new(0, 1);
+    [MutationProperty("Head Rotation (Side-to-Side)")] public (float, float) headRotationYaw = new(-1, 1);
+    [MutationProperty("Head Rotation (Up-Down Tilt)")] public (float, float) headRotationPitch = new(-1, 1);
+    [MutationProperty("Head Rotation (Side Tilt)")] public (float, float) headRotationRoll = new(-1, 1);
+    [MutationProperty("Head Position (Side-to-Side)")] public (float, float) headPositionX = new(-1, 1);
+    [MutationProperty("Head Position (Up-Down)")] public (float, float) headPositionY = new(-1, 1);
+    [MutationProperty("Head Position (Forward-Back)")] public (float, float) headPositionZ = new(-1, 1);
 
     public override string Name => "Parameter Adjustment";
 
