@@ -71,7 +71,7 @@ public static class Utils
             try
             {
                 proc.Kill(entireProcessTree: true);
-                if (!(proc.WaitForExit(2000) ?? false)) 
+                if (!proc.WaitForExit(2000)) 
                 {
                     // on windows we can use taskkill /F /T /PID {procId} to force kill a process very aggressively. this has a higher success rate than process.kill!
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
