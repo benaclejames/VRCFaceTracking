@@ -446,43 +446,52 @@ public class UnifiedLibManager : ILibManager
         _sandboxServer.SendData(eventTeardownPacket, module.SandboxProcessPort);
 
         // Kill the update thread
-        module.UpdateCancellationToken.Cancel();
-        if ( module.UpdateThread.IsAlive )
-        {
-            // Edge case, we wait for the thread to finish before unloading the assembly
-            _logger.LogDebug("Waiting for {module}'s thread to join...", module.ModuleClassName);
-            module.UpdateThread.Join();
-        }
-
+        module.UpdateCancellationToken?.Cancel();
         // Give the module 100ms to kill itself
         Thread.Sleep(100);
 
         // Only bother tearing down a module if it's actually shutdown
-        if ( !module.Process.HasExited )
+        if ( !(module.Process?.HasExited ?? true) )
         {
             _logger.LogDebug("Module process has not yet exited");
-            // @Note: Forcefully kill the process. We'll try to kill it 1000 times and then give up.
-            int tries = 0;
-            while ( tries < 1000 )
-            {
-                try
+            try  {
+                if (!(module.Process?.WaitForExit(200) ?? false))
                 {
-                    tries++;
-                    if ( !module.Process.HasExited )
-                        module.Process.Kill();
-                    if ( module.Process.HasExited )
+                    _logger.LogDebug("Module {id} didn't exit gracefully. Forcing kill...", module.Process?.Id ?? -1);
+                    module.Process?.Kill(entireProcessTree: true);
+                    if (!(module.Process?.WaitForExit(2000) ?? false))
                     {
-                        tries = int.MaxValue;
-                        break;
+                        // on windows we can use taskkill /F /T /PID {procId} to force kill a process very aggressively. this has a higher success rate than process.kill!
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                            using var killer = Process.Start(new ProcessStartInfo
+                            {
+                                FileName = "taskkill",
+                                Arguments = $"/F /T /PID {module.Process.Id}",
+                                CreateNoWindow = true,
+                                UseShellExecute = false
+                            });
+                            killer?.WaitForExit(2000);
+                        } else {
+                            _logger.LogCritical("Process {id} is a zombie or stuck in Kernel I/O. Manual intervention required.", module.Process.Id);
+                        }
+                        return false; 
                     }
-                } catch ( System.ComponentModel.Win32Exception ex ) {
-                    // Can fail to call OpenProcessEx due to some error such as ACCESS_DENIED (process has higher priveleges, eg Sraniple)
-                    _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got win32 error ({ex.ToString()}");
-                } catch ( Exception ex ) {
-                    // Tell the user why we got an exception so that we can hopefully fix it.
-                    _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got exception ({ex.HResult}) {ex.Message}");
                 }
+            } catch ( System.ComponentModel.Win32Exception ex ) {
+                // Can fail to call OpenProcessEx due to some error such as ACCESS_DENIED (process has higher priveleges, eg Sraniple)
+                _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got win32 error ({ex.ToString()}");
+            } catch ( Exception ex ) {
+                // Tell the user why we got an exception so that we can hopefully fix it.
+                _logger.LogError($"Tried killing process with PID {module.Process.Id}. Got exception ({ex.HResult}) {ex.Message}");
             }
+        }
+
+        if (module.UpdateThread?.IsAlive ?? false)
+        {
+            // Edge case, we wait for the thread to finish before unloading the assembly
+            var moduleName = module.ModuleInformation?.Name ?? module.ModuleClassName ?? "Unknown";
+            _logger.LogDebug("Waiting for {module}'s thread to join...", moduleName);
+            module.UpdateThread?.Join(500);
         }
 
         return true;
@@ -496,6 +505,8 @@ public class UnifiedLibManager : ILibManager
         foreach ( var module in _moduleThreads )
         {
             var success = false;
+            if (module == null || (module.Process?.HasExited ?? true))
+                continue;
             try
             {
                 success = TeardownModuleSandboxed(module);
@@ -511,18 +522,11 @@ public class UnifiedLibManager : ILibManager
 
         _moduleThreads.Clear();
 
-        EyeStatus = ModuleState.Uninitialized;
-        ExpressionStatus = ModuleState.Uninitialized;
-    }
-
-    // Signal all active modules to gracefully shut down their respective runtimes
-    public void TeardownAllAndResetAsyncLegacy()
-    {
-        _logger.LogInformation("Tearing down all modules...");
-
-        foreach ( var module in _moduleThreads )
+        foreach ( var module in AvailableSandboxModules )
         {
             var success = false;
+            if (module == null || (module.Process?.HasExited ?? true)) // c# objects may be null, use null coalesce to detect if a module has been destroyed but we have a lingering ref to it
+                continue;
             try
             {
                 success = TeardownModuleSandboxed(module);
@@ -530,13 +534,14 @@ public class UnifiedLibManager : ILibManager
             {
                 if ( !success )
                 {
-                    _logger.LogWarning($"Module: {module.Module.ModuleInformation.Name} failed to shut down. Killing its thread.");
-                    module.UpdateThread.Interrupt();
+                    var moduleName = module.ModuleInformation?.Name ?? module.ModuleClassName ?? "Unknown";
+                    _logger.LogWarning($"Module: {moduleName} failed to shut down. Killing its thread.");
+                    module.UpdateThread?.Interrupt();
                 }
             }
         }
 
-        _moduleThreads.Clear();
+        AvailableSandboxModules.Clear();
 
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
