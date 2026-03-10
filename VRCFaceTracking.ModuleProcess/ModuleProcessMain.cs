@@ -14,6 +14,8 @@ public class ModuleProcessMain
 {
     // How long in seconds we should wait for a connection to be established before giving up
     private const double CONNECTION_TIMEOUT = 60.0; // This is long because some modules like the Vive Facial Tracker software can take a long time to initialise
+    private const double POST_CONNECTION_TIMEOUT = 10.0f; // This is the amount of time we should take to tear down after we've already initialized n stuff
+    private static double CurrentTimeout = CONNECTION_TIMEOUT;
     private static bool WaitForPackets = true;
     public static ModuleAssembly DefModuleAssembly;
     public static ILoggerFactory? LoggerFactory;
@@ -208,6 +210,8 @@ public class ModuleProcessMain
                             IconDataStreams         = DefModuleAssembly.TrackingModule.ModuleInformation.StaticImages
                         };
                         _packetsToSend.Enqueue(pktNew);
+
+                        CurrentTimeout = POST_CONNECTION_TIMEOUT;
                         break;
                     }
 
@@ -257,10 +261,9 @@ public class ModuleProcessMain
             }
 
         };
-        if (OperatingSystem.IsWindows())
-        {
-            Core.Utils.TimeBeginPeriod(1);
-        }
+        
+        Core.Utils.TimeBeginPeriod(1);
+        
         
         // Start the connection
         Client.Connect(modulePath);
@@ -271,10 +274,11 @@ public class ModuleProcessMain
         // Loop infinitely while we wait for commands
         while ( WaitForPackets && !cts.IsCancellationRequested)
         {
-            if ( stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT )
+            if ( stopwatch.Elapsed.TotalSeconds > CurrentTimeout )
             {
                 Client.Close();
-                return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT;
+                Environment.Exit(ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT);
+                return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT; // Just in case
             }
 
             // Send packets in loop
@@ -294,12 +298,9 @@ public class ModuleProcessMain
         }
         
         DefModuleAssembly._updateCts.Cancel();
-
-        if (OperatingSystem.IsWindows())
-        {
-            Core.Utils.TimeEndPeriod(1);
-        }
-
+        
+        Core.Utils.TimeEndPeriod(1);
+        
         Environment.Exit(ModuleProcessExitCodes.OK);
         return ModuleProcessExitCodes.OK;
     }
