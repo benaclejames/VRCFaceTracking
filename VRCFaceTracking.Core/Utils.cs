@@ -15,11 +15,14 @@ public static class Utils
     // Timer resolution helpers
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage"), SuppressUnmanagedCodeSecurity]
     [DllImport("winmm.dll", EntryPoint = "timeBeginPeriod", SetLastError = true)]
-    public static extern uint TimeBeginPeriod(uint uMilliseconds);
+    private static extern uint ExternTimeBeginPeriod(uint uMilliseconds);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage"), SuppressUnmanagedCodeSecurity]
     [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", SetLastError = true)]
-    public static extern uint TimeEndPeriod(uint uMilliseconds);
+    public static extern uint ExternTimeEndPeriod(uint uMilliseconds);
+
+    public static uint TimeBeginPeriod(uint ms) => OperatingSystem.IsWindows() ? ExternTimeBeginPeriod(ms) : 0;
+    public static uint TimeEndPeriod(uint ms) => OperatingSystem.IsWindows() ? ExternTimeEndPeriod(ms) : 0;
 
     // Proc memory read helpers
     public const int PROCESS_VM_READ = 0x0010;

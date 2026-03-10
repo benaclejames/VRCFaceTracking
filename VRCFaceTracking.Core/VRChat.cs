@@ -236,6 +236,8 @@ public static class VRChat
     [SupportedOSPlatform("windows")]
     public static bool ForceEnableOsc()
     {
+        if (!OperatingSystem.IsWindows()) return true;
+        
         // Set all registry keys containing osc in the name to 1 in Computer\HKEY_CURRENT_USER\Software\VRChat\VRChat
         var regKey = Registry.CurrentUser.OpenSubKey("Software\\VRChat\\VRChat", true);
         if (regKey == null)
