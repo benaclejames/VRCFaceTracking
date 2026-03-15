@@ -41,6 +41,8 @@ public class AvatarConfigParser
         }*/
             
         AvatarConfigFile avatarConfig = null;
+        if (string.IsNullOrEmpty(VRChat.VRCOSCDirectory) || !Directory.Exists(VRChat.VRCOSCDirectory))
+            return null;
         foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory)
                      .Where(folder => Directory.Exists(Path.Combine(folder, "Avatars"))))
         {

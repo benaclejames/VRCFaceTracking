@@ -110,28 +110,22 @@ public class OscRecvService : BackgroundService
         {
             if (_linkedToken.IsCancellationRequested || _recvSocket is not { IsBound: true })
             {
+                await Task.Delay(10, _stoppingToken);
                 continue;
             }
 
             try
             {
-                if (_recvSocket.Available > 0)
+                var bytesReceived =
+                    await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
+                var offset = 0;
+                var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
+                if (newMsg == null)
                 {
-                    var bytesReceived =
-                        await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
-                    var offset = 0;
-                    var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
-                    if (newMsg == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    OnMessageReceived(newMsg);
-                }
-                else
-                {
-                    await Task.Delay(100, _linkedToken.Token);
-                }
+                OnMessageReceived(newMsg);
             }
             catch (Exception e)
             {

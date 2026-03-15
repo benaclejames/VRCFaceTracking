@@ -79,10 +79,10 @@ public class Filter : TrackingMutation
     public override MutationPriority Step => MutationPriority.Postprocessor;
 
     public override bool IsSaved => true;
-    public override bool IsActive { get; set; } = false;
 
     public Filter()
     {
+        _isActive = false;
         shapes = new EuroFilter[(int)UnifiedExpressions.Max];
         gazeLeftX = new();
         gazeLeftY = new();

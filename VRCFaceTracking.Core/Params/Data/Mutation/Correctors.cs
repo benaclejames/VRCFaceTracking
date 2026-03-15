@@ -12,12 +12,16 @@ public class Correctors : TrackingMutation
     public override string Name => "Unified Correctors";
     public override string Description => "Processes data to conform to Unified Expressions.";
     public override MutationPriority Step => MutationPriority.Postprocessor;
-    public override bool IsActive { get; set; } = true;
 
     [MutationProperty("MouthClosed/JawOpen Clamp", true)]
     public bool mouthClosedFix = true;
     [MutationProperty("LipSuck Limiter", true)]
     public bool lipSuckFix = true;
+
+    public Correctors()
+    {
+        _isActive = true;
+    }
 
     public override void MutateData(ref UnifiedTrackingData data)
     {
