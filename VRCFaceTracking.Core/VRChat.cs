@@ -30,6 +30,10 @@ public static class VRChat
             // (/home/USER_NAME/.steam/steam/)
             string[] possiblePaths =
             {
+                // macOS
+                Path.Combine(home, "Library", "Application Support", "Steam"),
+                
+                // Linux
                 Path.Combine(home, ".steam", "steam"),
                 Path.Combine(home, ".local", "share", "Steam"),
                 Path.Combine(home, ".var", "app", "com.valvesoftware.Steam", ".local", "share", "Steam")

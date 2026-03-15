@@ -147,7 +147,11 @@ public class Calibration : TrackingMutation
     public override string Description => "Normalizes tracking data.";
     public override MutationPriority Step => MutationPriority.Preprocessor;
     public override bool IsSaved => true;
-    public override bool IsActive { get; set; } = false;
+
+    public Calibration()
+    {
+        _isActive = false;
+    }
 
     public override void Initialize(UnifiedTrackingData data) => calData ??= new();
 

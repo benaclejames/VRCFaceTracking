@@ -12,7 +12,6 @@ public class Correctors : TrackingMutation
     public override string Name => "Unified Correctors";
     public override string Description => "Processes data to conform to Unified Expressions.";
     public override MutationPriority Step => MutationPriority.Postprocessor;
-    public override bool IsActive { get; set; } = true;
 
     [MutationProperty("MouthClosed/JawOpen Clamp", true)]
     public bool mouthClosedFix = true;
@@ -27,6 +26,11 @@ public class Correctors : TrackingMutation
     [MutationProperty("EyeLook Symmetrize", true)]
     public bool eyeLookSymmetrize = false;
     
+
+    public Correctors()
+    {
+        _isActive = true;
+    }
 
     private float BlendParam(float currentValue, float influencerValue) => Math.Clamp(currentValue * (1.0f - eyeLidBlend * 0.5f) + influencerValue * (eyeLidBlend * 0.5f), 0.0f, 1.0f);
 

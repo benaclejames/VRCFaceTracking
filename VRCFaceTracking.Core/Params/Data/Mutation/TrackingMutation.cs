@@ -30,8 +30,6 @@ public abstract partial class TrackingMutation
     public ObservableCollection<IMutationComponent> Components { get; set; }
     public virtual bool IsSaved { get; } = false;
 
-    public virtual bool IsActive { get; set; }
-
     [JsonIgnore]
     public ILogger Logger { get; set; }
     [JsonIgnore]
@@ -59,9 +57,18 @@ public abstract partial class TrackingMutation
 
         return mutations.ToArray();
     }
+    
+    protected bool _isActive;
 
-    public async Task Save()
+    public bool IsActive
     {
-        await LocalSettingsService.SaveSettingAsync(Name, this, true);
+        get => _isActive;
+        set
+        {
+            _isActive = value;
+            Save();
+        }
     }
+
+    public async Task Save() => await LocalSettingsService.SaveSettingAsync(Name, this, true);
 }

@@ -116,7 +116,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
             mutation.Logger = _logger;
             mutation.LocalSettingsService =  _localSettingsService;
             mutation.CreateProperties();
-            _mutations.Add(mutation);
+            lock (_mutationsLock) _mutations.Add(mutation);
         }
         catch (Exception ex)
         {
@@ -124,6 +124,7 @@ public partial class UnifiedTrackingMutator : ObservableObject
             mutation.Logger = _logger;
             mutation.LocalSettingsService =  _localSettingsService;
             mutation.CreateProperties();
+            lock (_mutationsLock) _mutations.Add(mutation);
         }
     }
 
