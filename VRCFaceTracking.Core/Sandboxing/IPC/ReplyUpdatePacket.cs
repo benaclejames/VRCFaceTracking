@@ -167,6 +167,13 @@ public class ReplyUpdatePacket : IpcPacket
             UnifiedTracking.Data.Eye._maxDilation = _contiguousUnifiedData.Eye_MaxDilation;
         if ( _contiguousUnifiedData.Eye_MinDilation != INVALID_FLOAT )
             UnifiedTracking.Data.Eye._minDilation = _contiguousUnifiedData.Eye_MinDilation;
+
+        // Eye-derived expression shapes
+        for ( int i = (int)UnifiedExpressions.EyeSquintRight; i <= (int)UnifiedExpressions.BrowOuterUpLeft; i++ )
+        {
+            if ( _contiguousUnifiedData.Expression_Shapes[i] != INVALID_FLOAT )
+                UnifiedTracking.Data.Shapes[i].Weight = _contiguousUnifiedData.Expression_Shapes[i];
+        }
     }
 
     public void UpdateHeadState()
@@ -189,7 +196,7 @@ public class ReplyUpdatePacket : IpcPacket
     public void UpdateGlobalExpressionState()
     {
         // Copy face tracking
-        for ( int i = 0; i < _contiguousUnifiedData.Expression_Shapes.Length; i++ )
+        for ( int i = (int)UnifiedExpressions.BrowOuterUpLeft; i < _contiguousUnifiedData.Expression_Shapes.Length; i++ )
         {
             if ( _contiguousUnifiedData.Expression_Shapes[i] != INVALID_FLOAT)
                 UnifiedTracking.Data.Shapes[i].Weight = _contiguousUnifiedData.Expression_Shapes[i];
