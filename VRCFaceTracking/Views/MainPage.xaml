@@ -577,8 +577,30 @@
                 </Grid>
             </Border>
 
-            <views:AvatarInfoControl 
-                AvatarInfo="{x:Bind ViewModel.ParameterOutputService.AvatarInfo, Mode=OneWay}" 
+            <Border Margin="0, 10, 0, 0" Padding="20" CornerRadius="6" BorderThickness="1" Background="{ThemeResource LayerFillColorDefaultBrush}"
+                    Visibility="{x:Bind ViewModel.IsAprilFoolsDay, Converter={StaticResource BoolVisConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <FontIcon Margin="10, 4" FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE77B;" FontSize="28"/>
+                        <StackPanel Margin="20, 4" Orientation="Vertical">
+                            <TextBlock FontSize="20" Style="{ThemeResource SubtitleTextBlockStyle}" Text="April Fools"/>
+                            <TextBlock FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Enable or disable the April Fools tracking shenanigans"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <ToggleSwitch Grid.Column="2" VerticalAlignment="Center" Margin="0, 0, 10, 0"
+                                  FontSize="16"
+                                  OnContent="Fun allowed" OffContent="No fun allowed"
+                                  IsOn="{x:Bind ViewModel.AprilFoolsEnabled, Mode=TwoWay}"/>
+                </Grid>
+            </Border>
+
+            <views:AvatarInfoControl
+                AvatarInfo="{x:Bind ViewModel.ParameterOutputService.AvatarInfo, Mode=OneWay}"
                 AvatarParameters="{x:Bind ViewModel.ParameterOutputService.AvatarParameters, Mode=OneWay}"/>
         </StackPanel>
     </Grid>

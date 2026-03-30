@@ -9,9 +9,11 @@ namespace VRCFaceTracking.Core.Params.Expressions;
 
 public static class UnifiedExpressionsParameters
 {
+    public static bool AprilFoolsEnabled { get; set; } = false;
+
     internal static bool IsAprilFoolsActive
     {
-        get { var n = DateTime.Now; return n.Month == 4 && n.Day == 1 && n.Minute == 0 && n.Second < 30; }
+        get { var n = DateTime.Now; return AprilFoolsEnabled && n.Month == 4 && n.Day == 1 && n.Minute == 0 && n.Second < 15; }
     }
 
     private static readonly float[] _rightOpennessBuffer = new float[30];
