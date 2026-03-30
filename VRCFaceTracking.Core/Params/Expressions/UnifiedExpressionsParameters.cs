@@ -9,6 +9,27 @@ namespace VRCFaceTracking.Core.Params.Expressions;
 
 public static class UnifiedExpressionsParameters
 {
+    internal static bool IsAprilFoolsActive
+    {
+        get { var n = DateTime.Now; return n.Month == 4 && n.Day == 1 && n.Minute == 0 && n.Second < 30; }
+    }
+
+    private static readonly float[] _rightOpennessBuffer = new float[30];
+    private static int _rightOpennessHead = 0;
+    private static DateTime _lastOpennessAdvance = DateTime.MinValue;
+
+    internal static float GetDelayedRightOpenness(float current)
+    {
+        var now = DateTime.Now;
+        if ( (now - _lastOpennessAdvance).TotalMilliseconds >= 10 )
+        {
+            _lastOpennessAdvance = now;
+            _rightOpennessBuffer[_rightOpennessHead] = current;
+            _rightOpennessHead = (_rightOpennessHead + 1) % _rightOpennessBuffer.Length;
+        }
+        return _rightOpennessBuffer[_rightOpennessHead]; // oldest entry = 30 frames ago
+    }
+
     private static (string paramName, Parameter paramLiteral)[] IsEyeParameter(IParameterDefinition[] param)
     {
         // Get all the names of all parameters in both the unified tracking list and the old legacy eye list
@@ -26,7 +47,7 @@ public static class UnifiedExpressionsParameters
         #region Eye Gaze
         
         new EParam("v2/Eye", exp => exp.Eye.Combined().Gaze),
-        new EParam("v2/EyeLeft", exp => exp.Eye.Left.Gaze),
+        new EParam("v2/EyeLeft", exp => IsAprilFoolsActive ? exp.Eye.Left.Gaze.FlipXCoordinates() : exp.Eye.Left.Gaze),
         new EParam("v2/EyeRight", exp => exp.Eye.Right.Gaze),
         
         // Use when tracking interface is sending verbose gaze data.
@@ -46,9 +67,9 @@ public static class UnifiedExpressionsParameters
         
         // Use when tracking interface is sending combined gaze data.
         new NativeParameter<Vector4>(exp =>
-            new Vector4(exp.Eye.Left.Gaze.ToPitch(), 
-                        exp.Eye.Left.Gaze.ToYaw(), 
-                        exp.Eye.Right.Gaze.ToPitch(), 
+            new Vector4(exp.Eye.Left.Gaze.ToPitch(),
+                        IsAprilFoolsActive ? -exp.Eye.Left.Gaze.ToYaw() : exp.Eye.Left.Gaze.ToYaw(),
+                        exp.Eye.Right.Gaze.ToPitch(),
                         exp.Eye.Right.Gaze.ToYaw()),
             param => 
                 IsEyeParameter(
@@ -85,12 +106,12 @@ public static class UnifiedExpressionsParameters
         #region Eye Openness
         
         new EParam("v2/EyeOpenLeft" , exp => exp.Eye.Left.Openness),
-        new EParam("v2/EyeOpenRight", exp => exp.Eye.Right.Openness),
-        new EParam("v2/EyeOpen", exp => (exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f),
-        
+        new EParam("v2/EyeOpenRight", exp => IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness),
+        new EParam("v2/EyeOpen", exp => (exp.Eye.Left.Openness + (IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness)) / 2.0f),
+
         new EParam("v2/EyeClosedLeft" , exp => 1 - exp.Eye.Left.Openness),
-        new EParam("v2/EyeClosedRight", exp => 1 - exp.Eye.Right.Openness),
-        new EParam("v2/EyeClosed", exp => 1 - (exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f),
+        new EParam("v2/EyeClosedRight", exp => 1 - (IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness)),
+        new EParam("v2/EyeClosed", exp => 1 - (exp.Eye.Left.Openness + (IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness)) / 2.0f),
 
         #endregion
 
@@ -106,9 +127,9 @@ public static class UnifiedExpressionsParameters
         #region Eyelids Combined
 
         new EParam("v2/EyeLidLeft", exp => exp.Eye.Left.Openness * .75f + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight * .25f),
-        new EParam("v2/EyeLidRight", exp => exp.Eye.Right.Openness * .75f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .25f),
+        new EParam("v2/EyeLidRight", exp => (IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness) * .75f + exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * .25f),
         new EParam("v2/EyeLid", exp =>
-            ((exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f) * .75f +
+            ((exp.Eye.Left.Openness + (IsAprilFoolsActive ? GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness)) / 2.0f) * .75f +
             ((exp.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight + exp.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight) / 2.0f) * .25f),
        
         #endregion
