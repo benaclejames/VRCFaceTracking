@@ -1,7 +1,6 @@
 ﻿using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.DataTypes;
-using VRCFaceTracking.Core.Params.Expressions;
 
 namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
 {
@@ -11,7 +10,7 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             #region XYParams
             
             new EParam("Eyes", exp => exp.Eye.Combined().Gaze),
-            new EParam("LeftEye", exp => UnifiedExpressionsParameters.IsAprilFoolsActive ? exp.Eye.Left.Gaze.FlipXCoordinates() : exp.Eye.Left.Gaze),
+            new EParam("LeftEye", exp => exp.Eye.Left.Gaze),
             new EParam("RightEye", exp => exp.Eye.Right.Gaze),
             
             #endregion
@@ -42,8 +41,8 @@ namespace VRCFaceTracking.Core.Params.Expressions.Legacy.Eye
             #region EyeLid
             
             new EParam("LeftEyeLid", exp => exp.Eye.Left.Openness),
-            new EParam("RightEyeLid", exp => UnifiedExpressionsParameters.IsAprilFoolsActive ? UnifiedExpressionsParameters.GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness),
-            new EParam("CombinedEyeLid", exp => (exp.Eye.Left.Openness + (UnifiedExpressionsParameters.IsAprilFoolsActive ? UnifiedExpressionsParameters.GetDelayedRightOpenness(exp.Eye.Right.Openness) : exp.Eye.Right.Openness)) / 2.0f),
+            new EParam("RightEyeLid", exp => exp.Eye.Right.Openness),
+            new EParam("CombinedEyeLid", exp => (exp.Eye.Left.Openness + exp.Eye.Right.Openness) / 2.0f),
             
             #endregion
             
