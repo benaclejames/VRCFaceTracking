@@ -72,9 +72,9 @@ public class ReplyUpdatePacket : IpcPacket
         _contiguousUnifiedData.Eye_MaxDilation              = UnifiedTracking.Data.Eye._maxDilation;
         _contiguousUnifiedData.Eye_MinDilation              = UnifiedTracking.Data.Eye._minDilation;
 
-        _contiguousUnifiedData.Head_Yaw                     = UnifiedTracking.Data.Head.HeadPitch;
-        _contiguousUnifiedData.Head_Pitch                   = UnifiedTracking.Data.Head.HeadRoll;
-        _contiguousUnifiedData.Head_Roll                    = UnifiedTracking.Data.Head.HeadYaw;
+        _contiguousUnifiedData.Head_Yaw                     = UnifiedTracking.Data.Head.HeadYaw;
+        _contiguousUnifiedData.Head_Pitch                   = UnifiedTracking.Data.Head.HeadPitch;
+        _contiguousUnifiedData.Head_Roll                    = UnifiedTracking.Data.Head.HeadRoll;
 
         _contiguousUnifiedData.Head_PosX                    = UnifiedTracking.Data.Head.HeadPosX;
         _contiguousUnifiedData.Head_PosY                    = UnifiedTracking.Data.Head.HeadPosY;
