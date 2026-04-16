@@ -22,6 +22,7 @@ public class ModuleProcessMain
     public static CancellationTokenSource cts = new();
 
     private static Queue<IpcPacket> _packetsToSend = new ();
+    private static Timer? _connectionTimer;
 
     private static object _callbackLock = new ();
     private static bool _shouldCallReceive = false;
@@ -60,16 +61,22 @@ public class ModuleProcessMain
             {
                 Description = "The path to the module to load."
             };
+            var parentPidOption = new Option<int?>("--parent-pid")
+            {
+                Description = "PID of the parent VRCFT process. Module process exits if parent dies."
+            };
 
             var rootCommand = new RootCommand("VRCFT Sandbox Module");
             rootCommand.Options.Add(portOption);
             rootCommand.Options.Add(modulePathOption);
+            rootCommand.Options.Add(parentPidOption);
 
             rootCommand.SetAction(parseResult =>
             {
                 var modulePath = parseResult.GetValue(modulePathOption);
                 var port = parseResult.GetValue(portOption);
-                VrcftMain(modulePath!, port ?? 0);
+                var parentPid = parseResult.GetValue(parentPidOption);
+                VrcftMain(modulePath!, port ?? 0, parentPid);
                 return 0;
             });
 
@@ -92,7 +99,7 @@ public class ModuleProcessMain
         }
     }
 
-    static int VrcftMain(string modulePath, int serverPortNumber)
+    static int VrcftMain(string modulePath, int serverPortNumber, int? parentPid = null)
     {
         // Give the main process enough time to add the module to the list before we begin sending data
         Thread.Sleep(50);
@@ -112,8 +119,44 @@ public class ModuleProcessMain
         LoggerFactory = serviceProvider.GetService<ILoggerFactory>();
         Logger = LoggerFactory.CreateLogger<ModuleProcessMain>();
 
+        // Separate watchdog thread independent of module code to ensure module shutdown  
+        if (parentPid.HasValue)
+        {
+            var watchdogThread = new Thread(() =>
+            {
+                try
+                {
+                    using var parent = Process.GetProcessById(parentPid.Value);
+                    parent.WaitForExit();
+                }
+                catch (Exception) { }
+
+                // Tryna be polite and give 10 seconds to tear down cleanly. Will kill process if we're still alive after 10 secs
+                var teardownThread = new Thread(() =>
+                {
+                    try
+                    {
+                        DefModuleAssembly?._updateCts?.Cancel();
+                        DefModuleAssembly?.TrackingModule?.Teardown();
+                    }
+                    catch (Exception) { }
+                });
+                teardownThread.IsBackground = true;
+                teardownThread.Start();
+                teardownThread.Join(TimeSpan.FromSeconds(10));
+
+                Process.GetCurrentProcess().Kill();
+            });
+            watchdogThread.IsBackground = true;
+            watchdogThread.Name = "ParentWatchdog";
+            watchdogThread.Start();
+        }
+        else
+        {
+            Logger.LogWarning("No parent pid provided. Lingering process detection is limited to existing timeouts and graceful shutdown");
+        }
+
         // A module process will connect to a given port number first. We try connecting to the server for 30 seconds, then give up, returning an error code in the process.
-        Stopwatch stopwatch = new Stopwatch(); // For timeout
         Client = new VrcftSandboxClient(serverPortNumber, LoggerFactory);
 
         // Bind the log function so that we can forward log messages to VRCFT's main process
@@ -155,7 +198,7 @@ public class ModuleProcessMain
         Client.OnReceiveShouldBeQueued += QueueReceiveEvent;
         Client.OnPacketReceivedCallback += (in IpcPacket packet) => {
             // Reset the timeout
-            stopwatch.Restart();
+            _connectionTimer?.Change(TimeSpan.FromSeconds(CONNECTION_TIMEOUT), Timeout.InfiniteTimeSpan);
 
             // Handle packets
             switch ( packet.GetPacketType() )
@@ -198,6 +241,8 @@ public class ModuleProcessMain
                                 DefModuleAssembly.TrackingModule.Update();
                             }
                         });
+                        // Background thread as to not prevent the CLR from terminating if stuck in native code (looking at you vive)
+                        thread.IsBackground = true;
                         thread.Start();
                         
                         var pktNew = new ReplyInitPacket()
@@ -266,17 +311,15 @@ public class ModuleProcessMain
         Client.Connect(modulePath);
         Logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
 
-        stopwatch.Start();
-        
+        _connectionTimer = new Timer(_ =>
+        {
+            Logger.LogWarning("No packets received for {timeout}s, assuming connection lost", CONNECTION_TIMEOUT);
+            Process.GetCurrentProcess().Kill();
+        }, null, TimeSpan.FromSeconds(CONNECTION_TIMEOUT), Timeout.InfiniteTimeSpan);
+
         // Loop infinitely while we wait for commands
         while ( WaitForPackets && !cts.IsCancellationRequested)
         {
-            if ( stopwatch.Elapsed.TotalSeconds > CONNECTION_TIMEOUT )
-            {
-                Client.Close();
-                return ModuleProcessExitCodes.NETWORK_CONNECTION_TIMED_OUT;
-            }
-
             // Send packets in loop
             while (_packetsToSend.TryDequeue(out IpcPacket pkt))
             {
@@ -294,6 +337,7 @@ public class ModuleProcessMain
         }
         
         DefModuleAssembly._updateCts.Cancel();
+        _connectionTimer?.Dispose();
 
         if (OperatingSystem.IsWindows())
         {

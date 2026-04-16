@@ -333,7 +333,7 @@ public class UnifiedLibManager : ILibManager
             {
                 // Start subprocess
                 var sandboxProcess  = Process.Start(new ProcessStartInfo(
-                    _sandboxProcessPath, $"--port {_sandboxServer.Port} --module-path \"{dll}\""
+                    _sandboxProcessPath, $"--port {_sandboxServer.Port} --module-path \"{dll}\" --parent-pid {Environment.ProcessId}"
                 )
                 {
 #if !DEBUG
