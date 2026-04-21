@@ -24,6 +24,16 @@ public class Correctors : TrackingMutation
     public float eyeLidBlend = 0.0f;    // 0.00f meaning zero influence, 1.00f meaning the value of each eyelid is the median of both
     
 
+    private float BlendParam(float currentValue, float influencerValue) => Math.Clamp(currentValue * (1.0f - eyeLidBlend * 0.5f) + influencerValue * (eyeLidBlend * 0.5f), 0.0f, 1.0f);
+
+    private void BlendOpposingParams(ref float leftParam, ref float rightParam)
+    {
+        leftParam = BlendParam(leftParam, rightParam);
+        rightParam = BlendParam(rightParam, leftParam);
+    }
+    
+    private void BlendUnifiedExpressionParams(ref UnifiedTrackingData data, UnifiedExpressions leftExpression, UnifiedExpressions rightExpression) => BlendOpposingParams(ref data.Shapes[(int)leftExpression].Weight, ref data.Shapes[(int)rightExpression].Weight);
+    
     public override void MutateData(ref UnifiedTrackingData data)
     {
         if (mouthClosedFix)
@@ -45,23 +55,16 @@ public class Correctors : TrackingMutation
 
         if (eyeLidBlend > 0.00f)
         {
-            // Half the blend because we don't want users swapping eyes unintentionally
-            var blend = eyeLidBlend * 0.5f;
-            var inverseBlend = 1.0f - blend;
+            BlendOpposingParams(ref data.Eye.Left.Openness, ref data.Eye.Right.Openness);
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.EyeWideLeft, UnifiedExpressions.EyeWideRight);
             
-            // Pre-calculate what our parameters would end up using internally
-            var leftCalculated  = data.Eye.Left.Openness  * 0.75f + data.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight  * 0.25f;
-            var rightCalculated = data.Eye.Right.Openness * 0.75f + data.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight * 0.25f;
-
-            // Actual blending logic
-            var leftResultant  = leftCalculated * inverseBlend + rightCalculated * blend;
-            var rightResultant = rightCalculated * inverseBlend + leftCalculated * blend;
-
-            // Solve for our original values
-            data.Eye.Left.Openness = Math.Clamp(leftResultant, 0.0f, 1.0f);
-            data.Shapes[(int)UnifiedExpressions.EyeWideLeft].Weight = Math.Clamp(leftResultant, 0.0f, 1.0f);
-            data.Eye.Right.Openness = Math.Clamp(rightResultant, 0.0f, 1.0f);
-            data.Shapes[(int)UnifiedExpressions.EyeWideRight].Weight = Math.Clamp(rightResultant, 0.0f, 1.0f);
+            // Thx to Hash for suggesting the rest of these
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.EyeSquintLeft, UnifiedExpressions.EyeSquintRight);
+            BlendOpposingParams(ref data.Eye.Left.PupilDiameter_MM, ref data.Eye.Right.PupilDiameter_MM);
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.BrowPinchLeft, UnifiedExpressions.BrowPinchRight);
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.BrowLowererLeft, UnifiedExpressions.BrowLowererRight);
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.BrowInnerUpLeft, UnifiedExpressions.BrowInnerUpRight);
+            BlendUnifiedExpressionParams(ref data, UnifiedExpressions.BrowOuterUpLeft, UnifiedExpressions.BrowOuterUpRight);
         }
     }
 }
