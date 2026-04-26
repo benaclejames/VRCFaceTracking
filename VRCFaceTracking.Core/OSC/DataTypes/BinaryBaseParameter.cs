@@ -92,6 +92,12 @@ public class BinaryBaseParameter : Parameter
     public override (string, Parameter)[] GetParamNames() =>
         _params.SelectMany(p => p.GetParamNames()).Concat(_negativeParam.GetParamNames()).ToArray();
 
+    public override void MarkDirty()
+    {
+        _negativeParam.MarkDirty();
+        foreach (var p in _params) p.MarkDirty();
+    }
+
     public new bool Deprecated => false; // Handled by our children
 
     // This serves both as a test to make sure this index is in the binary sequence, but also returns how many bits we need to shift to find it

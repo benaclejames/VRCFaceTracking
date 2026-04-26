@@ -116,6 +116,9 @@ public class BaseParam<T> : Parameter where T : struct
 
     public override bool Deprecated => !_paramName.StartsWith(CurrentVersionPrefix);
 
+    // Force the next ParamValue assignment to enqueue regardless of value-equality dedup.
+    public override void MarkDirty() => _lastValue = null;
+
     protected virtual void Process(UnifiedTrackingData data) => ParamValue = _getValueFunc.Invoke(data);
 
     ~BaseParam()
