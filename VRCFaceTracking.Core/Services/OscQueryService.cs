@@ -103,6 +103,14 @@ public partial class OscQueryService(
             AvatarInfo = newAvatar.Value.avatarInfo;
             AvatarParameters = newAvatar.Value.relevantParameters;
         });
+
+        // Bridge VRChat's animator-spawn race on avatar change. The freshly spawned animator
+        // on the new avatar receives no FT-driven values until something changes, because the
+        // value-equality dedup in BaseParam<T>'s setter short-circuits identical-to-previous
+        // updates. Mark every relevant face parameter dirty so the next sender tick emits a
+        // full baseline bundle. One walk over UnifiedTracking.AllParameters per (rare) avatar
+        // change; no steady-state hot-path cost.
+        foreach (var p in UnifiedTracking.AllParameters) p.MarkDirty();
     }
 
     private void HandleNewAvatarWrapper() => HandleNewAvatar(); // Helper func used in callbacks

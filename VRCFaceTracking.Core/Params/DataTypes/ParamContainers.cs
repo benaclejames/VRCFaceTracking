@@ -113,4 +113,9 @@ public class EParam : Parameter
     public override Parameter[] ResetParam(IParameterDefinition[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
 
     public override (string, Parameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
+
+    public override void MarkDirty()
+    {
+        foreach (var p in _parameter) p.MarkDirty();
+    }
 }
