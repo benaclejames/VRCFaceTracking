@@ -1,0 +1,172 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    x:DataType="vm:SettingsViewModel"
+    x:Class="VRCFaceTracking.Views.SettingsPage">
+
+    <ScrollViewer>
+        <StackPanel Spacing="4" Margin="0,4,0,20">
+
+            <TextBlock Text="APPEARANCE" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander Header="Theme" Description="Choose the application color theme" IsExpanded="True">
+                <ComboBox x:Name="ThemeCombo" SelectionChanged="ThemeCombo_SelectionChanged" MinWidth="160">
+                    <ComboBoxItem Content="Light" Tag="Light" />
+                    <ComboBoxItem Content="Dark" Tag="Dark" />
+                    <ComboBoxItem Content="System default" Tag="Default" />
+                </ComboBox>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="OSC SETTINGS" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander
+                Header="OSC Network"
+                Description="Configure OSC send/receive ports and destination address"
+                IsExpanded="True">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Receive Port (Legacy)" />
+                        <NumericUpDown
+                            Minimum="1"
+                            Maximum="65535"
+                            Increment="1"
+                            FormatString="0"
+                            MinWidth="120"
+                            Value="{Binding OscTarget.InPort, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Destination IP" />
+                        <TextBox
+                            Watermark="127.0.0.1"
+                            MinWidth="140"
+                            Text="{Binding OscTarget.DestinationAddress, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Send Port" />
+                        <NumericUpDown
+                            Minimum="1"
+                            Maximum="65535"
+                            Increment="1"
+                            FormatString="0"
+                            MinWidth="120"
+                            Value="{Binding OscTarget.OutPort, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="OPENXR / OPENVR" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <Border CornerRadius="6" BorderThickness="1" IsEnabled="{Binding IsOpenVREnabled}">
+                <Grid Margin="16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock FontWeight="SemiBold" Text="Auto-start with SteamVR" />
+                        <TextBlock FontSize="12" Opacity="0.6"
+                                   Text="Launch VRCFaceTracking automatically when SteamVR starts" />
+                    </StackPanel>
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        IsChecked="{Binding AutoStart, Mode=TwoWay}"
+                        OffContent=""
+                        OnContent=""
+                        VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <TextBlock Text="ADVANCED" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander
+                Header="Danger Zone"
+                Description="Actions here can cause instability">
+                <ToggleSwitch
+                    IsChecked="{Binding RiskySettings.Enabled, Mode=TwoWay}"
+                    OffContent=""
+                    OnContent="Gremlin Mode" />
+
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsExpanderItem
+                        Content="Force All Parameters Relevant"
+                        Description="Sends all face-tracking parameters every frame regardless of relevancy."
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <ToggleSwitch
+                                IsChecked="{Binding RiskySettings.AllRelevantDebug, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="Force Re-initialize"
+                        Description="Tears down and re-initializes all modules. May cause instability."
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="Re-initialize" Click="ForceReInit_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="Reset VRCFaceTracking"
+                        Description="Deletes all persistent data and resets the application on next launch."
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="Reset" Click="ResetVRCFT_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="Reset Avatar OSC Manifests"
+                        Description="Deletes all VRChat-generated OSC avatar config manifests."
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="Reset Avatar Config" Click="ResetAvatarConfig_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="ABOUT" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander Header="VRCFaceTracking">
+                <TextBlock x:Name="VersionText" Opacity="0.6" FontSize="13" />
+
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsExpanderItem Content="Contributors" Description="People who made VRCFaceTracking possible">
+                        <ui:SettingsExpanderItem.Footer>
+                            <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Contributors}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Margin="0,2"
+                                                Padding="10,6"
+                                                Tag="{Binding html_url}"
+                                                Click="ContributorButton_Click">
+                                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                                    <TextBlock Text="{Binding login}" FontSize="13" />
+                                                    <TextBlock
+                                                        Text="{Binding contributions, StringFormat='{}{0} commits'}"
+                                                        FontSize="12"
+                                                        Opacity="0.55"
+                                                        VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,35 +1,20 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
-using Microsoft.UI.Dispatching;
 
 namespace VRCFaceTracking.Services;
 
-public struct LogLine
+public class LogLine(string message, LogLevel level)
 {
-    public string Message;
-    public LogLevel Level;
-
-    public LogLine(string message, LogLevel level)
-    {
-        Message = message;
-        Level = level;
-    }
+    public string Message { get; } = message;
+    public LogLevel Level { get; } = level;
 
     public override string ToString() => Message;
 }    
 
-public class OutputPageLogger : ILogger
+public class OutputPageLogger(string categoryName) : ILogger
 {
-    private readonly string _categoryName;
     public static readonly ObservableCollection<LogLine> FilteredLogs = new();
     public static readonly ObservableCollection<LogLine> AllLogs = new();
-    private static DispatcherQueue? _dispatcher;
-
-    public OutputPageLogger(string categoryName, DispatcherQueue? queue)
-    {
-        _categoryName = categoryName;
-        _dispatcher = queue;
-    }
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
 
@@ -42,28 +27,36 @@ public class OutputPageLogger : ILogger
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        // Add to the staticLog from the dispatcher thread
-        _dispatcher?.TryEnqueue(() =>
+        if ( categoryName == "\0VRCFT\0" )
         {
-            if ( _categoryName == "\0VRCFT\0" )
-            {
-                // Log events from sub-processes have the unique category name "\0VRCFT\0"
-                AllLogs.Add(new LogLine($"{formatter(state, exception)}", logLevel));
-                // Filtered is what the user sees, so show Information scope
-                if ( logLevel >= LogLevel.Information )
-                {
-                    FilteredLogs.Add(new LogLine($"{formatter(state, exception)}", logLevel));
-                }
-            }
-            else
-            {
-                AllLogs.Add(new LogLine($"[{_categoryName}] {logLevel}: {formatter(state, exception)}", logLevel));
-                // Filtered is what the user sees, so show Information scope
-                if ( logLevel >= LogLevel.Information )
-                {
-                    FilteredLogs.Add(new LogLine($"[{_categoryName}] {logLevel}: {formatter(state, exception)}", logLevel));
-                }
-            }
-        });
+            // Log events from sub-processes have the unique category name "\0VRCFT\0", so skip category name
+            AddLineDispatched(new LogLine($"{formatter(state, exception)}", logLevel));
+        }
+        else
+        { 
+            AddLineDispatched(new LogLine($"[{categoryName}] {logLevel}: {formatter(state, exception)}", logLevel));
+        }
+    }
+
+    private static void AddLineDispatched(LogLine line)
+    {
+        var dispatcher = Avalonia.Threading.Dispatcher.UIThread;
+        if (dispatcher.CheckAccess())
+        {
+            AddLine(line);
+        }
+        else
+        {
+            dispatcher.Post(() => AddLine(line));
+        }
+    }
+
+    private static void AddLine(LogLine line)
+    {
+        AllLogs.Add(line);
+        if (line.Level >= LogLevel.Information)
+        {
+            FilteredLogs.Add(line);
+        }
     }
 }

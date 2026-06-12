@@ -1,0 +1,45 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    xmlns:svc="using:VRCFaceTracking.Services"
+    x:DataType="vm:OutputViewModel"
+    x:Class="VRCFaceTracking.Views.OutputPage">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Border Grid.Row="0" CornerRadius="6" BorderThickness="1" Padding="8,6" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button ToolTip.Tip="Copy all to clipboard" Click="CopyToClipboard_Click" Padding="8">
+                    <ui:SymbolIcon Symbol="Copy" FontSize="16" />
+                </Button>
+                <Button ToolTip.Tip="Save to file" Click="SaveToFile_Click" Padding="8">
+                    <ui:SymbolIcon Symbol="Save" FontSize="16" />
+                </Button>
+                <Separator />
+                <TextBlock x:Name="StatusText" VerticalAlignment="Center" Opacity="0.6" FontSize="12" Margin="8,0" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" CornerRadius="6" BorderThickness="1" Padding="4"
+                Background="{DynamicResource ControlFillColorDefaultBrush}">
+            <ScrollViewer x:Name="LogScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Logs}" x:Name="LogItems">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="svc:LogLine">
+                            <TextBlock
+                                x:Name="LogText"
+                                Text="{Binding Message}"
+                                FontFamily="Cascadia Mono, Consolas, Courier New, monospace"
+                                FontSize="12"
+                                Padding="6,1"
+                                TextWrapping="NoWrap"
+                                Foreground="{Binding Level, Converter={StaticResource LogLevelBrushConverter}}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

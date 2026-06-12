@@ -4,7 +4,6 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
 using VRCFaceTracking.Models;
-using Windows.Storage;
 
 namespace VRCFaceTracking.Services;
 
@@ -101,21 +100,11 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task<T?> ReadSettingAsync<T>(string key, T? defaultValue = default, bool forceLocal = false)
     {
-        if (RuntimeHelper.IsMSIX && !forceLocal)
-        {
-            if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
-            {
-                return await Json.ToObjectAsync<T>((string)obj);
-            }
-        }
-        else
-        {
-            await InitializeAsync();
+        await InitializeAsync();
 
-            if (_settings != null && _settings.TryGetValue(key, out var obj))
-            {
-                return await Json.ToObjectAsync<T>((string)obj);
-            }
+        if (_settings != null && _settings.TryGetValue(key, out var obj))
+        {
+            return await Json.ToObjectAsync<T>((string)obj);
         }
 
         return defaultValue;
@@ -123,19 +112,14 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task SaveSettingAsync<T>(string key, T value, bool forceLocal = false)
     {
-        if (RuntimeHelper.IsMSIX && !forceLocal)
-        {
-            ApplicationData.Current.LocalSettings.Values[key] = await Json.StringifyAsync(value);
-        }
-        else
-        {
-            await InitializeAsync();
+        await InitializeAsync();
 
-            _settings[key] = await Json.StringifyAsync(value);
+        _settings[key] = await Json.StringifyAsync(value);
 
-            await FlushSaveSettings();
-            //await _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
-        }
+        await _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
+        
+        await FlushSaveSettings();
+        //await _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
     }
 
     public async Task Load(object instance)

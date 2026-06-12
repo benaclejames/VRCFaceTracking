@@ -2,13 +2,12 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using VRCFaceTracking.Contracts.ViewModels;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 
 namespace VRCFaceTracking.ViewModels;
 
-public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationAware
+public partial class ModuleRegistryViewModel : ObservableRecipient
 {
     private readonly IModuleDataService _moduleDataService;
     [ObservableProperty] private InstallableTrackingModule? _selected;
@@ -58,18 +57,6 @@ public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationA
         foreach (var item in data)
         {
             ModuleInfos.Add(item);
-        }
-    }
-
-    public void OnNavigatedFrom()
-    {
-    }
-
-    public void EnsureItemSelected()
-    {
-        if (Selected == null && ModuleInfos.Any())
-        {
-            Selected = ModuleInfos.First();
         }
     }
 }
