@@ -1,11 +1,5 @@
-﻿using System.Windows.Input;
-
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-using Microsoft.UI.Xaml;
-
-using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Models;
 using VRCFaceTracking.Services;
 
@@ -13,62 +7,47 @@ namespace VRCFaceTracking.ViewModels;
 
 public partial class SettingsViewModel : ObservableRecipient
 {
-    private readonly IThemeSelectorService _themeSelectorService;
-    [ObservableProperty] private ElementTheme _elementTheme;
-    [ObservableProperty] private List<GithubContributor> _contributors;
-    
-    public ICommand SwitchThemeCommand
-    {
-        get;
-    }
+    [ObservableProperty] private List<GithubContributor> _contributors = [];
 
-    private GithubService GithubService
-    {
-        get;
-        set;
-    }
-    
-    private OpenVRService OpenVRService
-    {
-        get;
-    }
-    
+    public IOscTarget OscTarget { get; }
+    public RiskySettingsViewModel RiskySettings { get; }
+
+    private readonly OpenVRService _openVRService;
+
     public bool AutoStart
     {
-        get => OpenVRService.AutoStart;
+        get => _openVRService.AutoStart;
         set
         {
-            OpenVRService.AutoStart = value;
+            _openVRService.AutoStart = value;
             OnPropertyChanged();
         }
     }
 
-    public bool IsOpenVREnabled => OpenVRService.IsInitialized;
+    public bool IsOpenVREnabled => _openVRService.IsInitialized;
 
-    private async void LoadContributors()
+    public SettingsViewModel(
+        GithubService githubService,
+        OpenVRService openVRService,
+        IOscTarget oscTarget,
+        RiskySettingsViewModel riskySettingsViewModel)
     {
-        Contributors = await GithubService.GetContributors("benaclejames/VRCFaceTracking");
+        _openVRService = openVRService;
+        OscTarget = oscTarget;
+        RiskySettings = riskySettingsViewModel;
+
+        _openVRService.InitIfNotAlready();
+        LoadContributors(githubService);
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService, GithubService githubService, OpenVRService openVRService)
+    private async void LoadContributors(GithubService githubService)
     {
-        _themeSelectorService = themeSelectorService;
-        GithubService = githubService;
-        OpenVRService = openVRService;
-
-        _elementTheme = _themeSelectorService.Theme;
-
-        SwitchThemeCommand = new RelayCommand<ElementTheme>(
-            async (param) =>
-            {
-                if (ElementTheme != param)
-                {
-                    ElementTheme = param;
-                    await _themeSelectorService.SetThemeAsync(param);
-                }
-            });
-
-        OpenVRService.InitIfNotAlready();
-        LoadContributors();
+        try
+        {
+            Contributors = await githubService.GetContributors("benaclejames/VRCFaceTracking");
+        }
+        catch
+        {
+        }
     }
 }

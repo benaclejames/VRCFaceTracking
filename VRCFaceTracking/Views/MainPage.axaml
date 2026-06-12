@@ -1,0 +1,150 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    xmlns:model="clr-namespace:VRCFaceTracking;assembly=VRCFaceTracking.Core"
+    x:DataType="vm:MainViewModel"
+    x:Class="VRCFaceTracking.Views.MainPage">
+
+    <ScrollViewer>
+        <StackPanel Margin="0,10,0,20" Spacing="12">
+            <Border
+                IsVisible="{Binding NoModulesInstalled}"
+                CornerRadius="6"
+                BorderThickness="1"
+                Padding="20,15">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="#FFC107" Opacity="0.6" />
+                </Border.BorderBrush>
+                <Border.Background>
+                    <SolidColorBrush Color="#FFC107" Opacity="0.08" />
+                </Border.Background>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ui:SymbolIcon Symbol="Alert" FontSize="20" VerticalAlignment="Center" Foreground="#FFC107" />
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="No Modules Installed" />
+                        <TextBlock FontSize="12" Opacity="0.7"
+                                   Text="Go to Module Registry to install a tracking module." />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <TextBlock FontSize="13" FontWeight="SemiBold" Opacity="0.6" Text="Modules" />
+
+            <ItemsControl ItemsSource="{Binding LibManager.LoadedModulesMetadata}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="model:ModuleMetadataInternal">
+                        <Border CornerRadius="6" BorderThickness="1" Margin="0,0,0,4" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                            <Grid Margin="16,14" ColumnDefinitions="Auto,*,Auto">
+
+                                <Border Grid.Column="0" Width="48" Height="48" Margin="0,0,12,0"
+                                        CornerRadius="6" ClipToBounds="True"
+                                        Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                                        IsVisible="{Binding StaticImages, Converter={StaticResource HasModuleImagesConverter}}">
+                                    <Image Source="{Binding StaticImages, Converter={StaticResource StreamToBitmapConverter}}"
+                                           Stretch="UniformToFill" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="4">
+                                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Name, Mode=OneWay}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="Eye Tracking" FontSize="12" Opacity="0.7"
+                                                   IsVisible="{Binding UsingEye, Mode=OneWay}" />
+                                        <TextBlock Text="Expression Tracking" FontSize="12" Opacity="0.7"
+                                                   IsVisible="{Binding UsingExpression, Mode=OneWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <ToggleSwitch
+                                    Grid.Column="2"
+                                    IsChecked="{Binding Active, Mode=TwoWay}"
+                                    OffContent=""
+                                    OnContent=""
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock FontSize="13" FontWeight="SemiBold" Opacity="0.6" Text="Status" Margin="0,8,0,0" />
+            <Border CornerRadius="6" BorderThickness="1" Padding="16,14" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="Wifi4" FontSize="24" VerticalAlignment="Center" />
+                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                            <TextBlock FontWeight="SemiBold" FontSize="14" Text="OSC Connection" />
+                            <StackPanel Orientation="Horizontal" Spacing="4"
+                                        IsVisible="{Binding OscTarget.IsConnected}">
+                                <TextBlock FontSize="12" Opacity="0.7" Text="Recv:" />
+                                <TextBlock FontSize="12" Text="{Binding OscTarget.InPort, Mode=OneWay}" />
+                                <TextBlock FontSize="12" Opacity="0.7" Text="  Send:" />
+                                <TextBlock FontSize="12" Text="{Binding OscTarget.OutPort, Mode=OneWay}" />
+                                <TextBlock FontSize="12" Opacity="0.7" Text=" @" />
+                                <TextBlock FontSize="12" Text="{Binding OscTarget.DestinationAddress, Mode=OneWay}" />
+                            </StackPanel>
+                            <TextBlock FontSize="12" Opacity="0.5" Text="Not connected"
+                                       IsVisible="{Binding !OscTarget.IsConnected}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+                            <TextBlock FontSize="12" Text="{Binding MessagesInPerSec, Mode=OneWay}" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="msg/s in" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+                            <TextBlock FontSize="12" Text="{Binding MessagesOutPerSec, Mode=OneWay}" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="msg/s out" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <Border CornerRadius="6" BorderThickness="1" Padding="16,14" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                        <ui:SymbolIcon Symbol="Contact" FontSize="24" VerticalAlignment="Center" />
+                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                            <TextBlock FontWeight="SemiBold" FontSize="14" Text="{Binding ParameterOutputService.AvatarInfo.Name, Mode=OneWay}" />
+                            <TextBlock FontSize="12" Opacity="0.7" Text="{Binding ParameterOutputService.AvatarInfo.Id, Mode=OneWay}" />
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding ParameterOutputService.AvatarInfo.Id, Mode=OneWay, Converter={StaticResource IsLocalTestAvatarConverter}}">
+                                <Ellipse Width="8" Height="8" Fill="Red" VerticalAlignment="Center" />
+                                <TextBlock FontSize="12" Opacity="0.7" VerticalAlignment="Center"
+                                           Text="Local test avatar"
+                                           ToolTip.Tip="This avatar's parameters were loaded from a local avatar config file, not from VRChat." />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+                            <TextBlock FontSize="12" Text="{Binding ParameterOutputService.AvatarParameters.Count, Mode=OneWay}" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="parameters" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6"
+                                    IsVisible="{Binding ParameterOutputService.AvatarParameters, Mode=OneWay, Converter={StaticResource HasLegacyParametersConverter}}">
+                            <Ellipse Width="8" Height="8" Fill="Orange" VerticalAlignment="Center" />
+                            <TextBlock FontSize="12" Text="{Binding ParameterOutputService.AvatarParameters, Mode=OneWay, Converter={StaticResource LegacyParameterCountConverter}}" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="legacy" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

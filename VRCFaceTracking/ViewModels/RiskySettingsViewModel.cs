@@ -54,6 +54,9 @@ public partial class RiskySettingsViewModel(
         logger.LogInformation("Resetting VRChat avatar configuration...");
         try
         {
+            if (string.IsNullOrEmpty(VRChat.VRCOSCDirectory) || !Directory.Exists(VRChat.VRCOSCDirectory))
+                return;
+            
             foreach (var userFolder in Directory.GetDirectories(VRChat.VRCOSCDirectory))
             {
                 if (Directory.Exists(userFolder + "\\Avatars"))

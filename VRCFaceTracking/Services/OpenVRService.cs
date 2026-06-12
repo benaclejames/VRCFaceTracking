@@ -1,74 +1,100 @@
-﻿using System.Reflection;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Valve.VR;
 
 namespace VRCFaceTracking.Services;
 
-public class OpenVRService
+public class OpenVRService(ILogger<OpenVRService> logger)
 {
-    private CVRSystem _system;
-    private readonly ILogger<OpenVRService> _logger;
-    
-    public OpenVRService(ILogger<OpenVRService> logger)
-    {
-        _logger = logger;
-    }
+    private CVRSystem? _system;
 
     public bool Initialize()
     {
-        EVRInitError error = EVRInitError.None;
-        _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Background);
-        
-        if (error != EVRInitError.None)
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            _logger.LogWarning("Failed to initialize OpenVR: {0}", error);
-            IsInitialized = false;
-            return IsInitialized;
+            return false;
         }
-        
-        // Our app.vrmanifest is next to the executable, so we can just use the current directory of the executable
-        var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
-        var fullManifestPath = Path.Combine(currentDirectory, "app.vrmanifest"); // Replace is for Linux
-        var manifestRegisterResult = OpenVR.Applications.AddApplicationManifest(fullManifestPath, false);
-        if (manifestRegisterResult != EVRApplicationError.None)
+
+        try
         {
-            _logger.LogWarning("Failed to register manifest: {0}", manifestRegisterResult);
-            IsInitialized = false;
-            return IsInitialized;
+            EVRInitError error = EVRInitError.None;
+            _system = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Background);
+
+            if (error != EVRInitError.None)
+            {
+                logger.LogWarning("Failed to initialize OpenVR: {0}", error);
+                IsInitialized = false;
+                return false;
+            }
+
+            var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            if (currentDirectory == null)
+            {
+                IsInitialized = false;
+                return false;
+            }
+
+            var fullManifestPath = Path.Combine(currentDirectory, "app.vrmanifest");
+            var manifestRegisterResult = OpenVR.Applications.AddApplicationManifest(fullManifestPath, false);
+            if (manifestRegisterResult != EVRApplicationError.None)
+            {
+                logger.LogWarning("Failed to register manifest: {0}", manifestRegisterResult);
+                IsInitialized = false;
+                return false;
+            }
+
+            logger.LogInformation("Successfully initialized OpenVR");
+            IsInitialized = true;
+            return true;
         }
-        
-        _logger.LogInformation("Successfully initialized OpenVR");
-        
-        IsInitialized = true;
-        return IsInitialized;
+        catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException or TypeInitializationException)
+        {
+            logger.LogWarning("OpenVR native library not available: {Message}", ex.Message);
+            IsInitialized = false;
+            return false;
+        }
     }
 
     public void InitIfNotAlready()
     {
         if (!IsInitialized)
-        {
             Initialize();
-        }
     }
-    
+
     public bool IsInitialized { get; private set; }
 
     public bool AutoStart
     {
-        get => IsInitialized && OpenVR.Applications.GetApplicationAutoLaunch("benaclejames.vrcft");
+        get
+        {
+            try
+            {
+                return IsInitialized && OpenVR.Applications.GetApplicationAutoLaunch("benaclejames.vrcft");
+            }
+            catch
+            {
+                return false;
+            }
+        }
         set
         {
             if (!IsInitialized && !Initialize())
             {
-                _logger.LogWarning("Failed to set AutoStart preference. OpenVR couldn't be initialized.");
+                logger.LogWarning("Failed to set AutoStart preference. OpenVR couldn't be initialized.");
                 return;
             }
 
-            var setAutoLaunchResult = OpenVR.Applications.SetApplicationAutoLaunch("benaclejames.vrcft", value);
-            if (setAutoLaunchResult != EVRApplicationError.None)
+            try
             {
-                _logger.LogError("Failed to set auto launch: {0}", setAutoLaunchResult);
+                var result = OpenVR.Applications.SetApplicationAutoLaunch("benaclejames.vrcft", value);
+                if (result != EVRApplicationError.None)
+                    logger.LogError("Failed to set auto launch: {0}", result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Exception setting auto launch");
             }
         }
     }
-} 
+}

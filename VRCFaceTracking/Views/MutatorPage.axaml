@@ -1,0 +1,99 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    xmlns:mutation="clr-namespace:VRCFaceTracking.Core.Params.Data.Mutation;assembly=VRCFaceTracking.Core"
+    x:DataType="vm:MutatorViewModel"
+    x:Class="VRCFaceTracking.Views.MutatorPage">
+
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Mutations}" Margin="0,4">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="{x:Type mutation:TrackingMutation}">
+                    <Expander Margin="0,0,0,6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="Auto,*" Margin="0,4">
+                                <ToggleSwitch
+                                    Grid.Column="0"
+                                    IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                    OffContent=""
+                                    OnContent=""
+                                    Margin="0,0,12,0"
+                                    VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding Name}" />
+                                    <TextBlock FontSize="12" Opacity="0.6" Text="{Binding Description}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                        </Expander.Header>
+
+                        <Border Padding="4,0">
+                            <ItemsControl ItemsSource="{Binding Components}">
+                                <ItemsControl.DataTemplates>
+                                    <DataTemplate x:DataType="{x:Type mutation:MutationProperty}">
+                                        <Border Padding="16,10" Margin="0,1">
+                                            <Grid ColumnDefinitions="5*,6*">
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                                <CheckBox
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding BoolValue, Mode=TwoWay}"
+                                                    IsVisible="{Binding Type, Converter={StaticResource MutationTypeCheckboxConverter}}"
+                                                    HorizontalAlignment="Right" />
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    IsVisible="{Binding Type, Converter={StaticResource MutationTypeSliderConverter}}"
+                                                    Spacing="8">
+                                                    <TextBlock
+                                                        Text="{Binding FloatValue, StringFormat='{}{0:F2}'}"
+                                                        VerticalAlignment="Center"
+                                                        MinWidth="45"
+                                                        TextAlignment="Right" />
+                                                    <Slider
+                                                        Minimum="{Binding Min}"
+                                                        Maximum="{Binding Max}"
+                                                        Value="{Binding FloatValue, Mode=TwoWay}"
+                                                        TickFrequency="0.01"
+                                                        Width="200" />
+                                                </StackPanel>
+                                                <TextBox
+                                                    Grid.Column="1"
+                                                    Text="{Binding StringValue, Mode=TwoWay}"
+                                                    IsVisible="{Binding Type, Converter={StaticResource MutationTypeTextConverter}}"
+                                                    HorizontalAlignment="Stretch" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+
+                                    <DataTemplate x:DataType="{x:Type mutation:MutationRangeProperty}">
+                                        <Border Padding="16,10" Margin="0,1">
+                                            <Grid ColumnDefinitions="5*,6*">
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Item1, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" MinWidth="40" TextAlignment="Right" />
+                                                    <Slider Minimum="{Binding Min}" Maximum="{Binding Max}" Value="{Binding Item1, Mode=TwoWay}" TickFrequency="0.01" Width="90" />
+                                                    <Slider Minimum="{Binding Min}" Maximum="{Binding Max}" Value="{Binding Item2, Mode=TwoWay}" TickFrequency="0.01" Width="90" />
+                                                    <TextBlock Text="{Binding Item2, StringFormat='{}{0:F2}'}" VerticalAlignment="Center" MinWidth="40" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+
+                                    <DataTemplate x:DataType="{x:Type mutation:MutationAction}">
+                                        <Border Padding="16,10" Margin="0,1">
+                                            <Grid ColumnDefinitions="5*,6*">
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                                <Button Grid.Column="1" Content="{Binding Name}" Command="{Binding}" HorizontalAlignment="Right" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.DataTemplates>
+                            </ItemsControl>
+                        </Border>
+                    </Expander>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>
