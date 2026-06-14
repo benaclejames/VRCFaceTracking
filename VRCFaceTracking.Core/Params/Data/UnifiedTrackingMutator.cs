@@ -18,15 +18,20 @@ public partial class UnifiedTrackingMutator : ObservableObject
 
     private readonly ILogger<UnifiedTrackingMutator> _logger;
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly IDispatcherService _dispatcherService;
     private readonly object _mutationsLock = new();
     private UnifiedTrackingData _inputBuffer;
     public ObservableCollection<TrackingMutation> _mutations = new();
 
-    public UnifiedTrackingMutator(ILogger<UnifiedTrackingMutator> logger, ILocalSettingsService localSettingsService)
+    public UnifiedTrackingMutator(
+        ILogger<UnifiedTrackingMutator> logger,
+        ILocalSettingsService localSettingsService,
+        IDispatcherService dispatcherService)
     {
         UnifiedTracking.Mutator = this;
         _logger = logger;
         _localSettingsService = localSettingsService;
+        _dispatcherService = dispatcherService;
             
         Enabled = false;
         _inputBuffer = new UnifiedTrackingData();
@@ -77,24 +82,10 @@ public partial class UnifiedTrackingMutator : ObservableObject
         _logger.LogDebug("Mutation data saved.");
     }
 
-    public void Initialize()
+    private async Task CreateMutation(TrackingMutation mutation)
     {
-        // Try to load config and propogate data into Unified if they exist.
-        _logger.LogDebug("Initializing mutations...");
-        lock (_mutationsLock)
-        {
-            foreach (var mutation in _mutations)
-            {
-                _logger.LogInformation($"Initializing {mutation.Name}");
-                mutation.Initialize(UnifiedTracking.Data);
-            }
-        }
+        TrackingMutation mutationToAdd = mutation;
 
-        _logger.LogDebug("Mutations initialized successfully.");
-    }
-    
-    private async void CreateMutation(TrackingMutation mutation) 
-    {
         try
         {
             _logger.LogInformation($"Loading {mutation.Name}");
@@ -111,38 +102,42 @@ public partial class UnifiedTrackingMutator : ObservableObject
             PropertyInfo resultProperty = task.GetType().GetProperty("Result");
             var typedMutation = resultProperty.GetValue(task);
 
-            mutation = (TrackingMutation)typedMutation;
-
-            mutation.Logger = _logger;
-            mutation.LocalSettingsService =  _localSettingsService;
-            mutation.CreateProperties();
-            _mutations.Add(mutation);
+            mutationToAdd = (TrackingMutation)typedMutation;
         }
         catch (Exception ex)
         {
             _logger.LogError($"Creating new mutation data. {ex.Message}");
-            mutation.Logger = _logger;
-            mutation.LocalSettingsService =  _localSettingsService;
-            mutation.CreateProperties();
         }
+
+        mutationToAdd.Logger = _logger;
+        mutationToAdd.LocalSettingsService =  _localSettingsService;
+        mutationToAdd.DispatcherService = _dispatcherService;
+
+        await _dispatcherService.RunAsync(() =>
+        {
+            mutationToAdd.CreateProperties();
+            _logger.LogInformation($"Initializing {mutationToAdd.Name}");
+            mutationToAdd.Initialize(UnifiedTracking.Data);
+
+            lock (_mutationsLock)
+            {
+                _mutations.Add(mutationToAdd);
+            }
+        }).ConfigureAwait(false);
     }
 
-    public async void Load()
+    public async Task LoadAsync()
     {
         // Try to load config and propogate data into Unified if they exist.
         _logger.LogDebug("Loading mutation data...");
         var mutations = TrackingMutation.GetImplementingMutations(true);
         await _localSettingsService.Load(this);
 
-        lock (_mutationsLock)
+        foreach (var mutation in mutations)
         {
-            foreach (var mutation in mutations)
-            {
-                CreateMutation(mutation);
-            }
+            await CreateMutation(mutation).ConfigureAwait(false);
         }
 
         _logger.LogDebug("Mutation data loaded.");
-        Initialize();
     }
 }

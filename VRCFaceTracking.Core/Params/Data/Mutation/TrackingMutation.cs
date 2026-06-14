@@ -27,6 +27,8 @@ public abstract partial class TrackingMutation
     public abstract string Description { get; }
     public abstract MutationPriority Step { get; }
     [JsonIgnore]
+    public virtual int Order => 0;
+    [JsonIgnore]
     public ObservableCollection<IMutationComponent> Components { get; set; }
     public virtual bool IsSaved { get; } = false;
 
@@ -36,9 +38,11 @@ public abstract partial class TrackingMutation
     public ILogger Logger { get; set; }
     [JsonIgnore]
     public ILocalSettingsService LocalSettingsService { get; set; }
+    [JsonIgnore]
+    public IDispatcherService? DispatcherService { get; set; }
     public virtual void Initialize(UnifiedTrackingData data) { }
     public abstract void MutateData(ref UnifiedTrackingData data);
-    public void CreateProperties() => Components = MutationComponentFactory.CreateComponents(this);
+    public virtual void CreateProperties() => Components = MutationComponentFactory.CreateComponents(this);
     public static TrackingMutation[] GetImplementingMutations(bool ordered = true)
     {
         var types = Assembly.GetExecutingAssembly()
@@ -54,7 +58,11 @@ public abstract partial class TrackingMutation
 
         if (ordered)
         {
-            mutations.Sort((a, b) => a.Step.CompareTo(b.Step));
+            mutations.Sort((a, b) =>
+            {
+                var stepCompare = a.Step.CompareTo(b.Step);
+                return stepCompare != 0 ? stepCompare : a.Order.CompareTo(b.Order);
+            });
         }
 
         return mutations.ToArray();

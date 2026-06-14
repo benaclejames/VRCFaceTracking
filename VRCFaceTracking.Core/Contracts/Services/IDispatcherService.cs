@@ -5,4 +5,9 @@
 public interface IDispatcherService
 {
     public void Run(Action action);
+
+    /// <summary>
+    /// Runs an action on the UI dispatcher and completes after the action has run.
+    /// </summary>
+    public Task RunAsync(Action action);
 }
