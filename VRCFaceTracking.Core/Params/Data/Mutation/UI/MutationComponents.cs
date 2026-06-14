@@ -20,6 +20,19 @@ public interface IMutationComponent
     public string Name { get; }
 }
 
+/// <summary>
+/// Read-only informational row in a mutation settings panel.
+/// </summary>
+public class MutationInfo : IMutationComponent
+{
+    public MutationInfo(string name)
+    {
+        Name = name;
+    }
+
+    public string Name { get; }
+}
+
 public class MutationProperty : IMutationComponent, INotifyPropertyChanged
 {
     private object _value;
@@ -129,17 +142,161 @@ public class MutationRangeProperty : IMutationComponent, INotifyPropertyChanged
 public class MutationAction : IMutationComponent, ICommand
 {
     public string Name { get; }
+    public string ButtonText { get; }
     private readonly Action _execute;
+    private readonly Func<bool> _canExecute;
+    private readonly Action<Action>? _dispatch;
 
-    public MutationAction(string name, Action execute)
+    public MutationAction(
+        string name,
+        Action execute,
+        string? buttonText = null,
+        Func<bool>? canExecute = null,
+        Action<Action>? dispatch = null)
     {
         Name = name;
+        ButtonText = buttonText ?? name;
         _execute = execute;
+        _canExecute = canExecute ?? (() => true);
+        _dispatch = dispatch;
     }
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
-    public bool CanExecute(object parameter) => true; // Adjust logic as needed
+    public bool CanExecute(object? parameter) => _canExecute();
 
-    public void Execute(object parameter) => Task.Run(() => _execute());
+    public void Execute(object? parameter)
+    {
+        if (!CanExecute(parameter))
+        {
+            return;
+        }
+
+        Task.Run(() => _execute());
+    }
+
+    public void Refresh()
+    {
+        Dispatch(() => CanExecuteChanged?.Invoke(this, EventArgs.Empty));
+    }
+
+    private void Dispatch(Action action)
+    {
+        if (_dispatch != null)
+        {
+            _dispatch(action);
+            return;
+        }
+
+        action();
+    }
+}
+
+/// <summary>
+/// Read-only status row whose value is supplied by a callback and refreshed on demand.
+/// </summary>
+public class MutationStatus : IMutationComponent, INotifyPropertyChanged
+{
+    private readonly Func<string> _getValue;
+    private readonly Action<Action>? _dispatch;
+
+    public MutationStatus(string name, Func<string> getValue, Action<Action>? dispatch = null)
+    {
+        Name = name;
+        _getValue = getValue;
+        _dispatch = dispatch;
+    }
+
+    public string Name { get; }
+
+    public string Value => _getValue();
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void Refresh()
+    {
+        Dispatch(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value))));
+    }
+
+    private void Dispatch(Action action)
+    {
+        if (_dispatch != null)
+        {
+            _dispatch(action);
+            return;
+        }
+
+        action();
+    }
+}
+
+/// <summary>
+/// Combined status row and command button for stateful mutation actions.
+/// </summary>
+public class MutationStatusAction : IMutationComponent, ICommand, INotifyPropertyChanged
+{
+    private readonly Func<string> _getStatus;
+    private readonly Func<string> _getButtonText;
+    private readonly Func<bool> _canExecute;
+    private readonly Action _execute;
+    private readonly Action<Action>? _dispatch;
+
+    public MutationStatusAction(
+        string name,
+        Func<string> getStatus,
+        Func<string> getButtonText,
+        Func<bool> canExecute,
+        Action execute,
+        Action<Action>? dispatch = null)
+    {
+        Name = name;
+        _getStatus = getStatus;
+        _getButtonText = getButtonText;
+        _canExecute = canExecute;
+        _execute = execute;
+        _dispatch = dispatch;
+    }
+
+    public string Name { get; }
+
+    public string Status => _getStatus();
+
+    public string ButtonText => _getButtonText();
+
+    public event EventHandler? CanExecuteChanged;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public bool CanExecute(object? parameter) => _canExecute();
+
+    public void Execute(object? parameter)
+    {
+        if (!CanExecute(parameter))
+        {
+            return;
+        }
+
+        Task.Run(() => _execute());
+    }
+
+    public void Refresh()
+    {
+        Dispatch(() =>
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ButtonText)));
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        });
+    }
+
+    private void Dispatch(Action action)
+    {
+        if (_dispatch != null)
+        {
+            _dispatch(action);
+            return;
+        }
+
+        action();
+    }
 }

@@ -99,7 +99,51 @@
                         <ColumnDefinition Width="6*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <Button Content="{Binding Name}" MinWidth="0" Command="{Binding}" Margin="0" HorizontalAlignment="Right" Grid.Column="2"/>
+                    <Button Content="{Binding ButtonText}" MinWidth="0" Command="{Binding}" Margin="0" HorizontalAlignment="Right" Grid.Column="2"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="InfoTemplate">
+            <Border Background="#08ffffff"
+                    CornerRadius="2"
+                    Padding="20,10,20,10"
+                    Margin="0,1,0,1">
+                <TextBlock Text="{Binding Name}" Foreground="LightGray" TextWrapping="Wrap"/>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StatusTemplate">
+            <Border Background="#08ffffff"
+                    CornerRadius="2"
+                    Padding="20,10,20,10"
+                    Margin="0,1,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="6*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding Value}" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Column="2"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StatusActionTemplate">
+            <Border Background="#08ffffff"
+                    CornerRadius="2"
+                    Padding="20,10,20,10"
+                    Margin="0,1,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="5*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Name}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Column="1" Margin="0,0,20,0"/>
+                    <Button Content="{Binding ButtonText}" MinWidth="0" Command="{Binding}" Margin="0" HorizontalAlignment="Right" Grid.Column="2"/>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -140,6 +184,9 @@
                                           TextInputTemplate="{StaticResource TextInputTemplate}"
                                           ButtonTemplate="{StaticResource ButtonTemplate}"
                                           RangeTemplate="{StaticResource RangeTemplate}"
+                                          InfoTemplate="{StaticResource InfoTemplate}"
+                                          StatusTemplate="{StaticResource StatusTemplate}"
+                                          StatusActionTemplate="{StaticResource StatusActionTemplate}"
                                           SliderTemplate="{StaticResource SliderTemplate}"/>
     </Page.Resources>
 

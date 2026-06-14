@@ -137,10 +137,17 @@ public static class MutationComponentFactory
             var attribute = method.GetCustomAttribute<MutationButtonAttribute>();
             if (attribute != null)
             {
+                Action<Action>? dispatch = null;
+                if (instance is TrackingMutation mutation && mutation.DispatcherService != null)
+                {
+                    dispatch = action => mutation.DispatcherService.Run(action);
+                }
+
                 var mutationProperty = new MutationAction
                 (
                     attribute.Name,
-                    () => method.Invoke(instance, null)
+                    () => method.Invoke(instance, null),
+                    dispatch: dispatch
                 );
                 components.Add(mutationProperty);
             }
