@@ -15,6 +15,7 @@
     <PackageVersion Include="Gameloop.Vdf" Version="0.6.2" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="ReactiveUI.Avalonia" Version="11.3.8" />
     <PackageVersion Include="Sentry" Version="6.0.0" />
