@@ -48,6 +48,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="FluentAvaloniaUI" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
     <PackageReference Include="ReactiveUI.Avalonia" />
     <PackageReference Include="Sentry" />
     <PackageReference Include="Sentry.Extensions.Logging" />
