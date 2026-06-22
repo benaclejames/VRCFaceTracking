@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
 using Avalonia.Data.Core.Plugins;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using FluentAvalonia.Styling;
 using Microsoft.Extensions.Hosting;
 using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Views;
@@ -20,6 +21,14 @@ namespace VRCFaceTracking
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+
+            // gsettings breaks gamescope on linux and system theme is unreliable on plasma anyways
+            if (!OperatingSystem.IsLinux())
+            {
+                var faTheme = Styles.OfType<FluentAvaloniaTheme>().FirstOrDefault();
+                if (faTheme is not null)
+                    faTheme.PreferSystemTheme = true;
+            }
 
 #if DEBUG
             var loggerFactory = LoggerFactory.Create(b => b
