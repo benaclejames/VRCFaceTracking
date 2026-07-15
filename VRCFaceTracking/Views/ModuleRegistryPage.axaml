@@ -21,6 +21,7 @@
                 <ListBox
                     ItemsSource="{Binding ModuleInfos}"
                     SelectedItem="{Binding Selected}"
+                    SelectionChanged="ModuleSelection_Click"
                     ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="models:InstallableTrackingModule">

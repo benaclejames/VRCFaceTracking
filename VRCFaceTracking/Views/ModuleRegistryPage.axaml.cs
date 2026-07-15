@@ -23,10 +23,22 @@ public partial class ModuleRegistryPage : UserControl
         ViewModel.OnNavigatedTo(null);
     }
 
+    private async void ModuleSelection_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {   
+        if (ViewModel.Selected is not InstallableTrackingModule module) return;
+        InstallButton.IsVisible = module.InstallationState != InstallState.Installed;
+        UninstallButton.IsVisible = module.InstallationState == InstallState.Installed;
+        InstallButton.Content = "Install";
+        InstallButton.IsEnabled = true;
+        if (module.InstallationState != InstallState.AwaitingRestart)
+        {
+            UninstallButton.IsEnabled = true;
+            UninstallButton.Content =  "Uninstall";
+        }
+    }
     private async void InstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (ViewModel.Selected is not InstallableTrackingModule module) return;
-
         InstallButton.IsEnabled = false;
         InstallButton.Content = "Installing...";
 
@@ -37,8 +49,7 @@ public partial class ModuleRegistryPage : UserControl
         }
         finally
         {
-            InstallButton.IsEnabled = true;
-            InstallButton.Content = "Install";
+            InstallButton.Content = "Installed.";
         }
     }
 
@@ -47,13 +58,16 @@ public partial class ModuleRegistryPage : UserControl
         if (ViewModel.Selected is not InstallableTrackingModule module) return;
 
         _moduleInstaller.UninstallModule(module);
+        InstallButton.IsVisible = false;
+        UninstallButton.IsEnabled = false;
+        UninstallButton.Content = "Please restart VRCFT to complete uninstallation.";
         module.InstallationState = InstallState.AwaitingRestart;
     }
 
     private async void OpenModulePage_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (ViewModel.Selected?.ModulePageUrl is not { Length: > 0 } url) return;
-
+        
         try
         {
             var launcher = TopLevel.GetTopLevel(this)?.Launcher;
