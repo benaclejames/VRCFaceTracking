@@ -41,7 +41,7 @@
                                 <Border Grid.Column="1" CornerRadius="4" Padding="6,2"
                                         Margin="8,0,0,0" VerticalAlignment="Center"
                                         x:Name="StateBadge">
-                                    <TextBlock FontSize="11" Text="{Binding InstallationState}" />
+                                    <TextBlock FontSize="11" Text="{Binding InstallationState, Mode=OneWay}" />
                                 </Border>
                             </Grid>
                         </DataTemplate>
