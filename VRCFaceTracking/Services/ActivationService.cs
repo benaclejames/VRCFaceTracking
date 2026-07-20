@@ -49,24 +49,15 @@ public class ActivationService(
         logger.LogInformation("VRCFT Version {version} initializing...", Assembly.GetExecutingAssembly().GetName().Version);
         
         logger.LogInformation("Initializing OSC...");
-        await parameterOutputService.InitializeAsync().ConfigureAwait(false);
+        await parameterOutputService.InitializeAsync();
 
         logger.LogInformation("Initializing main service...");
-        await mainService.InitializeAsync().ConfigureAwait(false);
+        await mainService.InitializeAsync();
         
         logger.LogInformation("Initializing OpenVR...");
         if (!openVrService.Initialize())
         {
             logger.LogWarning("Failed to initialize OpenVR during ActivationService startup. Skipping.");
-        }
-
-        // Before we initialize, we need to delete pending restart modules and check for updates for all our installed modules
-        logger.LogDebug("Checking for deletion requests for installed modules...");
-        var needsDeleting = moduleDataService.GetInstalledModules().Concat(moduleDataService.GetLegacyModules())
-            .Where(m => m.InstallationState == InstallState.AwaitingRestart);
-        foreach (var deleteModule in needsDeleting)
-        {
-            moduleInstaller.UninstallModule(deleteModule);
         }
 
         logger.LogInformation("Checking for updates for installed modules...");
@@ -97,7 +88,7 @@ public class ActivationService(
         }
         
         logger.LogInformation("Initializing modules...");
-        Dispatcher.UIThread.Post(() => libManager.Initialize());
+        Dispatcher.UIThread.Post(async () => await libManager.Initialize());
         
         await Task.CompletedTask;
     }

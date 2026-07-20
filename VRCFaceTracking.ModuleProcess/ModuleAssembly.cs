@@ -5,13 +5,36 @@ using Microsoft.Extensions.Logging;
 namespace VRCFaceTracking.ModuleProcess;
 public class ModuleAssembly
 {
-    public Assembly Assembly;
+    private Assembly? Assembly
+    {
+        get
+        {
+            if (field == null)
+            {
+                field = TryLoadAssembly();
+            }
+
+            return field;
+        }
+    }
+
+    public ExtTrackingModule? TrackingModule
+    {
+        get
+        {
+            if (field == null)
+            {
+                field = LoadExternalModule();
+            }
+
+            return field;
+        }
+    }
+    
     public string ModulePath;
-    public bool Loaded;
     private ILogger<ModuleProcessMain> _logger;
     private ILoggerFactory? _loggerFactory;
-    public ExtTrackingModule TrackingModule;
-    public CancellationTokenSource _updateCts;
+    public CancellationTokenSource? _updateCts;
 
     public ModuleAssembly(ILogger<ModuleProcessMain> logger, ILoggerFactory loggerFactory, string dllPath)
     {
@@ -27,58 +50,24 @@ public class ModuleAssembly
         _logger         = logger;
         _loggerFactory  = loggerFactory;
         ModulePath      = dllPath;
-        Loaded          = false;
     }
 
-    public void TryLoadAssembly()
+    private Assembly? TryLoadAssembly()
     {
-        if ( Loaded )
-        {
-            return;
-        }
-
         try
         {
             var alc = new AssemblyLoadContext(ModulePath, true);
-            Assembly = alc.LoadFromAssemblyPath(ModulePath);
-
-            var references = Assembly.GetReferencedAssemblies();
-            var oldRefs = false;
-            foreach ( var reference in references )
-            {
-                if ( reference.Name == "VRCFaceTracking" || reference.Name == "VRCFaceTracking.Core" )
-                {
-                    if ( reference.Version < new Version(5, 0, 0, 0) )
-                    {
-                        _logger.LogWarning("Module {dll} references an older version of VRCFaceTracking. Skipping.", Path.GetFileName(ModulePath));
-                        oldRefs = true;
-                    }
-                }
-            }
-            if ( oldRefs )
-            {
-                return;
-            }
-
-            foreach ( var type in Assembly.GetExportedTypes() )
-            {
-                if ( type.BaseType != typeof(ExtTrackingModule) )
-                {
-                    continue;
-                }
-
-                _logger.LogDebug("{module} properly implements ExtTrackingModule.", type.Name);
-                Loaded          = true;
-                TrackingModule  = LoadExternalModule();
-                break;
-            }
-        } catch ( Exception e )
+            return alc.LoadFromAssemblyPath(ModulePath);
+        }
+        catch (Exception e)
         {
             _logger.LogWarning("{error} Assembly not able to be loaded. Skipping.", e.Message);
         }
+
+        return null;
     }
 
-    private ExtTrackingModule LoadExternalModule()
+    private ExtTrackingModule? LoadExternalModule()
     {
         if ( Assembly == null )
         {
