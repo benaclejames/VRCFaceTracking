@@ -42,7 +42,7 @@ public static class VRChat
 
             if (string.IsNullOrEmpty(steamPath))
             {
-                throw new InvalidProgramException("Steam was not detected!");
+                return;
             }
 
             // 3) Inside the steam install directory, find the file steamPath/steamapps/libraryfolders.vdf
@@ -81,8 +81,7 @@ public static class VRChat
 
             if (!vrchatPaths.Any())
             {
-                throw new InvalidProgramException(
-                    "Steam was detected, but VRChat was not detected on this system! Is it installed?");
+                return;
             }
 
             // 4) Finally, construct the path to the user's VRChat install, check it exists and try the next path if not

@@ -19,7 +19,7 @@ public partial class ModuleRegistryViewModel : ObservableRecipient
         _moduleDataService = moduleDataService;
     }
 
-    public async void OnNavigatedTo(object parameter)
+    public async Task OnNavigatedTo()
     {
         ModuleInfos.Clear();
 

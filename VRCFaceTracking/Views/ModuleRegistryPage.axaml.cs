@@ -18,10 +18,7 @@ public partial class ModuleRegistryPage : UserControl
         _moduleInstaller = Ioc.Default.GetRequiredService<ModuleInstaller>();
     }
 
-    public void OnNavigatedTo()
-    {
-        ViewModel.OnNavigatedTo(null);
-    }
+    public async void OnNavigatedTo() => await ViewModel.OnNavigatedTo();
 
     private async void ModuleSelection_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {   
@@ -53,15 +50,13 @@ public partial class ModuleRegistryPage : UserControl
         }
     }
 
-    private void UninstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void UninstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (ViewModel.Selected is not InstallableTrackingModule module) return;
 
-        _moduleInstaller.UninstallModule(module);
-        InstallButton.IsVisible = false;
         UninstallButton.IsEnabled = false;
-        UninstallButton.Content = "Please restart VRCFT to complete uninstallation.";
-        module.InstallationState = InstallState.AwaitingRestart;
+        await _moduleInstaller.UninstallModule(module);
+        await ViewModel.OnNavigatedTo();
     }
 
     private async void OpenModulePage_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

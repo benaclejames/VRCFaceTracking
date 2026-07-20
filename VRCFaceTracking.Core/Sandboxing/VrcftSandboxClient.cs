@@ -125,16 +125,15 @@ public class VrcftSandboxClient : UdpFullDuplex
 
     public void SendAllPendingPackets()
     {
-        if ( _isConnected )
+        if (!_isConnected || _eventBus.Count <= 0)
         {
-            if ( _eventBus.Count > 0 )
-            {
-                while ( _eventBus.Count > 0 )
-                {
-                    IpcPacket pkt = _eventBus.Pop<IpcPacket>();
-                    SendData(pkt);
-                }
-            }
+            return;
+        }
+
+        while ( _eventBus.Count > 0 )
+        {
+            IpcPacket pkt = _eventBus.Pop<IpcPacket>();
+            SendData(pkt);
         }
     }
 }

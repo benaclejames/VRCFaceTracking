@@ -39,7 +39,6 @@ public class UnifiedLibManager : ILibManager
     #endregion
 
     #region Thread
-    private Thread _initializeWorker;
     private static VrcftSandboxServer _sandboxServer;
     #endregion
     
@@ -62,7 +61,7 @@ public class UnifiedLibManager : ILibManager
         // @TODO: Kill any lingering sub-modules to eliminate any conflicts
     }
 
-    public void Initialize()
+    public async Task Initialize()
     {
         LoadedModulesMetadata.Clear();
         LoadedModulesMetadata.Add(new ModuleMetadataInternal
@@ -289,40 +288,36 @@ public class UnifiedLibManager : ILibManager
         }
 
         // Start Initialization
-        _initializeWorker = new Thread(() =>
-        {
-            // Kill lingering threads
-            TeardownAllAndResetAsync();
-
-            // Find all modules
-            var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
-
-            // Load all modules
-            AvailableSandboxModules.Clear();
-            InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());
-
-            if ( AvailableSandboxModules != null && AvailableSandboxModules.Count > 0 )
-            {
-                _logger.LogDebug("Initializing requested runtimes...");
-            }
-            else
-            {
-                _dispatcherService.Run(() =>
-                {
-                    LoadedModulesMetadata.Clear();
-                    LoadedModulesMetadata.Add(new ModuleMetadataInternal
-                    {
-                        Active = false,
-                        Name = "No Modules Loaded"
-                    });
-                });
-                _logger.LogWarning("No modules loaded.");
-            }
-
-        });
         _logger.LogInformation("Starting initialization tracking");
-        _initializeWorker.Start();
+        
+        // Kill lingering threads
+        await TeardownAllModules();
+
+        // Find all modules
+        var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+        var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+        // Load all modules
+        AvailableSandboxModules.Clear();
+        InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());
+
+        if ( AvailableSandboxModules != null && AvailableSandboxModules.Count > 0 )
+        {
+            _logger.LogDebug("Initializing requested runtimes...");
+        }
+        else
+        {
+            _dispatcherService.Run(() =>
+            {
+                LoadedModulesMetadata.Clear();
+                LoadedModulesMetadata.Add(new ModuleMetadataInternal
+                {
+                    Active = false,
+                    Name = "No Modules Loaded"
+                });
+            });
+            _logger.LogWarning("No modules loaded.");
+        }
     }
 
     private void InitialiseSandboxesBaseOnPaths(IEnumerable<string> paths)
@@ -437,7 +432,7 @@ public class UnifiedLibManager : ILibManager
         }
     }
 
-    private bool TeardownModuleSandboxed(ModuleRuntimeInfo module)
+    private async Task<bool> TeardownModuleSandboxed(ModuleRuntimeInfo module)
     {
         _logger.LogInformation("Tearing down {module} ", module.ModuleClassName);
 
@@ -446,9 +441,7 @@ public class UnifiedLibManager : ILibManager
         _sandboxServer.SendData(eventTeardownPacket, module.SandboxProcessPort);
 
         // Kill the update thread
-        module.UpdateCancellationToken?.Cancel();
-        // Give the module 100ms to kill itself
-        Thread.Sleep(100);
+        await module.UpdateCancellationToken.CancelAsync();
 
         // Only bother tearing down a module if it's actually shutdown
         if ( !(module.Process?.HasExited ?? true) )
@@ -498,7 +491,7 @@ public class UnifiedLibManager : ILibManager
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes
-    public void TeardownAllAndResetAsync()
+    public async Task TeardownAllModules()
     {
         _logger.LogInformation("Tearing down all modules...");
 
@@ -509,7 +502,7 @@ public class UnifiedLibManager : ILibManager
                 continue;
             try
             {
-                success = TeardownModuleSandboxed(module);
+                success = await TeardownModuleSandboxed(module);
             } finally
             {
                 if ( !success )
@@ -529,7 +522,7 @@ public class UnifiedLibManager : ILibManager
                 continue;
             try
             {
-                success = TeardownModuleSandboxed(module);
+                success = await TeardownModuleSandboxed(module);
             } finally
             {
                 if ( !success )
