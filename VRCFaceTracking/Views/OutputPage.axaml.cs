@@ -1,8 +1,7 @@
-using System.Collections.Specialized;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using VRCFaceTracking.Services;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -10,19 +9,35 @@ namespace VRCFaceTracking.Views;
 public partial class OutputPage : UserControl
 {
     private OutputViewModel ViewModel => (OutputViewModel)DataContext!;
+    private const double StickThreshold = 40;
+    private bool _stickToBottom = true;
 
     public OutputPage()
     {
         InitializeComponent();
         DataContext = Ioc.Default.GetRequiredService<OutputViewModel>();
 
-        // Auto-scroll when new log lines arrive
-        OutputPageLogger.FilteredLogs.CollectionChanged += OnLogsChanged;
+        LogItems.LayoutUpdated += OnLogItemsLayoutUpdated;
+        LogItems.AddHandler(ScrollViewer.ScrollChangedEvent, OnLogItemsScrollChanged, RoutingStrategies.Bubble);
     }
 
-    private void OnLogsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnLogItemsLayoutUpdated(object? sender, EventArgs e)
     {
-        LogScroller.ScrollToEnd();
+        if (!_stickToBottom || LogItems.Scroll is not { } scroll)
+            return;
+
+        var target = scroll.Extent.Height - scroll.Viewport.Height;
+        if (target > 0 && scroll.Offset.Y < target)
+            scroll.Offset = scroll.Offset.WithY(target);
+    }
+
+    private void OnLogItemsScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (e.OffsetDelta.Y == 0 || LogItems.Scroll is not { } scroll)
+            return;
+
+        var target = scroll.Extent.Height - scroll.Viewport.Height;
+        _stickToBottom = target <= 0 || target - scroll.Offset.Y <= StickThreshold;
     }
 
     private async void CopyToClipboard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
