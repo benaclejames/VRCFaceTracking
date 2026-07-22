@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Services;
@@ -9,12 +11,16 @@ public class LogLine(string message, LogLevel level)
     public LogLevel Level { get; } = level;
 
     public override string ToString() => Message;
-}    
+}
 
 public class OutputPageLogger(string categoryName) : ILogger
 {
     public static readonly ObservableCollection<LogLine> FilteredLogs = new();
     public static readonly ObservableCollection<LogLine> AllLogs = new();
+
+    private static readonly ConcurrentQueue<LogLine> _pending = new();
+    private static DispatcherTimer? _flushTimer;
+    private static int _timerStarted;
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
 
@@ -27,36 +33,37 @@ public class OutputPageLogger(string categoryName) : ILogger
         Exception? exception,
         Func<TState, Exception?, string> formatter)
     {
-        if ( categoryName == "\0VRCFT\0" )
-        {
+        var line = categoryName == "\0VRCFT\0"
             // Log events from sub-processes have the unique category name "\0VRCFT\0", so skip category name
-            AddLineDispatched(new LogLine($"{formatter(state, exception)}", logLevel));
-        }
-        else
-        { 
-            AddLineDispatched(new LogLine($"[{categoryName}] {logLevel}: {formatter(state, exception)}", logLevel));
-        }
+            ? new LogLine($"{formatter(state, exception)}", logLevel)
+            : new LogLine($"[{categoryName}] {logLevel}: {formatter(state, exception)}", logLevel);
+
+        _pending.Enqueue(line);
+        EnsureFlushTimer();
     }
 
-    private static void AddLineDispatched(LogLine line)
+    private static void EnsureFlushTimer()
     {
-        var dispatcher = Avalonia.Threading.Dispatcher.UIThread;
-        if (dispatcher.CheckAccess())
+        if (Interlocked.CompareExchange(ref _timerStarted, 1, 0) != 0)
+            return;
+
+        Dispatcher.UIThread.Post(() =>
         {
-            AddLine(line);
-        }
-        else
-        {
-            dispatcher.Post(() => AddLine(line));
-        }
+            _flushTimer = new DispatcherTimer(
+                TimeSpan.FromMilliseconds(50),
+                DispatcherPriority.Background,
+                Flush);
+            _flushTimer.Start();
+        });
     }
 
-    private static void AddLine(LogLine line)
+    private static void Flush(object? sender, EventArgs e)
     {
-        AllLogs.Add(line);
-        if (line.Level >= LogLevel.Information)
+        while (_pending.TryDequeue(out var line))
         {
-            FilteredLogs.Add(line);
+            AllLogs.Add(line);
+            if (line.Level >= LogLevel.Information)
+                FilteredLogs.Add(line);
         }
     }
 }
