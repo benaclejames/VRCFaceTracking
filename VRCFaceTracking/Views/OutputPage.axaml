@@ -4,6 +4,7 @@
     xmlns:ui="using:FluentAvalonia.UI.Controls"
     xmlns:vm="using:VRCFaceTracking.ViewModels"
     xmlns:svc="using:VRCFaceTracking.Services"
+    xmlns:models="clr-namespace:VRCFaceTracking.Models"
     x:DataType="vm:OutputViewModel"
     x:Class="VRCFaceTracking.Views.OutputPage">
 
@@ -47,7 +48,7 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="svc:LogLine">
+                    <DataTemplate x:DataType="models:LogLine">
                         <TextBlock
                             x:Name="LogText"
                             Text="{Binding Message}"

@@ -1,9 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Services.Logging;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -48,7 +47,7 @@ public partial class OutputPage : UserControl
 
     private async void CopyToClipboard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        var text = ViewModel.AllLogsText;
+        var text = Ioc.Default.GetRequiredService<LogBufferProvider>().Snapshot();
         var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
         if (clipboard != null)
         {
@@ -73,7 +72,8 @@ public partial class OutputPage : UserControl
         {
             await using var stream = await file.OpenWriteAsync();
             await using var writer = new StreamWriter(stream);
-            await writer.WriteAsync(ViewModel.AllLogsText);
+            var text = Ioc.Default.GetRequiredService<LogBufferProvider>().Snapshot();
+            await writer.WriteAsync(text);
             StatusText.Text = "Log saved.";
         }
     }

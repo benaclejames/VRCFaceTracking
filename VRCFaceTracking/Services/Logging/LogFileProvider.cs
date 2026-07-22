@@ -1,8 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using VRCFaceTracking.Core.Services;
 
-namespace VRCFaceTracking.Core.Services;
+namespace VRCFaceTracking.Services.Logging;
 
 [ProviderAlias("Debug")]
 public class LogFileProvider : ILoggerProvider
@@ -13,10 +14,10 @@ public class LogFileProvider : ILoggerProvider
     {
         try
         {
-            if (!Directory.Exists(Utils.UserAccessibleDataDirectory)) // Eat my ass windows
-                Directory.CreateDirectory(Utils.UserAccessibleDataDirectory);
+            if (!Directory.Exists(Core.Utils.UserAccessibleDataDirectory)) // Eat my ass windows
+                Directory.CreateDirectory(Core.Utils.UserAccessibleDataDirectory);
 
-            var logPath = Path.Combine(Utils.UserAccessibleDataDirectory, "latest.log");
+            var logPath = Path.Combine(Core.Utils.UserAccessibleDataDirectory, "latest.log");
 
             var file = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite, 4096,
                 FileOptions.WriteThrough);

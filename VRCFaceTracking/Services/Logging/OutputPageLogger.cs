@@ -2,18 +2,13 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Models;
 
-namespace VRCFaceTracking.Services;
-
-public record LogLine(string Message, LogLevel Level)
-{
-    public override string ToString() => Message;
-}    
+namespace VRCFaceTracking.Services.Logging;
 
 public class OutputPageLogger(string categoryName) : ILogger
 {
-    public static readonly ObservableCollection<LogLine> FilteredLogs = new();
-    public static readonly List<LogLine> AllLogs = new();
+    public static readonly ObservableCollection<LogLine> AllLogs = new();
 
     private static readonly ConcurrentQueue<LogLine> _pending = new();
     private static DispatcherTimer? _flushTimer;
@@ -59,8 +54,6 @@ public class OutputPageLogger(string categoryName) : ILogger
         while (_pending.TryDequeue(out var line))
         {
             AllLogs.Add(line);
-            if (line.Level >= LogLevel.Information)
-                FilteredLogs.Add(line);
         }
     }
 }
