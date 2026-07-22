@@ -30,11 +30,15 @@
                      BorderThickness="0"
                      SelectionMode="Single"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.AllowAutoHide="False">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Padding" Value="0" />
                         <Setter Property="MinHeight" Value="0" />
+                    </Style>
+                    <Style Selector="ListBox /template/ ScrollViewer">
+                        <Setter Property="Padding" Value="0,0,0,16" />
                     </Style>
                 </ListBox.Styles>
                 <ListBox.ItemsPanel>

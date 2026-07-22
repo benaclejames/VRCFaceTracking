@@ -441,7 +441,10 @@ public class UnifiedLibManager : ILibManager
         _sandboxServer.SendData(eventTeardownPacket, module.SandboxProcessPort);
 
         // Kill the update thread
-        await module.UpdateCancellationToken.CancelAsync();
+        if (module.UpdateCancellationToken != null)
+        {
+            await module.UpdateCancellationToken.CancelAsync();
+        }
 
         // Only bother tearing down a module if it's actually shutdown
         if ( !(module.Process?.HasExited ?? true) )
@@ -507,7 +510,7 @@ public class UnifiedLibManager : ILibManager
             {
                 if ( !success )
                 {
-                    _logger.LogWarning($"Module: {module.Module.ModuleInformation.Name} failed to shut down. Killing its thread.");
+                    _logger.LogWarning($"Module: {module.ModuleClassName} failed to shut down. Killing its thread.");
                     module.UpdateThread.Interrupt();
                 }
             }

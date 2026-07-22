@@ -5,18 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace VRCFaceTracking.Services;
 
-public class LogLine(string message, LogLevel level)
+public record LogLine(string Message, LogLevel Level)
 {
-    public string Message { get; } = message;
-    public LogLevel Level { get; } = level;
-
     public override string ToString() => Message;
-}
+}    
 
 public class OutputPageLogger(string categoryName) : ILogger
 {
     public static readonly ObservableCollection<LogLine> FilteredLogs = new();
-    public static readonly ObservableCollection<LogLine> AllLogs = new();
+    public static readonly List<LogLine> AllLogs = new();
 
     private static readonly ConcurrentQueue<LogLine> _pending = new();
     private static DispatcherTimer? _flushTimer;
