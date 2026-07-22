@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -7,7 +6,7 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Core.Models;
 
-namespace VRCFaceTracking.Core.Services;
+namespace VRCFaceTracking.Services;
 
 public class ModuleDataService : IModuleDataService
 {
@@ -74,12 +73,12 @@ public class ModuleDataService : IModuleDataService
 
     public IEnumerable<InstallableTrackingModule> GetLegacyModules()
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
+        if (!Directory.Exists(Core.Utils.CustomLibsDirectory))
         {
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+            Directory.CreateDirectory(Core.Utils.CustomLibsDirectory);
         }
 
-        var moduleDlls = Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
+        var moduleDlls = Directory.GetFiles(Core.Utils.CustomLibsDirectory, "*.dll");
 
         return moduleDlls.Select(moduleDll => new InstallableTrackingModule
         {
@@ -167,15 +166,15 @@ public class ModuleDataService : IModuleDataService
 
     public IEnumerable<InstallableTrackingModule> GetInstalledModules()
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
+        if (!Directory.Exists(Core.Utils.CustomLibsDirectory))
         {
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+            Directory.CreateDirectory(Core.Utils.CustomLibsDirectory);
         }
 
         // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
         // If it does, deserialize it and add it to the list of installed modules.
         var installedModules = new List<InstallableTrackingModule>();
-        var moduleFolders = Directory.GetDirectories(Utils.CustomLibsDirectory);
+        var moduleFolders = Directory.GetDirectories(Core.Utils.CustomLibsDirectory);
         foreach (var moduleFolder in moduleFolders)
         {
             var moduleJsonPath = Path.Combine(moduleFolder, "module.json");
