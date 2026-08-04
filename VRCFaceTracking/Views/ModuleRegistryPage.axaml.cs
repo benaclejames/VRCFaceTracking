@@ -1,12 +1,13 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using VRCFaceTracking.Contracts;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
 
-public partial class ModuleRegistryPage : UserControl
+public partial class ModuleRegistryPage : UserControl, INotifyNavigated
 {
     private ModuleRegistryViewModel ViewModel => (ModuleRegistryViewModel)DataContext!;
     private readonly ModuleInstaller _moduleInstaller;
