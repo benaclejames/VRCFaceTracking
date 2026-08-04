@@ -10,7 +10,7 @@ namespace VRCFaceTracking.Services;
 
 public class ModuleDataService : IModuleDataService
 {
-    private List<InstallableTrackingModule>? _remoteModules;
+    private IEnumerable<InstallableTrackingModule>? _remoteModules;
     private readonly Dictionary<Guid, int> _ratingCache = new();
 
     private readonly IIdentityService _identityService;
@@ -51,8 +51,8 @@ public class ModuleDataService : IModuleDataService
     public async Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules()
     {
         _remoteModules ??= new List<InstallableTrackingModule>(await AllModules());
-
-        return _remoteModules;
+        
+        return new List<InstallableTrackingModule>(_remoteModules);
     }
 
     public async Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata)
@@ -84,7 +84,6 @@ public class ModuleDataService : IModuleDataService
         {
             AssemblyLoadPath = moduleDll,
             DllFileName = Path.GetFileName(moduleDll),
-            InstallationState = InstallState.Installed,
             ModuleId = Guid.Empty,
             ModuleName = Path.GetFileNameWithoutExtension(moduleDll),
             ModuleDescription = "Legacy module",
