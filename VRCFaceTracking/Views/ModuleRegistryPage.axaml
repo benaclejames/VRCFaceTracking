@@ -19,12 +19,12 @@
 
             <Border Grid.Row="1" CornerRadius="6" BorderThickness="1" Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <ListBox
-                    ItemsSource="{Binding ModuleInfos}"
+                    ItemsSource="{Binding ModuleInfos, Mode=OneWay}"
                     SelectedItem="{Binding Selected}"
                     SelectionChanged="ModuleSelection_Click"
                     ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="models:InstallableTrackingModule">
+                        <DataTemplate x:DataType="models:InstallTrackedTrackingModule">
                             <Grid Height="56" Margin="4,2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -32,10 +32,10 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
                                     <TextBlock FontSize="14" FontWeight="SemiBold"
-                                               Text="{Binding ModuleName}"
+                                               Text="{Binding TrackingModuleMetadata.ModuleName}"
                                                TextTrimming="CharacterEllipsis" />
                                     <TextBlock FontSize="12" Opacity="0.6"
-                                               Text="{Binding AuthorName}"
+                                               Text="{Binding TrackingModuleMetadata.AuthorName}"
                                                TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
                                 <Border Grid.Column="1" CornerRadius="4" Padding="6,2"
@@ -64,7 +64,7 @@
                 CornerRadius="6"
                 BorderThickness="1">
                 <ScrollViewer Padding="20">
-                    <StackPanel Spacing="14" DataContext="{Binding Selected}">
+                    <StackPanel Spacing="14" DataContext="{Binding Selected.TrackingModuleMetadata}">
 
                         <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
                             <StackPanel Spacing="4">

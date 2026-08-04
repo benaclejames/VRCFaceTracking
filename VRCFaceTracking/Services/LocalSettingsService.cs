@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Helpers;
@@ -13,7 +14,8 @@ public class LocalSettingsService : ILocalSettingsService
 
     private readonly IFileService _fileService;
     private readonly LocalSettingsOptions _options;
-
+    private readonly ILogger<LocalSettingsService> _logger;
+    
     private readonly string _localApplicationData = Core.Utils.PersistentDataDirectory;
     private readonly string _applicationDataFolder;
     private readonly string _localSettingsFile;
@@ -27,10 +29,11 @@ public class LocalSettingsService : ILocalSettingsService
     private CancellationTokenSource? _cts = new();
     private static readonly TimeSpan Debounce = TimeSpan.FromMilliseconds(300);
     
-    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
+    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options, ILogger<LocalSettingsService> logger)
     {
         _fileService = fileService;
         _options = options.Value;
+        _logger = logger;
 
         _applicationDataFolder = Path.Combine(_localApplicationData, _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
         _localSettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
@@ -40,11 +43,58 @@ public class LocalSettingsService : ILocalSettingsService
 
     private async Task InitializeAsync()
     {
-        if (!_isInitialized)
+        if (_isInitialized)
         {
-            _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localSettingsFile)) ?? new Dictionary<string, object>();
+            return;
+        }
 
-            _isInitialized = true;
+        var backupFile = _localSettingsFile + ".bak";
+        var mainPath = Path.Combine(_applicationDataFolder, _localSettingsFile);
+        var backupPath = Path.Combine(_applicationDataFolder, backupFile);
+
+        var loaded = await Task.Run(() => TestSettingsFileRead(_localSettingsFile));
+        if (loaded == null)
+        {
+            // If our primary settings file is unreadable or corrupt
+            _logger.LogWarning("Primary settings is was corrupt");
+            loaded = await Task.Run(() => TestSettingsFileRead(backupFile));
+            if (loaded != null)
+            {
+                // But our backup settings file isn't corrupt then restore it
+                _logger.LogWarning("Restoring primary settings from session backup");
+                Directory.CreateDirectory(_applicationDataFolder);
+                File.Copy(backupPath, mainPath, overwrite: true);
+            }
+        }
+
+        _settings = loaded ?? new Dictionary<string, object>();
+
+        if (loaded == null)
+        {
+            // Neither file was usable. Restore defaults
+            _logger.LogWarning("Restoring default settings");
+            await _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
+        }
+
+        if (File.Exists(mainPath))
+        {
+            // Copy current main file to backup file
+            Directory.CreateDirectory(_applicationDataFolder);
+            File.Copy(mainPath, backupPath, overwrite: true);
+        }
+
+        _isInitialized = true;
+    }
+
+    private IDictionary<string, object>? TestSettingsFileRead(string fileName)
+    {
+        try
+        {
+            return _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, fileName);
+        }
+        catch
+        {
+            return null;
         }
     }
 

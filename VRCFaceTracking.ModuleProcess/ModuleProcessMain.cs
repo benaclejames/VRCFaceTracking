@@ -40,7 +40,7 @@ public class ModuleProcessMain
         {
             Logger.LogInformation("Received SIGTERM");
             WaitForPackets = false;
-            DefModuleAssembly._updateCts.Cancel();
+            DefModuleAssembly._updateCts?.Cancel();
             cts.Cancel();
             cts.Token.WaitHandle.WaitOne(TimeSpan.FromSeconds(5));
         };
@@ -101,9 +101,6 @@ public class ModuleProcessMain
 
     static int VrcftMain(string modulePath, int serverPortNumber, int? parentPid = null)
     {
-        // Give the main process enough time to add the module to the list before we begin sending data
-        Thread.Sleep(50);
-
         ServiceProvider serviceProvider = new ServiceCollection()
         .AddLogging((loggingBuilder) => loggingBuilder
                 .ClearProviders()
@@ -165,10 +162,6 @@ public class ModuleProcessMain
             var pkt = new EventLogPacket(level, msg);
             Client.SendData(pkt);
         };
-
-        // Try loading the module
-        DefModuleAssembly = new ModuleAssembly(Logger, LoggerFactory, modulePath);
-        DefModuleAssembly.TryLoadAssembly();
 
         // Initialise to invalid state
         UnifiedTracking.Data = new() {
@@ -277,6 +270,9 @@ public class ModuleProcessMain
                         // Tell VRCFT we have shutdown immediately
                         Client.SendData(pkt);
                         
+                        // Flush all remaining stuff
+                        Client.SendAllPendingPackets();
+                        
                         Logger.LogInformation("Sent teardown ACK");
 
                         // Shut down the event loop
@@ -307,9 +303,27 @@ public class ModuleProcessMain
             Core.Utils.TimeBeginPeriod(1);
         }
         
+        DefModuleAssembly = new ModuleAssembly(Logger, LoggerFactory, modulePath);
+        
         // Start the connection
+        Logger.LogInformation("Connecting to Sandbox Server");
         Client.Connect(modulePath);
-        Logger.LogInformation("Initializing {module}", DefModuleAssembly.Assembly.ToString());
+        
+        // Try loading the module
+        Logger.LogInformation("Initializing {module}", Path.GetFileNameWithoutExtension(DefModuleAssembly.ModulePath));
+        
+        // If we failed to load any modules, there's no point us running any further
+        /*if (!DefModuleAssembly.Loaded)
+        {
+            var pkt = new ReplyTeardownPacket();
+            // Tell VRCFT we have shutdown immediately
+            Client.SendData(pkt);
+            
+            // Flush all remaining stuff
+            Client.SendAllPendingPackets();
+            
+            Environment.Exit(ModuleProcessExitCodes.OK);
+        }*/
 
         _connectionTimer = new Timer(_ =>
         {

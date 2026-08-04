@@ -1,12 +1,13 @@
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using VRCFaceTracking.Contracts;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
 
-public partial class ModuleRegistryPage : UserControl
+public partial class ModuleRegistryPage : UserControl, INotifyNavigated
 {
     private ModuleRegistryViewModel ViewModel => (ModuleRegistryViewModel)DataContext!;
     private readonly ModuleInstaller _moduleInstaller;
@@ -18,14 +19,11 @@ public partial class ModuleRegistryPage : UserControl
         _moduleInstaller = Ioc.Default.GetRequiredService<ModuleInstaller>();
     }
 
-    public void OnNavigatedTo()
-    {
-        ViewModel.OnNavigatedTo(null);
-    }
+    public async void OnNavigatedTo() => await ViewModel.OnNavigatedTo();
 
     private async void ModuleSelection_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {   
-        if (ViewModel.Selected is not InstallableTrackingModule module) return;
+        if (ViewModel.Selected is not InstallTrackedTrackingModule module) return;
         InstallButton.IsVisible = module.InstallationState != InstallState.Installed;
         UninstallButton.IsVisible = module.InstallationState == InstallState.Installed;
         InstallButton.Content = "Install";
@@ -38,13 +36,13 @@ public partial class ModuleRegistryPage : UserControl
     }
     private async void InstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (ViewModel.Selected is not InstallableTrackingModule module) return;
+        if (ViewModel.Selected is not InstallTrackedTrackingModule module) return;
         InstallButton.IsEnabled = false;
         InstallButton.Content = "Installing...";
 
         try
         {
-            await _moduleInstaller.InstallRemoteModule(module);
+            await _moduleInstaller.InstallRemoteModule(module.TrackingModuleMetadata);
             module.InstallationState = InstallState.Installed;
         }
         finally
@@ -53,20 +51,18 @@ public partial class ModuleRegistryPage : UserControl
         }
     }
 
-    private void UninstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void UninstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (ViewModel.Selected is not InstallableTrackingModule module) return;
+        if (ViewModel.Selected is not InstallTrackedTrackingModule module) return;
 
-        _moduleInstaller.UninstallModule(module);
-        InstallButton.IsVisible = false;
         UninstallButton.IsEnabled = false;
-        UninstallButton.Content = "Please restart VRCFT to complete uninstallation.";
-        module.InstallationState = InstallState.AwaitingRestart;
+        await _moduleInstaller.UninstallModule(module.TrackingModuleMetadata);
+        await ViewModel.OnNavigatedTo();
     }
 
     private async void OpenModulePage_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (ViewModel.Selected?.ModulePageUrl is not { Length: > 0 } url) return;
+        if (ViewModel.Selected?.TrackingModuleMetadata.ModulePageUrl is not { Length: > 0 } url) return;
         
         try
         {

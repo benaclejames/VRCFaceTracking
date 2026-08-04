@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 
-namespace VRCFaceTracking.Services;
+namespace VRCFaceTracking.Services.Logging;
 
-public sealed class OutputLogProvider : ILoggerProvider
+public sealed class OutputPageLogProvider : ILoggerProvider
 {
     private readonly ConcurrentDictionary<string, OutputPageLogger> _loggers =
         new(StringComparer.OrdinalIgnoreCase);

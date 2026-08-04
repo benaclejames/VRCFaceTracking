@@ -1,8 +1,8 @@
-using System.Collections.Specialized;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using VRCFaceTracking.Services;
+using VRCFaceTracking.Services.Logging;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -10,24 +10,44 @@ namespace VRCFaceTracking.Views;
 public partial class OutputPage : UserControl
 {
     private OutputViewModel ViewModel => (OutputViewModel)DataContext!;
+    private const double StickThreshold = 40;
+    private bool _snapping;
 
     public OutputPage()
     {
         InitializeComponent();
         DataContext = Ioc.Default.GetRequiredService<OutputViewModel>();
 
-        // Auto-scroll when new log lines arrive
-        OutputPageLogger.FilteredLogs.CollectionChanged += OnLogsChanged;
+        LogItems.AddHandler(ScrollViewer.ScrollChangedEvent, OnLogItemsScrollChanged, RoutingStrategies.Bubble);
     }
 
-    private void OnLogsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnLogItemsScrollChanged(object? sender, ScrollChangedEventArgs e)
     {
-        LogScroller.ScrollToEnd();
+        if (_snapping || LogItems.Scroll is not { } scroll)
+            return;
+
+        if (e.ExtentDelta.Y <= 0)
+            return;
+
+        var prevExtent = scroll.Extent.Height - e.ExtentDelta.Y;
+        var prevTarget = prevExtent - scroll.Viewport.Height;
+        var prevOffsetY = scroll.Offset.Y - e.OffsetDelta.Y;
+        var wasAtBottom = prevTarget <= 0 || prevTarget - prevOffsetY <= StickThreshold;
+        if (!wasAtBottom)
+            return;
+
+        var target = scroll.Extent.Height - scroll.Viewport.Height;
+        if (target <= 0 || scroll.Offset.Y >= target)
+            return;
+
+        _snapping = true;
+        try { scroll.Offset = scroll.Offset.WithY(target); }
+        finally { _snapping = false; }
     }
 
     private async void CopyToClipboard_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        var text = ViewModel.AllLogsText;
+        var text = Ioc.Default.GetRequiredService<LogBufferProvider>().Snapshot();
         var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
         if (clipboard != null)
         {
@@ -52,7 +72,8 @@ public partial class OutputPage : UserControl
         {
             await using var stream = await file.OpenWriteAsync();
             await using var writer = new StreamWriter(stream);
-            await writer.WriteAsync(ViewModel.AllLogsText);
+            var text = Ioc.Default.GetRequiredService<LogBufferProvider>().Snapshot();
+            await writer.WriteAsync(text);
             StatusText.Text = "Log saved.";
         }
     }

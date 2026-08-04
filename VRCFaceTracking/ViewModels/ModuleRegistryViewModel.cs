@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-
+using DynamicData;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 
@@ -10,53 +10,46 @@ namespace VRCFaceTracking.ViewModels;
 public partial class ModuleRegistryViewModel : ObservableRecipient
 {
     private readonly IModuleDataService _moduleDataService;
-    [ObservableProperty] private InstallableTrackingModule? _selected;
+    [ObservableProperty] private InstallTrackedTrackingModule? _selected;
 
-    public ObservableCollection<InstallableTrackingModule> ModuleInfos { get; } = new();
+    public ObservableCollection<InstallTrackedTrackingModule> ModuleInfos { get; } = new();
     
     public ModuleRegistryViewModel(IModuleDataService moduleDataService)
     {
         _moduleDataService = moduleDataService;
     }
 
-    public async void OnNavigatedTo(object parameter)
+    public async Task OnNavigatedTo()
     {
         ModuleInfos.Clear();
 
         var data = await _moduleDataService.GetRemoteModules();
         
+        // Lay out our list as we normally would with ordering and all, and assume all are uninstalled
+        ModuleInfos.AddRange(new ObservableCollection<InstallTrackedTrackingModule>(data
+            .OrderByDescending(x => x.AuthorName == "VRCFT Team").ThenBy(x => x.ModuleName).Select(x =>
+                new InstallTrackedTrackingModule {TrackingModuleMetadata = x, InstallationState = InstallState.NotInstalled})));
+        
         // Now comes the tricky bit, we get all locally installed modules and add them to the list.
         // If any of the IDs match a remote module and the other data contained within does not match,
         // then we need to set the local module install state to outdated. If everything matches then we need to set the install state to installed.
         var installedModules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-        var localModules = new List<InstallableTrackingModule>();    // dw about it
         foreach (var installedModule in installedModules)
         {
-            installedModule.InstallationState = InstallState.Installed;
-            var remoteModule = data.FirstOrDefault(x => x.ModuleId == installedModule.ModuleId);
+            var remoteModule = ModuleInfos.FirstOrDefault(x => x.TrackingModuleMetadata.ModuleId == installedModule.ModuleId);
             if (remoteModule == null)   // If this module is completely missing from the remote list, then we need to add it to the list.
             {
-                // This module is installed but not in the remote list, so we need to add it to the list.
-                localModules.Add(installedModule);
+                // This module is installed but not in the remote list, so we need to add it to the list at the top
+                ModuleInfos.Insert(0, new InstallTrackedTrackingModule {TrackingModuleMetadata = installedModule, InstallationState = InstallState.Installed});
             }
             else
             {
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
-                remoteModule.InstallationState = remoteModule.Version != installedModule.Version ? InstallState.Outdated : InstallState.Installed;
+                remoteModule.InstallationState = remoteModule.TrackingModuleMetadata.Version != installedModule.Version
+                    ? InstallState.Outdated
+                    : InstallState.Installed;
+                ModuleInfos.Move(ModuleInfos.IndexOf(remoteModule), 0);
             }
-        }
-
-        // Sort our data by name, then place any modules with the author name VRCFT Team at the top of the list. (unbiased)
-        data = data.OrderByDescending(x => x.InstallationState == InstallState.Installed)
-            .ThenByDescending(x => x.AuthorName == "VRCFT Team")
-            .ThenBy(x => x.ModuleName);
-        
-        // Then prepend the local modules to the list.
-        data = localModules.Concat(data);
-
-        foreach (var item in data)
-        {
-            ModuleInfos.Add(item);
         }
     }
 }

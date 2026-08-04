@@ -4,6 +4,7 @@
     xmlns:ui="using:FluentAvalonia.UI.Controls"
     xmlns:vm="using:VRCFaceTracking.ViewModels"
     xmlns:svc="using:VRCFaceTracking.Services"
+    xmlns:models="clr-namespace:VRCFaceTracking.Models"
     x:DataType="vm:OutputViewModel"
     x:Class="VRCFaceTracking.Views.OutputPage">
 
@@ -24,22 +25,41 @@
 
         <Border Grid.Row="1" CornerRadius="6" BorderThickness="1" Padding="4"
                 Background="{DynamicResource ControlFillColorDefaultBrush}">
-            <ScrollViewer x:Name="LogScroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding Logs}" x:Name="LogItems">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="svc:LogLine">
-                            <TextBlock
-                                x:Name="LogText"
-                                Text="{Binding Message}"
-                                FontFamily="Cascadia Mono, Consolas, Courier New, monospace"
-                                FontSize="12"
-                                Padding="6,1"
-                                TextWrapping="NoWrap"
-                                Foreground="{Binding Level, Converter={StaticResource LogLevelBrushConverter}}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <ListBox x:Name="LogItems"
+                     ItemsSource="{Binding Logs}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     SelectionMode="Single"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.AllowAutoHide="False">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="MinHeight" Value="0" />
+                    </Style>
+                    <Style Selector="ListBox /template/ ScrollViewer">
+                        <Setter Property="Padding" Value="0,0,0,16" />
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:LogLine">
+                        <TextBlock
+                            x:Name="LogText"
+                            Text="{Binding Message}"
+                            FontFamily="Cascadia Mono, Consolas, Courier New, monospace"
+                            FontSize="12"
+                            Padding="6,1"
+                            TextWrapping="NoWrap"
+                            Foreground="{Binding Level, Converter={StaticResource LogLevelBrushConverter}}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Border>
     </Grid>
 </UserControl>

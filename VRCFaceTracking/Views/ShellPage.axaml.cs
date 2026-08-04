@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
+using VRCFaceTracking.Contracts;
 
 namespace VRCFaceTracking.Views;
 
@@ -40,8 +41,8 @@ public partial class ShellPage : UserControl
         _currentPage = page;
 
         // Notify module registry when navigated to so it loads data
-        if (page == _moduleRegistryPage)
-            _moduleRegistryPage.OnNavigatedTo();
+        if (page is INotifyNavigated notifyNavigated)
+            notifyNavigated.OnNavigatedTo();
     }
 
     private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
