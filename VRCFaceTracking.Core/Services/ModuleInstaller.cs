@@ -343,5 +343,7 @@ public class ModuleInstaller(ILogger<ModuleInstaller> logger, ILibManager libMan
         {
             logger.LogDebug("Module {module} could not be found where it was expected in {moduleDirectory}", moduleMetadata.ModuleId, moduleDirectory);
         }
+
+        await libManager.Initialize();
     }
 }
