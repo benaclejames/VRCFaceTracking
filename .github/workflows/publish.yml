@@ -19,6 +19,7 @@ jobs:
 
       - name: Download latest translations
         run: crowdin download
+        continue-on-error: true
         env:
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
