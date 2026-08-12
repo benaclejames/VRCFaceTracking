@@ -36,6 +36,7 @@
     <Resource Language="pl-PL"/>
     <Resource Language="es-ES"/>
     <Resource Language="ja-JP"/>
+    <Resource Language="ko-KR"/>
   </Resources>
 
   <Applications>

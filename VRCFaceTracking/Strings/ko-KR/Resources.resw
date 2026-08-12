@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>VRCFaceTracking</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>VRCFaceTracking</value>
+  </data>
+  <data name="Shell_Main.Content" xml:space="preserve">
+    <value>홈</value>
+  </data>
+  <data name="ListDetails_NoSelection.Text" xml:space="preserve">
+    <value>목록에서 항목을 선택하세요.</value>
+  </data>
+  <data name="Shell_ListDetails.Content" xml:space="preserve">
+    <value>세부정보 확인</value>
+  </data>
+  <data name="Settings_Personalization.Text" xml:space="preserve">
+    <value>개인화</value>
+  </data>
+  <data name="Settings_Theme.Text" xml:space="preserve">
+    <value>테마</value>
+  </data>
+  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+    <value>라이트 모드</value>
+  </data>
+  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+    <value>다크 모드</value>
+  </data>
+  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+    <value>기본값</value>
+  </data>
+  <data name="Settings_About.Text" xml:space="preserve">
+    <value>VRChat OSC 앱을 사용하여 AV3 아바타가 눈과 입술 추적 런타임과 상호 작용합니다</value>
+  </data>
+  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+    <value>VRChat OSC 앱을 사용하여 AV3 아바타가 눈과 입술 추적 런타임과 상호 작용합니다</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
+    <value>개인정보 보호정책</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
+    <value>https://github.com/benaclejames/VRCFaceTracking</value>
+  </data>
+  <data name="AppNotificationSamplePayload" xml:space="preserve">
+    <value>&lt;toast launch="action=ToastClick"&gt;
+  &lt;visual&gt;
+    &lt;binding template="ToastGeneric"&gt;
+      &lt;text&gt;App Notification&lt;/text&gt;
+      &lt;text&gt;&lt;/text&gt;
+      &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
+    &lt;/binding&gt;
+  &lt;/visual&gt;
+  &lt;actions&gt;
+    &lt;action content="Settings" arguments="action=Settings"/&gt;
+  &lt;/actions&gt;
+&lt;/toast&gt;</value>
+  </data>
+  <data name="Shell_Output.Content" xml:space="preserve">
+    <value>출력</value>
+  </data>
+  <data name="Shell_Parameters.Content" xml:space="preserve">
+    <value>파라미터</value>
+  </data>
+  <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
+    <value>목록에서 항목을 선택하세요.</value>
+  </data>
+  <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
+    <value>모듈 레지스트리</value>
+  </data>
+  <data name="About.Text" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="Appearance.Text" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Author.Text" xml:space="preserve">
+    <value>제작자</value>
+  </data>
+  <data name="AvatarStatus.Text" xml:space="preserve">
+    <value>아바타 상태</value>
+  </data>
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>로컬 테스트 아바타 감지됨</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>로컬 테스트 아바타는 지원되지 않으며 문제가 발생할 수 있습니다.</value>
+  </data>
+  <data name="Copyright.Description" xml:space="preserve">
+    <value>© 2023 VRCFaceTracking. 모든 권리 보유.</value>
+  </data>
+  <data name="Credits.Description" xml:space="preserve">
+    <value>이 모든 것을 가능하게 만든 천재들 &lt;3</value>
+  </data>
+  <data name="Dependencies.Header" xml:space="preserve">
+    <value>종속 &amp; 참조</value>
+  </data>
+  <data name="Description.Text" xml:space="preserve">
+    <value>설명</value>
+  </data>
+  <data name="Disclaimer.Header" xml:space="preserve">
+    <value>본 코드 및 정보는 명시적이든 묵시적이든 어떠한 종류의 보증 없이 "있는 그대로" 제공되며, 상품성 및/또는 특정 목적에의 적합성에 대한 묵시적 보증을 포함하되 이에 국한되지 않습니다.</value>
+  </data>
+  <data name="Downloads.Text" xml:space="preserve">
+    <value>다운로드</value>
+  </data>
+  <data name="EyeTrackingActive.Text" xml:space="preserve">
+    <value>눈 트래킹 활성화됨</value>
+  </data>
+  <data name="FaceTrackingActive.Text" xml:space="preserve">
+    <value>얼굴 트래킹 활성화됨</value>
+  </data>
+  <data name="EyeTrackingInactive.Text" xml:space="preserve">
+    <value>눈 트래킹 비활성화됨</value>
+  </data>
+  <data name="FaceTrackingInactive.Text" xml:space="preserve">
+    <value>얼굴 트래킹 비활성화됨</value>
+  </data>
+  <data name="BugRequestCard.Header" xml:space="preserve">
+    <value>버그 신고 제출</value>
+  </data>
+  <data name="PrivacyPolicyCard.Header" xml:space="preserve">
+    <value>개인정보 정책</value>
+  </data>
+  <data name="LastUpdated.Text" xml:space="preserve">
+    <value>마지막 업데이트</value>
+  </data>
+  <data name="LegacyParameters.Text" xml:space="preserve">
+    <value>레거시 파라미터</value>
+  </data>
+  <data name="Listening_on_Port.Text" xml:space="preserve">
+    <value>수신중인 포트:</value>
+  </data>
+  <data name="ModulePage.Text" xml:space="preserve">
+    <value>모듈 페이지</value>
+  </data>
+  <data name="msIncoming.Text" xml:space="preserve">
+    <value>msgs/sec 수신</value>
+  </data>
+  <data name="msOutgoing.Text" xml:space="preserve">
+    <value>msgs/sec 송신</value>
+  </data>
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
+    <value>설치된 모듈 없음</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>여기에서 모듈을 설치하세요!</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>OSC 설정 수정됨</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>VRChat에서 OSC가 꺼져 있는 것을 확인했습니다. 방금 활성화해 드렸습니다. 만약 게임이 실행 중인 상태에서 문제가 발생했다면, 실행 메뉴에서 수동으로 OSC를 활성화해야 할 수도 있습니다. 그렇지 않다면 바로 사용 가능합니다!</value>
+  </data>
+  <data name="OSCStatus.Text" xml:space="preserve">
+    <value>OSC 상태</value>
+  </data>
+  <data name="Parameters.Text" xml:space="preserve">
+    <value>파라미터</value>
+  </data>
+  <data name="Rating.Text" xml:space="preserve">
+    <value>평점</value>
+  </data>
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>앱 테마</value>
+  </data>
+  <data name="ThemeSettings.Description" xml:space="preserve">
+    <value>사용할 앱 테마를 선택하세요</value>
+  </data>
+  <data name="Sending_on_Port.Text" xml:space="preserve">
+    <value>송신중인 포트:</value>
+  </data>
+  <data name="ToggleTracking.Content" xml:space="preserve">
+    <value>트래킹 토글</value>
+  </data>
+  <data name="CloneRepoCard.Header" xml:space="preserve">
+    <value>이 레포지토리를 복제하려면</value>
+  </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>로컬 저장소 열기</value>
+  </data>
+  <data name="UsageInstructions.Text" xml:space="preserve">
+    <value>사용 지침</value>
+  </data>
+  <data name="Version.Text" xml:space="preserve">
+    <value>버전</value>
+  </data>
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>OSC 주소</value>
+  </data>
+  <data name="OscSettings.Description" xml:space="preserve">
+    <value>OSC 데이터를 어디로 보내야 하나요?</value>
+  </data>
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
+    <value>설치된 모듈이 없는것 같습니다.</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>캘리브레이션 설정</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>추적 데이터를 직접 조정하세요</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>위험한 설정</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>주의, 주의. 고전압..</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>자동 시작</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>SteamVR이 실행되면 자동으로 시작됩니다</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+    <value>캘리브레이션 활성화됨</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+    <value>Toggles whether or not calibration is enabled</value>
+  </data>
+  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+    <value>연속 캘리브레이션</value>
+  </data>
+  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+    <value>시간이 지나면서 서서히 사용자의 얼굴 표정에 맞춰 조정됩니다.</value>
+  </data>
+  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+    <value>캘리브레이션</value>
+  </data>
+  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+    <value>일시적으로 표정이 캘리브레이션에 미치는 영향을 높입니다</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+    <value>캘리브레이션 영향</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+    <value>얼굴 표정이 시간이 지남에 따라 전체적인 캘리브레이션에 미치는 영향을 조절합니다.</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>캘리브레이션</value>
+  </data>
+  <data name="ForceReInitButton.Description" xml:space="preserve">
+    <value>강제로 모든 모듈을 언로드하고 초기화합니다</value>
+  </data>
+  <data name="ForceReInitButton.Header" xml:space="preserve">
+    <value>강제 재초기화</value>
+  </data>
+  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+    <value>관련성을 강제하여 프레임마다 모든 매개변수를 전송하도록 합니다.</value>
+  </data>
+  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+    <value>Force Relevancy</value>
+  </data>
+  <data name="ReInitButton.Content" xml:space="preserve">
+    <value>재초기화</value>
+  </data>
+  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+    <value>모든 VRChat OSC 데이터를 초기화합니다 (아바타가 다시 로딩되면 재생성됩니다)</value>
+  </data>
+  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+    <value>VRChat 설정 초기화</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>초기화</value>
+  </data>
+  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+    <value>AppData 폴더에 있는 모든 VRCFT 데이터를 삭제합니다</value>
+  </data>
+  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+    <value>VRCFT 초기화</value>
+  </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>하드웨어 디버그</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>혀의 위치를 확인해 보세요</value>
+  </data>
+  <data name="Shell_TrackingSettings.Content" xml:space="preserve">
+    <value>추적 설정</value>
+  </data>
+</root>
