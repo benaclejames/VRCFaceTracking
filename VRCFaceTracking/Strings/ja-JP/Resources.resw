@@ -186,7 +186,7 @@
     <value>モジュール管理</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>About</value>
+    <value>情報</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
     <value>アプリケーションライセンス</value>
@@ -198,13 +198,13 @@
     <value>アバターステータス</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Local Test Avatar Detected</value>
+    <value>ローカルテストアバターが検出されました</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Local Test Avatars are not supported and will cause issues</value>
+    <value>ローカルテストアバターはサポートされておらず、問題が発生します</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. All rights reserved.</value>
+    <value>© 2023 VRCFaceTracking. 無断複写・転載を禁じます。</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
     <value>ソフトウエアに貢献してくれた方々</value>
@@ -216,7 +216,7 @@
     <value>概要</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.</value>
+    <value>本コードおよび情報は「現状のまま」提供され、明示または黙示を問わず、商品性および/または特定目的への適合性の黙示的保証を含むがこれらに限定されない、いかなる種類の保証も伴いません。</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
     <value>ダウンロード数</value>
@@ -228,19 +228,22 @@
     <value>フェイストラッキング　アクティブ</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Eye Tracking Inactive</value>
+    <value>アイトラッキング 非アクティブ</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Face Tracking Inactive</value>
+    <value>フェイストラッキング 非アクティブ</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
     <value>バグレポートを提出する</value>
+  </data>
+  <data name="PrivacyPolicyCard.Header" xml:space="preserve">
+    <value>プライバシーポリシー</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
     <value>最終更新</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Legacy Parameters</value>
+    <value>レガシーパラメーター</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
     <value>受信ポート:</value>
@@ -325,5 +328,71 @@
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
     <value>SteamVRの起動時に自動で起動します</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+    <value>キャリブレーション有効</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+    <value>キャリブレーションの有効・無効を切り替えます</value>
+  </data>
+  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+    <value>連続キャリブレーション</value>
+  </data>
+  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+    <value>時間の経過とともに、あなたの表情に合わせて徐々にキャリブレーションを行います</value>
+  </data>
+  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+    <value>キャリブレーション</value>
+  </data>
+  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+    <value>あなたの表情がキャリブレーションに与える影響を一時的に高めます</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+    <value>キャリブレーションへの影響</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+    <value>あなたの表情が時間の経過とともに全体のキャリブレーションにどの程度影響を与えるかを制御します</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>キャリブレーション</value>
+  </data>
+  <data name="ForceReInitButton.Description" xml:space="preserve">
+    <value>VRCFTにすべてのモジュールを強制的にアンロードして再初期化させます</value>
+  </data>
+  <data name="ForceReInitButton.Header" xml:space="preserve">
+    <value>強制再初期化</value>
+  </data>
+  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+    <value>関連性を強制することで、毎フレームすべてのパラメーターの送信を強制します</value>
+  </data>
+  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+    <value>関連性を強制</value>
+  </data>
+  <data name="ReInitButton.Content" xml:space="preserve">
+    <value>再初期化</value>
+  </data>
+  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+    <value>すべてのVRChat OSC設定データをリセットします（アバターの再読み込み時に再生成されます）</value>
+  </data>
+  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+    <value>VRChat設定をリセット</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>リセット</value>
+  </data>
+  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+    <value>AppDataフォルダー内のVRCFTが保存したすべてのデータをリセットします</value>
+  </data>
+  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+    <value>VRCFTをリセット</value>
+  </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>ハードウェアデバッグ</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>自分の舌でも眺めていてください</value>
+  </data>
+  <data name="Shell_TrackingSettings.Content" xml:space="preserve">
+    <value>トラッキング設定</value>
   </data>
 </root>

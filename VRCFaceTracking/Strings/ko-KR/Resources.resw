@@ -189,7 +189,7 @@
     <value>정보</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Appearance</value>
+    <value>외관</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
     <value>제작자</value>
@@ -333,7 +333,7 @@
     <value>캘리브레이션 활성화됨</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Toggles whether or not calibration is enabled</value>
+    <value>캘리브레이션 활성화 여부를 전환합니다</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
     <value>연속 캘리브레이션</value>
@@ -366,7 +366,7 @@
     <value>관련성을 강제하여 프레임마다 모든 매개변수를 전송하도록 합니다.</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Force Relevancy</value>
+    <value>관련성 강제</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
     <value>재초기화</value>

@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Start</value>
+    <value>Início</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Selecione um item da lista.</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>Wyświetl szczegóły</value>
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+    <value>Personalização</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Tema</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
+    <value>Claro</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
+    <value>Escuro</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
+    <value>Padrão</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplicativo OSC do VRChat que permite que avatares AV3 interajam com runtimes de rastreamento ocular e labial</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplicativo OSC do VRChat que permite que avatares AV3 interajam com runtimes de rastreamento ocular e labial</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Declaração de Privacidade</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,225 +174,225 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Logi</value>
+    <value>Saída</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Parâmetros</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Selecione um item da lista.</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Rejestr modułów</value>
+    <value>Registro de Módulos</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>O programie</value>
+    <value>Sobre</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Wygląd</value>
+    <value>Aparência</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
     <value>Autor</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Status awatara</value>
+    <value>Status do Avatar</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Wykryto lokalny awatar testowy</value>
+    <value>Avatar de Teste Local Detectado</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
+    <value>Avatares de Teste Local não são suportados e causarão problemas</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
+    <value>© 2023 VRCFaceTracking. Todos os direitos reservados.</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
+    <value>Os nerds que tornaram tudo isso possível &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
-    <value>Zależności &amp; odnośniki</value>
+    <value>Dependências &amp; referências</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Opis</value>
+    <value>Descrição</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
+    <value>ESTE CÓDIGO E AS INFORMAÇÕES SÃO FORNECIDOS ‘NO ESTADO EM QUE SE ENCONTRAM’, SEM GARANTIA DE QUALQUER TIPO, EXPRESSA OU IMPLÍCITA, INCLUINDO, MAS NÃO SE LIMITANDO A, GARANTIAS IMPLÍCITAS DE COMERCIALIZAÇÃO E/OU ADEQUAÇÃO A UM PROPÓSITO ESPECÍFICO.</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Pobrań</value>
+    <value>Downloads</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie oczu aktywne</value>
+    <value>Rastreamento Ocular Ativo</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy aktywne</value>
+    <value>Rastreamento Facial Ativo</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie oczu nieaktywne</value>
+    <value>Rastreamento Ocular Inativo</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy nieaktywne</value>
+    <value>Rastreamento Facial Inativo</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
-    <value>Zgłoś błąd</value>
+    <value>Reportar um bug</value>
   </data>
   <data name="PrivacyPolicyCard.Header" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Política de Privacidade</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>Ostatnia aktualizacja</value>
+    <value>Última Atualização</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Przestarzałe parametry</value>
+    <value>Parâmetros Legados</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Port nasłuchiwania:</value>
+    <value>Escutando na Porta:</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>Strona modułu</value>
+    <value>Página do Módulo</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>wiad./s przychodzących</value>
+    <value>msgs/sec Recebidas</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>wiad./s wychodzących</value>
+    <value>msgs/sec Enviadas</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
-    <value>Brak zainstalowanych modułów.</value>
+    <value>Nenhum Módulo Instalado</value>
   </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
-    <value>Zainstaluj jakieś stąd!</value>
+    <value>Instale alguns por aqui!</value>
   </data>
   <data name="osc_was_disabled_warning.Title" xml:space="preserve">
-    <value>Zmodyfikowano ustawienia OSC</value>
+    <value>Configurações do OSC Modificadas</value>
   </data>
   <data name="osc_was_disabled_warning.Description" xml:space="preserve">
-    <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
+    <value>Percebemos que o OSC estava desativado no VRChat e o ativamos para você. Se o jogo estava aberto quando isso aconteceu, talvez seja necessário ativá-lo manualmente pelo menu radial. Caso contrário, está tudo pronto!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
-    <value>Status OSC</value>
+    <value>Status do OSC</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Parâmetros</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Ocena</value>
+    <value>Avaliação</value>
   </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Tema do aplicativo</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
-    <value>Wybierz motyw aplikacji</value>
+    <value>Selecione qual tema do aplicativo exibir</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Port wysyłania:</value>
+    <value>Enviando na Porta:</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Przełącz śledzenie</value>
+    <value>Alternar Rastreamento</value>
   </data>
   <data name="CloneRepoCard.Header" xml:space="preserve">
-    <value>Klonowanie repozytorium</value>
+    <value>Para clonar este repositório</value>
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
-    <value>Otwórz lokalną pamięć</value>
+    <value>Abrir Armazenamento Local</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>Instrukcja użytkowania</value>
+    <value>Instruções de Uso</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Wersja</value>
+    <value>Versão</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
-    <value>Adres OSC</value>
+    <value>Endereço OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
-    <value>Gdzie wysyłać dane OSC?</value>
+    <value>Para onde os dados OSC devem ser enviados?</value>
   </data>
   <data name="no_modules_installed_warning.Description" xml:space="preserve">
-    <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
+    <value>Parece que você não tem nenhum módulo instalado.</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">
-    <value>Ustawienia kalibracji</value>
+    <value>Configurações de Calibração</value>
   </data>
   <data name="CalibrationSettings.Description" xml:space="preserve">
-    <value>Dostosuj dane śledzenia do swoich potrzeb</value>
+    <value>Ajuste os dados de rastreamento como bem entender</value>
   </data>
   <data name="RiskySettings.Header" xml:space="preserve">
-    <value>Ryzykowne ustawienia</value>
+    <value>Configurações Arriscadas</value>
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
-    <value>Ostrożnie! Kopie!</value>
+    <value>Perigo, perigo. Alta voltagem..</value>
   </data>
   <data name="AutoStartSettings.Header" xml:space="preserve">
-    <value>Automatyczne uruchamianie</value>
+    <value>Iniciar Automaticamente</value>
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
-    <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
+    <value>Iniciar automaticamente quando o SteamVR for aberto</value>
   </data>
   <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
-    <value>Włącz kalibrację</value>
+    <value>Calibração Ativada</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Przełącza czy kalibracja jest włączona</value>
+    <value>Alterna se a calibração está ativada ou não</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
-    <value>Ciągła kalibracja</value>
+    <value>Calibração Contínua</value>
   </data>
   <data name="ContCalibrationToggle.Description" xml:space="preserve">
-    <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
+    <value>Calibra lentamente com base em suas expressões faciais ao longo do tempo</value>
   </data>
   <data name="TrackingCalibrateButton.Header" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Calibrar</value>
   </data>
   <data name="TrackingCalibrateButton.Description" xml:space="preserve">
-    <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
+    <value>Aumente temporariamente a influência que suas expressões têm sobre a calibração</value>
   </data>
   <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
-    <value>Wpływ na kalibrację</value>
+    <value>Influência da Calibração</value>
   </data>
   <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
-    <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
+    <value>Controla o quanto suas expressões faciais influenciam a calibração geral ao longo do tempo</value>
   </data>
   <data name="CalibrateButton.Content" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Calibrar</value>
   </data>
   <data name="ForceReInitButton.Description" xml:space="preserve">
-    <value>Wymuś na VRCFT reset wszystkich modułów</value>
+    <value>Força o VRCFT a descarregar e reinicializar todos os módulos</value>
   </data>
   <data name="ForceReInitButton.Header" xml:space="preserve">
-    <value>Wymuś reinicjalizację</value>
+    <value>Forçar Reinicialização</value>
   </data>
   <data name="ForceRelevancyToggle.Description" xml:space="preserve">
-    <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
+    <value>Força o envio de todos os parâmetros a cada quadro, forçando a relevância</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Wymuszaj istotność</value>
+    <value>Forçar Relevância</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
-    <value>Reinicjalizuj</value>
+    <value>Reinicializar</value>
   </data>
   <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
+    <value>Redefine todos os dados de configuração do OSC do VRChat (serão gerados novamente quando o avatar for recarregado)</value>
   </data>
   <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Resetuj pliki konfiguracyjne VRChat</value>
+    <value>Redefinir Configurações do VRChat</value>
   </data>
   <data name="ResetButton.Content" xml:space="preserve">
-    <value>Resetuj</value>
+    <value>Redefinir</value>
   </data>
   <data name="ResetVRCFTButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
+    <value>Redefine todos os dados armazenados pelo VRCFT em sua pasta AppData</value>
   </data>
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
-    <value>Resetuj VRCFT</value>
+    <value>Redefinir VRCFT</value>
   </data>
   <data name="HardwareDebug.Header" xml:space="preserve">
-    <value>Debug sprzętu</value>
+    <value>Depuração de Hardware</value>
   </data>
   <data name="HardwareDebug.Description" xml:space="preserve">
-    <value>Po prostu pooglądaj sobie swój język</value>
+    <value>Ficar olhando para sua língua, eu acho?</value>
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
-    <value>Ustawienia śledzenia</value>
+    <value>Configurações de Rastreamento</value>
   </data>
 </root>
