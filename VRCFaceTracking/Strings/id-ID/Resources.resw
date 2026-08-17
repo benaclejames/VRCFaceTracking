@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Start</value>
+    <value>Beranda</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Pilih item dari daftar.</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>Wyświetl szczegóły</value>
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+    <value>Personalisasi</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Tema</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
+    <value>Terang</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
+    <value>Gelap</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
+    <value>Bawaan</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplikasi OSC untuk VRChat yang memungkinkan avatar AV3 berinteraksi dengan runtime pelacakan mata dan bibir</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplikasi OSC untuk VRChat yang memungkinkan avatar AV3 berinteraksi dengan runtime pelacakan mata dan bibir</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Pernyataan Privasi</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,225 +174,225 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Logi</value>
+    <value>Keluaran</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Parameter</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Pilih item dari daftar.</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Rejestr modułów</value>
+    <value>Registri Modul</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>O programie</value>
+    <value>Tentang</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Wygląd</value>
+    <value>Tampilan</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
-    <value>Autor</value>
+    <value>Pembuat</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Status awatara</value>
+    <value>Status Avatar</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Wykryto lokalny awatar testowy</value>
+    <value>Avatar Uji Lokal Terdeteksi</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
+    <value>Avatar Uji Lokal tidak didukung dan akan menyebabkan masalah</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
+    <value>© 2023 VRCFaceTracking. Seluruh hak cipta dilindungi.</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
+    <value>Para kutu buku yang membuat semua ini menjadi mungkin &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
-    <value>Zależności &amp; odnośniki</value>
+    <value>Dependensi &amp; referensi</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Opis</value>
+    <value>Deskripsi</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
+    <value>KODE DAN INFORMASI INI DISEDIAKAN ‘SEBAGAIMANA ADANYA’ TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN TERSIRAT, TERMASUK NAMUN TIDAK TERBATAS PADA JAMINAN TERSIRAT ATAS KELAYAKAN UNTUK DIPERJUALBELIKAN DAN/ATAU KESESUAIAN UNTUK TUJUAN TERTENTU.</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Pobrań</value>
+    <value>Unduhan</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie oczu aktywne</value>
+    <value>Pelacakan Mata Aktif</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy aktywne</value>
+    <value>Pelacakan Wajah Aktif</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie oczu nieaktywne</value>
+    <value>Pelacakan Mata Nonaktif</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy nieaktywne</value>
+    <value>Pelacakan Wajah Nonaktif</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
-    <value>Zgłoś błąd</value>
+    <value>Laporkan bug</value>
   </data>
   <data name="PrivacyPolicyCard.Header" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Kebijakan Privasi</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>Ostatnia aktualizacja</value>
+    <value>Terakhir Diperbarui</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Przestarzałe parametry</value>
+    <value>Parameter Lama</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Port nasłuchiwania:</value>
+    <value>Mendengarkan pada Port:</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>Strona modułu</value>
+    <value>Halaman Modul</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>wiad./s przychodzących</value>
+    <value>msgs/sec Masuk</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>wiad./s wychodzących</value>
+    <value>msgs/sec Keluar</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
-    <value>Brak zainstalowanych modułów.</value>
+    <value>Tidak Ada Modul Terpasang</value>
   </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
-    <value>Zainstaluj jakieś stąd!</value>
+    <value>Pasang beberapa dari sini!</value>
   </data>
   <data name="osc_was_disabled_warning.Title" xml:space="preserve">
-    <value>Zmodyfikowano ustawienia OSC</value>
+    <value>Pengaturan OSC Diubah</value>
   </data>
   <data name="osc_was_disabled_warning.Description" xml:space="preserve">
-    <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
+    <value>Kami mendeteksi bahwa OSC di VRChat kamu dalam kondisi mati, dan kami baru saja mengaktifkannya untukmu. Jika game sedang terbuka saat ini terjadi, kamu mungkin perlu mengaktifkannya secara manual melalui radial menu. Jika tidak, semuanya sudah siap digunakan!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
     <value>Status OSC</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Parameter</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Ocena</value>
+    <value>Peringkat</value>
   </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Tema aplikasi</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
-    <value>Wybierz motyw aplikacji</value>
+    <value>Pilih tema aplikasi yang ingin ditampilkan</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Port wysyłania:</value>
+    <value>Mengirim pada Port:</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Przełącz śledzenie</value>
+    <value>Alihkan Pelacakan</value>
   </data>
   <data name="CloneRepoCard.Header" xml:space="preserve">
-    <value>Klonowanie repozytorium</value>
+    <value>Untuk mengkloning repositori ini</value>
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
-    <value>Otwórz lokalną pamięć</value>
+    <value>Buka Penyimpanan Lokal</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>Instrukcja użytkowania</value>
+    <value>Petunjuk Penggunaan</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Wersja</value>
+    <value>Versi</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
-    <value>Adres OSC</value>
+    <value>Alamat OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
-    <value>Gdzie wysyłać dane OSC?</value>
+    <value>Ke mana data OSC harus dikirim?</value>
   </data>
   <data name="no_modules_installed_warning.Description" xml:space="preserve">
-    <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
+    <value>Sepertinya kamu belum memasang modul apa pun.</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">
-    <value>Ustawienia kalibracji</value>
+    <value>Pengaturan Kalibrasi</value>
   </data>
   <data name="CalibrationSettings.Description" xml:space="preserve">
-    <value>Dostosuj dane śledzenia do swoich potrzeb</value>
+    <value>Sesuaikan data pelacakan sesuka hatimu</value>
   </data>
   <data name="RiskySettings.Header" xml:space="preserve">
-    <value>Ryzykowne ustawienia</value>
+    <value>Pengaturan Berisiko</value>
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
-    <value>Ostrożnie! Kopie!</value>
+    <value>Bahaya, bahaya. Tegangan tinggi..</value>
   </data>
   <data name="AutoStartSettings.Header" xml:space="preserve">
-    <value>Automatyczne uruchamianie</value>
+    <value>Mulai Otomatis</value>
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
-    <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
+    <value>Mulai otomatis saat SteamVR dijalankan</value>
   </data>
   <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
-    <value>Włącz kalibrację</value>
+    <value>Kalibrasi Diaktifkan</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Przełącza czy kalibracja jest włączona</value>
+    <value>Mengalihkan apakah kalibrasi diaktifkan atau tidak</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
-    <value>Ciągła kalibracja</value>
+    <value>Kalibrasi Berkelanjutan</value>
   </data>
   <data name="ContCalibrationToggle.Description" xml:space="preserve">
-    <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
+    <value>Mengkalibrasi ekspresi wajahmu secara perlahan seiring waktu</value>
   </data>
   <data name="TrackingCalibrateButton.Header" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Kalibrasi</value>
   </data>
   <data name="TrackingCalibrateButton.Description" xml:space="preserve">
-    <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
+    <value>Meningkatkan pengaruh ekspresi wajahmu terhadap kalibrasi untuk sementara</value>
   </data>
   <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
-    <value>Wpływ na kalibrację</value>
+    <value>Pengaruh Kalibrasi</value>
   </data>
   <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
-    <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
+    <value>Mengatur seberapa besar pengaruh ekspresi wajahmu terhadap kalibrasi secara keseluruhan seiring waktu</value>
   </data>
   <data name="CalibrateButton.Content" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Kalibrasi</value>
   </data>
   <data name="ForceReInitButton.Description" xml:space="preserve">
-    <value>Wymuś na VRCFT reset wszystkich modułów</value>
+    <value>Memaksa VRCFT untuk membongkar dan menginisialisasi ulang semua modul</value>
   </data>
   <data name="ForceReInitButton.Header" xml:space="preserve">
-    <value>Wymuś reinicjalizację</value>
+    <value>Paksa Inisialisasi Ulang</value>
   </data>
   <data name="ForceRelevancyToggle.Description" xml:space="preserve">
-    <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
+    <value>Memaksa pengiriman semua parameter di setiap frame dengan memaksa relevansi</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Wymuszaj istotność</value>
+    <value>Paksa Relevansi</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
-    <value>Reinicjalizuj</value>
+    <value>Inisialisasi Ulang</value>
   </data>
   <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
+    <value>Setel ulang semua data konfigurasi OSC VRChat (akan dibuat ulang saat avatar dimuat kembali)</value>
   </data>
   <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Resetuj pliki konfiguracyjne VRChat</value>
+    <value>Setel Ulang Konfigurasi VRChat</value>
   </data>
   <data name="ResetButton.Content" xml:space="preserve">
-    <value>Resetuj</value>
+    <value>Setel Ulang</value>
   </data>
   <data name="ResetVRCFTButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
+    <value>Setel ulang semua data yang disimpan VRCFT di folder AppData kamu</value>
   </data>
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
-    <value>Resetuj VRCFT</value>
+    <value>Setel Ulang VRCFT</value>
   </data>
   <data name="HardwareDebug.Header" xml:space="preserve">
-    <value>Debug sprzętu</value>
+    <value>Debug Perangkat Keras</value>
   </data>
   <data name="HardwareDebug.Description" xml:space="preserve">
-    <value>Po prostu pooglądaj sobie swój język</value>
+    <value>Tatap lidahmu, mungkin?</value>
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
-    <value>Ustawienia śledzenia</value>
+    <value>Pengaturan Pelacakan</value>
   </data>
 </root>

@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Start</value>
+    <value>หน้าแรก</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>เลือกรายการจากรายการด้านข้าง</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>Wyświetl szczegóły</value>
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+    <value>การปรับแต่งส่วนบุคคล</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
+    <value>ธีม</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
+    <value>สว่าง</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
+    <value>มืด</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
+    <value>ค่าเริ่มต้น</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>แอป OSC สำหรับ VRChat ที่ช่วยให้อวตาร AV3 ทำงานร่วมกับระบบติดตามการเคลื่อนไหวของดวงตาและริมฝีปากได้</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>แอป OSC สำหรับ VRChat ที่ช่วยให้อวตาร AV3 ทำงานร่วมกับระบบติดตามการเคลื่อนไหวของดวงตาและริมฝีปากได้</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>นโยบายความเป็นส่วนตัว</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,225 +174,225 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Logi</value>
+    <value>ผลลัพธ์</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
-    <value>Parametry</value>
+    <value>พารามิเตอร์</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>เลือกรายการจากรายการด้านข้าง</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Rejestr modułów</value>
+    <value>คลังโมดูล</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>O programie</value>
+    <value>เกี่ยวกับ</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Wygląd</value>
+    <value>ลักษณะที่แสดง</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
-    <value>Autor</value>
+    <value>ผู้พัฒนา</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Status awatara</value>
+    <value>สถานะอวตาร</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Wykryto lokalny awatar testowy</value>
+    <value>ตรวจพบอวตารทดสอบในเครื่อง</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
+    <value>ไม่รองรับอวตารทดสอบในเครื่อง และอาจทำให้เกิดปัญหาได้</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
+    <value>© 2023 VRCFaceTracking สงวนลิขสิทธิ์ทุกประการ</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
+    <value>ขอบคุณเหล่ากีคที่ทำให้สิ่งนี้เกิดขึ้นได้ &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
-    <value>Zależności &amp; odnośniki</value>
+    <value>ไลบรารีที่ใช้ &amp; แหล่งอ้างอิง</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Opis</value>
+    <value>คำอธิบาย</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
+    <value>โค้ดและข้อมูลนี้ให้บริการ “ตามสภาพที่เป็นอยู่” โดยไม่มีการรับประกันใด ๆ ทั้งโดยชัดแจ้งหรือโดยนัย ซึ่งรวมถึงแต่ไม่จำกัดเพียงการรับประกันโดยนัยเกี่ยวกับความสามารถในการนำไปใช้เชิงพาณิชย์ และ/หรือความเหมาะสมสำหรับวัตถุประสงค์เฉพาะอย่างใดอย่างหนึ่ง</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Pobrań</value>
+    <value>ยอดดาวน์โหลด</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie oczu aktywne</value>
+    <value>ระบบติดตามดวงตากำลังทำงาน</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy aktywne</value>
+    <value>ระบบติดตามใบหน้ากำลังทำงาน</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie oczu nieaktywne</value>
+    <value>ระบบติดตามดวงตาไม่ทำงาน</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy nieaktywne</value>
+    <value>ระบบติดตามใบหน้าไม่ทำงาน</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
-    <value>Zgłoś błąd</value>
+    <value>แจ้งปัญหา (Bug Report)</value>
   </data>
   <data name="PrivacyPolicyCard.Header" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>นโยบายความเป็นส่วนตัว</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>Ostatnia aktualizacja</value>
+    <value>อัปเดตล่าสุด</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Przestarzałe parametry</value>
+    <value>พารามิเตอร์รุ่นเก่า</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Port nasłuchiwania:</value>
+    <value>รับฟังที่พอร์ต:</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>Strona modułu</value>
+    <value>หน้าโมดูล</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>wiad./s przychodzących</value>
+    <value>msgs/sec ขาเข้า</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>wiad./s wychodzących</value>
+    <value>msgs/sec ขาออก</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
-    <value>Brak zainstalowanych modułów.</value>
+    <value>ยังไม่ได้ติดตั้งโมดูล</value>
   </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
-    <value>Zainstaluj jakieś stąd!</value>
+    <value>ติดตั้งได้จากที่นี่!</value>
   </data>
   <data name="osc_was_disabled_warning.Title" xml:space="preserve">
-    <value>Zmodyfikowano ustawienia OSC</value>
+    <value>การตั้งค่า OSC ถูกเปลี่ยนแปลง</value>
   </data>
   <data name="osc_was_disabled_warning.Description" xml:space="preserve">
-    <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
+    <value>เราพบว่า OSC ของคุณถูกปิดอยู่ใน VRChat จึงได้เปิดใช้งานให้คุณเรียบร้อยแล้ว หากเกมเปิดอยู่ในตอนที่เกิดเหตุการณ์นี้ คุณอาจต้องเปิดใช้งานด้วยตนเองผ่านเมนูวงกลม (radial menu) แต่ถ้าไม่ ก็พร้อมใช้งานได้เลย!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
-    <value>Status OSC</value>
+    <value>สถานะ OSC</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
-    <value>Parametry</value>
+    <value>พารามิเตอร์</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Ocena</value>
+    <value>คะแนน</value>
   </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
-    <value>Motyw</value>
+    <value>ธีมของแอป</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
-    <value>Wybierz motyw aplikacji</value>
+    <value>เลือกธีมของแอปที่ต้องการแสดง</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Port wysyłania:</value>
+    <value>ส่งออกที่พอร์ต:</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Przełącz śledzenie</value>
+    <value>เปิด/ปิดการติดตาม</value>
   </data>
   <data name="CloneRepoCard.Header" xml:space="preserve">
-    <value>Klonowanie repozytorium</value>
+    <value>วิธีโคลนคลังโค้ดนี้</value>
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
-    <value>Otwórz lokalną pamięć</value>
+    <value>เปิดที่จัดเก็บข้อมูลในเครื่อง</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>Instrukcja użytkowania</value>
+    <value>วิธีใช้งาน</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Wersja</value>
+    <value>เวอร์ชัน</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
-    <value>Adres OSC</value>
+    <value>ที่อยู่ OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
-    <value>Gdzie wysyłać dane OSC?</value>
+    <value>ต้องการให้ส่งข้อมูล OSC ไปที่ใด?</value>
   </data>
   <data name="no_modules_installed_warning.Description" xml:space="preserve">
-    <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
+    <value>ดูเหมือนว่าคุณยังไม่ได้ติดตั้งโมดูลใด ๆ</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">
-    <value>Ustawienia kalibracji</value>
+    <value>การตั้งค่าการปรับเทียบ</value>
   </data>
   <data name="CalibrationSettings.Description" xml:space="preserve">
-    <value>Dostosuj dane śledzenia do swoich potrzeb</value>
+    <value>ปรับแต่งข้อมูลการติดตามได้ตามใจชอบ</value>
   </data>
   <data name="RiskySettings.Header" xml:space="preserve">
-    <value>Ryzykowne ustawienia</value>
+    <value>การตั้งค่าที่มีความเสี่ยง</value>
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
-    <value>Ostrożnie! Kopie!</value>
+    <value>อันตราย อันตราย ไฟฟ้าแรงสูง..</value>
   </data>
   <data name="AutoStartSettings.Header" xml:space="preserve">
-    <value>Automatyczne uruchamianie</value>
+    <value>เริ่มอัตโนมัติ</value>
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
-    <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
+    <value>เริ่มทำงานอัตโนมัติเมื่อเปิด SteamVR</value>
   </data>
   <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
-    <value>Włącz kalibrację</value>
+    <value>เปิดใช้งานการปรับเทียบ</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Przełącza czy kalibracja jest włączona</value>
+    <value>เปิดหรือปิดการใช้งานการปรับเทียบ</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
-    <value>Ciągła kalibracja</value>
+    <value>การปรับเทียบแบบต่อเนื่อง</value>
   </data>
   <data name="ContCalibrationToggle.Description" xml:space="preserve">
-    <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
+    <value>ค่อย ๆ ปรับเทียบตามการแสดงสีหน้าของคุณเมื่อเวลาผ่านไป</value>
   </data>
   <data name="TrackingCalibrateButton.Header" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>ปรับเทียบ</value>
   </data>
   <data name="TrackingCalibrateButton.Description" xml:space="preserve">
-    <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
+    <value>เพิ่มระดับอิทธิพลของสีหน้าของคุณต่อการปรับเทียบเป็นการชั่วคราว</value>
   </data>
   <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
-    <value>Wpływ na kalibrację</value>
+    <value>อิทธิพลของการปรับเทียบ</value>
   </data>
   <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
-    <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
+    <value>ควบคุมว่าสีหน้าของคุณมีอิทธิพลต่อการปรับเทียบโดยรวมมากน้อยเพียงใดเมื่อเวลาผ่านไป</value>
   </data>
   <data name="CalibrateButton.Content" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>ปรับเทียบ</value>
   </data>
   <data name="ForceReInitButton.Description" xml:space="preserve">
-    <value>Wymuś na VRCFT reset wszystkich modułów</value>
+    <value>บังคับให้ VRCFT ยกเลิกการโหลดและเริ่มต้นโมดูลทั้งหมดใหม่</value>
   </data>
   <data name="ForceReInitButton.Header" xml:space="preserve">
-    <value>Wymuś reinicjalizację</value>
+    <value>บังคับเริ่มต้นใหม่</value>
   </data>
   <data name="ForceRelevancyToggle.Description" xml:space="preserve">
-    <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
+    <value>บังคับให้ส่งพารามิเตอร์ทั้งหมดในทุกเฟรม โดยการบังคับให้ถือว่าเกี่ยวข้องเสมอ</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Wymuszaj istotność</value>
+    <value>บังคับความเกี่ยวข้อง</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
-    <value>Reinicjalizuj</value>
+    <value>เริ่มต้นใหม่</value>
   </data>
   <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
+    <value>รีเซ็ตข้อมูลการตั้งค่า OSC ของ VRChat ทั้งหมด (จะถูกสร้างขึ้นใหม่เมื่อโหลดอวตารอีกครั้ง)</value>
   </data>
   <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Resetuj pliki konfiguracyjne VRChat</value>
+    <value>รีเซ็ตการตั้งค่า VRChat</value>
   </data>
   <data name="ResetButton.Content" xml:space="preserve">
-    <value>Resetuj</value>
+    <value>รีเซ็ต</value>
   </data>
   <data name="ResetVRCFTButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
+    <value>รีเซ็ตข้อมูลทั้งหมดที่ VRCFT จัดเก็บไว้ในโฟลเดอร์ AppData ของคุณ</value>
   </data>
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
-    <value>Resetuj VRCFT</value>
+    <value>รีเซ็ต VRCFT</value>
   </data>
   <data name="HardwareDebug.Header" xml:space="preserve">
-    <value>Debug sprzętu</value>
+    <value>ดีบักฮาร์ดแวร์</value>
   </data>
   <data name="HardwareDebug.Description" xml:space="preserve">
-    <value>Po prostu pooglądaj sobie swój język</value>
+    <value>ลองจ้องดูลิ้นของคุณดูสิ?</value>
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
-    <value>Ustawienia śledzenia</value>
+    <value>การตั้งค่าการติดตาม</value>
   </data>
 </root>

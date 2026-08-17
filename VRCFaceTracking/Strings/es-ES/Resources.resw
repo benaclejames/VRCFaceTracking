@@ -197,8 +197,17 @@
   <data name="AvatarStatus.Text" xml:space="preserve">
     <value>Estado del avatar</value>
   </data>
-  <data name="copyright.Description" xml:space="preserve">
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>Avatar de prueba local detectado</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>Los avatares de prueba local no son compatibles y causarán problemas</value>
+  </data>
+  <data name="Copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking. Todos los derechos reservados.</value>
+  </data>
+  <data name="Credits.Description" xml:space="preserve">
+    <value>Los cerebritos que hicieron todo esto posible &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
     <value>Dependencias y referencias</value>
@@ -219,13 +228,16 @@
     <value>Seguimiento facial activo</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Eye Tracking Inactive</value>
+    <value>Seguimiento ocular inactivo</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Face Tracking Inactive</value>
+    <value>Seguimiento facial inactivo</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
     <value>Registrar un error o solicitar una nueva muestra</value>
+  </data>
+  <data name="PrivacyPolicyCard.Header" xml:space="preserve">
+    <value>Política de privacidad</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
     <value>Última actualización</value>
@@ -248,6 +260,21 @@
   <data name="NoModulesInstalled.Text" xml:space="preserve">
     <value>No hay módulos instalados</value>
   </data>
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
+    <value>No hay módulos instalados</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>¡Instala algunos desde aquí!</value>
+  </data>
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
+    <value>Parece que no tienes ningún módulo instalado.</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>Ajustes de OSC modificados</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>Notamos que tu OSC estaba desactivado en VRChat; lo hemos activado por ti. Si el juego estaba abierto cuando ocurrió, es posible que debas habilitarlo manualmente desde tu menú radial. Si no, ¡ya estás listo!</value>
+  </data>
   <data name="OSCStatus.Text" xml:space="preserve">
     <value>Estado de OSC</value>
   </data>
@@ -256,6 +283,9 @@
   </data>
   <data name="Rating.Text" xml:space="preserve">
     <value>Valoración</value>
+  </data>
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>Tema de la aplicación</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
     <value>Selecciona qué tema de aplicación mostrar</value>
@@ -269,11 +299,17 @@
   <data name="CloneRepoCard.Header" xml:space="preserve">
     <value>Para clonar este repositorio</value>
   </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>Abrir almacenamiento local</value>
+  </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Instrucciones de uso</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
     <value>Versión</value>
+  </data>
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>Dirección OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
     <value>¿Dónde se deben enviar los datos OSC?</value>
@@ -283,5 +319,86 @@
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
     <value>Configuración de Seguimiento</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>Ajustes de calibración</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>Ajusta los datos de seguimiento a tu gusto</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>Ajustes arriesgados</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>Peligro, peligro. Alto voltaje..</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>Inicio automático</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>Iniciar automáticamente cuando se abre SteamVR</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+    <value>Calibración activada</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+    <value>Activa o desactiva la calibración</value>
+  </data>
+  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+    <value>Calibración continua</value>
+  </data>
+  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+    <value>Calibra lentamente según tus expresiones faciales con el tiempo</value>
+  </data>
+  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+    <value>Calibrar</value>
+  </data>
+  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+    <value>Aumenta temporalmente la influencia de tus expresiones en la calibración</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+    <value>Influencia de calibración</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+    <value>Controla cuánta influencia tienen tus expresiones faciales sobre la calibración global con el tiempo</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>Calibrar</value>
+  </data>
+  <data name="ForceReInitButton.Description" xml:space="preserve">
+    <value>Fuerza a VRCFT a descargar y reinicializar todos los módulos</value>
+  </data>
+  <data name="ForceReInitButton.Header" xml:space="preserve">
+    <value>Forzar reinicialización</value>
+  </data>
+  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+    <value>Fuerza el envío de todos los parámetros en cada fotograma forzando la relevancia</value>
+  </data>
+  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+    <value>Forzar relevancia</value>
+  </data>
+  <data name="ReInitButton.Content" xml:space="preserve">
+    <value>Reinicializar</value>
+  </data>
+  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+    <value>Restablecer todos los datos de configuración OSC de VRChat (se regenerarán cuando se recargue el avatar)</value>
+  </data>
+  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+    <value>Restablecer configuraciones de VRChat</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
+  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+    <value>Restablece todos los datos almacenados por VRCFT en tu carpeta AppData</value>
+  </data>
+  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+    <value>Restablecer VRCFT</value>
+  </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>Depuración de hardware</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>¿Mírate la lengua, supongo?</value>
   </data>
 </root>

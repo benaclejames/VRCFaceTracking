@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Start</value>
+    <value>Domů</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Vyberte položku ze seznamu.</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>Wyświetl szczegóły</value>
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+    <value>Přizpůsobení</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Motiv</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
+    <value>Světlý</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
+    <value>Tmavý</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
+    <value>Výchozí</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplikace VRChat OSC umožňující avatarům AV3 pracovat s runtimy pro sledování očí a rtů</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Aplikace VRChat OSC umožňující avatarům AV3 pracovat s runtimy pro sledování očí a rtů</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Prohlášení o ochraně osobních údajů</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,225 +174,225 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Logi</value>
+    <value>Výstup</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
     <value>Parametry</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Vyberte položku ze seznamu.</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Rejestr modułów</value>
+    <value>Registr modulů</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>O programie</value>
+    <value>O aplikaci</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Wygląd</value>
+    <value>Vzhled</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
     <value>Autor</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Status awatara</value>
+    <value>Stav avatara</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Wykryto lokalny awatar testowy</value>
+    <value>Zjištěn lokální testovací avatar</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
+    <value>Lokální testovací avatary nejsou podporovány a způsobí problémy</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
+    <value>© 2023 VRCFaceTracking. Všechna práva vyhrazena.</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
+    <value>Šílenci, díky kterým to všechno vzniklo &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
-    <value>Zależności &amp; odnośniki</value>
+    <value>Závislosti a reference</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Opis</value>
+    <value>Popis</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
+    <value>TENTO KÓD A INFORMACE JSOU POSKYTOVÁNY „TAK, JAK JSOU“ BEZ JAKÉKOLI ZÁRUKY, AŤ UŽ VÝSLOVNÉ, NEBO PŘEDPOKLÁDANÉ, VČETNĚ, ALE NIKOLI VÝHRADNĚ, PŘEDPOKLÁDANÝCH ZÁRUK PRODEJNOSTI A/NEBO VHODNOSTI PRO KONKRÉTNÍ ÚČEL.</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Pobrań</value>
+    <value>Stažení</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie oczu aktywne</value>
+    <value>Sledování očí je aktivní</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy aktywne</value>
+    <value>Sledování obličeje je aktivní</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie oczu nieaktywne</value>
+    <value>Sledování očí je neaktivní</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy nieaktywne</value>
+    <value>Sledování obličeje je neaktivní</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
-    <value>Zgłoś błąd</value>
+    <value>Nahlásit chybu</value>
   </data>
   <data name="PrivacyPolicyCard.Header" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Zásady ochrany osobních údajů</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>Ostatnia aktualizacja</value>
+    <value>Naposledy aktualizováno</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Przestarzałe parametry</value>
+    <value>Starší parametry</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Port nasłuchiwania:</value>
+    <value>Naslouchání na portu:</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>Strona modułu</value>
+    <value>Stránka modulu</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>wiad./s przychodzących</value>
+    <value>msgs/sec příchozí</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>wiad./s wychodzących</value>
+    <value>msgs/sec odchozí</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
-    <value>Brak zainstalowanych modułów.</value>
+    <value>Nejsou nainstalovány žádné moduly</value>
   </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
-    <value>Zainstaluj jakieś stąd!</value>
+    <value>Nějaké si nainstalujte odsud!</value>
   </data>
   <data name="osc_was_disabled_warning.Title" xml:space="preserve">
-    <value>Zmodyfikowano ustawienia OSC</value>
+    <value>Nastavení OSC bylo změněno</value>
   </data>
   <data name="osc_was_disabled_warning.Description" xml:space="preserve">
-    <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
+    <value>Všimli jsme si, že máte ve VRChat vypnuté OSC – právě jsme ho za vás zapnuli. Pokud byla hra v tu chvíli spuštěná, možná bude potřeba ho ručně aktivovat z radiálního menu. Jinak by mělo být vše připravené!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
-    <value>Status OSC</value>
+    <value>Stav OSC</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
     <value>Parametry</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Ocena</value>
+    <value>Hodnocení</value>
   </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Motiv aplikace</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
-    <value>Wybierz motyw aplikacji</value>
+    <value>Vyberte, který motiv aplikace se má zobrazit</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Port wysyłania:</value>
+    <value>Odesílání na portu:</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Przełącz śledzenie</value>
+    <value>Přepnout sledování</value>
   </data>
   <data name="CloneRepoCard.Header" xml:space="preserve">
-    <value>Klonowanie repozytorium</value>
+    <value>Naklonování tohoto repozitáře</value>
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
-    <value>Otwórz lokalną pamięć</value>
+    <value>Otevřít místní úložiště</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>Instrukcja użytkowania</value>
+    <value>Návod k použití</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Wersja</value>
+    <value>Verze</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
-    <value>Adres OSC</value>
+    <value>Adresa OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
-    <value>Gdzie wysyłać dane OSC?</value>
+    <value>Kam se mají data OSC odesílat?</value>
   </data>
   <data name="no_modules_installed_warning.Description" xml:space="preserve">
-    <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
+    <value>Zdá se, že nemáte nainstalované žádné moduly.</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">
-    <value>Ustawienia kalibracji</value>
+    <value>Nastavení kalibrace</value>
   </data>
   <data name="CalibrationSettings.Description" xml:space="preserve">
-    <value>Dostosuj dane śledzenia do swoich potrzeb</value>
+    <value>Dolaďte si sledovaná data podle libosti</value>
   </data>
   <data name="RiskySettings.Header" xml:space="preserve">
-    <value>Ryzykowne ustawienia</value>
+    <value>Riziková nastavení</value>
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
-    <value>Ostrożnie! Kopie!</value>
+    <value>Pozor, pozor. Vysoké napětí..</value>
   </data>
   <data name="AutoStartSettings.Header" xml:space="preserve">
-    <value>Automatyczne uruchamianie</value>
+    <value>Automatické spuštění</value>
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
-    <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
+    <value>Automaticky spustit při startu SteamVR</value>
   </data>
   <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
-    <value>Włącz kalibrację</value>
+    <value>Kalibrace povolena</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Przełącza czy kalibracja jest włączona</value>
+    <value>Přepíná, zda je kalibrace povolena</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
-    <value>Ciągła kalibracja</value>
+    <value>Průběžná kalibrace</value>
   </data>
   <data name="ContCalibrationToggle.Description" xml:space="preserve">
-    <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
+    <value>Postupně se v čase přizpůsobuje vašim mimickým výrazům</value>
   </data>
   <data name="TrackingCalibrateButton.Header" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Kalibrovat</value>
   </data>
   <data name="TrackingCalibrateButton.Description" xml:space="preserve">
-    <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
+    <value>Dočasně zvýší vliv vašich výrazů na kalibraci</value>
   </data>
   <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
-    <value>Wpływ na kalibrację</value>
+    <value>Vliv kalibrace</value>
   </data>
   <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
-    <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
+    <value>Určuje, jak velký vliv mají vaše mimické výrazy na celkovou kalibraci v průběhu času</value>
   </data>
   <data name="CalibrateButton.Content" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Kalibrovat</value>
   </data>
   <data name="ForceReInitButton.Description" xml:space="preserve">
-    <value>Wymuś na VRCFT reset wszystkich modułów</value>
+    <value>Vynutí, aby VRCFT uvolnil a znovu inicializoval všechny moduly</value>
   </data>
   <data name="ForceReInitButton.Header" xml:space="preserve">
-    <value>Wymuś reinicjalizację</value>
+    <value>Vynutit reinicializaci</value>
   </data>
   <data name="ForceRelevancyToggle.Description" xml:space="preserve">
-    <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
+    <value>Vynutí odesílání všech parametrů v každém snímku vynucením relevance</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Wymuszaj istotność</value>
+    <value>Vynutit relevanci</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
-    <value>Reinicjalizuj</value>
+    <value>Znovu inicializovat</value>
   </data>
   <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
+    <value>Obnoví veškerá konfigurační data VRChat OSC (znovu se vygenerují při načtení avatara)</value>
   </data>
   <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Resetuj pliki konfiguracyjne VRChat</value>
+    <value>Obnovit konfigurace VRChat</value>
   </data>
   <data name="ResetButton.Content" xml:space="preserve">
-    <value>Resetuj</value>
+    <value>Obnovit</value>
   </data>
   <data name="ResetVRCFTButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
+    <value>Obnoví veškerá data uložená VRCFT ve složce AppData</value>
   </data>
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
-    <value>Resetuj VRCFT</value>
+    <value>Obnovit VRCFT</value>
   </data>
   <data name="HardwareDebug.Header" xml:space="preserve">
-    <value>Debug sprzętu</value>
+    <value>Ladění hardwaru</value>
   </data>
   <data name="HardwareDebug.Description" xml:space="preserve">
-    <value>Po prostu pooglądaj sobie swój język</value>
+    <value>Zírejte si na jazyk, no ne?</value>
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
-    <value>Ustawienia śledzenia</value>
+    <value>Nastavení sledování</value>
   </data>
 </root>

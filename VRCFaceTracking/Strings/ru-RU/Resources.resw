@@ -1,17 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
+  <!--
+    Microsoft ResX Schema
+
     Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
     associated with the data types.
-    
+
     Example:
-    
+
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,36 +26,36 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-                
-    There are any number of "resheader" rows that contain simple 
+
+    There are any number of "resheader" rows that contain simple
     name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
     mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
     extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
     read any of the formats listed below.
-    
+
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
+    value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte array
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
@@ -124,37 +124,37 @@
     <value>VRCFaceTracking</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>Start</value>
+    <value>Главная</value>
   </data>
   <data name="ListDetails_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Выберите элемент из списка.</value>
   </data>
   <data name="Shell_ListDetails.Content" xml:space="preserve">
-    <value>Wyświetl szczegóły</value>
+    <value>ListDetails</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+    <value>Персонализация</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Тема</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
+    <value>Светлая</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
+    <value>Тёмная</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
+    <value>Системная</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Приложение VRChat OSC, позволяющее аватарам AV3 работать с системами отслеживания глаз и губ</value>
   </data>
   <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
+    <value>Приложение VRChat OSC, позволяющее аватарам AV3 работать с системами отслеживания глаз и губ</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Политика конфиденциальности</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
@@ -174,225 +174,225 @@
 &lt;/toast&gt;</value>
   </data>
   <data name="Shell_Output.Content" xml:space="preserve">
-    <value>Logi</value>
+    <value>Вывод</value>
   </data>
   <data name="Shell_Parameters.Content" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Параметры</value>
   </data>
   <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
-    <value>Wybierz opcję z listy.</value>
+    <value>Выберите элемент из списка.</value>
   </data>
   <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
-    <value>Rejestr modułów</value>
+    <value>Реестр модулей</value>
   </data>
   <data name="About.Text" xml:space="preserve">
-    <value>O programie</value>
+    <value>О программе</value>
   </data>
   <data name="Appearance.Text" xml:space="preserve">
-    <value>Wygląd</value>
+    <value>Внешний вид</value>
   </data>
   <data name="Author.Text" xml:space="preserve">
-    <value>Autor</value>
+    <value>Автор</value>
   </data>
   <data name="AvatarStatus.Text" xml:space="preserve">
-    <value>Status awatara</value>
+    <value>Состояние аватара</value>
   </data>
   <data name="LocalTestAvatar.Text" xml:space="preserve">
-    <value>Wykryto lokalny awatar testowy</value>
+    <value>Обнаружен локальный тестовый аватар</value>
   </data>
   <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
-    <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
+    <value>Локальные тестовые аватары не поддерживаются и могут приводить к сбоям</value>
   </data>
   <data name="Copyright.Description" xml:space="preserve">
-    <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
+    <value>© 2023 VRCFaceTracking. Все права защищены.</value>
   </data>
   <data name="Credits.Description" xml:space="preserve">
-    <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
+    <value>Гики, благодаря которым всё это стало возможным &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
-    <value>Zależności &amp; odnośniki</value>
+    <value>Зависимости и ссылки</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Opis</value>
+    <value>Описание</value>
   </data>
   <data name="Disclaimer.Header" xml:space="preserve">
-    <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
+    <value>ДАННЫЙ КОД И ИНФОРМАЦИЯ ПРЕДОСТАВЛЯЮТСЯ «КАК ЕСТЬ», БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ, НО НЕ ОГРАНИЧИВАЯСЬ ПОДРАЗУМЕВАЕМЫМИ ГАРАНТИЯМИ КОММЕРЧЕСКОЙ ПРИГОДНОСТИ И/ИЛИ ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЁННОЙ ЦЕЛИ.</value>
   </data>
   <data name="Downloads.Text" xml:space="preserve">
-    <value>Pobrań</value>
+    <value>Загрузки</value>
   </data>
   <data name="EyeTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie oczu aktywne</value>
+    <value>Отслеживание глаз активно</value>
   </data>
   <data name="FaceTrackingActive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy aktywne</value>
+    <value>Отслеживание лица активно</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie oczu nieaktywne</value>
+    <value>Отслеживание глаз неактивно</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Śledzenie twarzy nieaktywne</value>
+    <value>Отслеживание лица неактивно</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
-    <value>Zgłoś błąd</value>
+    <value>Сообщить об ошибке</value>
   </data>
   <data name="PrivacyPolicyCard.Header" xml:space="preserve">
-    <value>Polityka prywatności</value>
+    <value>Политика конфиденциальности</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
-    <value>Ostatnia aktualizacja</value>
+    <value>Последнее обновление</value>
   </data>
   <data name="LegacyParameters.Text" xml:space="preserve">
-    <value>Przestarzałe parametry</value>
+    <value>Устаревшие параметры</value>
   </data>
   <data name="Listening_on_Port.Text" xml:space="preserve">
-    <value>Port nasłuchiwania:</value>
+    <value>Прослушивание порта:</value>
   </data>
   <data name="ModulePage.Text" xml:space="preserve">
-    <value>Strona modułu</value>
+    <value>Страница модуля</value>
   </data>
   <data name="msIncoming.Text" xml:space="preserve">
-    <value>wiad./s przychodzących</value>
+    <value>msgs/sec входящих</value>
   </data>
   <data name="msOutgoing.Text" xml:space="preserve">
-    <value>wiad./s wychodzących</value>
+    <value>msgs/sec исходящих</value>
   </data>
   <data name="no_modules_installed_warning.Title" xml:space="preserve">
-    <value>Brak zainstalowanych modułów.</value>
+    <value>Модули не установлены</value>
   </data>
   <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
-    <value>Zainstaluj jakieś stąd!</value>
+    <value>Установите их отсюда!</value>
   </data>
   <data name="osc_was_disabled_warning.Title" xml:space="preserve">
-    <value>Zmodyfikowano ustawienia OSC</value>
+    <value>Настройки OSC изменены</value>
   </data>
   <data name="osc_was_disabled_warning.Description" xml:space="preserve">
-    <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
+    <value>Мы заметили, что OSC в VRChat был отключён, и включили его за вас. Если игра уже была запущена, возможно, потребуется вручную включить OSC через радиальное меню. В противном случае всё готово к работе!</value>
   </data>
   <data name="OSCStatus.Text" xml:space="preserve">
-    <value>Status OSC</value>
+    <value>Состояние OSC</value>
   </data>
   <data name="Parameters.Text" xml:space="preserve">
-    <value>Parametry</value>
+    <value>Параметры</value>
   </data>
   <data name="Rating.Text" xml:space="preserve">
-    <value>Ocena</value>
+    <value>Рейтинг</value>
   </data>
   <data name="ThemeSettings.Header" xml:space="preserve">
-    <value>Motyw</value>
+    <value>Тема приложения</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
-    <value>Wybierz motyw aplikacji</value>
+    <value>Выберите тему оформления приложения</value>
   </data>
   <data name="Sending_on_Port.Text" xml:space="preserve">
-    <value>Port wysyłania:</value>
+    <value>Отправка через порт:</value>
   </data>
   <data name="ToggleTracking.Content" xml:space="preserve">
-    <value>Przełącz śledzenie</value>
+    <value>Переключить отслеживание</value>
   </data>
   <data name="CloneRepoCard.Header" xml:space="preserve">
-    <value>Klonowanie repozytorium</value>
+    <value>Чтобы клонировать этот репозиторий</value>
   </data>
   <data name="OpenLocalStorageCard.Header" xml:space="preserve">
-    <value>Otwórz lokalną pamięć</value>
+    <value>Открыть локальное хранилище</value>
   </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
-    <value>Instrukcja użytkowania</value>
+    <value>Инструкции по использованию</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
-    <value>Wersja</value>
+    <value>Версия</value>
   </data>
   <data name="OscSettings.Header" xml:space="preserve">
-    <value>Adres OSC</value>
+    <value>Адрес OSC</value>
   </data>
   <data name="OscSettings.Description" xml:space="preserve">
-    <value>Gdzie wysyłać dane OSC?</value>
+    <value>Куда следует отправлять данные OSC?</value>
   </data>
   <data name="no_modules_installed_warning.Description" xml:space="preserve">
-    <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
+    <value>Похоже, у вас не установлено ни одного модуля.</value>
   </data>
   <data name="CalibrationSettings.Header" xml:space="preserve">
-    <value>Ustawienia kalibracji</value>
+    <value>Настройки калибровки</value>
   </data>
   <data name="CalibrationSettings.Description" xml:space="preserve">
-    <value>Dostosuj dane śledzenia do swoich potrzeb</value>
+    <value>Настраивайте данные отслеживания как душе угодно</value>
   </data>
   <data name="RiskySettings.Header" xml:space="preserve">
-    <value>Ryzykowne ustawienia</value>
+    <value>Опасные настройки</value>
   </data>
   <data name="RiskySettings.Description" xml:space="preserve">
-    <value>Ostrożnie! Kopie!</value>
+    <value>Осторожно, высокое напряжение..</value>
   </data>
   <data name="AutoStartSettings.Header" xml:space="preserve">
-    <value>Automatyczne uruchamianie</value>
+    <value>Автозапуск</value>
   </data>
   <data name="AutoStartSettings.Description" xml:space="preserve">
-    <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
+    <value>Автоматический запуск при старте SteamVR</value>
   </data>
   <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
-    <value>Włącz kalibrację</value>
+    <value>Калибровка включена</value>
   </data>
   <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
-    <value>Przełącza czy kalibracja jest włączona</value>
+    <value>Включает или отключает калибровку</value>
   </data>
   <data name="ContCalibrationToggle.Header" xml:space="preserve">
-    <value>Ciągła kalibracja</value>
+    <value>Непрерывная калибровка</value>
   </data>
   <data name="ContCalibrationToggle.Description" xml:space="preserve">
-    <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
+    <value>Постепенно подстраивается под ваши мимические выражения со временем</value>
   </data>
   <data name="TrackingCalibrateButton.Header" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Калибровать</value>
   </data>
   <data name="TrackingCalibrateButton.Description" xml:space="preserve">
-    <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
+    <value>Временно усилить влияние ваших выражений лица на калибровку</value>
   </data>
   <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
-    <value>Wpływ na kalibrację</value>
+    <value>Влияние на калибровку</value>
   </data>
   <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
-    <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
+    <value>Определяет, насколько сильно ваши мимические выражения влияют на общую калибровку со временем</value>
   </data>
   <data name="CalibrateButton.Content" xml:space="preserve">
-    <value>Kalibruj</value>
+    <value>Калибровать</value>
   </data>
   <data name="ForceReInitButton.Description" xml:space="preserve">
-    <value>Wymuś na VRCFT reset wszystkich modułów</value>
+    <value>Принудительно выгрузить и заново инициализировать все модули VRCFT</value>
   </data>
   <data name="ForceReInitButton.Header" xml:space="preserve">
-    <value>Wymuś reinicjalizację</value>
+    <value>Принудительная переинициализация</value>
   </data>
   <data name="ForceRelevancyToggle.Description" xml:space="preserve">
-    <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
+    <value>Принудительно отправляет все параметры каждый кадр, форсируя их актуальность</value>
   </data>
   <data name="ForceRelevancyToggle.Header" xml:space="preserve">
-    <value>Wymuszaj istotność</value>
+    <value>Принудительная актуальность</value>
   </data>
   <data name="ReInitButton.Content" xml:space="preserve">
-    <value>Reinicjalizuj</value>
+    <value>Переинициализировать</value>
   </data>
   <data name="ResetAvatarConfButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
+    <value>Сбросить все конфигурационные данные OSC для VRChat (они будут созданы заново при перезагрузке аватара)</value>
   </data>
   <data name="ResetAvatarConfButton.Header" xml:space="preserve">
-    <value>Resetuj pliki konfiguracyjne VRChat</value>
+    <value>Сбросить конфигурации VRChat</value>
   </data>
   <data name="ResetButton.Content" xml:space="preserve">
-    <value>Resetuj</value>
+    <value>Сбросить</value>
   </data>
   <data name="ResetVRCFTButton.Description" xml:space="preserve">
-    <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
+    <value>Сбросить все данные, сохранённые VRCFT в вашей папке AppData</value>
   </data>
   <data name="ResetVRCFTButton.Header" xml:space="preserve">
-    <value>Resetuj VRCFT</value>
+    <value>Сбросить VRCFT</value>
   </data>
   <data name="HardwareDebug.Header" xml:space="preserve">
-    <value>Debug sprzętu</value>
+    <value>Отладка оборудования</value>
   </data>
   <data name="HardwareDebug.Description" xml:space="preserve">
-    <value>Po prostu pooglądaj sobie swój język</value>
+    <value>Полюбуйтесь на свой язык, что ли?</value>
   </data>
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
-    <value>Ustawienia śledzenia</value>
+    <value>Настройки отслеживания</value>
   </data>
 </root>

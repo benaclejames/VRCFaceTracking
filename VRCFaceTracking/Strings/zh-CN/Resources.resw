@@ -197,8 +197,17 @@
   <data name="AvatarStatus.Text" xml:space="preserve">
     <value>模型状态</value>
   </data>
-  <data name="copyright.Description" xml:space="preserve">
+  <data name="LocalTestAvatar.Text" xml:space="preserve">
+    <value>检测到本地测试模型</value>
+  </data>
+  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+    <value>不支持本地测试模型，会导致问题</value>
+  </data>
+  <data name="Copyright.Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking。版权所有。</value>
+  </data>
+  <data name="Credits.Description" xml:space="preserve">
+    <value>让这一切成为可能的极客们 &lt;3</value>
   </data>
   <data name="Dependencies.Header" xml:space="preserve">
     <value>依赖 &amp; 参考</value>
@@ -219,13 +228,16 @@
     <value>面捕已激活</value>
   </data>
   <data name="EyeTrackingInactive.Text" xml:space="preserve">
-    <value>Eye Tracking Inactive</value>
+    <value>眼追未激活</value>
   </data>
   <data name="FaceTrackingInactive.Text" xml:space="preserve">
-    <value>Face Tracking Inactive</value>
+    <value>面捕未激活</value>
   </data>
   <data name="BugRequestCard.Header" xml:space="preserve">
     <value>提交BUG或请求新功能</value>
+  </data>
+  <data name="PrivacyPolicyCard.Header" xml:space="preserve">
+    <value>隐私政策</value>
   </data>
   <data name="LastUpdated.Text" xml:space="preserve">
     <value>最近更新时间</value>
@@ -248,6 +260,21 @@
   <data name="NoModulesInstalled.Text" xml:space="preserve">
     <value>没有安装模块</value>
   </data>
+  <data name="no_modules_installed_warning.Title" xml:space="preserve">
+    <value>未安装模块</value>
+  </data>
+  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+    <value>从这里安装一些！</value>
+  </data>
+  <data name="no_modules_installed_warning.Description" xml:space="preserve">
+    <value>您似乎没有安装任何模块。</value>
+  </data>
+  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+    <value>OSC 设置已被修改</value>
+  </data>
+  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+    <value>我们注意到您在 VRChat 中的 OSC 已被关闭，我们已为您重新启用。如果启用时游戏正处于打开状态，您可能需要从径向菜单中手动启用；如果没有，则可以直接使用！</value>
+  </data>
   <data name="OSCStatus.Text" xml:space="preserve">
     <value>OSC状态</value>
   </data>
@@ -256,6 +283,9 @@
   </data>
   <data name="Rating.Text" xml:space="preserve">
     <value>评分</value>
+  </data>
+  <data name="ThemeSettings.Header" xml:space="preserve">
+    <value>应用主题</value>
   </data>
   <data name="ThemeSettings.Description" xml:space="preserve">
     <value>选择要显示的应用主题</value>
@@ -269,16 +299,106 @@
   <data name="CloneRepoCard.Header" xml:space="preserve">
     <value>克隆此存储库</value>
   </data>
+  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+    <value>打开本地存储</value>
+  </data>
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>使用说明</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
     <value>版本号</value>
   </data>
+  <data name="OscSettings.Header" xml:space="preserve">
+    <value>OSC 地址</value>
+  </data>
   <data name="OscSettings.Description" xml:space="preserve">
     <value>OSC 数据应该发送到哪里？</value>
   </data>
   <data name="You_appear_to_have_no_modules_installed.Text" xml:space="preserve">
     <value>您似乎没有安装任何模块。</value>
+  </data>
+  <data name="CalibrationSettings.Header" xml:space="preserve">
+    <value>校准设置</value>
+  </data>
+  <data name="CalibrationSettings.Description" xml:space="preserve">
+    <value>随心调整追踪数据</value>
+  </data>
+  <data name="RiskySettings.Header" xml:space="preserve">
+    <value>危险设置</value>
+  </data>
+  <data name="RiskySettings.Description" xml:space="preserve">
+    <value>危险，危险。高压电..</value>
+  </data>
+  <data name="AutoStartSettings.Header" xml:space="preserve">
+    <value>自动启动</value>
+  </data>
+  <data name="AutoStartSettings.Description" xml:space="preserve">
+    <value>SteamVR 启动时自动启动</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+    <value>启用校准</value>
+  </data>
+  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+    <value>切换是否启用校准</value>
+  </data>
+  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+    <value>持续校准</value>
+  </data>
+  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+    <value>随时间逐步根据您的面部表情进行校准</value>
+  </data>
+  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+    <value>校准</value>
+  </data>
+  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+    <value>暂时增强您的表情对校准的影响</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+    <value>校准影响度</value>
+  </data>
+  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+    <value>控制您的面部表情随时间对整体校准的影响程度</value>
+  </data>
+  <data name="CalibrateButton.Content" xml:space="preserve">
+    <value>校准</value>
+  </data>
+  <data name="ForceReInitButton.Description" xml:space="preserve">
+    <value>强制 VRCFT 卸载并重新初始化所有模块</value>
+  </data>
+  <data name="ForceReInitButton.Header" xml:space="preserve">
+    <value>强制重新初始化</value>
+  </data>
+  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+    <value>通过强制相关性来强制每帧发送所有参数</value>
+  </data>
+  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+    <value>强制相关性</value>
+  </data>
+  <data name="ReInitButton.Content" xml:space="preserve">
+    <value>重新初始化</value>
+  </data>
+  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+    <value>重置所有 VRChat OSC 配置数据（重新加载模型时将重新生成）</value>
+  </data>
+  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+    <value>重置 VRChat 配置</value>
+  </data>
+  <data name="ResetButton.Content" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+    <value>重置 VRCFT 存储在您 AppData 文件夹中的所有数据</value>
+  </data>
+  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+    <value>重置 VRCFT</value>
+  </data>
+  <data name="HardwareDebug.Header" xml:space="preserve">
+    <value>硬件调试</value>
+  </data>
+  <data name="HardwareDebug.Description" xml:space="preserve">
+    <value>盯着你的舌头看吧？</value>
+  </data>
+  <data name="Shell_TrackingSettings.Content" xml:space="preserve">
+    <value>追踪设置</value>
   </data>
 </root>
