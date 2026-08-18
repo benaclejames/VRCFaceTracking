@@ -7,19 +7,46 @@
     x:DataType="vm:ModuleRegistryViewModel"
     x:Class="VRCFaceTracking.Views.ModuleRegistryPage">
 
-    <Grid ColumnDefinitions="300,*">
+    <Grid ColumnDefinitions="300,*" Margin="0,12,0,0">
 
         <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="0,0,10,0">
-            <Border Grid.Row="0" CornerRadius="6" BorderThickness="1" Padding="8,6" Margin="0,0,0,8">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <ui:SymbolIcon Symbol="Find" FontSize="16" VerticalAlignment="Center" Opacity="0.6" />
-                    <TextBlock VerticalAlignment="Center" Opacity="0.6" FontSize="13" Text="Available Modules" />
-                </StackPanel>
-            </Border>
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                <Border Grid.Column="0" Height="32" CornerRadius="6" BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}"
+                        Padding="10,0">
+                    <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Find" FontSize="14"
+                                       VerticalAlignment="Center" Opacity="0.55" Margin="0,0,8,0" />
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Watermark="Search modules"
+                                 FontSize="13"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Padding="0"
+                                 VerticalContentAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Button Grid.Column="1"
+                        Click="Button_OnClick"
+                        ToolTip.Tip="Install from .zip"
+                        Width="32" Height="32"
+                        Margin="6,0,0,0"
+                        Padding="0"
+                        CornerRadius="6"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                    <ui:SymbolIcon Symbol="Add" FontSize="16" />
+                </Button>
+            </Grid>
 
             <Border Grid.Row="1" CornerRadius="6" BorderThickness="1" Background="{DynamicResource ControlFillColorDefaultBrush}">
                 <ListBox
-                    ItemsSource="{Binding ModuleInfos, Mode=OneWay}"
+                    ItemsSource="{Binding FilteredModuleInfos, Mode=OneWay}"
                     SelectedItem="{Binding Selected}"
                     SelectionChanged="ModuleSelection_Click"
                     ScrollViewer.VerticalScrollBarVisibility="Auto">
