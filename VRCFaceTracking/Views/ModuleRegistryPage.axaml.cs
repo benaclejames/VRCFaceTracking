@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using VRCFaceTracking.Contracts;
 using VRCFaceTracking.Core.Models;
@@ -71,5 +73,43 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
                 await launcher.LaunchUriAsync(new Uri(url));
         }
         catch { }
+    }
+
+    private async void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Install from .zip",
+            AllowMultiple = false,
+            FileTypeFilter = [
+                new FilePickerFileType("Zip Files")
+                {
+                    Patterns = (IReadOnlyList<string>)
+                    [
+                        "*.zip"
+                    ],
+                    AppleUniformTypeIdentifiers = (IReadOnlyList<string>)
+                    [
+                        "public.zip"
+                    ],
+                    MimeTypes = (IReadOnlyList<string>)
+                        [
+                            "application/zip",
+                            "application/x-zip",
+                            "application/x-zip-compressed",
+                            "application/zip-compressed",
+                            "multipart/x-zip"
+                        ]
+                    
+                }
+            ]
+        });
+
+        foreach (var file in files)
+        {
+            await _moduleInstaller.InstallLocalModule(file.Path.AbsolutePath);
+        }
     }
 }

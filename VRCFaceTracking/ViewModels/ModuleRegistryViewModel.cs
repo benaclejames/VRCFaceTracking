@@ -11,12 +11,30 @@ public partial class ModuleRegistryViewModel : ObservableRecipient
 {
     private readonly IModuleDataService _moduleDataService;
     [ObservableProperty] private InstallTrackedTrackingModule? _selected;
+    [ObservableProperty] private string _searchQuery = string.Empty;
 
     public ObservableCollection<InstallTrackedTrackingModule> ModuleInfos { get; } = new();
-    
+    public ObservableCollection<InstallTrackedTrackingModule> FilteredModuleInfos { get; } = new();
+
     public ModuleRegistryViewModel(IModuleDataService moduleDataService)
     {
         _moduleDataService = moduleDataService;
+        ModuleInfos.CollectionChanged += (_, _) => ApplyFilter();
+    }
+
+    partial void OnSearchQueryChanged(string value) => ApplyFilter();
+
+    private void ApplyFilter()
+    {
+        FilteredModuleInfos.Clear();
+        var query = SearchQuery?.Trim();
+        var filtered = string.IsNullOrEmpty(query)
+            ? ModuleInfos
+            : ModuleInfos.Where(m =>
+                (m.TrackingModuleMetadata.ModuleName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (m.TrackingModuleMetadata.AuthorName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false));
+        foreach (var m in filtered)
+            FilteredModuleInfos.Add(m);
     }
 
     public async Task OnNavigatedTo()
