@@ -33,5 +33,6 @@ public static class ServiceCollectionExtensions
         
         services.AddHostedService(p => p.GetRequiredService<ParameterSenderService>());
         services.AddHostedService(p => p.GetRequiredService<OscRecvService>());
+        services.AddHostedService<BinaryFaceDataSender>();
     }
 }

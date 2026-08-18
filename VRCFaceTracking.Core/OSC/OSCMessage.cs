@@ -8,13 +8,14 @@ public class OscMessage
 {
     public OscMessageMeta _meta;
     private IntPtr _metaPtr;
+    private GCHandle _blobHandle;
 
     public string Address
     {
         get => _meta.Address;
         set => _meta.Address = value;
     }
-    
+
     private readonly Action<object> _valueSetter;
 
     public object Value
@@ -36,7 +37,7 @@ public class OscMessage
 
             return values[0].Value;
         }
-        set => _valueSetter(value);
+        set => _valueSetter?.Invoke(value);
     }
 
     public OscMessage(string address, Type type)
@@ -82,6 +83,21 @@ public class OscMessage
         }
     }
 
+    public static OscMessage CreateBlob(string address, byte[] data)
+    {
+        var msg = new OscMessage(new OscMessageMeta { Address = address });
+        msg._blobHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        msg._meta.ValueLength = 1;
+        msg._meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>());
+        Marshal.StructureToPtr(new OscValue
+        {
+            Type = OscValueType.Blob,
+            Blob = msg._blobHandle.AddrOfPinnedObject(),
+            BlobLen = data.Length,
+        }, msg._meta.Value, false);
+        return msg;
+    }
+
     public static OscMessage TryParseOsc(byte[] bytes, int len, ref int messageIndex)
     {
         var msg = new OscMessage(bytes, len, ref messageIndex);
@@ -113,11 +129,10 @@ public class OscMessage
     public OscMessage(OscMessageMeta meta) => _meta = meta;
     
     ~OscMessage()
-    {   
-        // If we don't own this memory, then we need to sent it back to rust to free it
+    {
         if (_metaPtr != IntPtr.Zero)
-        {
             fti_osc.free_osc_message(_metaPtr);
-        }
+        if (_blobHandle.IsAllocated)
+            _blobHandle.Free();
     }
 }
