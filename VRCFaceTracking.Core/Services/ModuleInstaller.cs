@@ -127,8 +127,10 @@ public class ModuleInstaller(ILogger<ModuleInstaller> logger, ILibManager libMan
         return Path.GetFileName(dllFile.FileName);
     }
 
-    public async Task<string> InstallLocalModule(string zipPath)
+    public async Task<string?> InstallLocalModule(string zipPath)
     {
+        if (!Path.Exists(zipPath)) return null;
+        
         EnsureCustomLibsDirectoryExists();
         
         // First, we copy the zip to our custom libs directory
@@ -143,7 +145,7 @@ public class ModuleInstaller(ILogger<ModuleInstaller> logger, ILibManager libMan
             Directory.Delete(tempDirectory, true);
         }
         Directory.CreateDirectory(tempDirectory);
-        ZipFile.ExtractToDirectory(newZipPath, tempDirectory);
+        await ZipFile.ExtractToDirectoryAsync(newZipPath, tempDirectory);
         File.Delete(newZipPath);
 
         // Now, we need to find the module.json file and deserialize it
