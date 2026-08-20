@@ -25,7 +25,7 @@
                                  FontSize="13"
                                  BorderThickness="0"
                                  Background="Transparent"
-                                 Padding="0"
+                                 Padding="5"
                                  VerticalContentAlignment="Center" />
                     </Grid>
                 </Border>

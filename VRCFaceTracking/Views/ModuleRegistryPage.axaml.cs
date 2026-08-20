@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using VRCFaceTracking.Contracts;
+using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.ViewModels;
@@ -13,12 +14,14 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
 {
     private ModuleRegistryViewModel ViewModel => (ModuleRegistryViewModel)DataContext!;
     private readonly ModuleInstaller _moduleInstaller;
+    private readonly ILibManager _libManager;
 
     public ModuleRegistryPage()
     {
         InitializeComponent();
         DataContext = Ioc.Default.GetRequiredService<ModuleRegistryViewModel>();
         _moduleInstaller = Ioc.Default.GetRequiredService<ModuleInstaller>();
+        _libManager = Ioc.Default.GetRequiredService<ILibManager>();
     }
 
     public async void OnNavigatedTo() => await ViewModel.OnNavigatedTo();
@@ -107,9 +110,16 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
             ]
         });
 
-        foreach (var file in files)
+        try
         {
-            await _moduleInstaller.InstallLocalModule(file.Path.AbsolutePath);
+            foreach (var file in files)
+            {
+                await _moduleInstaller.InstallLocalModule(file.Path.LocalPath);
+            }
+        }
+        finally
+        {
+            await _libManager.Initialize();
         }
     }
 }
