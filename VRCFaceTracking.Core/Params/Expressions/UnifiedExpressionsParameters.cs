@@ -28,6 +28,10 @@ public static class UnifiedExpressionsParameters
         new EParam("v2/Eye", exp => exp.Eye.Combined().Gaze),
         new EParam("v2/EyeLeft", exp => exp.Eye.Left.Gaze),
         new EParam("v2/EyeRight", exp => exp.Eye.Right.Gaze),
+
+        new EParam("v2/EyeLinear", exp => exp.Eye.Combined().Gaze.ToNormalized()),
+        new EParam("v2/EyeLeftLinear", exp => exp.Eye.Left.Gaze.ToNormalized()),
+        new EParam("v2/EyeRightLinear", exp => exp.Eye.Right.Gaze.ToNormalized()),
         
         // Use when tracking interface is sending verbose gaze data.
         /*new NativeParameter<Vector2>(exp =>
