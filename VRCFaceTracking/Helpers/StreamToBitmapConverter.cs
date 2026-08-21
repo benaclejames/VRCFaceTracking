@@ -10,12 +10,11 @@ public class StreamToBitmapConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not List<Stream> { Count: > 0 } streams)
+        if (value is not Stream stream)
         {
             return null;
         }
 
-        var stream = streams[0];
         if (stream.CanSeek)
         {
             stream.Position = 0;
