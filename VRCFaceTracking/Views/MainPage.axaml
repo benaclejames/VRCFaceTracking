@@ -38,13 +38,25 @@
                         <Border CornerRadius="6" BorderThickness="1" Margin="0,0,0,4" Background="{DynamicResource ControlFillColorDefaultBrush}">
                             <Grid Margin="16,14" ColumnDefinitions="Auto,*,Auto">
 
-                                <Border Grid.Column="0" Width="48" Height="48" Margin="0,0,12,0"
-                                        CornerRadius="6" ClipToBounds="True"
-                                        Background="{DynamicResource ControlFillColorSecondaryBrush}"
-                                        IsVisible="{Binding StaticImages, Converter={StaticResource HasModuleImagesConverter}}">
-                                    <Image Source="{Binding StaticImages, Converter={StaticResource StreamToBitmapConverter}}"
-                                           Stretch="UniformToFill" />
-                                </Border>
+                                <ItemsControl Grid.Column="0" Margin="0,0,12,0"
+                                              ItemsSource="{Binding StaticImages}"
+                                              IsVisible="{Binding StaticImages, Converter={StaticResource HasModuleImagesConverter}}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="6" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="6" ClipToBounds="True"
+                                                    Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                                <Image Source="{Binding Converter={StaticResource StreamToBitmapConverter}}"
+                                                       Height="72"
+                                                       Stretch="Uniform" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
                                 <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="4">
                                     <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Name, Mode=OneWay}" />
