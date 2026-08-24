@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Buffers;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using VRCFaceTracking.OSC;
 
@@ -9,6 +10,7 @@ public class OscMessage
     public OscMessageMeta _meta;
     private IntPtr _metaPtr;
     private GCHandle _blobHandle;
+    private byte[] _pooledBlob;
 
     public string Address
     {
@@ -83,17 +85,18 @@ public class OscMessage
         }
     }
 
-    public static OscMessage CreateBlob(string address, byte[] data)
+    public static OscMessage CreateBlob(string address, byte[] pooledData, int length)
     {
         var msg = new OscMessage(new OscMessageMeta { Address = address });
-        msg._blobHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        msg._pooledBlob = pooledData;
+        msg._blobHandle = GCHandle.Alloc(pooledData, GCHandleType.Pinned);
         msg._meta.ValueLength = 1;
         msg._meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>());
         Marshal.StructureToPtr(new OscValue
         {
             Type = OscValueType.Blob,
             Blob = msg._blobHandle.AddrOfPinnedObject(),
-            BlobLen = data.Length,
+            BlobLen = length,
         }, msg._meta.Value, false);
         return msg;
     }
@@ -134,5 +137,10 @@ public class OscMessage
             fti_osc.free_osc_message(_metaPtr);
         if (_blobHandle.IsAllocated)
             _blobHandle.Free();
+        if (_pooledBlob != null)
+        {
+            ArrayPool<byte>.Shared.Return(_pooledBlob);
+            _pooledBlob = null;
+        }
     }
 }
