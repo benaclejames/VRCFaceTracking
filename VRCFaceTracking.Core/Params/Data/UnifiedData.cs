@@ -168,15 +168,16 @@ namespace VRCFaceTracking.Core.Params.Data
         }
 
         private const int EyeByteCount = 14;
+        public const int SerializedLength = 102;
 
         public void CopyTo(ref byte[] bytes)
         {
-            if (bytes.Length != 102) return;
+            if (bytes.Length < SerializedLength) return;
 
             // Eye parameters first
             Eye.CopyTo(ref bytes);
 
-            for (int i = EyeByteCount; i < bytes.Length; i++)
+            for (int i = EyeByteCount; i < SerializedLength; i++)
             {
                 var shapeIndex = i - EyeByteCount;
                 bytes[i] = shapeIndex < Shapes.Length
