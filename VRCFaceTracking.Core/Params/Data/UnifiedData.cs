@@ -78,18 +78,18 @@ namespace VRCFaceTracking.Core.Params.Data
             // I would put a helper func in the struct but we need to invert for left eye anyway
             
             // Right
-            bytes[0] = (byte)(Math.Clamp(Right.Gaze.x, 0, 1) * 255f);
-            bytes[1] = (byte)(Math.Clamp(Right.Gaze.x*-1, 0, 1) * 255f);
-            bytes[2] = (byte)(Math.Clamp(Right.Gaze.y, 0, 1) * 255f);
-            bytes[3] = (byte)(Math.Clamp(Right.Gaze.y*-1, 0, 1) * 255f);
-            bytes[8] = (byte)(Math.Clamp((Right.Openness-1)*-1, 0, 1) * 255f);
+            bytes[0] = (byte)(Math.Clamp(Right.Gaze.x, 0f, 1f) * 255);
+            bytes[1] = (byte)(Math.Clamp(Right.Gaze.x*-1, 0f, 1f) * 255);
+            bytes[2] = (byte)(Math.Clamp(Right.Gaze.y, 0f, 1f) * 255);
+            bytes[3] = (byte)(Math.Clamp(Right.Gaze.y*-1, 0f, 1f) * 255);
+            bytes[8] = (byte)(Math.Clamp((Right.Openness-1)*-1, 0f, 1f) * 255);
             
             // Left
-            bytes[4] = (byte)(Math.Clamp(Left.Gaze.x*-1, 0, 1) * 255f);
-            bytes[5] = (byte)(Math.Clamp(Left.Gaze.x, 0, 1) * 255f);
-            bytes[6] = (byte)(Math.Clamp(Left.Gaze.y, 0, 1) * 255f);
-            bytes[7] = (byte)(Math.Clamp(Left.Gaze.y*-1, 0, 1) * 255f);
-            bytes[9] = (byte)(Math.Clamp((Left.Openness-1)*-1, 0, 1) * 255f);
+            bytes[4] = (byte)(Math.Clamp(Left.Gaze.x*-1, 0f, 1f) * 255);
+            bytes[5] = (byte)(Math.Clamp(Left.Gaze.x, 0f, 1f) * 255);
+            bytes[6] = (byte)(Math.Clamp(Left.Gaze.y, 0f, 1f) * 255);
+            bytes[7] = (byte)(Math.Clamp(Left.Gaze.y*-1, 0f, 1f) * 255);
+            bytes[9] = (byte)(Math.Clamp((Left.Openness-1)*-1, 0f, 1f) * 255);
         }
     }
 
@@ -181,7 +181,7 @@ namespace VRCFaceTracking.Core.Params.Data
             {
                 var shapeIndex = i - EyeByteCount;
                 bytes[i] = shapeIndex < Shapes.Length
-                    ? (byte)(Math.Clamp(Shapes[shapeIndex].Weight, 0, 1) * 255f)
+                    ? (byte)(Math.Clamp(Shapes[shapeIndex].Weight, 0f, 1f) * 255)
                     : (byte)0;
             }
         }
