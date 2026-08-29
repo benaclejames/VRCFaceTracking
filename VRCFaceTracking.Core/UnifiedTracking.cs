@@ -65,5 +65,11 @@ namespace VRCFaceTracking
         /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.
         /// </summary>
         public static async Task UpdateData(CancellationToken ct) => OnUnifiedDataUpdated.Invoke(await Task.Run(() => Mutator.MutateData(Data), ct));
+
+        /// <summary>
+        /// Synchronous alternative to UpdateData to avoid Task.Run overhead
+        /// (might replace original with this in the future depending on results)
+        /// </summary>
+        public static void UpdateDataSync() => OnUnifiedDataUpdated.Invoke(Mutator.MutateData(Data));
     }
 }

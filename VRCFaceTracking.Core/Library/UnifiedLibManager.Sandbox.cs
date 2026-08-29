@@ -147,6 +147,7 @@ public partial class UnifiedLibManager
         module.ModuleInformation.UsingExpression = !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
         module.ModuleInformation.StaticImages    = reply.IconDataStreams;
 
+        _sendCoordinator.RegisterModule(port);
         EnsureModuleThreadStartedSandboxed(module);
 
         _dispatcherService.Run(() => PublishInitializedModuleToUi(moduleIndex));
@@ -210,6 +211,8 @@ public partial class UnifiedLibManager
             reply.UpdateGlobalExpressionState();
         }
         reply.UpdateHeadState();
+
+        _sendCoordinator.NotifyReply(module.SandboxProcessPort);
     }
 
     private void InitialiseSandboxesBaseOnPaths(IEnumerable<string> paths)
@@ -316,6 +319,7 @@ public partial class UnifiedLibManager
     {
         _logger.LogInformation("Tearing down {module} ", module.ModuleClassName);
 
+        _sendCoordinator.UnregisterModule(module.SandboxProcessPort);
         _sandboxServer.SendData(new EventTeardownPacket(), module.SandboxProcessPort);
 
         if (module.UpdateCancellationToken != null)
