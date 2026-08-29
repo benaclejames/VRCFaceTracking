@@ -68,9 +68,6 @@ public class MainStandalone : IMainService
 
         _mutator.Load();
 
-        // Begin main OSC update loop
-        _logger.LogDebug("Starting OSC update loop...");
-
         if (isWindows)
         {
             Utils.TimeBeginPeriod(1);

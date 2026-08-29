@@ -1,18 +1,19 @@
-﻿using Microsoft.Extensions.Hosting;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Params.Data;
 
 namespace VRCFaceTracking.Core.Services;
 
-public class ParameterSenderService : BackgroundService
+public class ParameterSenderService
 {
     // We probably don't need a queue since we use osc message bundles, but for now, we're keeping it as
     // we might want to allow a way for the user to specify bundle or single message sends in the future
     private static readonly Queue<OscMessage> SendQueue = new();
- 
+
     private readonly OscSendService _sendService;
     private readonly UnifiedTrackingMutator _mutator; // We don't use this but we do want DI to run its constructor
+
+    private readonly SemaphoreSlim _flushLock = new(1, 1);
 
     public static bool AllParametersRelevantStatic
     {
@@ -32,7 +33,7 @@ public class ParameterSenderService : BackgroundService
             }
         }
     }
-    
+
     public ParameterSenderService(OscSendService sendService, UnifiedTrackingMutator mutator)
     {
         _sendService = sendService;
@@ -41,41 +42,26 @@ public class ParameterSenderService : BackgroundService
 
     public static void Enqueue(OscMessage message) => SendQueue.Enqueue(message);
     public static void Clear() => SendQueue.Clear();
-    
-    protected async override Task ExecuteAsync(CancellationToken cancellationToken)
+
+    public async Task FlushAsync(CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        if (SendQueue.Count == 0) return;
+
+        await _flushLock.WaitAsync(cancellationToken);
+        try
         {
-            try
-            {
-                await Task.Delay(10, cancellationToken);
-
-                await UnifiedTracking.UpdateData(cancellationToken);
-
-                // Send all messages in OSCParams.SendQueue
-                if (SendQueue.Count <= 0)
-                {
-                    continue;
-                }
-
-                await _sendService.Send(SendQueue.ToArray(), cancellationToken);
-
-                SendQueue.Clear();
-            }
-            catch (Exception e)
-            {
-                SentrySdk.CaptureException(e, scope =>
-                {
-                    var i = 0;
-                    foreach (var msg in SendQueue)
-                    {
-                        scope.SetExtra($"Address {i}", msg.Address);
-                        scope.SetExtra($"Values {i}", msg._meta.ValueLength);
-                        scope.SetExtra($"Value 0 {i}", msg.Value);
-                        i++;
-                    }
-                });
-            }
+            if (SendQueue.Count == 0) return;
+            var messages = SendQueue.ToArray();
+            SendQueue.Clear();
+            await _sendService.Send(messages, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            SentrySdk.CaptureException(e);
+        }
+        finally
+        {
+            _flushLock.Release();
         }
     }
 }

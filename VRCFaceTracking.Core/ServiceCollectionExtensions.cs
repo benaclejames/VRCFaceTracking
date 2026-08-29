@@ -29,9 +29,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<OscRecvService>();
         services.AddSingleton<HttpHandler>();
         services.AddSingleton<ParameterSenderService>();
+        services.AddSingleton<SendCoordinator>();
         services.AddSingleton<UnifiedTrackingMutator>();
-        
-        services.AddHostedService(p => p.GetRequiredService<ParameterSenderService>());
+
         services.AddHostedService(p => p.GetRequiredService<OscRecvService>());
         services.AddHostedService<BinaryFaceDataSender>();
     }
