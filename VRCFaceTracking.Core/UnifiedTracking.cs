@@ -50,10 +50,12 @@ namespace VRCFaceTracking
         /// </summary>
         public static readonly Parameter[] HeadParameters = UnifiedHeadParameters.HeadParameters;
 
+        public static readonly Parameter[] NativeParameters = VRCNativeParameters.NativeParameters;
+
         /// <summary> 
         /// The collection of EVERY possible output parameter
         /// </summary>
-        public static readonly Parameter[] AllParameters = AllParameters_v2.Concat(AllParameters_v1).Concat(HeadParameters).ToArray();
+        public static readonly Parameter[] AllParameters = AllParameters_v2.Concat(AllParameters_v1).Concat(HeadParameters).Concat(NativeParameters).ToArray();
 #pragma warning restore CS0618
 
         /// <summary>
