@@ -2,7 +2,7 @@
   <PropertyGroup>
     <VftTargetFramework>net10.0</VftTargetFramework>
     <VftTargetPlatformMinVersion>10.0.17763.0</VftTargetPlatformMinVersion>
-    <AssemblyVersion>5.4.5.0</AssemblyVersion>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

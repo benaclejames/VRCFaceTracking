@@ -2,6 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
     xmlns:vm="using:VRCFaceTracking.ViewModels"
     x:DataType="vm:SettingsViewModel"
     x:Class="VRCFaceTracking.Views.SettingsPage">
@@ -9,21 +10,22 @@
     <ScrollViewer>
         <StackPanel Spacing="4" Margin="0,4,0,20">
 
-            <TextBlock Text="APPEARANCE" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+            <TextBlock Text="{x:Static s:Resources.Appearance_Text}" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
 
-            <ui:SettingsExpander Header="Theme" Description="Choose the application color theme" IsExpanded="True">
+            <ui:SettingsExpander Header="{x:Static s:Resources.ThemeSettings_Header}"
+                                 Description="{x:Static s:Resources.ThemeSettings_Description}" IsExpanded="True">
                 <ComboBox x:Name="ThemeCombo" SelectionChanged="ThemeCombo_SelectionChanged" MinWidth="160">
-                    <ComboBoxItem Content="Light" Tag="Light" />
-                    <ComboBoxItem Content="Dark" Tag="Dark" />
-                    <ComboBoxItem Content="System default" Tag="Default" />
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Light_Content}" Tag="Light" />
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Dark_Content}" Tag="Dark" />
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Default_Content}" Tag="Default" />
                 </ComboBox>
             </ui:SettingsExpander>
 
             <TextBlock Text="OSC SETTINGS" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
 
             <ui:SettingsExpander
-                Header="OSC Network"
-                Description="Configure OSC send/receive ports and destination address"
+                Header="{x:Static s:Resources.OscSettings_Header}"
+                Description="{x:Static s:Resources.OscSettings_Description}"
                 IsExpanded="True">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <StackPanel Spacing="4">
@@ -65,9 +67,9 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
-                        <TextBlock FontWeight="SemiBold" Text="Auto-start with SteamVR" />
+                        <TextBlock FontWeight="SemiBold" Text="{x:Static s:Resources.AutoStartSettings_Header}" />
                         <TextBlock FontSize="12" Opacity="0.6"
-                                   Text="Launch VRCFaceTracking automatically when SteamVR starts" />
+                                   Text="{x:Static s:Resources.AutoStartSettings_Description}" />
                     </StackPanel>
                     <ToggleSwitch
                         Grid.Column="1"
@@ -81,8 +83,8 @@
             <TextBlock Text="ADVANCED" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
 
             <ui:SettingsExpander
-                Header="Danger Zone"
-                Description="Actions here can cause instability">
+                Header="{x:Static s:Resources.RiskySettings_Header}"
+                Description="{x:Static s:Resources.RiskySettings_Description}">
                 <ToggleSwitch
                     IsChecked="{Binding RiskySettings.Enabled, Mode=TwoWay}"
                     OffContent=""
@@ -90,8 +92,8 @@
 
                 <ui:SettingsExpander.Items>
                     <ui:SettingsExpanderItem
-                        Content="Force All Parameters Relevant"
-                        Description="Sends all face-tracking parameters every frame regardless of relevancy."
+                        Content="{x:Static s:Resources.ForceRelevancyToggle_Header}"
+                        Description="{x:Static s:Resources.ForceRelevancyToggle_Description}"
                         IsEnabled="{Binding RiskySettings.Enabled}">
                         <ui:SettingsExpanderItem.Footer>
                             <ToggleSwitch
@@ -102,41 +104,41 @@
                     </ui:SettingsExpanderItem>
 
                     <ui:SettingsExpanderItem
-                        Content="Force Re-initialize"
-                        Description="Tears down and re-initializes all modules. May cause instability."
+                        Content="{x:Static s:Resources.ForceReInitButton_Header}"
+                        Description="{x:Static s:Resources.ForceReInitButton_Description}"
                         IsEnabled="{Binding RiskySettings.Enabled}">
                         <ui:SettingsExpanderItem.Footer>
-                            <Button Content="Re-initialize" Click="ForceReInit_Click" />
+                            <Button Content="{x:Static s:Resources.ReInitButton_Content}" Click="ForceReInit_Click" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
 
                     <ui:SettingsExpanderItem
-                        Content="Reset VRCFaceTracking"
-                        Description="Deletes all persistent data and resets the application on next launch."
+                        Content="{x:Static s:Resources.ResetVRCFTButton_Header}"
+                        Description="{x:Static s:Resources.ResetVRCFTButton_Description}"
                         IsEnabled="{Binding RiskySettings.Enabled}">
                         <ui:SettingsExpanderItem.Footer>
-                            <Button Content="Reset" Click="ResetVRCFT_Click" />
+                            <Button Content="{x:Static s:Resources.ResetButton_Content}" Click="ResetVRCFT_Click" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
 
                     <ui:SettingsExpanderItem
-                        Content="Reset Avatar OSC Manifests"
-                        Description="Deletes all VRChat-generated OSC avatar config manifests."
+                        Content="{x:Static s:Resources.ResetAvatarConfButton_Header}"
+                        Description="{x:Static s:Resources.ResetAvatarConfButton_Description}"
                         IsEnabled="{Binding RiskySettings.Enabled}">
                         <ui:SettingsExpanderItem.Footer>
-                            <Button Content="Reset Avatar Config" Click="ResetAvatarConfig_Click" />
+                            <Button Content="{x:Static s:Resources.ResetButton_Content}" Click="ResetAvatarConfig_Click" />
                         </ui:SettingsExpanderItem.Footer>
                     </ui:SettingsExpanderItem>
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
 
-            <TextBlock Text="ABOUT" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+            <TextBlock Text="{x:Static s:Resources.About_Text}" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
 
-            <ui:SettingsExpander Header="VRCFaceTracking">
+            <ui:SettingsExpander Header="{x:Static s:Resources.AppDisplayName}">
                 <TextBlock x:Name="VersionText" Opacity="0.6" FontSize="13" />
 
                 <ui:SettingsExpander.Items>
-                    <ui:SettingsExpanderItem Content="Contributors" Description="People who made VRCFaceTracking possible">
+                    <ui:SettingsExpanderItem Content="Contributors" Description="{x:Static s:Resources.Credits_Description}">
                         <ui:SettingsExpanderItem.Footer>
                             <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemsSource="{Binding Contributors}">

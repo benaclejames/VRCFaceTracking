@@ -2,6 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
     xmlns:vm="using:VRCFaceTracking.ViewModels"
     xmlns:models="clr-namespace:VRCFaceTracking.Core.Models;assembly=VRCFaceTracking.Core"
     x:DataType="vm:ModuleRegistryViewModel"
@@ -84,7 +85,7 @@
                 VerticalAlignment="Center"
                 Opacity="0.5"
                 FontSize="16"
-                Text="Select a module to view details" />
+                Text="{x:Static s:Resources.ModuleRegistry_NoSelection_Text}" />
 
             <Border
                 IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}"
@@ -116,26 +117,26 @@
 
                         <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" VerticalAlignment="Top">
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Version" />
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Version_Text}" />
                             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Version}" TextWrapping="Wrap" />
 
-                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Downloads" Margin="0,8,0,0" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Downloads_Text}" Margin="0,8,0,0" />
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Downloads}" Margin="0,8,0,0" />
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Last Updated" Margin="0,8,0,0" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.LastUpdated_Text}" Margin="0,8,0,0" />
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastUpdated, StringFormat='{}{0:d}'}" Margin="0,8,0,0" />
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Module Page" Margin="0,8,0,0" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.ModulePage_Text}" Margin="0,8,0,0" />
                             <Button Grid.Row="3" Grid.Column="1" Margin="0,8,0,0"
                                     Padding="0"
                                     Classes="hyperlink"
                                     Content="{Binding ModulePageUrl}"
                                     Click="OpenModulePage_Click" />
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Description" Margin="0,16,0,0" />
+                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Description_Text}" Margin="0,16,0,0" />
                             <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ModuleDescription}" TextWrapping="Wrap" Margin="0,16,0,0" />
 
-                            <TextBlock Grid.Row="5" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="Usage" Margin="0,8,0,0" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="5" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.UsageInstructions_Text}" Margin="0,8,0,0" VerticalAlignment="Top" />
                             <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding UsageInstructions}" TextWrapping="Wrap" Margin="0,8,0,0" />
                         </Grid>
 

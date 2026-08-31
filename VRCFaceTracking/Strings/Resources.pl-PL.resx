@@ -123,40 +123,40 @@
   <data name="AppDescription" xml:space="preserve">
     <value>VRCFaceTracking</value>
   </data>
-  <data name="Shell_Main.Content" xml:space="preserve">
+  <data name="Shell_Main_Content" xml:space="preserve">
     <value>Start</value>
   </data>
-  <data name="ListDetails_NoSelection.Text" xml:space="preserve">
+  <data name="ListDetails_NoSelection_Text" xml:space="preserve">
     <value>Wybierz opcję z listy.</value>
   </data>
-  <data name="Shell_ListDetails.Content" xml:space="preserve">
+  <data name="Shell_ListDetails_Content" xml:space="preserve">
     <value>Wyświetl szczegóły</value>
   </data>
-  <data name="Settings_Personalization.Text" xml:space="preserve">
+  <data name="Settings_Personalization_Text" xml:space="preserve">
     <value>Personalizacja</value>
   </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
+  <data name="Settings_Theme_Text" xml:space="preserve">
     <value>Motyw</value>
   </data>
-  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+  <data name="Settings_Theme_Light_Content" xml:space="preserve">
     <value>Jasny</value>
   </data>
-  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+  <data name="Settings_Theme_Dark_Content" xml:space="preserve">
     <value>Ciemny</value>
   </data>
-  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+  <data name="Settings_Theme_Default_Content" xml:space="preserve">
     <value>Domyślny</value>
   </data>
-  <data name="Settings_About.Text" xml:space="preserve">
+  <data name="Settings_About_Text" xml:space="preserve">
     <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
   </data>
-  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+  <data name="Settings_AboutDescription_Text" xml:space="preserve">
     <value>Aplikacja do OSC VRChatu pozwalająca na interakcję z modułami śledzenia oczu i ust</value>
   </data>
-  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
+  <data name="SettingsPage_PrivacyTermsLink_Content" xml:space="preserve">
     <value>Polityka prywatności</value>
   </data>
-  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
+  <data name="SettingsPage_PrivacyTermsLink_NavigateUri" xml:space="preserve">
     <value>https://github.com/benaclejames/VRCFaceTracking</value>
   </data>
   <data name="AppNotificationSamplePayload" xml:space="preserve">
@@ -173,221 +173,221 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="Shell_Output.Content" xml:space="preserve">
+  <data name="Shell_Output_Content" xml:space="preserve">
     <value>Logi</value>
   </data>
-  <data name="Shell_Parameters.Content" xml:space="preserve">
+  <data name="Shell_Parameters_Content" xml:space="preserve">
     <value>Parametry</value>
   </data>
-  <data name="ModuleRegistry_NoSelection.Text" xml:space="preserve">
+  <data name="ModuleRegistry_NoSelection_Text" xml:space="preserve">
     <value>Wybierz opcję z listy.</value>
   </data>
-  <data name="Shell_ModuleRegistry.Content" xml:space="preserve">
+  <data name="Shell_ModuleRegistry_Content" xml:space="preserve">
     <value>Rejestr modułów</value>
   </data>
-  <data name="About.Text" xml:space="preserve">
+  <data name="About_Text" xml:space="preserve">
     <value>O programie</value>
   </data>
-  <data name="Appearance.Text" xml:space="preserve">
+  <data name="Appearance_Text" xml:space="preserve">
     <value>Wygląd</value>
   </data>
-  <data name="Author.Text" xml:space="preserve">
+  <data name="Author_Text" xml:space="preserve">
     <value>Autor</value>
   </data>
-  <data name="AvatarStatus.Text" xml:space="preserve">
+  <data name="AvatarStatus_Text" xml:space="preserve">
     <value>Status awatara</value>
   </data>
-  <data name="LocalTestAvatar.Text" xml:space="preserve">
+  <data name="LocalTestAvatar_Text" xml:space="preserve">
     <value>Wykryto lokalny awatar testowy</value>
   </data>
-  <data name="LocalTestAvatarTooltip.Content" xml:space="preserve">
+  <data name="LocalTestAvatarTooltip_Content" xml:space="preserve">
     <value>Lokalne awatary testowe nie są wspierane i będą powodować problemy</value>
   </data>
-  <data name="Copyright.Description" xml:space="preserve">
+  <data name="Copyright_Description" xml:space="preserve">
     <value>© 2023 VRCFaceTracking. Wszelkie prawa zastrzeżone.</value>
   </data>
-  <data name="Credits.Description" xml:space="preserve">
+  <data name="Credits_Description" xml:space="preserve">
     <value>Nerdy, dzięki którym powstaje ta apka &lt;3</value>
   </data>
-  <data name="Dependencies.Header" xml:space="preserve">
+  <data name="Dependencies_Header" xml:space="preserve">
     <value>Zależności &amp; odnośniki</value>
   </data>
-  <data name="Description.Text" xml:space="preserve">
+  <data name="Description_Text" xml:space="preserve">
     <value>Opis</value>
   </data>
-  <data name="Disclaimer.Header" xml:space="preserve">
+  <data name="Disclaimer_Header" xml:space="preserve">
     <value>NINEJSZY KOD I INFORMACJE SĄ DOSTARCZANE W STANIE, "W JAKIM SĄ", BEZ JAKICHKOLWIEK GWARANCJI, WYRAŹNYCH LUB DOROZUMIANYCH, W TYM MIĘDZY INNYMI GWARANCJI PRZYDATNOŚCI HANDLOWEJ I/LUB PRZYDATNOŚCI DO OKREŚLONEGO CELU.</value>
   </data>
-  <data name="Downloads.Text" xml:space="preserve">
+  <data name="Downloads_Text" xml:space="preserve">
     <value>Pobrań</value>
   </data>
-  <data name="EyeTrackingActive.Text" xml:space="preserve">
+  <data name="EyeTrackingActive_Text" xml:space="preserve">
     <value>Śledzenie oczu aktywne</value>
   </data>
-  <data name="FaceTrackingActive.Text" xml:space="preserve">
+  <data name="FaceTrackingActive_Text" xml:space="preserve">
     <value>Śledzenie twarzy aktywne</value>
   </data>
-  <data name="EyeTrackingInactive.Text" xml:space="preserve">
+  <data name="EyeTrackingInactive_Text" xml:space="preserve">
     <value>Eye Tracking Inactive</value>
   </data>
-  <data name="FaceTrackingInactive.Text" xml:space="preserve">
+  <data name="FaceTrackingInactive_Text" xml:space="preserve">
     <value>Face Tracking Inactive</value>
   </data>
-  <data name="BugRequestCard.Header" xml:space="preserve">
+  <data name="BugRequestCard_Header" xml:space="preserve">
     <value>Zgłoś błąd</value>
   </data>
-  <data name="LastUpdated.Text" xml:space="preserve">
+  <data name="LastUpdated_Text" xml:space="preserve">
     <value>Ostatnia aktualizacja</value>
   </data>
-  <data name="LegacyParameters.Text" xml:space="preserve">
+  <data name="LegacyParameters_Text" xml:space="preserve">
     <value>Przestarzałe parametry</value>
   </data>
-  <data name="Listening_on_Port.Text" xml:space="preserve">
+  <data name="Listening_on_Port_Text" xml:space="preserve">
     <value>Port nasłuchiwania:</value>
   </data>
-  <data name="ModulePage.Text" xml:space="preserve">
+  <data name="ModulePage_Text" xml:space="preserve">
     <value>Strona modułu</value>
   </data>
-  <data name="msIncoming.Text" xml:space="preserve">
+  <data name="msIncoming_Text" xml:space="preserve">
     <value>wiad./s przychodzących</value>
   </data>
-  <data name="msOutgoing.Text" xml:space="preserve">
+  <data name="msOutgoing_Text" xml:space="preserve">
     <value>wiad./s wychodzących</value>
   </data>
-  <data name="no_modules_installed_warning.Title" xml:space="preserve">
+  <data name="no_modules_installed_warning_Title" xml:space="preserve">
     <value>Brak zainstalowanych modułów.</value>
   </data>
-  <data name="no_modules_installed_warning.ButtonText" xml:space="preserve">
+  <data name="no_modules_installed_warning_ButtonText" xml:space="preserve">
     <value>Zainstaluj jakieś stąd!</value>
   </data>
-  <data name="osc_was_disabled_warning.Title" xml:space="preserve">
+  <data name="osc_was_disabled_warning_Title" xml:space="preserve">
     <value>Zmodyfikowano ustawienia OSC</value>
   </data>
-  <data name="osc_was_disabled_warning.Description" xml:space="preserve">
+  <data name="osc_was_disabled_warning_Description" xml:space="preserve">
     <value>Zauważyliśmy, że Twoje ustawienia OSC w VRChat były wyłączone, dlatego włączyliśmy je za Ciebie. Jeżeli gra była w tym momencie uruchomiona - musisz włączyć je ręcznie w menu kołowym; w przeciwnym wypadku - wszystko gra!</value>
   </data>
-  <data name="OSCStatus.Text" xml:space="preserve">
+  <data name="OSCStatus_Text" xml:space="preserve">
     <value>Status OSC</value>
   </data>
-  <data name="Parameters.Text" xml:space="preserve">
+  <data name="Parameters_Text" xml:space="preserve">
     <value>Parametry</value>
   </data>
-  <data name="Rating.Text" xml:space="preserve">
+  <data name="Rating_Text" xml:space="preserve">
     <value>Ocena</value>
   </data>
-  <data name="ThemeSettings.Header" xml:space="preserve">
+  <data name="ThemeSettings_Header" xml:space="preserve">
     <value>Motyw</value>
   </data>
-  <data name="ThemeSettings.Description" xml:space="preserve">
+  <data name="ThemeSettings_Description" xml:space="preserve">
     <value>Wybierz motyw aplikacji</value>
   </data>
-  <data name="Sending_on_Port.Text" xml:space="preserve">
+  <data name="Sending_on_Port_Text" xml:space="preserve">
     <value>Port wysyłania:</value>
   </data>
-  <data name="ToggleTracking.Content" xml:space="preserve">
+  <data name="ToggleTracking_Content" xml:space="preserve">
     <value>Przełącz śledzenie</value>
   </data>
-  <data name="CloneRepoCard.Header" xml:space="preserve">
+  <data name="CloneRepoCard_Header" xml:space="preserve">
     <value>Klonowanie repozytorium</value>
   </data>
-  <data name="OpenLocalStorageCard.Header" xml:space="preserve">
+  <data name="OpenLocalStorageCard_Header" xml:space="preserve">
     <value>Open Local Storage</value>
     <value>Otwórz lokalną pamięć</value>
   </data>
-  <data name="UsageInstructions.Text" xml:space="preserve">
+  <data name="UsageInstructions_Text" xml:space="preserve">
     <value>Instrukcja użytkowania</value>
   </data>
-  <data name="Version.Text" xml:space="preserve">
+  <data name="Version_Text" xml:space="preserve">
     <value>Wersja</value>
   </data>
-  <data name="OscSettings.Header" xml:space="preserve">
+  <data name="OscSettings_Header" xml:space="preserve">
     <value>Adres OSC</value>
   </data>
-  <data name="OscSettings.Description" xml:space="preserve">
+  <data name="OscSettings_Description" xml:space="preserve">
     <value>Gdzie wysyłać dane OSC?</value>
   </data>
-  <data name="no_modules_installed_warning.Description" xml:space="preserve">
+  <data name="no_modules_installed_warning_Description" xml:space="preserve">
     <value>Wygląda na to, że nie zainstalowano jeszcze żadnego modułu.</value>
   </data>
-  <data name="CalibrationSettings.Header" xml:space="preserve">
+  <data name="CalibrationSettings_Header" xml:space="preserve">
     <value>Ustawienia kalibracji</value>
   </data>
-  <data name="CalibrationSettings.Description" xml:space="preserve">
+  <data name="CalibrationSettings_Description" xml:space="preserve">
     <value>Dostosuj dane śledzenia do swoich potrzeb</value>
   </data>
-  <data name="RiskySettings.Header" xml:space="preserve">
+  <data name="RiskySettings_Header" xml:space="preserve">
     <value>Ryzykowne ustawienia</value>
   </data>
-  <data name="RiskySettings.Description" xml:space="preserve">
+  <data name="RiskySettings_Description" xml:space="preserve">
     <value>Ostrożnie! Kopie!</value>
   </data>
-  <data name="AutoStartSettings.Header" xml:space="preserve">
+  <data name="AutoStartSettings_Header" xml:space="preserve">
     <value>Automatyczne uruchamianie</value>
   </data>
-  <data name="AutoStartSettings.Description" xml:space="preserve">
+  <data name="AutoStartSettings_Description" xml:space="preserve">
     <value>Automatycznie uruchamiaj aplikację wraz ze SteamVR</value>
   </data>
-  <data name="CalibrationEnabledToggle.Header" xml:space="preserve">
+  <data name="CalibrationEnabledToggle_Header" xml:space="preserve">
     <value>Włącz kalibrację</value>
   </data>
-  <data name="CalibrationEnabledToggle.Description" xml:space="preserve">
+  <data name="CalibrationEnabledToggle_Description" xml:space="preserve">
     <value>Przełącza czy kalibracja jest włączona</value>
   </data>
-  <data name="ContCalibrationToggle.Header" xml:space="preserve">
+  <data name="ContCalibrationToggle_Header" xml:space="preserve">
     <value>Ciągła kalibracja</value>
   </data>
-  <data name="ContCalibrationToggle.Description" xml:space="preserve">
+  <data name="ContCalibrationToggle_Description" xml:space="preserve">
     <value>Z czasem powoli automatycznie kalibruj się na podstawie ekspresji twarzy</value>
   </data>
-  <data name="TrackingCalibrateButton.Header" xml:space="preserve">
+  <data name="TrackingCalibrateButton_Header" xml:space="preserve">
     <value>Kalibruj</value>
   </data>
-  <data name="TrackingCalibrateButton.Description" xml:space="preserve">
+  <data name="TrackingCalibrateButton_Description" xml:space="preserve">
     <value>Tymczasowo zwiększ wpływ ekspresji twarzy na kalibrację</value>
   </data>
-  <data name="CalibrationInfluenceSlider.Header" xml:space="preserve">
+  <data name="CalibrationInfluenceSlider_Header" xml:space="preserve">
     <value>Wpływ na kalibrację</value>
   </data>
-  <data name="CalibrationInfluenceSlider.Description" xml:space="preserve">
+  <data name="CalibrationInfluenceSlider_Description" xml:space="preserve">
     <value>Kontroluje, jak duży wpływ mają ekspresje twarzy na ogólną kalibrację w czasie</value>
   </data>
-  <data name="CalibrateButton.Content" xml:space="preserve">
+  <data name="CalibrateButton_Content" xml:space="preserve">
     <value>Kalibruj</value>
   </data>
-  <data name="ForceReInitButton.Description" xml:space="preserve">
+  <data name="ForceReInitButton_Description" xml:space="preserve">
     <value>Wymuś na VRCFT reset wszystkich modułów</value>
   </data>
-  <data name="ForceReInitButton.Header" xml:space="preserve">
+  <data name="ForceReInitButton_Header" xml:space="preserve">
     <value>Wymuś reinicjalizację</value>
   </data>
-  <data name="ForceRelevancyToggle.Description" xml:space="preserve">
+  <data name="ForceRelevancyToggle_Description" xml:space="preserve">
     <value>Wymuszaj wysyłanie wszystkich parametrów co klatkę poprzez wymuszenie istotności</value>
   </data>
-  <data name="ForceRelevancyToggle.Header" xml:space="preserve">
+  <data name="ForceRelevancyToggle_Header" xml:space="preserve">
     <value>Wymuszaj istotność</value>
   </data>
-  <data name="ReInitButton.Content" xml:space="preserve">
+  <data name="ReInitButton_Content" xml:space="preserve">
     <value>Reinicjalizuj</value>
   </data>
-  <data name="ResetAvatarConfButton.Description" xml:space="preserve">
+  <data name="ResetAvatarConfButton_Description" xml:space="preserve">
     <value>Zresetuj wszystkie pliki konfiguracyjne OSC VRChatu (zostaną zregenerowane po ponownym załadowaniu awatara)</value>
   </data>
-  <data name="ResetAvatarConfButton.Header" xml:space="preserve">
+  <data name="ResetAvatarConfButton_Header" xml:space="preserve">
     <value>Resetuj pliki konfiguracyjne VRChat</value>
   </data>
-  <data name="ResetButton.Content" xml:space="preserve">
+  <data name="ResetButton_Content" xml:space="preserve">
     <value>Resetuj</value>
   </data>
-  <data name="ResetVRCFTButton.Description" xml:space="preserve">
+  <data name="ResetVRCFTButton_Description" xml:space="preserve">
     <value>Zresetuj wszystkie dane przechowywane przez VRCFT w folderze AppData</value>
   </data>
-  <data name="ResetVRCFTButton.Header" xml:space="preserve">
+  <data name="ResetVRCFTButton_Header" xml:space="preserve">
     <value>Resetuj VRCFT</value>
   </data>
-  <data name="HardwareDebug.Header" xml:space="preserve">
+  <data name="HardwareDebug_Header" xml:space="preserve">
     <value>Debug sprzętu</value>
   </data>
-  <data name="HardwareDebug.Description" xml:space="preserve">
+  <data name="HardwareDebug_Description" xml:space="preserve">
     <value>Po prostu pooglądaj sobie swój język</value>
   </data>
 </root>

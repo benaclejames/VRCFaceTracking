@@ -2,6 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
     xmlns:vm="using:VRCFaceTracking.ViewModels"
     xmlns:model="clr-namespace:VRCFaceTracking;assembly=VRCFaceTracking.Core"
     x:DataType="vm:MainViewModel"
@@ -23,9 +24,9 @@
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <ui:SymbolIcon Symbol="Alert" FontSize="20" VerticalAlignment="Center" Foreground="#FFC107" />
                     <StackPanel VerticalAlignment="Center" Spacing="2">
-                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="No Modules Installed" />
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{x:Static s:Resources.no_modules_installed_warning_Title}" />
                         <TextBlock FontSize="12" Opacity="0.7"
-                                   Text="Go to Module Registry to install a tracking module." />
+                                   Text="{x:Static s:Resources.no_modules_installed_warning_Description}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -61,9 +62,9 @@
                                 <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="4">
                                     <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding Name, Mode=OneWay}" />
                                     <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <TextBlock Text="Eye Tracking" FontSize="12" Opacity="0.7"
+                                        <TextBlock Text="{x:Static s:Resources.EyeTrackingActive_Text}" FontSize="12" Opacity="0.7"
                                                    IsVisible="{Binding UsingEye, Mode=OneWay}" />
-                                        <TextBlock Text="Expression Tracking" FontSize="12" Opacity="0.7"
+                                        <TextBlock Text="{x:Static s:Resources.FaceTrackingActive_Text}" FontSize="12" Opacity="0.7"
                                                    IsVisible="{Binding UsingExpression, Mode=OneWay}" />
                                     </StackPanel>
                                 </StackPanel>
@@ -92,7 +93,7 @@
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
                         <ui:SymbolIcon Symbol="Wifi4" FontSize="24" VerticalAlignment="Center" />
                         <StackPanel Spacing="3" VerticalAlignment="Center">
-                            <TextBlock FontWeight="SemiBold" FontSize="14" Text="OSC Connection" />
+                            <TextBlock FontWeight="SemiBold" FontSize="14" Text="{x:Static s:Resources.OSCStatus_Text}" />
                             <StackPanel Orientation="Horizontal" Spacing="4"
                                         IsVisible="{Binding OscTarget.IsConnected}">
                                 <TextBlock FontSize="12" Opacity="0.7" Text="Recv:" />
@@ -110,11 +111,11 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
                             <TextBlock FontSize="12" Text="{Binding MessagesInPerSec, Mode=OneWay}" />
-                            <TextBlock FontSize="12" Opacity="0.6" Text="msg/s in" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="{x:Static s:Resources.msIncoming_Text}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
                             <TextBlock FontSize="12" Text="{Binding MessagesOutPerSec, Mode=OneWay}" />
-                            <TextBlock FontSize="12" Opacity="0.6" Text="msg/s out" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="{x:Static s:Resources.msOutgoing_Text}" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -136,8 +137,8 @@
                                         IsVisible="{Binding ParameterOutputService.AvatarInfo.Id, Mode=OneWay, Converter={StaticResource IsLocalTestAvatarConverter}}">
                                 <Ellipse Width="8" Height="8" Fill="Red" VerticalAlignment="Center" />
                                 <TextBlock FontSize="12" Opacity="0.7" VerticalAlignment="Center"
-                                           Text="Local test avatar"
-                                           ToolTip.Tip="This avatar's parameters were loaded from a local avatar config file, not from VRChat." />
+                                           Text="{x:Static s:Resources.LocalTestAvatar_Text}"
+                                           ToolTip.Tip="{x:Static s:Resources.LocalTestAvatarTooltip_Content}" />
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
@@ -145,13 +146,13 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
                             <TextBlock FontSize="12" Text="{Binding ParameterOutputService.AvatarParameters.Count, Mode=OneWay}" />
-                            <TextBlock FontSize="12" Opacity="0.6" Text="parameters" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="{x:Static s:Resources.Parameters_Text}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6"
                                     IsVisible="{Binding ParameterOutputService.AvatarParameters, Mode=OneWay, Converter={StaticResource HasLegacyParametersConverter}}">
                             <Ellipse Width="8" Height="8" Fill="Orange" VerticalAlignment="Center" />
                             <TextBlock FontSize="12" Text="{Binding ParameterOutputService.AvatarParameters, Mode=OneWay, Converter={StaticResource LegacyParameterCountConverter}}" />
-                            <TextBlock FontSize="12" Opacity="0.6" Text="legacy" />
+                            <TextBlock FontSize="12" Opacity="0.6" Text="{x:Static s:Resources.LegacyParameters_Text}" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
