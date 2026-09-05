@@ -390,4 +390,34 @@
   <data name="HardwareDebug.Description" xml:space="preserve">
     <value>Po prostu pooglądaj sobie swój język</value>
   </data>
+<data name="ModuleStateTitle.Text" xml:space="preserve">
+    <value>Stan modułu</value>
+  </data>
+  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+    <value>Włączony</value>
+  </data>
+  <data name="ModuleState_Disabled.Content" xml:space="preserve">
+    <value>Wyłączony</value>
+  </data>
+  <data name="ModuleState_EyesOnly.Content" xml:space="preserve">
+    <value>Tylko oczy</value>
+  </data>
+  <data name="ModuleState_FaceOnly.Content" xml:space="preserve">
+    <value>Tylko twarz</value>
+  </data>
+  <data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>Włączony</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>Wyłączony</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>Tylko oczy</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>Tylko twarz</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>Zmiany zostaną zastosowane po ponownym uruchomieniu VRCFT</value>
+  </data>
 </root>

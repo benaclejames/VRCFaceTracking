@@ -284,4 +284,34 @@
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
     <value>Configuración de Seguimiento</value>
   </data>
+<data name="ModuleStateTitle.Text" xml:space="preserve">
+    <value>Estado del Módulo</value>
+  </data>
+  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+    <value>Habilitado</value>
+  </data>
+  <data name="ModuleState_Disabled.Content" xml:space="preserve">
+    <value>Deshabilitado</value>
+  </data>
+  <data name="ModuleState_EyesOnly.Content" xml:space="preserve">
+    <value>Solo ojos</value>
+  </data>
+  <data name="ModuleState_FaceOnly.Content" xml:space="preserve">
+    <value>Solo cara</value>
+  </data>
+  <data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>Habilitado</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>Deshabilitado</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>Solo ojos</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>Solo cara</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>Los cambios se aplicarán al reiniciar VRCFT</value>
+  </data>
 </root>

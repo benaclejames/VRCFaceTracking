@@ -395,4 +395,34 @@
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
     <value>추적 설정</value>
   </data>
+<data name="ModuleStateTitle.Text" xml:space="preserve">
+    <value>모듈 상태</value>
+  </data>
+  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+    <value>활성화됨</value>
+  </data>
+  <data name="ModuleState_Disabled.Content" xml:space="preserve">
+    <value>비활성화됨</value>
+  </data>
+  <data name="ModuleState_EyesOnly.Content" xml:space="preserve">
+    <value>눈만</value>
+  </data>
+  <data name="ModuleState_FaceOnly.Content" xml:space="preserve">
+    <value>얼굴만</value>
+  </data>
+  <data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>활성화됨</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>비활성화됨</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>눈만</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>얼굴만</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>변경 사항은 VRCFT를 다시 시작한 후에 적용됩니다</value>
+  </data>
 </root>

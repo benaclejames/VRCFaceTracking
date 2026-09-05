@@ -326,4 +326,34 @@
   <data name="AutoStartSettings.Description" xml:space="preserve">
     <value>SteamVRの起動時に自動で起動します</value>
   </data>
+<data name="ModuleStateTitle.Text" xml:space="preserve">
+    <value>モジュール状態</value>
+  </data>
+  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="ModuleState_Disabled.Content" xml:space="preserve">
+    <value>無効</value>
+  </data>
+  <data name="ModuleState_EyesOnly.Content" xml:space="preserve">
+    <value>目のみ</value>
+  </data>
+  <data name="ModuleState_FaceOnly.Content" xml:space="preserve">
+    <value>顔のみ</value>
+  </data>
+  <data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>無効</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>目のみ</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>顔のみ</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>変更はVRCFTの再起動後に有効になります</value>
+  </data>
 </root>
