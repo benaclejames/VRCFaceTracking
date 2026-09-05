@@ -11,6 +11,6 @@ public interface IModuleDataService
     Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata);
     IEnumerable<InstallableTrackingModule> GetLegacyModules();
 
-    Task<Dictionary<string, ModuleEnabledSettings>> GetModuleSettingsAsync();
-    Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledSettings settings);
+    Task<Dictionary<string, ModuleEnabledState>> GetModuleSettingsAsync();
+    Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledState state);
 }

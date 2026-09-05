@@ -1,8 +1,9 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.Helpers;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -19,7 +20,7 @@ public sealed partial class ModuleRegistryDetailControl
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly MainViewModel _mainViewModel;
-    private bool _suppressToggleEvent;
+    private bool _suppressStateChange;
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(TrackingModuleMetadata), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -42,7 +43,7 @@ public sealed partial class ModuleRegistryDetailControl
 
         control.ForegroundElement.ChangeView(0, 0, 1);
         control.InstallButton.IsEnabled = true;
-        control.UpdateEnabledToggle();
+        control.UpdateModuleState();
         switch (control.ListDetailsMenuItem!.InstallationState)
         {
             case InstallState.NotInstalled:
@@ -99,7 +100,7 @@ public sealed partial class ModuleRegistryDetailControl
                     InstallButton.Content = "Uninstall";
                     InstallButton.IsEnabled = true;
                     _mainViewModel.NoModulesInstalled = false;
-                    UpdateEnabledToggle();
+                    UpdateModuleState();
                 }
                 break;
             }
@@ -123,60 +124,40 @@ public sealed partial class ModuleRegistryDetailControl
         await _moduleDataService.SetMyRatingAsync(ListDetailsMenuItem!, (int)RatingControl.Value);
     }
 
-    private void UpdateEnabledToggle()
+    private void UpdateModuleState()
     {
-        _suppressToggleEvent = true;
+        _suppressStateChange = true;
 
         var isInstalled = ListDetailsMenuItem is { InstallationState: not InstallState.NotInstalled };
         var module = ListDetailsMenuItem;
 
-        EnabledToggle.IsEnabled = isInstalled;
-        EnabledToggle.IsOn = module?.IsEnabled ?? false;
-        ModuleEnabledHint.Visibility = isInstalled ? Visibility.Visible : Visibility.Collapsed;
+        ModuleStateComboBox.IsEnabled = isInstalled;
+        ModuleStateComboBox.SelectedIndex = isInstalled ? (int)(module?.State ?? ModuleEnabledState.Enabled) : -1;
 
-        // Eye / facial sub-toggles only make sense when the module itself is enabled.
-        var canConfigureParts = isInstalled && (module?.IsEnabled ?? false);
-        EyeToggle.IsEnabled = canConfigureParts;
-        EyeToggle.IsOn = module?.EnableEye ?? false;
-        ExpressionToggle.IsEnabled = canConfigureParts;
-        ExpressionToggle.IsOn = module?.EnableExpression ?? false;
+        if (isInstalled && module != null)
+        {
+            var applied = _libManager.AppliedModuleStates.TryGetValue(module.ModuleKey, out var appliedState) ? appliedState : module.State;
+            module.StateBadgeText = ModuleStateStrings.BuildBadge(applied, module.State);
+            // Only show the restart hint while a state change is still pending (i.e. it differs from the applied state).
+            ModuleEnabledHint.Visibility = applied != module.State ? Visibility.Visible : Visibility.Collapsed;
+        }
+        else
+        {
+            ModuleEnabledHint.Visibility = Visibility.Collapsed;
+        }
 
-        _suppressToggleEvent = false;
+        _suppressStateChange = false;
     }
 
-    private async void EnabledToggle_OnToggled(object sender, RoutedEventArgs e)
+    private async void ModuleStateComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_suppressToggleEvent || ListDetailsMenuItem == null)
+        if (_suppressStateChange || ListDetailsMenuItem == null || ModuleStateComboBox.SelectedIndex < 0)
         {
             return;
         }
 
-        ListDetailsMenuItem.IsEnabled = EnabledToggle.IsOn;
-        await SaveModuleSettingsAsync();
-
-        // Keep the sub-toggles in sync when the module is toggled off/on.
-        UpdateEnabledToggle();
-    }
-
-    private async void EyeToggle_OnToggled(object sender, RoutedEventArgs e)
-    {
-        if (_suppressToggleEvent || ListDetailsMenuItem == null)
-        {
-            return;
-        }
-
-        ListDetailsMenuItem.EnableEye = EyeToggle.IsOn;
-        await SaveModuleSettingsAsync();
-    }
-
-    private async void ExpressionToggle_OnToggled(object sender, RoutedEventArgs e)
-    {
-        if (_suppressToggleEvent || ListDetailsMenuItem == null)
-        {
-            return;
-        }
-
-        ListDetailsMenuItem.EnableExpression = ExpressionToggle.IsOn;
+        ListDetailsMenuItem.State = (ModuleEnabledState)ModuleStateComboBox.SelectedIndex;
+        UpdateModuleState();
         await SaveModuleSettingsAsync();
     }
 
@@ -188,11 +169,6 @@ public sealed partial class ModuleRegistryDetailControl
             return;
         }
 
-        await _moduleDataService.SaveModuleSettingsAsync(module, new ModuleEnabledSettings
-        {
-            Enabled = module.IsEnabled,
-            EnableEye = module.EnableEye,
-            EnableExpression = module.EnableExpression
-        });
+        await _moduleDataService.SaveModuleSettingsAsync(module, module.State);
     }
 }

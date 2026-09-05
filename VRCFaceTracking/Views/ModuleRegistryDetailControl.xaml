@@ -24,32 +24,28 @@
 
                 <AppBarSeparator/>
 
-                <ToggleSwitch x:Name="EnabledToggle"
-                              x:Uid="ModuleEnabledToggle"
-                              MinWidth="160"
-                              Margin="{StaticResource SmallTopMargin}"
-                              Toggled="EnabledToggle_OnToggled" />
+                <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
+                    <TextBlock x:Uid="ModuleStateTitle"
+                               Text="Module State"
+                               Style="{StaticResource DetailSubTitleStyle}" />
+                    <ComboBox x:Name="ModuleStateComboBox"
+                              MinWidth="200"
+                              HorizontalAlignment="Left"
+                              Margin="{StaticResource XSmallTopMargin}"
+                              SelectionChanged="ModuleStateComboBox_OnSelectionChanged">
+                        <ComboBoxItem x:Uid="ModuleState_Enabled" Tag="Enabled" />
+                        <ComboBoxItem x:Uid="ModuleState_Disabled" Tag="Disabled" />
+                        <ComboBoxItem x:Uid="ModuleState_EyesOnly" Tag="EyesOnly" />
+                        <ComboBoxItem x:Uid="ModuleState_FaceOnly" Tag="FaceOnly" />
+                    </ComboBox>
 
-                <TextBlock x:Name="ModuleEnabledHint"
-                           x:Uid="ModuleEnabledHint"
-                           Text="Changes take effect after restarting VRCFT"
-                           Style="{StaticResource DetailBodyBaseMediumStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Margin="{StaticResource SmallTopMargin}"
-                           Visibility="Collapsed" />
-
-                <StackPanel Margin="16,0,0,0">
-                    <ToggleSwitch x:Name="EyeToggle"
-                                  x:Uid="ModuleEyeToggle"
-                                  MinWidth="160"
-                                  Margin="{StaticResource SmallTopMargin}"
-                                  Toggled="EyeToggle_OnToggled" />
-
-                    <ToggleSwitch x:Name="ExpressionToggle"
-                                  x:Uid="ModuleExpressionToggle"
-                                  MinWidth="160"
-                                  Margin="{StaticResource SmallTopMargin}"
-                                  Toggled="ExpressionToggle_OnToggled" />
+                    <TextBlock x:Name="ModuleEnabledHint"
+                               x:Uid="ModuleEnabledHint"
+                               Text="Changes take effect after restarting VRCFT"
+                               Style="{StaticResource DetailBodyBaseMediumStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Margin="{StaticResource XSmallTopMargin}"
+                               Visibility="Collapsed" />
                 </StackPanel>
 
                 <TextBlock x:Uid="Author" Style="{StaticResource DetailSubTitleStyle}" />

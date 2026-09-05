@@ -28,12 +28,10 @@
                     <TextBlock Text="{x:Bind ModuleName}" Style="{StaticResource ListTitleStyle}" />
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
-                        <TextBlock Text="{x:Bind InstallationState, Converter={StaticResource EnumToStringConverter}, Mode=OneWay}" Style="{StaticResource ListSubTitleStyle}" />
-                        <TextBlock x:Uid="ModuleDisabled"
-                                   Text="Disabled"
+                        <TextBlock Text="{x:Bind StateBadgeText, Mode=OneWay}"
                                    Style="{StaticResource ListSubTitleStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Visibility="{x:Bind IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse, Mode=OneWay}" />
+                                   Visibility="{x:Bind HasStateBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>

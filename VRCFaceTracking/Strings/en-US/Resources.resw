@@ -299,26 +299,35 @@
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Usage Instructions</value>
   </data>
-  <data name="ModuleEnabledToggle.Header" xml:space="preserve">
+  <data name="ModuleStateTitle.Text" xml:space="preserve">
+    <value>Module State</value>
+  </data>
+  <data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>Enabled</value>
   </data>
-  <data name="ModuleEnabledToggle.OffContent" xml:space="preserve">
+  <data name="ModuleState_Disabled.Content" xml:space="preserve">
     <value>Disabled</value>
   </data>
-  <data name="ModuleEnabledToggle.OnContent" xml:space="preserve">
+  <data name="ModuleState_EyesOnly.Content" xml:space="preserve">
+    <value>Eyes Only</value>
+  </data>
+  <data name="ModuleState_FaceOnly.Content" xml:space="preserve">
+    <value>Face Only</value>
+  </data>
+  <data name="ModuleStateText_Enabled" xml:space="preserve">
     <value>Enabled</value>
   </data>
-  <data name="ModuleEyeToggle.Header" xml:space="preserve">
-    <value>Eye Tracking</value>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>Disabled</value>
   </data>
-  <data name="ModuleExpressionToggle.Header" xml:space="preserve">
-    <value>Facial Tracking</value>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>Eyes Only</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>Face Only</value>
   </data>
   <data name="ModuleEnabledHint.Text" xml:space="preserve">
     <value>Changes take effect after restarting VRCFT</value>
-  </data>
-  <data name="ModuleDisabled.Text" xml:space="preserve">
-    <value>Disabled</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
     <value>Version</value>

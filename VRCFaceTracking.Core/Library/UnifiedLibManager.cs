@@ -37,7 +37,8 @@ public class UnifiedLibManager : ILibManager
 
     private string _sandboxProcessPath { get; set; }
     private List<ModuleRuntimeInfo> AvailableSandboxModules = new ();
-    private Dictionary<string, ModuleEnabledSettings> _moduleSettingsByPath = new ();
+    private Dictionary<string, ModuleEnabledState> _moduleSettingsByPath = new ();
+    public IReadOnlyDictionary<string, ModuleEnabledState> AppliedModuleStates { get; private set; } = new Dictionary<string, ModuleEnabledState>();
     #endregion
 
     #region Thread
@@ -159,10 +160,10 @@ public class UnifiedLibManager : ILibManager
                             AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replySupportedPacket.eyeAvailable;
                             AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replySupportedPacket.expressionAvailable;
 
-                            // Respect the user's per-module eye / facial toggles. A module may only claim a slot it has been allowed to use.
-                            _moduleSettingsByPath.TryGetValue(AvailableSandboxModules[moduleIndex].SandboxModulePath, out var moduleSettings);
-                            var allowEye = moduleSettings?.EnableEye ?? true;
-                            var allowExpression = moduleSettings?.EnableExpression ?? true;
+                            // Respect the user's per-module state. A module may only claim a slot it has been allowed to use.
+                            _moduleSettingsByPath.TryGetValue(AvailableSandboxModules[moduleIndex].SandboxModulePath, out var moduleState);
+                            var allowEye = moduleState is ModuleEnabledState.Enabled or ModuleEnabledState.EyesOnly;
+                            var allowExpression = moduleState is ModuleEnabledState.Enabled or ModuleEnabledState.FaceOnly;
 
                             // Now tell it to initialise
                             EventInitPacket eventInitPacket = new EventInitPacket()
@@ -304,17 +305,19 @@ public class UnifiedLibManager : ILibManager
             // Find all modules
             var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
 
-            // Load the per-module toggle settings. They are applied at startup, so toggling a module only takes effect after a restart.
+            // Load the per-module state settings. They are applied at startup, so changing a module's state only takes effect after a restart.
             var allSettings = _moduleDataService.GetModuleSettingsAsync().GetAwaiter().GetResult();
             var modulesToLoad = new List<InstallableTrackingModule>();
-            var settingsByPath = new Dictionary<string, ModuleEnabledSettings>();
+            var settingsByPath = new Dictionary<string, ModuleEnabledState>();
+            var appliedStates = new Dictionary<string, ModuleEnabledState>();
             foreach ( var m in modules )
             {
-                var settings = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : new ModuleEnabledSettings();
-                settingsByPath[m.AssemblyLoadPath] = settings;
+                var state = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : ModuleEnabledState.Enabled;
+                settingsByPath[m.AssemblyLoadPath] = state;
+                appliedStates[m.ModuleKey] = state;
 
                 // Skip modules that have been disabled by the user as a whole
-                if ( !settings.Enabled )
+                if ( state == ModuleEnabledState.Disabled )
                 {
                     continue;
                 }
@@ -323,6 +326,7 @@ public class UnifiedLibManager : ILibManager
             }
 
             _moduleSettingsByPath = settingsByPath;
+            AppliedModuleStates = appliedStates;
             var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
 
             // Load all modules

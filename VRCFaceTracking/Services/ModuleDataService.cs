@@ -20,7 +20,7 @@ public class ModuleDataService : IModuleDataService
     private readonly HttpClient _httpClient;
 
     private const string BaseUrl = "https://registry.vrcft.io/";
-    private const string ModuleSettingsKey = "ModuleEnabledSettings";
+    private const string ModuleSettingsKey = "ModuleEnabledState";
 
     public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger, ILocalSettingsService settingsService)
     {
@@ -203,12 +203,12 @@ public class ModuleDataService : IModuleDataService
         return installedModules;
     }
 
-    public async Task<Dictionary<string, ModuleEnabledSettings>> GetModuleSettingsAsync()
+    public async Task<Dictionary<string, ModuleEnabledState>> GetModuleSettingsAsync()
     {
-        return await _settingsService.ReadSettingAsync(ModuleSettingsKey, new Dictionary<string, ModuleEnabledSettings>());
+        return await _settingsService.ReadSettingAsync(ModuleSettingsKey, new Dictionary<string, ModuleEnabledState>());
     }
 
-    public async Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledSettings settings)
+    public async Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledState state)
     {
         if (string.IsNullOrEmpty(module.ModuleKey))
         {
@@ -217,10 +217,10 @@ public class ModuleDataService : IModuleDataService
         }
 
         var allSettings = await GetModuleSettingsAsync();
-        allSettings[module.ModuleKey] = settings;
+        allSettings[module.ModuleKey] = state;
 
         await _settingsService.SaveSettingAsync(ModuleSettingsKey, allSettings);
-        _logger.LogInformation("Module {module} settings saved: Enabled={enabled}, Eye={eye}, Expression={expression}. Restart VRCFT to apply changes.",
-            module.ModuleName, settings.Enabled, settings.EnableEye, settings.EnableExpression);
+        _logger.LogInformation("Module {module} state saved: {state}. Restart VRCFT to apply changes.",
+            module.ModuleName, state);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace VRCFaceTracking.Core.Models;
 
@@ -10,8 +11,10 @@ public enum InstallState
     AwaitingRestart
 }
 
-public class InstallableTrackingModule : TrackingModuleMetadata
+public class InstallableTrackingModule : TrackingModuleMetadata, INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public InstallState InstallationState
     {
         get; set;
@@ -23,33 +26,56 @@ public class InstallableTrackingModule : TrackingModuleMetadata
         get; set;
     }
 
+    private ModuleEnabledState _state = ModuleEnabledState.Enabled;
+
     /// <summary>
-    /// Whether this module is enabled. Disabled modules are not loaded until VRCFT is restarted.
+    /// The enabled state of this module. Changes take effect after VRCFT is restarted.
     /// The value is persisted separately and does not get written to module.json.
     /// </summary>
     [JsonIgnore]
-    public bool IsEnabled
+    public ModuleEnabledState State
     {
-        get; set;
-    } = true;
+        get => _state;
+        set
+        {
+            if ( _state == value )
+            {
+                return;
+            }
+
+            _state = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
+        }
+    }
+
+    private string _stateBadgeText = string.Empty;
 
     /// <summary>
-    /// Whether this module is allowed to claim the eye tracking slot.
+    /// Localized display text for the module's enabled state shown in the module list.
+    /// Shows "(old → new)" when the state has been changed and a restart is pending.
     /// </summary>
     [JsonIgnore]
-    public bool EnableEye
+    public string StateBadgeText
     {
-        get; set;
-    } = true;
+        get => _stateBadgeText;
+        set
+        {
+            if ( _stateBadgeText == value )
+            {
+                return;
+            }
+
+            _stateBadgeText = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StateBadgeText)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasStateBadge)));
+        }
+    }
 
     /// <summary>
-    /// Whether this module is allowed to claim the facial / expression tracking slot.
+    /// Whether the module list should show a state badge (false for not-installed modules).
     /// </summary>
     [JsonIgnore]
-    public bool EnableExpression
-    {
-        get; set;
-    } = true;
+    public bool HasStateBadge => !string.IsNullOrEmpty(_stateBadgeText);
 
     /// <summary>
     /// A stable identifier used to persist the enabled/disabled state of a module.
