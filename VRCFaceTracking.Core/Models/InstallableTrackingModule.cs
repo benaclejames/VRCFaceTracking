@@ -78,6 +78,19 @@ public class InstallableTrackingModule : TrackingModuleMetadata, INotifyProperty
     public bool HasStateBadge => !string.IsNullOrEmpty(_stateBadgeText);
 
     /// <summary>
+    /// Updates the list badge text. The state-to-string conversion is delegated to
+    /// <paramref name="localize"/> so this Core model stays free of UI dependencies.
+    /// Shows "(old → new)" when the state has been changed and a restart is pending.
+    /// </summary>
+    public void UpdateStateBadge(ModuleEnabledState? applied, Func<ModuleEnabledState, string> localize)
+    {
+        var current = localize(State);
+        StateBadgeText = applied.HasValue && applied.Value != State
+            ? $"({localize(applied.Value)} → {current})"
+            : $"({current})";
+    }
+
+    /// <summary>
     /// A stable identifier used to persist the enabled/disabled state of a module.
     /// Registry modules are keyed by their module id, legacy modules by their assembly path.
     /// </summary>

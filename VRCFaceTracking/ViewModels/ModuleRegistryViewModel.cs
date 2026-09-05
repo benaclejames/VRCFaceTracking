@@ -44,8 +44,8 @@ public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationA
                 installedModule.State = state;
             }
 
-            var applied = appliedStates.TryGetValue(installedModule.ModuleKey, out var appliedState) ? appliedState : installedModule.State;
-            installedModule.StateBadgeText = ResourceExtensions.BuildBadge(applied, installedModule.State);
+            var applied = appliedStates.TryGetValue(installedModule.ModuleKey, out var appliedState) ? appliedState : (ModuleEnabledState?)null;
+            installedModule.UpdateStateBadge(applied, s => $"ModuleStateText_{s}".GetLocalized());
 
             var remoteModule = data.FirstOrDefault(x => x.ModuleId == installedModule.ModuleId);
             if (remoteModule == null)   // If this module is completely missing from the remote list, then we need to add it to the list.
