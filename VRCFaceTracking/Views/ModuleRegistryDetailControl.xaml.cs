@@ -137,7 +137,7 @@ public sealed partial class ModuleRegistryDetailControl
         if (isInstalled && module != null)
         {
             var applied = _libManager.AppliedModuleStates.TryGetValue(module.ModuleKey, out var appliedState) ? appliedState : module.State;
-            module.StateBadgeText = ModuleStateStrings.BuildBadge(applied, module.State);
+            module.StateBadgeText = ResourceExtensions.BuildBadge(applied, module.State);
             // Only show the restart hint while a state change is still pending (i.e. it differs from the applied state).
             ModuleEnabledHint.Visibility = applied != module.State ? Visibility.Visible : Visibility.Collapsed;
         }
