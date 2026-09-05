@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using FluentAvalonia.Styling;
 using Microsoft.Extensions.Hosting;
 using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Views;
 
 namespace VRCFaceTracking
@@ -58,7 +59,14 @@ namespace VRCFaceTracking
             {
                 MainWindow = new MainWindow();
                 desktop.MainWindow = MainWindow;
-                desktop.Exit += (_, _) => _host.StopAsync().GetAwaiter().GetResult();
+                desktop.Exit += (_, _) =>
+                {
+                    Task.Run(async () =>
+                    {
+                        await Ioc.Default.GetRequiredService<IMainService>().Teardown();
+                        await _host.StopAsync();
+                    }).GetAwaiter().GetResult();
+                };
             }
 
             HandleResetFile();
