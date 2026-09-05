@@ -160,19 +160,13 @@ public sealed partial class ModuleRegistryDetailControl
 
         ListDetailsMenuItem.State = (ModuleEnabledState)ModuleStateComboBox.SelectedIndex;
         UpdateModuleState();
-        await SaveModuleSettingsAsync();
-    }
 
-    private async Task SaveModuleSettingsAsync()
-    {
-        var module = ListDetailsMenuItem;
-        if (module == null || string.IsNullOrEmpty(module.ModuleKey))
+        if (ListDetailsMenuItem != null && !string.IsNullOrEmpty(ListDetailsMenuItem.ModuleKey))
         {
-            return;
+            var allSettings = await _settingsService.ReadSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey,
+                new Dictionary<string, ModuleEnabledState>());
+            allSettings[ListDetailsMenuItem.ModuleKey] = ListDetailsMenuItem.State;
+            await _settingsService.SaveSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, allSettings);
         }
-
-        var allSettings = await _settingsService.ReadSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>());
-        allSettings[module.ModuleKey] = module.State;
-        await _settingsService.SaveSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, allSettings);
     }
 }
