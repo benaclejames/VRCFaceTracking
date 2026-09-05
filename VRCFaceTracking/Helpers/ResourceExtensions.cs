@@ -29,6 +29,6 @@ public static class ResourceExtensions
             return $"({Localize(applied.Value)} → {Localize(current)})";
         }
 
-        return Localize(current);
+        return $"({Localize(current)})";
     }
 }

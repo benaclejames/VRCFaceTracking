@@ -25,13 +25,16 @@
                     Grid.Column="1"
                     Margin="{StaticResource SmallLeftMargin}"
                     VerticalAlignment="Center">
-                    <TextBlock Text="{x:Bind ModuleName}" Style="{StaticResource ListTitleStyle}" />
                     <StackPanel Orientation="Horizontal" Spacing="5">
-                        <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
+                        <TextBlock Text="{x:Bind ModuleName}" Style="{StaticResource ListTitleStyle}" />
                         <TextBlock Text="{x:Bind StateBadgeText, Mode=OneWay}"
                                    Style="{StaticResource ListSubTitleStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   VerticalAlignment="Center"
                                    Visibility="{x:Bind HasStateBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>
