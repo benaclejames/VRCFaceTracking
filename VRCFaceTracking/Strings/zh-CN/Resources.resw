@@ -272,6 +272,27 @@
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>使用说明</value>
   </data>
+  <data name="ModuleEnabledToggle.Header" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="ModuleEnabledToggle.OffContent" xml:space="preserve">
+    <value>已禁用</value>
+  </data>
+  <data name="ModuleEnabledToggle.OnContent" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="ModuleEyeToggle.Header" xml:space="preserve">
+    <value>眼部追踪</value>
+  </data>
+  <data name="ModuleExpressionToggle.Header" xml:space="preserve">
+    <value>面部追踪</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>更改将在重启 VRCFT 后生效</value>
+  </data>
+  <data name="ModuleDisabled.Text" xml:space="preserve">
+    <value>已禁用</value>
+  </data>
   <data name="Version.Text" xml:space="preserve">
     <value>版本号</value>
   </data>

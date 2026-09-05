@@ -16,14 +16,17 @@ public class ModuleDataService : IModuleDataService
 
     private readonly IIdentityService _identityService;
     private readonly ILogger<ModuleDataService> _logger;
+    private readonly ILocalSettingsService _settingsService;
     private readonly HttpClient _httpClient;
 
     private const string BaseUrl = "https://registry.vrcft.io/";
+    private const string ModuleSettingsKey = "ModuleEnabledSettings";
 
-    public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger)
+    public ModuleDataService(IIdentityService identityService, ILogger<ModuleDataService> logger, ILocalSettingsService settingsService)
     {
         _identityService = identityService;
         _logger = logger;
+        _settingsService = settingsService;
         _httpClient = HappyEyeballsHttp.CreateHttpClient();
         _httpClient.BaseAddress = new Uri(BaseUrl);
     }
@@ -198,5 +201,26 @@ public class ModuleDataService : IModuleDataService
         }
 
         return installedModules;
-    } 
+    }
+
+    public async Task<Dictionary<string, ModuleEnabledSettings>> GetModuleSettingsAsync()
+    {
+        return await _settingsService.ReadSettingAsync(ModuleSettingsKey, new Dictionary<string, ModuleEnabledSettings>());
+    }
+
+    public async Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledSettings settings)
+    {
+        if (string.IsNullOrEmpty(module.ModuleKey))
+        {
+            _logger.LogWarning("Could not save settings for module {module} as it has no stable identifier.", module.ModuleName);
+            return;
+        }
+
+        var allSettings = await GetModuleSettingsAsync();
+        allSettings[module.ModuleKey] = settings;
+
+        await _settingsService.SaveSettingAsync(ModuleSettingsKey, allSettings);
+        _logger.LogInformation("Module {module} settings saved: Enabled={enabled}, Eye={eye}, Expression={expression}. Restart VRCFT to apply changes.",
+            module.ModuleName, settings.Enabled, settings.EnableEye, settings.EnableExpression);
+    }
 }

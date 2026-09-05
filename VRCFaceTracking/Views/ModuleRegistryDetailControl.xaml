@@ -23,7 +23,35 @@
                 <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
 
                 <AppBarSeparator/>
-                
+
+                <ToggleSwitch x:Name="EnabledToggle"
+                              x:Uid="ModuleEnabledToggle"
+                              MinWidth="160"
+                              Margin="{StaticResource SmallTopMargin}"
+                              Toggled="EnabledToggle_OnToggled" />
+
+                <TextBlock x:Name="ModuleEnabledHint"
+                           x:Uid="ModuleEnabledHint"
+                           Text="Changes take effect after restarting VRCFT"
+                           Style="{StaticResource DetailBodyBaseMediumStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Margin="{StaticResource SmallTopMargin}"
+                           Visibility="Collapsed" />
+
+                <StackPanel Margin="16,0,0,0">
+                    <ToggleSwitch x:Name="EyeToggle"
+                                  x:Uid="ModuleEyeToggle"
+                                  MinWidth="160"
+                                  Margin="{StaticResource SmallTopMargin}"
+                                  Toggled="EyeToggle_OnToggled" />
+
+                    <ToggleSwitch x:Name="ExpressionToggle"
+                                  x:Uid="ModuleExpressionToggle"
+                                  MinWidth="160"
+                                  Margin="{StaticResource SmallTopMargin}"
+                                  Toggled="ExpressionToggle_OnToggled" />
+                </StackPanel>
+
                 <TextBlock x:Uid="Author" Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.AuthorName, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />
 

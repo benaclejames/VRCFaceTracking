@@ -10,4 +10,7 @@ public interface IModuleDataService
     IEnumerable<InstallableTrackingModule> GetInstalledModules();
     Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata);
     IEnumerable<InstallableTrackingModule> GetLegacyModules();
+
+    Task<Dictionary<string, ModuleEnabledSettings>> GetModuleSettingsAsync();
+    Task SaveModuleSettingsAsync(InstallableTrackingModule module, ModuleEnabledSettings settings);
 }

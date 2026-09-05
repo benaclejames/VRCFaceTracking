@@ -299,6 +299,27 @@
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Usage Instructions</value>
   </data>
+  <data name="ModuleEnabledToggle.Header" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="ModuleEnabledToggle.OffContent" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="ModuleEnabledToggle.OnContent" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="ModuleEyeToggle.Header" xml:space="preserve">
+    <value>Eye Tracking</value>
+  </data>
+  <data name="ModuleExpressionToggle.Header" xml:space="preserve">
+    <value>Facial Tracking</value>
+  </data>
+  <data name="ModuleEnabledHint.Text" xml:space="preserve">
+    <value>Changes take effect after restarting VRCFT</value>
+  </data>
+  <data name="ModuleDisabled.Text" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
   <data name="Version.Text" xml:space="preserve">
     <value>Version</value>
   </data>

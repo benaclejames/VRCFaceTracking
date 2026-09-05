@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -36,6 +37,7 @@ public class UnifiedLibManager : ILibManager
 
     private string _sandboxProcessPath { get; set; }
     private List<ModuleRuntimeInfo> AvailableSandboxModules = new ();
+    private Dictionary<string, ModuleEnabledSettings> _moduleSettingsByPath = new ();
     #endregion
 
     #region Thread
@@ -157,11 +159,16 @@ public class UnifiedLibManager : ILibManager
                             AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replySupportedPacket.eyeAvailable;
                             AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replySupportedPacket.expressionAvailable;
 
+                            // Respect the user's per-module eye / facial toggles. A module may only claim a slot it has been allowed to use.
+                            _moduleSettingsByPath.TryGetValue(AvailableSandboxModules[moduleIndex].SandboxModulePath, out var moduleSettings);
+                            var allowEye = moduleSettings?.EnableEye ?? true;
+                            var allowExpression = moduleSettings?.EnableExpression ?? true;
+
                             // Now tell it to initialise
                             EventInitPacket eventInitPacket = new EventInitPacket()
                             {
-                                expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized,
-                                eyeAvailable            = EyeStatus == ModuleState.Uninitialized,
+                                expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized && allowExpression,
+                                eyeAvailable            = EyeStatus == ModuleState.Uninitialized && allowEye,
                             };
                             _logger.LogInformation("Got supported for module {module}. Expr: {} Eye: {}...",
                                 AvailableSandboxModules[moduleIndex].ModuleClassName,
@@ -296,7 +303,27 @@ public class UnifiedLibManager : ILibManager
 
             // Find all modules
             var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+            // Load the per-module toggle settings. They are applied at startup, so toggling a module only takes effect after a restart.
+            var allSettings = _moduleDataService.GetModuleSettingsAsync().GetAwaiter().GetResult();
+            var modulesToLoad = new List<InstallableTrackingModule>();
+            var settingsByPath = new Dictionary<string, ModuleEnabledSettings>();
+            foreach ( var m in modules )
+            {
+                var settings = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : new ModuleEnabledSettings();
+                settingsByPath[m.AssemblyLoadPath] = settings;
+
+                // Skip modules that have been disabled by the user as a whole
+                if ( !settings.Enabled )
+                {
+                    continue;
+                }
+
+                modulesToLoad.Add(m);
+            }
+
+            _moduleSettingsByPath = settingsByPath;
+            var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
 
             // Load all modules
             AvailableSandboxModules.Clear();

@@ -13,6 +13,7 @@
     mc:Ignorable="d">
     <Page.Resources>
         <helpers:EnumToStringConverter x:Key="EnumToStringConverter" />
+        <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         
         <DataTemplate x:Key="ItemTemplate" x:DataType="models:InstallableTrackingModule">
             <Grid Height="60">
@@ -28,6 +29,11 @@
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <TextBlock Text="{x:Bind AuthorName}" Style="{StaticResource ListSubTitleStyle}" />
                         <TextBlock Text="{x:Bind InstallationState, Converter={StaticResource EnumToStringConverter}, Mode=OneWay}" Style="{StaticResource ListSubTitleStyle}" />
+                        <TextBlock x:Uid="ModuleDisabled"
+                                   Text="Disabled"
+                                   Style="{StaticResource ListSubTitleStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Visibility="{x:Bind IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse, Mode=OneWay}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>

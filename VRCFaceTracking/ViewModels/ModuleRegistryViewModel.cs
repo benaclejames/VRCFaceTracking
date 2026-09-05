@@ -30,10 +30,18 @@ public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationA
         // If any of the IDs match a remote module and the other data contained within does not match,
         // then we need to set the local module install state to outdated. If everything matches then we need to set the install state to installed.
         var installedModules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+        var moduleSettings = await _moduleDataService.GetModuleSettingsAsync();
         var localModules = new List<InstallableTrackingModule>();    // dw about it
         foreach (var installedModule in installedModules)
         {
             installedModule.InstallationState = InstallState.Installed;
+            if (moduleSettings.TryGetValue(installedModule.ModuleKey, out var settings))
+            {
+                installedModule.IsEnabled = settings.Enabled;
+                installedModule.EnableEye = settings.EnableEye;
+                installedModule.EnableExpression = settings.EnableExpression;
+            }
+
             var remoteModule = data.FirstOrDefault(x => x.ModuleId == installedModule.ModuleId);
             if (remoteModule == null)   // If this module is completely missing from the remote list, then we need to add it to the list.
             {
@@ -44,6 +52,9 @@ public partial class ModuleRegistryViewModel : ObservableRecipient, INavigationA
             {
                 // This module is installed and in the remote list, so we need to update the remote module's install state.
                 remoteModule.InstallationState = remoteModule.Version != installedModule.Version ? InstallState.Outdated : InstallState.Installed;
+                remoteModule.IsEnabled = installedModule.IsEnabled;
+                remoteModule.EnableEye = installedModule.EnableEye;
+                remoteModule.EnableExpression = installedModule.EnableExpression;
             }
         }
 
