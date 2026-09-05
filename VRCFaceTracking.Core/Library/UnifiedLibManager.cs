@@ -16,6 +16,7 @@ public class UnifiedLibManager : ILibManager
     private readonly ILogger<UnifiedLibManager> _logger;
     private readonly ILogger _moduleLogger;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILocalSettingsService _settingsService;
     #endregion
 
     #region Observables
@@ -46,13 +47,14 @@ public class UnifiedLibManager : ILibManager
     private static VrcftSandboxServer _sandboxServer;
     #endregion
     
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, ILocalSettingsService settingsService)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
+        _settingsService = settingsService;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
         _sandboxProcessPath = Path.GetFullPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "VRCFaceTracking.ModuleProcess.exe" : "VRCFaceTracking.ModuleProcess");
@@ -306,7 +308,7 @@ public class UnifiedLibManager : ILibManager
             var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
 
             // Load the per-module state settings. They are applied at startup, so changing a module's state only takes effect after a restart.
-            var allSettings = _moduleDataService.GetModuleSettingsAsync().GetAwaiter().GetResult();
+            var allSettings = _settingsService.ReadSettingAsync(Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>()).GetAwaiter().GetResult();
             var modulesToLoad = new List<InstallableTrackingModule>();
             var settingsByPath = new Dictionary<string, ModuleEnabledState>();
             var appliedStates = new Dictionary<string, ModuleEnabledState>();
