@@ -390,10 +390,7 @@
   <data name="HardwareDebug.Description" xml:space="preserve">
     <value>Po prostu pooglądaj sobie swój język</value>
   </data>
-<data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>Stan modułu</value>
-  </data>
-  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+<data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>Włączony</value>
   </data>
   <data name="ModuleState_Disabled.Content" xml:space="preserve">

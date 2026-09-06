@@ -20,33 +20,28 @@
                     Style="{ThemeResource TitleTextBlockStyle}" />
             </StackPanel>
             <StackPanel Padding="0,15,0,0">
-                <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button x:Name="InstallButton" IsEnabled="False" Content="Install Module" Click="Install_Click" Style="{StaticResource AccentButtonStyle}"/>
 
-                <AppBarSeparator/>
-
-                <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
-                    <TextBlock x:Uid="ModuleStateTitle"
-                               Text="Module State"
-                               Style="{StaticResource DetailSubTitleStyle}" />
                     <ComboBox x:Name="ModuleStateComboBox"
-                              MinWidth="200"
-                              HorizontalAlignment="Left"
-                              Margin="{StaticResource XSmallTopMargin}"
+                              VerticalAlignment="Center"
                               SelectionChanged="ModuleStateComboBox_OnSelectionChanged">
                         <ComboBoxItem x:Uid="ModuleState_Enabled" Tag="Enabled" />
                         <ComboBoxItem x:Uid="ModuleState_Disabled" Tag="Disabled" />
                         <ComboBoxItem x:Uid="ModuleState_EyesOnly" Tag="EyesOnly" />
                         <ComboBoxItem x:Uid="ModuleState_FaceOnly" Tag="FaceOnly" />
                     </ComboBox>
-
-                    <TextBlock x:Name="ModuleEnabledHint"
-                               x:Uid="ModuleEnabledHint"
-                               Text="Changes take effect after restarting VRCFT"
-                               Style="{StaticResource DetailBodyBaseMediumStyle}"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               Margin="{StaticResource XSmallTopMargin}"
-                               Visibility="Collapsed" />
                 </StackPanel>
+
+                <AppBarSeparator/>
+
+                <TextBlock x:Name="ModuleEnabledHint"
+                           x:Uid="ModuleEnabledHint"
+                           Text="Changes take effect after restarting VRCFT"
+                           Style="{StaticResource DetailBodyBaseMediumStyle}"
+                           Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                           Margin="0,0,0,12"
+                           Visibility="Collapsed" />
 
                 <TextBlock x:Uid="Author" Style="{StaticResource DetailSubTitleStyle}" />
                 <TextBlock Text="{x:Bind ListDetailsMenuItem.AuthorName, Mode=OneWay}" Style="{StaticResource DetailBodyBaseMediumStyle}" />

@@ -326,10 +326,7 @@
   <data name="AutoStartSettings.Description" xml:space="preserve">
     <value>SteamVRの起動時に自動で起動します</value>
   </data>
-<data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>モジュール状態</value>
-  </data>
-  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+<data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>有効</value>
   </data>
   <data name="ModuleState_Disabled.Content" xml:space="preserve">

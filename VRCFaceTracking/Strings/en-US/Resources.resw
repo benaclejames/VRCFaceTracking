@@ -299,9 +299,6 @@
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>Usage Instructions</value>
   </data>
-  <data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>Module State</value>
-  </data>
   <data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>Enabled</value>
   </data>

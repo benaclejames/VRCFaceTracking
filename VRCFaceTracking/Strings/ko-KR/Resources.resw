@@ -395,10 +395,7 @@
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
     <value>추적 설정</value>
   </data>
-<data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>모듈 상태</value>
-  </data>
-  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+<data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>활성화됨</value>
   </data>
   <data name="ModuleState_Disabled.Content" xml:space="preserve">

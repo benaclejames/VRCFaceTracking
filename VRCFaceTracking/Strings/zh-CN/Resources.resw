@@ -272,9 +272,6 @@
   <data name="UsageInstructions.Text" xml:space="preserve">
     <value>使用说明</value>
   </data>
-  <data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>模块状态</value>
-  </data>
   <data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>启用</value>
   </data>

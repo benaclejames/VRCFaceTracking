@@ -284,10 +284,7 @@
   <data name="Shell_TrackingSettings.Content" xml:space="preserve">
     <value>Configuración de Seguimiento</value>
   </data>
-<data name="ModuleStateTitle.Text" xml:space="preserve">
-    <value>Estado del Módulo</value>
-  </data>
-  <data name="ModuleState_Enabled.Content" xml:space="preserve">
+<data name="ModuleState_Enabled.Content" xml:space="preserve">
     <value>Habilitado</value>
   </data>
   <data name="ModuleState_Disabled.Content" xml:space="preserve">
