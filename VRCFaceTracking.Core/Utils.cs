@@ -42,6 +42,11 @@ public static class Utils
     public static readonly string UserAccessibleDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "VRCFaceTracking");
     public static readonly string PersistentDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VRCFaceTracking");
     public static readonly string CustomLibsDirectory = Path.Combine(PersistentDataDirectory, "CustomLibs");
+
+    /// <summary>
+    /// Local settings key for the persisted per-module enabled-state dictionary.
+    /// </summary>
+    public const string ModuleStateSettingsKey = "ModuleEnabledState";
     
     public static int GetRandomFreePort()
     {

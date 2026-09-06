@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -15,6 +16,7 @@ public class UnifiedLibManager : ILibManager
     private readonly ILogger<UnifiedLibManager> _logger;
     private readonly ILogger _moduleLogger;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly ILocalSettingsService _settingsService;
     #endregion
 
     #region Observables
@@ -36,6 +38,8 @@ public class UnifiedLibManager : ILibManager
 
     private string _sandboxProcessPath { get; set; }
     private List<ModuleRuntimeInfo> AvailableSandboxModules = new ();
+    private Dictionary<string, ModuleEnabledState> _moduleSettingsByPath = new ();
+    public IReadOnlyDictionary<string, ModuleEnabledState> AppliedModuleStates { get; private set; } = new Dictionary<string, ModuleEnabledState>();
     #endregion
 
     #region Thread
@@ -43,13 +47,14 @@ public class UnifiedLibManager : ILibManager
     private static VrcftSandboxServer _sandboxServer;
     #endregion
     
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService)
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, ILocalSettingsService settingsService)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
+        _settingsService = settingsService;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
         _sandboxProcessPath = Path.GetFullPath(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "VRCFaceTracking.ModuleProcess.exe" : "VRCFaceTracking.ModuleProcess");
@@ -157,11 +162,16 @@ public class UnifiedLibManager : ILibManager
                             AvailableSandboxModules[moduleIndex].SupportsEyeTracking        = AvailableSandboxModules[moduleIndex].SupportsEyeTracking && replySupportedPacket.eyeAvailable;
                             AvailableSandboxModules[moduleIndex].SupportsExpressionTracking = AvailableSandboxModules[moduleIndex].SupportsExpressionTracking && replySupportedPacket.expressionAvailable;
 
+                            // Respect the user's per-module state. A module may only claim a slot it has been allowed to use.
+                            _moduleSettingsByPath.TryGetValue(AvailableSandboxModules[moduleIndex].SandboxModulePath, out var moduleState);
+                            var allowEye = moduleState is ModuleEnabledState.Enabled or ModuleEnabledState.EyesOnly;
+                            var allowExpression = moduleState is ModuleEnabledState.Enabled or ModuleEnabledState.FaceOnly;
+
                             // Now tell it to initialise
                             EventInitPacket eventInitPacket = new EventInitPacket()
                             {
-                                expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized,
-                                eyeAvailable            = EyeStatus == ModuleState.Uninitialized,
+                                expressionAvailable     = ExpressionStatus == ModuleState.Uninitialized && allowExpression,
+                                eyeAvailable            = EyeStatus == ModuleState.Uninitialized && allowEye,
                             };
                             _logger.LogInformation("Got supported for module {module}. Expr: {} Eye: {}...",
                                 AvailableSandboxModules[moduleIndex].ModuleClassName,
@@ -296,7 +306,30 @@ public class UnifiedLibManager : ILibManager
 
             // Find all modules
             var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-            var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+            // Load the per-module state settings. They are applied at startup, so changing a module's state only takes effect after a restart.
+            var allSettings = _settingsService.ReadSettingAsync(Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>()).GetAwaiter().GetResult();
+            var modulesToLoad = new List<InstallableTrackingModule>();
+            var settingsByPath = new Dictionary<string, ModuleEnabledState>();
+            var appliedStates = new Dictionary<string, ModuleEnabledState>();
+            foreach ( var m in modules )
+            {
+                var state = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : ModuleEnabledState.Enabled;
+                settingsByPath[m.AssemblyLoadPath] = state;
+                appliedStates[m.ModuleKey] = state;
+
+                // Skip modules that have been disabled by the user as a whole
+                if ( state == ModuleEnabledState.Disabled )
+                {
+                    continue;
+                }
+
+                modulesToLoad.Add(m);
+            }
+
+            _moduleSettingsByPath = settingsByPath;
+            AppliedModuleStates = appliedStates;
+            var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
 
             // Load all modules
             AvailableSandboxModules.Clear();

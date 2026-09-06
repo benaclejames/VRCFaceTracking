@@ -1,8 +1,9 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.Helpers;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -16,9 +17,11 @@ public sealed partial class ModuleRegistryDetailControl
     }
 
     private readonly IModuleDataService _moduleDataService;
+    private readonly ILocalSettingsService _settingsService;
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
     private readonly MainViewModel _mainViewModel;
+    private bool _suppressStateChange;
 
     public static readonly DependencyProperty ListDetailsMenuItemProperty = DependencyProperty.Register("ListDetailsMenuItem", typeof(TrackingModuleMetadata), typeof(ModuleRegistryDetailControl), new PropertyMetadata(null, OnListDetailsMenuItemPropertyChanged));
 
@@ -26,6 +29,7 @@ public sealed partial class ModuleRegistryDetailControl
     {
         InitializeComponent();
         _moduleDataService = App.GetService<IModuleDataService>();
+        _settingsService = App.GetService<ILocalSettingsService>();
         _moduleInstaller = App.GetService<ModuleInstaller>();
         _libManager = App.GetService<ILibManager>();
         _mainViewModel = App.GetService<MainViewModel>();
@@ -41,6 +45,7 @@ public sealed partial class ModuleRegistryDetailControl
 
         control.ForegroundElement.ChangeView(0, 0, 1);
         control.InstallButton.IsEnabled = true;
+        control.UpdateModuleState();
         switch (control.ListDetailsMenuItem!.InstallationState)
         {
             case InstallState.NotInstalled:
@@ -97,6 +102,7 @@ public sealed partial class ModuleRegistryDetailControl
                     InstallButton.Content = "Uninstall";
                     InstallButton.IsEnabled = true;
                     _mainViewModel.NoModulesInstalled = false;
+                    UpdateModuleState();
                 }
                 break;
             }
@@ -118,5 +124,49 @@ public sealed partial class ModuleRegistryDetailControl
         RatingControl.Caption = "Your Rating";
         
         await _moduleDataService.SetMyRatingAsync(ListDetailsMenuItem!, (int)RatingControl.Value);
+    }
+
+    private void UpdateModuleState()
+    {
+        _suppressStateChange = true;
+
+        var isInstalled = ListDetailsMenuItem is { InstallationState: not InstallState.NotInstalled };
+        var module = ListDetailsMenuItem;
+
+        ModuleStateComboBox.IsEnabled = isInstalled;
+        ModuleStateComboBox.SelectedIndex = isInstalled ? (int)(module?.State ?? ModuleEnabledState.Enabled) : -1;
+
+        if (isInstalled && module != null)
+        {
+            var applied = _libManager.AppliedModuleStates.TryGetValue(module.ModuleKey, out var appliedState) ? appliedState : (ModuleEnabledState?)null;
+            module.UpdateStateBadge(applied, s => $"ModuleStateText_{s}".GetLocalized());
+            // Only show the restart hint while a state change is still pending (i.e. it differs from the applied state).
+            ModuleEnabledHint.Visibility = applied.HasValue && applied.Value != module.State ? Visibility.Visible : Visibility.Collapsed;
+        }
+        else
+        {
+            ModuleEnabledHint.Visibility = Visibility.Collapsed;
+        }
+
+        _suppressStateChange = false;
+    }
+
+    private async void ModuleStateComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressStateChange || ListDetailsMenuItem == null || ModuleStateComboBox.SelectedIndex < 0)
+        {
+            return;
+        }
+
+        ListDetailsMenuItem.State = (ModuleEnabledState)ModuleStateComboBox.SelectedIndex;
+        UpdateModuleState();
+
+        if (ListDetailsMenuItem != null && !string.IsNullOrEmpty(ListDetailsMenuItem.ModuleKey))
+        {
+            var allSettings = await _settingsService.ReadSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey,
+                new Dictionary<string, ModuleEnabledState>());
+            allSettings[ListDetailsMenuItem.ModuleKey] = ListDetailsMenuItem.State;
+            await _settingsService.SaveSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, allSettings);
+        }
     }
 }
