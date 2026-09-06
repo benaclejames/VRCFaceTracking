@@ -8,6 +8,7 @@ public partial class ShellPage : UserControl
 {
     private readonly MainPage _mainPage = new();
     private readonly OutputPage _outputPage = new();
+    private readonly ModuleConfigPage _moduleConfigPage = new();
     private readonly ModuleRegistryPage _moduleRegistryPage = new();
     private readonly MutatorPage _mutatorPage = new();
     private readonly SettingsPage _settingsPage = new();
@@ -20,6 +21,7 @@ public partial class ShellPage : UserControl
 
         PageContainer.Children.Add(_mainPage);
         PageContainer.Children.Add(_outputPage);
+        PageContainer.Children.Add(_moduleConfigPage);
         PageContainer.Children.Add(_moduleRegistryPage);
         PageContainer.Children.Add(_mutatorPage);
         PageContainer.Children.Add(_settingsPage);
@@ -59,6 +61,7 @@ public partial class ShellPage : UserControl
             {
                 "Main" => (Control)_mainPage,
                 "Output" => _outputPage,
+                "ModuleConfig" => _moduleConfigPage,
                 "ModuleRegistry" => _moduleRegistryPage,
                 "Mutator" => _mutatorPage,
                 _ => _mainPage

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -87,40 +88,48 @@ public partial class UnifiedLibManager
         }
     }
 
-    private void HandleReplyGetSupported(ReplySupportedPacket reply, int port, int moduleIndex)
+    private async void HandleReplyGetSupported(ReplySupportedPacket reply, int port, int moduleIndex)
     {
         var module = AvailableSandboxModules[moduleIndex];
+        var moduleConfig = await _moduleConfigurationService.GetInitializationConfig(module.ModuleMetadata.ModuleId);
+        
         module.SupportsEyeTracking        = module.SupportsEyeTracking        && reply.eyeAvailable;
         module.SupportsExpressionTracking = module.SupportsExpressionTracking && reply.expressionAvailable;
 
         var initPacket = new EventInitPacket
         {
-            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized,
-            eyeAvailable        = EyeStatus == ModuleState.Uninitialized,
+            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized && moduleConfig.expression,
+            eyeAvailable        = EyeStatus == ModuleState.Uninitialized && moduleConfig.eyes,
         };
         _logger.LogInformation("Got supported for module {module}. Expr: {expr} Eye: {eye}...",
             module.ModuleClassName, initPacket.expressionAvailable, initPacket.eyeAvailable);
         _sandboxServer.SendData(initPacket, port);
     }
 
-    private void HandleReplyInit(ReplyInitPacket reply, int port, int moduleIndex)
+    private async void HandleReplyInit(ReplyInitPacket reply, int port, int moduleIndex)
     {
         var module = AvailableSandboxModules[moduleIndex];
-        module.ModuleInformation.Name     = reply.ModuleInformationName;
-        module.SupportsEyeTracking        = module.SupportsEyeTracking        && reply.eyeSuccess;
-        module.SupportsExpressionTracking = module.SupportsExpressionTracking && reply.expressionSuccess;
+        var moduleConfig = await _moduleConfigurationService.GetInitializationConfig(module.ModuleMetadata.ModuleId);
+
+        module.ModuleInformation.Name = reply.ModuleInformationName;
+        module.SupportsEyeTracking = module.SupportsEyeTracking && reply.eyeSuccess;
+        module.SupportsExpressionTracking =
+            module.SupportsExpressionTracking && reply.expressionSuccess;
 
         _logger.LogInformation("Got init for module {module}. Eye: {eye} Expr: {expr}...",
             module.ModuleClassName, reply.eyeSuccess, reply.expressionSuccess);
 
+        NoteInitReply();
+
         // Skip modules that failed to init anything
         if (!reply.eyeSuccess && !reply.expressionSuccess)
         {
+            RefreshLoadedModulesUi();
             return;
         }
 
-        EyeStatus        = reply.eyeSuccess        ? ModuleState.Active : ModuleState.Uninitialized;
-        ExpressionStatus = reply.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        if (EyeStatus != ModuleState.Active) EyeStatus = reply.eyeSuccess ? ModuleState.Active : ModuleState.Uninitialized;
+        if (ExpressionStatus != ModuleState.Active) ExpressionStatus = reply.expressionSuccess ? ModuleState.Active : ModuleState.Uninitialized;
 
         module.ModuleInformation.PropertyChanged += (_, args) =>
         {
@@ -143,54 +152,28 @@ public partial class UnifiedLibManager
         };
 
         module.ModuleInformation.Active          = true;
-        module.ModuleInformation.UsingEye        = !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye)        && reply.eyeSuccess;
-        module.ModuleInformation.UsingExpression = !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
+        // I wouldn't otherwise check moduleConfig for this, but we can't trust modules for accuracy
+        module.ModuleInformation.UsingEye        = moduleConfig.eyes && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye)        && reply.eyeSuccess;
+        module.ModuleInformation.UsingExpression = moduleConfig.expression && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
         module.ModuleInformation.StaticImages    = reply.IconDataStreams;
 
         _sendCoordinator.RegisterModule(port);
         EnsureModuleThreadStartedSandboxed(module);
 
-        _dispatcherService.Run(() => PublishInitializedModuleToUi(moduleIndex));
+        _logger.LogInformation("Tracking initialized via {module}", module.ModuleClassName);
+        RefreshLoadedModulesUi();
     }
 
-    private void PublishInitializedModuleToUi(int moduleIndex)
+    private void NoteInitReply()
     {
-        var module = AvailableSandboxModules[moduleIndex];
-
-        var replaced = false;
-        for (var i = 0; i < LoadedModulesMetadata.Count; i++)
+        if (_pendingInits > 0)
         {
-            if (LoadedModulesMetadata[i].Name == module.ModuleInformation.Name)
-            {
-                LoadedModulesMetadata[i] = module.ModuleInformation;
-                replaced = true;
-                break;
-            }
-        }
-        if (!replaced)
-        {
-            LoadedModulesMetadata.Add(module.ModuleInformation);
+            _pendingInits--;
         }
 
-        if (AvailableSandboxModules.Count == 0)
+        if (_pendingInits == 0)
         {
-            _logger.LogWarning("No modules loaded.");
-            LoadedModulesMetadata.Clear();
-            LoadedModulesMetadata.Add(new ModuleMetadataInternal { Active = false, Name = "No Modules Loaded" });
-            return;
-        }
-
-        if (LoadedModulesMetadata.Count > 0
-            && !LoadedModulesMetadata[0].Active
-            && (LoadedModulesMetadata[0].Name == "No Modules Loaded"
-                || LoadedModulesMetadata[0].Name == "Initializing Modules..."))
-        {
-            LoadedModulesMetadata.RemoveAt(0);
-        }
-
-        if (module.ModuleInformation.Active)
-        {
-            _logger.LogInformation("Tracking initialized via {module}", module.ModuleClassName);
+            _isInitializing = false;
         }
     }
 
@@ -215,10 +198,14 @@ public partial class UnifiedLibManager
         _sendCoordinator.NotifyReply(module.SandboxProcessPort);
     }
 
-    private void InitialiseSandboxesBaseOnPaths(IEnumerable<string> paths)
+    private async Task InitialiseSandboxesBase(IEnumerable<InstallableTrackingModule> modules)
     {
-        foreach (var dll in paths)
+        foreach (var module in modules)
         {
+            var dll = module.AssemblyLoadPath;
+            var config = await _moduleConfigurationService.GetInitializationConfig(module.ModuleId);
+            if (config is { expression: false, eyes: false }) continue;
+            
             try
             {
                 var sandboxProcess = Process.Start(new ProcessStartInfo(
@@ -253,6 +240,7 @@ public partial class UnifiedLibManager
                     Process            = sandboxProcess,
                     ModuleClassName    = Path.GetFileNameWithoutExtension(dll),
                     ModuleInformation  = new(),
+                    ModuleMetadata     = module,
                     EventBus           = new(),
                 };
                 lock (AvailableSandboxModules)

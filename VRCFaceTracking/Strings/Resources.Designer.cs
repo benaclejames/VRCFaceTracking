@@ -447,6 +447,42 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose which tracking types each installed module is allowed to initialize..
+        /// </summary>
+        public static string ModuleConfig_Description_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Description_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression.
+        /// </summary>
+        public static string ModuleConfig_Expression_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Expression_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eye.
+        /// </summary>
+        public static string ModuleConfig_Eye_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Eye_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings are automatically saved. You should click the reload button once you&apos;re finished to re-initialize modules.
+        /// </summary>
+        public static string ModuleConfig_SaveCondition_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_SaveCondition_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Module Page.
         /// </summary>
         public static string ModulePage_Text {
@@ -767,6 +803,15 @@ namespace VRCFaceTracking.Strings {
         public static string Shell_Main_Content {
             get {
                 return ResourceManager.GetString("Shell_Main_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Module Configuration.
+        /// </summary>
+        public static string Shell_ModuleConfig_Content {
+            get {
+                return ResourceManager.GetString("Shell_ModuleConfig_Content", resourceCulture);
             }
         }
         

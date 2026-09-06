@@ -14,6 +14,7 @@ public partial class UnifiedLibManager : ILibManager
     private readonly ILoggerFactory _loggerFactory;
     private readonly IDispatcherService _dispatcherService;
     private readonly IModuleDataService _moduleDataService;
+    private readonly IModuleConfigurationService _moduleConfigurationService;
     private readonly SendCoordinator _sendCoordinator;
 
     public ObservableCollection<ModuleMetadataInternal> LoadedModulesMetadata { get; set; }
@@ -27,13 +28,23 @@ public partial class UnifiedLibManager : ILibManager
     private readonly List<ModuleRuntimeInfo> _moduleThreads = new();
     private static VrcftSandboxServer _sandboxServer;
 
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, SendCoordinator sendCoordinator)
+    private bool _isInitializing;
+    private int _pendingInits;
+
+    private static readonly ModuleMetadataInternal InitializingPlaceholder =
+        new() { Active = false, Name = "Initializing Modules..." };
+
+    private static readonly ModuleMetadataInternal NoModulesPlaceholder =
+        new() { Active = false, Name = "No Modules Loaded" };
+
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, IModuleConfigurationService moduleConfigurationService, SendCoordinator sendCoordinator)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
+        _moduleConfigurationService = moduleConfigurationService;
         _sendCoordinator = sendCoordinator;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
@@ -49,12 +60,9 @@ public partial class UnifiedLibManager : ILibManager
 
     public async Task Initialize()
     {
-        LoadedModulesMetadata.Clear();
-        LoadedModulesMetadata.Add(new ModuleMetadataInternal
-        { 
-            Active = false,
-            Name = "Initializing Modules..."
-        });
+        _isInitializing = true;
+        _pendingInits = 0;
+        RefreshLoadedModulesUi();
 
         // Spawn sandbox server if it's null
         if (_sandboxServer == null )
@@ -70,27 +78,44 @@ public partial class UnifiedLibManager : ILibManager
         await TeardownAllModules();
 
         var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-        var modulePaths = modules.Select(m => m.AssemblyLoadPath);
 
         AvailableSandboxModules.Clear();
-        InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());
+        await InitialiseSandboxesBase(modules);
 
-        if (AvailableSandboxModules.Count > 0)
+        _pendingInits = AvailableSandboxModules.Count;
+
+        if (_pendingInits > 0)
         {
             _logger.LogDebug("Initializing requested runtimes...");
             return;
         }
 
+        _isInitializing = false;
+        _logger.LogWarning("No modules loaded.");
+        RefreshLoadedModulesUi();
+    }
+
+    private void RefreshLoadedModulesUi()
+    {
         _dispatcherService.Run(() =>
         {
             LoadedModulesMetadata.Clear();
-            LoadedModulesMetadata.Add(new ModuleMetadataInternal
+
+            foreach (var module in AvailableSandboxModules)
             {
-                Active = false,
-                Name = "No Modules Loaded",
-            });
+                if (module.ModuleInformation?.Active == true)
+                {
+                    LoadedModulesMetadata.Add(module.ModuleInformation);
+                }
+            }
+
+            if (LoadedModulesMetadata.Count > 0)
+            {
+                return;
+            }
+
+            LoadedModulesMetadata.Add(_isInitializing ? InitializingPlaceholder : NoModulesPlaceholder);
         });
-        _logger.LogWarning("No modules loaded.");
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes.
@@ -112,6 +137,12 @@ public partial class UnifiedLibManager : ILibManager
 
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
+
+        _pendingInits = 0;
+        if (!_isInitializing)
+        {
+            RefreshLoadedModulesUi();
+        }
     }
 
     private async Task TryTeardownModule(ModuleRuntimeInfo module)

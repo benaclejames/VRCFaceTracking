@@ -24,6 +24,11 @@
                     <ui:SymbolIconSource Symbol="List" />
                 </ui:NavigationViewItem.IconSource>
             </ui:NavigationViewItem>
+            <ui:NavigationViewItem Tag="ModuleConfig" Content="{x:Static s:Resources.Shell_ModuleConfig_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="Document" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
             <ui:NavigationViewItem Tag="ModuleRegistry" Content="{x:Static s:Resources.Shell_ModuleRegistry_Content}">
                 <ui:NavigationViewItem.IconSource>
                     <ui:SymbolIconSource Symbol="Document" />

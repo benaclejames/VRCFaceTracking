@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Loader;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -40,6 +41,10 @@ public class ModuleRuntimeInfo
     /// The module's retreived metadata
     /// </summary>
     public ModuleMetadataInternal ModuleInformation;
+    /// <summary>
+    /// Source module information
+    /// </summary>
+    public TrackingModuleMetadata ModuleMetadata;
     /// <summary>
     /// Module status
     /// </summary>

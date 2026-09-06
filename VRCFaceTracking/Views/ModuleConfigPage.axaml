@@ -1,0 +1,104 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    xmlns:models="clr-namespace:VRCFaceTracking.Core.Models;assembly=VRCFaceTracking.Core"
+    x:DataType="vm:ModuleConfigViewModel"
+    x:Class="VRCFaceTracking.Views.ModuleConfigPage">
+
+    <Grid RowDefinitions="Auto,*" Margin="0,12,0,0">
+
+        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,16">
+            <TextBlock FontSize="22" FontWeight="Bold"
+                       Text="{x:Static s:Resources.Shell_ModuleConfig_Content}" />
+            <TextBlock FontSize="13" Opacity="0.6"
+                       Text="{x:Static s:Resources.ModuleConfig_Description_Text}"
+                       TextWrapping="Wrap" />
+            <TextBlock FontSize="13" Opacity="0.6"
+                       Text="{x:Static s:Resources.ModuleConfig_SaveCondition_Text}"
+                       TextWrapping="Wrap" />
+            <Button Click="ReloadButton_OnClick">Save &amp; Reload</Button>
+        </StackPanel>
+
+        <Panel Grid.Row="1">
+
+            <StackPanel IsVisible="{Binding !HasModules}"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Spacing="8">
+                <ui:SymbolIcon Symbol="Document" FontSize="42" Opacity="0.4"
+                               HorizontalAlignment="Center" />
+                <TextBlock FontSize="15" Opacity="0.6"
+                           HorizontalAlignment="Center"
+                           Text="{x:Static s:Resources.no_modules_installed_warning_Title}" />
+            </StackPanel>
+
+            <ScrollViewer IsVisible="{Binding HasModules}"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Modules}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:ModuleConfigEntry">
+                            <Border CornerRadius="6"
+                                    BorderThickness="1"
+                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                    Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                    Margin="0,0,0,8"
+                                    Padding="18,14">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+
+                                    <StackPanel Grid.Column="0" Grid.Row="0" Spacing="2">
+                                        <TextBlock FontSize="15" FontWeight="SemiBold"
+                                                   Text="{Binding ModuleName}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock FontSize="12" Opacity="0.6"
+                                                       Text="{Binding AuthorName}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock FontSize="12" Opacity="0.4" Text="·" />
+                                            <TextBlock FontSize="12" Opacity="0.6"
+                                                       Text="{Binding Version}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                Spacing="24"
+                                                VerticalAlignment="Center">
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                                    VerticalAlignment="Center">
+                                            <ui:SymbolIcon Symbol="View" FontSize="16" Opacity="0.75" />
+                                            <TextBlock FontSize="13"
+                                                       VerticalAlignment="Center"
+                                                       Text="{x:Static s:Resources.ModuleConfig_Eye_Text}" />
+                                            <ToggleSwitch IsChecked="{Binding EyesEnabled, Mode=TwoWay}"
+                                                          OnContent="" OffContent=""
+                                                          MinWidth="0" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8"
+                                                    VerticalAlignment="Center">
+                                            <ui:SymbolIcon Symbol="Emoji" FontSize="16" Opacity="0.75" />
+                                            <TextBlock FontSize="13"
+                                                       VerticalAlignment="Center"
+                                                       Text="{x:Static s:Resources.ModuleConfig_Expression_Text}" />
+                                            <ToggleSwitch IsChecked="{Binding ExpressionEnabled, Mode=TwoWay}"
+                                                          OnContent="" OffContent=""
+                                                          MinWidth="0" />
+                                        </StackPanel>
+
+                                    </StackPanel>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+        </Panel>
+
+    </Grid>
+</UserControl>
