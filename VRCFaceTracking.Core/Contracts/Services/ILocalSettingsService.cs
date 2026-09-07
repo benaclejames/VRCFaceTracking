@@ -24,6 +24,6 @@ public interface ILocalSettingsService
 
     Task SaveSettingAsync<T>(string key, T value, bool forceLocal = false);
 
-    Task Save(object target);
-    Task Load(object target);
+    Task Save<T>(T target, string prefix = "");
+    Task Load<T>(T target, string prefix = "");
 }
