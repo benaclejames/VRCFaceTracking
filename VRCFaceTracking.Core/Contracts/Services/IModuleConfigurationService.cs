@@ -1,7 +1,9 @@
+using VRCFaceTracking.Core.Models;
+
 namespace VRCFaceTracking.Core.Contracts.Services;
 
 public interface IModuleConfigurationService
 {
-    Task SetInitializationConfig(Guid moduleId, bool eyes, bool expression);
-    Task<(bool eyes, bool expression)> GetInitializationConfig(Guid moduleId);
+    Task SaveModule(ModuleConfigEntry module);
+    Task<ModuleConfigEntry?> LoadModule(Guid id);
 }
