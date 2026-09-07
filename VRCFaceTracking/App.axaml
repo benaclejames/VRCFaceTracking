@@ -1,0 +1,27 @@
+<Application
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sty="using:FluentAvalonia.Styling"
+    xmlns:helpers="using:VRCFaceTracking.Helpers"
+    RequestedThemeVariant="Default"
+    x:Class="VRCFaceTracking.App">
+
+    <Application.Resources>
+        <helpers:LogLevelBrushConverter x:Key="LogLevelBrushConverter" />
+
+        <helpers:MutationTypeCheckboxConverter x:Key="MutationTypeCheckboxConverter" />
+        <helpers:MutationTypeSliderConverter   x:Key="MutationTypeSliderConverter" />
+        <helpers:MutationTypeTextConverter     x:Key="MutationTypeTextConverter" />
+
+        <helpers:IsLocalTestAvatarConverter   x:Key="IsLocalTestAvatarConverter" />
+        <helpers:LegacyParameterCountConverter x:Key="LegacyParameterCountConverter" />
+        <helpers:HasLegacyParametersConverter  x:Key="HasLegacyParametersConverter" />
+
+        <helpers:StreamToBitmapConverter x:Key="StreamToBitmapConverter" />
+        <helpers:HasModuleImagesConverter x:Key="HasModuleImagesConverter" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <sty:FluentAvaloniaTheme PreferSystemTheme="False" PreferUserAccentColor="True" />
+    </Application.Styles>
+</Application>

@@ -1,7 +1,5 @@
-﻿using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
-using Windows.System.Profile;
+﻿using System.Security.Cryptography;
+using System.Text;
 using VRCFaceTracking.Core.Contracts.Services;
 
 namespace VRCFaceTracking.Services;
@@ -12,22 +10,16 @@ public class IdentityService : IIdentityService
     
     public string GetUniqueUserId()
     {
+        // Updated to support multi platform, so old ratings are gonna be lost
         if (!string.IsNullOrEmpty(_uniqueUserId))
         {
             return _uniqueUserId;
         }
 
-        var systemId = SystemIdentification.GetSystemIdForPublisher();
-
-        // Convert the binary ID to a string
-        var binaryId = systemId.Id;
-        var systemIdString = CryptographicBuffer.EncodeToHexString(binaryId);
-
-        // Hash the string
-        var hasher = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-        var hashed =
-            hasher.HashData(CryptographicBuffer.ConvertStringToBinary(systemIdString, BinaryStringEncoding.Utf8));
-        _uniqueUserId = CryptographicBuffer.EncodeToHexString(hashed);
+        var systemId = Environment.MachineName + Environment.UserName + Environment.OSVersion.Platform;
+        var machineIdBytes = Encoding.UTF8.GetBytes(systemId);
+        var hashed = SHA256.HashData(machineIdBytes);
+        _uniqueUserId = Convert.ToHexString(hashed);
 
         return _uniqueUserId;
     }

@@ -1,0 +1,148 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    xmlns:models="clr-namespace:VRCFaceTracking.Core.Models;assembly=VRCFaceTracking.Core"
+    x:DataType="vm:ModuleRegistryViewModel"
+    x:Class="VRCFaceTracking.Views.ModuleRegistryPage">
+
+    <Grid ColumnDefinitions="300,*" Margin="0,12,0,0">
+
+        <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="0,0,10,0">
+
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                <Border Grid.Column="0" Height="32" CornerRadius="6" BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}"
+                        Padding="10,0">
+                    <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
+                        <ui:SymbolIcon Grid.Column="0" Symbol="Find" FontSize="14"
+                                       VerticalAlignment="Center" Opacity="0.55" Margin="0,0,8,0" />
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Watermark="Search modules"
+                                 FontSize="13"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Padding="5"
+                                 VerticalContentAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <Button Grid.Column="1"
+                        Click="Button_OnClick"
+                        ToolTip.Tip="Install from .zip"
+                        Width="32" Height="32"
+                        Margin="6,0,0,0"
+                        Padding="0"
+                        CornerRadius="6"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                    <ui:SymbolIcon Symbol="Add" FontSize="16" />
+                </Button>
+            </Grid>
+
+            <Border Grid.Row="1" CornerRadius="6" BorderThickness="1" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                <ListBox
+                    ItemsSource="{Binding FilteredModuleInfos, Mode=OneWay}"
+                    SelectedItem="{Binding Selected}"
+                    SelectionChanged="ModuleSelection_Click"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:InstallTrackedTrackingModule">
+                            <Grid Height="56" Margin="4,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock FontSize="14" FontWeight="SemiBold"
+                                               Text="{Binding TrackingModuleMetadata.ModuleName}"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock FontSize="12" Opacity="0.6"
+                                               Text="{Binding TrackingModuleMetadata.AuthorName}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <Border Grid.Column="1" CornerRadius="4" Padding="6,2"
+                                        Margin="8,0,0,0" VerticalAlignment="Center"
+                                        x:Name="StateBadge">
+                                    <TextBlock FontSize="11" Text="{Binding InstallationState, Mode=OneWay}" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <TextBlock
+                IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNull}}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Opacity="0.5"
+                FontSize="16"
+                Text="{x:Static s:Resources.ModuleRegistry_NoSelection_Text}" />
+
+            <Border
+                IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}"
+                CornerRadius="6"
+                BorderThickness="1">
+                <ScrollViewer Padding="20">
+                    <StackPanel Spacing="14" DataContext="{Binding Selected.TrackingModuleMetadata}">
+
+                        <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                            <StackPanel Spacing="4">
+                                <TextBlock FontSize="22" FontWeight="Bold" Text="{Binding ModuleName}" />
+                                <TextBlock FontSize="13" Opacity="0.6" Text="{Binding AuthorName}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button
+                                x:Name="InstallButton"
+                                Classes="accent"
+                                Click="InstallButton_Click"
+                                Content="Install" />
+                            <Button
+                                x:Name="UninstallButton"
+                                Click="UninstallButton_Click"
+                                Content="Uninstall" />
+                        </StackPanel>
+
+                        <Separator />
+
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" VerticalAlignment="Top">
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Version_Text}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Version}" TextWrapping="Wrap" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Downloads_Text}" Margin="0,8,0,0" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Downloads}" Margin="0,8,0,0" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.LastUpdated_Text}" Margin="0,8,0,0" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastUpdated, StringFormat='{}{0:d}'}" Margin="0,8,0,0" />
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.ModulePage_Text}" Margin="0,8,0,0" />
+                            <Button Grid.Row="3" Grid.Column="1" Margin="0,8,0,0"
+                                    Padding="0"
+                                    Classes="hyperlink"
+                                    Content="{Binding ModulePageUrl}"
+                                    Click="OpenModulePage_Click" />
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.Description_Text}" Margin="0,16,0,0" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ModuleDescription}" TextWrapping="Wrap" Margin="0,16,0,0" />
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" FontWeight="SemiBold" Opacity="0.7" Text="{x:Static s:Resources.UsageInstructions_Text}" Margin="0,8,0,0" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding UsageInstructions}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        </Grid>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

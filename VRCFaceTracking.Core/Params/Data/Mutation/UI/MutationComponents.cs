@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows.Input;
 
 namespace VRCFaceTracking.Core.Params.Data.Mutation;
@@ -54,6 +49,43 @@ public class MutationProperty : IMutationComponent, INotifyPropertyChanged
                 OnPropertyChanged(nameof(Value));
                 _updateField?.Invoke(_value);
             }
+        }
+    }
+
+    // Wish we didn't have to do this, but Avalonia just kinda doesn't understand object?
+    public double FloatValue
+    {
+        get => Convert.ToDouble(_value);
+        set
+        {
+            _value = value;
+            OnPropertyChanged(nameof(FloatValue));
+            OnPropertyChanged(nameof(Value));
+            _updateField?.Invoke(_value);
+        }
+    }
+
+    public bool BoolValue
+    {
+        get => _value is bool b && b;
+        set
+        {
+            _value = value;
+            OnPropertyChanged(nameof(BoolValue));
+            OnPropertyChanged(nameof(Value));
+            _updateField?.Invoke(_value);
+        }
+    }
+
+    public string StringValue
+    {
+        get => _value?.ToString() ?? string.Empty;
+        set
+        {
+            _value = value;
+            OnPropertyChanged(nameof(StringValue));
+            OnPropertyChanged(nameof(Value));
+            _updateField?.Invoke(_value);
         }
     }
 

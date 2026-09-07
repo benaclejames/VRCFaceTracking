@@ -1,0 +1,42 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
+    x:Class="VRCFaceTracking.Views.ShellPage">
+
+    <ui:NavigationView
+        x:Name="NavView"
+        IsBackButtonVisible="False"
+        IsPaneToggleButtonVisible="True"
+        OpenPaneLength="220"
+        PaneDisplayMode="Auto"
+        SelectionChanged="OnNavigationSelectionChanged">
+
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Tag="Main" Content="{x:Static s:Resources.Shell_Main_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="Home" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
+            <ui:NavigationViewItem Tag="Output" Content="{x:Static s:Resources.Shell_Output_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="List" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
+            <ui:NavigationViewItem Tag="ModuleRegistry" Content="{x:Static s:Resources.Shell_ModuleRegistry_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="Document" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
+            <ui:NavigationViewItem Tag="Mutator" Content="{x:Static s:Resources.Shell_TrackingSettings_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="Edit" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
+        </ui:NavigationView.MenuItems>
+
+        <Panel x:Name="PageContainer" Margin="20,0,20,20" />
+
+    </ui:NavigationView>
+</UserControl>

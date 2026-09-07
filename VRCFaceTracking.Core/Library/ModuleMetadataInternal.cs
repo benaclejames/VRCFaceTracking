@@ -7,8 +7,6 @@ public class ModuleMetadataInternal : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public ModuleMetadata.ActiveChange OnActiveChange;
-
     public List<Stream> StaticImages { get; set; }
     public string Name { get; set; }
     private bool _active;
@@ -19,7 +17,6 @@ public class ModuleMetadataInternal : INotifyPropertyChanged
         set
         {
             _active = value;
-            OnActiveChange?.Invoke(value);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Active)));
         }
     }

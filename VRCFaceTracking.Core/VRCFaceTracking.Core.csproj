@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>$(VftTargetFramework)</TargetFramework>
     <RootNamespace>VRCFaceTracking.Core</RootNamespace>
+    <IsRidAgnostic>false</IsRidAgnostic>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
@@ -14,23 +15,28 @@
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.SDK\VRCFaceTracking.SDK.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <Content Include="C:\Windows\System32\vcruntime140.dll" Link="vcruntime140.dll">
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Windows')))">
+    <Content Include="..\VRCFaceTracking\runtimes\win64\fti_osc.dll" Link="fti_osc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <Content Include="..\fti_osc.dll" Link="fti_osc.dll">
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Linux')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X64')">
+    <Content Include="..\VRCFaceTracking\runtimes\linux64\fti_osc.so" Link="fti_osc.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' Or '$(RuntimeIdentifier)' == 'osx-arm64'">
-    <Content Include="../fti_osc.dylib" Link="fti_osc.dylib">
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-arm64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Linux')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'Arm64')">
+    <Content Include="..\VRCFaceTracking\runtimes\linuxarm64\fti_osc.so" Link="fti_osc.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or '$(RuntimeIdentifier)' == 'linux-arm64'">
-    <Content Include="../fti_osc.so" Link="fti_osc.so">
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-x64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('OSX')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X64')">
+    <Content Include="..\VRCFaceTracking\runtimes\osx64\fti_osc.dylib" Link="fti_osc.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'osx-arm64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('OSX')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'Arm64')">
+    <Content Include="..\VRCFaceTracking\runtimes\osxarm64\fti_osc.dylib" Link="fti_osc.dylib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

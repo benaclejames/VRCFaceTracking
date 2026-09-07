@@ -1,26 +1,39 @@
-﻿using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Media.Imaging;
+﻿using System.Globalization;
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
 
 namespace VRCFaceTracking.Helpers;
 
 public class StreamToBitmapConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public static readonly StreamToBitmapConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var bitmapImages = new List<BitmapImage>();
-        if (value == null)
-            return bitmapImages;
-        
-        var imageSources = (List<Stream>)value;
-        foreach (var imageSource in imageSources)
+        if (value is not Stream stream)
         {
-            var bitmapImage = new BitmapImage();
-            imageSource.Seek(0, SeekOrigin.Begin);
-            bitmapImage.SetSource(imageSource.AsRandomAccessStream());
-            bitmapImages.Add(bitmapImage);
+            return null;
         }
-        return bitmapImages;
+
+        if (stream.CanSeek)
+        {
+            stream.Position = 0;
+        }
+
+        return new Bitmap(stream);
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+public class HasModuleImagesConverter : IValueConverter
+{
+    public static readonly HasModuleImagesConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is List<Stream> { Count: > 0 };
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 }

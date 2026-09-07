@@ -97,28 +97,25 @@ public class VrcftSandboxClient : UdpFullDuplex
 
     private void SendData(in byte[] message)
     {
-        // @TODO: Check packet size, if too big, convert to partial packet, and send partial packets
-        _receivingUdpClient.Send(message, message.Length, _serverEndpoint);
+        if ( message.Length > MTU )
+        {
+            byte[][] packetChunkBytes = PartialPacket.SplitPacketIntoChunks(message, MTU);
+            foreach ( var packetChunk in packetChunkBytes )
+            {
+                SendData(packetChunk);
+                Thread.Sleep(1);    //TODO: Potentially switch to ACK based chunking system
+            }
+        }
+        else
+        {
+            _receivingUdpClient.Send(message, message.Length, _serverEndpoint);
+        }
     }
     public void SendData(in IpcPacket packet)
     {
         if ( _isConnected || packet.GetPacketType() == IpcPacket.PacketType.Handshake)
         {
-            byte[] packetData = packet.GetBytes();
-            if ( packetData.Length > MTU )
-            {
-                // @TODO: Split packet into chunks
-                byte[][] packetChunkBytes = PartialPacket.SplitPacketIntoChunks(packetData, MTU);
-                foreach ( var packetChunk in packetChunkBytes )
-                {
-                    SendData(packetChunk);
-                    Thread.Sleep(1);    //TODO: Potentially switch to ACK based chunking system
-                }
-            }
-            else
-            {
-                SendData(packetData);
-            }
+            SendData(packet.GetBytes());
         }
         else
         {
@@ -128,16 +125,15 @@ public class VrcftSandboxClient : UdpFullDuplex
 
     public void SendAllPendingPackets()
     {
-        if ( _isConnected )
+        if (!_isConnected || _eventBus.Count <= 0)
         {
-            if ( _eventBus.Count > 0 )
-            {
-                while ( _eventBus.Count > 0 )
-                {
-                    IpcPacket pkt = _eventBus.Pop<IpcPacket>();
-                    SendData(pkt);
-                }
-            }
+            return;
+        }
+
+        while ( _eventBus.Count > 0 )
+        {
+            IpcPacket pkt = _eventBus.Pop<IpcPacket>();
+            SendData(pkt);
         }
     }
 }

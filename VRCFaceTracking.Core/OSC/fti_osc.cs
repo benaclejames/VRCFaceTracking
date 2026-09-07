@@ -9,8 +9,9 @@ public enum OscValueType : byte
     Float = 2,
     Bool = 3,
     String = 4,
-    ArrayBegin = 5,
-    ArrayEnd = 6,
+    Blob = 5,
+    ArrayBegin = 6,
+    ArrayEnd = 7,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -24,7 +25,10 @@ public struct OscValue
     [MarshalAs(UnmanagedType.I1)]
     public bool BoolValue;
     [MarshalAs(UnmanagedType.LPUTF8Str)]
-    public string StringValue; // Use IntPtr for pointer types
+    public string StringValue;
+    public IntPtr Blob;
+    [MarshalAs(UnmanagedType.I4)]
+    public int BlobLen;
 
     public object Value
     {
@@ -34,6 +38,7 @@ public struct OscValue
             OscValueType.Float => FloatValue,
             OscValueType.Bool => BoolValue,
             OscValueType.String => StringValue,
+            OscValueType.Blob => Blob,
             _ => null
         };
         set
@@ -51,6 +56,9 @@ public struct OscValue
                     break;
                 case OscValueType.String:
                     StringValue = (string)value;
+                    break;
+                case OscValueType.Blob:
+                    Blob = (IntPtr)value;
                     break;
             }
         }

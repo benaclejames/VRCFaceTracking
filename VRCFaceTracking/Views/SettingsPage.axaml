@@ -1,0 +1,174 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:s="using:VRCFaceTracking.Strings"
+    xmlns:vm="using:VRCFaceTracking.ViewModels"
+    x:DataType="vm:SettingsViewModel"
+    x:Class="VRCFaceTracking.Views.SettingsPage">
+
+    <ScrollViewer>
+        <StackPanel Spacing="4" Margin="0,4,0,20">
+
+            <TextBlock Text="{x:Static s:Resources.Appearance_Text}" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander Header="{x:Static s:Resources.ThemeSettings_Header}"
+                                 Description="{x:Static s:Resources.ThemeSettings_Description}" IsExpanded="True">
+                <ComboBox x:Name="ThemeCombo" SelectionChanged="ThemeCombo_SelectionChanged" MinWidth="160">
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Light_Content}" Tag="Light" />
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Dark_Content}" Tag="Dark" />
+                    <ComboBoxItem Content="{x:Static s:Resources.Settings_Theme_Default_Content}" Tag="Default" />
+                </ComboBox>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="OSC SETTINGS" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander
+                Header="{x:Static s:Resources.OscSettings_Header}"
+                Description="{x:Static s:Resources.OscSettings_Description}"
+                IsExpanded="True">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Receive Port (Legacy)" />
+                        <NumericUpDown
+                            Minimum="1"
+                            Maximum="65535"
+                            Increment="1"
+                            FormatString="0"
+                            MinWidth="120"
+                            Value="{Binding OscTarget.InPort, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Destination IP" />
+                        <TextBox
+                            Watermark="127.0.0.1"
+                            MinWidth="140"
+                            Text="{Binding OscTarget.DestinationAddress, Mode=TwoWay}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock FontSize="12" Opacity="0.7" Text="Send Port" />
+                        <NumericUpDown
+                            Minimum="1"
+                            Maximum="65535"
+                            Increment="1"
+                            FormatString="0"
+                            MinWidth="120"
+                            Value="{Binding OscTarget.OutPort, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="OPENXR / OPENVR" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <Border CornerRadius="6" BorderThickness="1" IsEnabled="{Binding IsOpenVREnabled}">
+                <Grid Margin="16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock FontWeight="SemiBold" Text="{x:Static s:Resources.AutoStartSettings_Header}" />
+                        <TextBlock FontSize="12" Opacity="0.6"
+                                   Text="{x:Static s:Resources.AutoStartSettings_Description}" />
+                    </StackPanel>
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        IsChecked="{Binding AutoStart, Mode=TwoWay}"
+                        OffContent=""
+                        OnContent=""
+                        VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <TextBlock Text="ADVANCED" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander
+                Header="{x:Static s:Resources.RiskySettings_Header}"
+                Description="{x:Static s:Resources.RiskySettings_Description}">
+                <ToggleSwitch
+                    IsChecked="{Binding RiskySettings.Enabled, Mode=TwoWay}"
+                    OffContent=""
+                    OnContent="Gremlin Mode" />
+
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsExpanderItem
+                        Content="{x:Static s:Resources.ForceRelevancyToggle_Header}"
+                        Description="{x:Static s:Resources.ForceRelevancyToggle_Description}"
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <ToggleSwitch
+                                IsChecked="{Binding RiskySettings.AllRelevantDebug, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="{x:Static s:Resources.ForceReInitButton_Header}"
+                        Description="{x:Static s:Resources.ForceReInitButton_Description}"
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="{x:Static s:Resources.ReInitButton_Content}" Click="ForceReInit_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="{x:Static s:Resources.ResetVRCFTButton_Header}"
+                        Description="{x:Static s:Resources.ResetVRCFTButton_Description}"
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="{x:Static s:Resources.ResetButton_Content}" Click="ResetVRCFT_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+
+                    <ui:SettingsExpanderItem
+                        Content="{x:Static s:Resources.ResetAvatarConfButton_Header}"
+                        Description="{x:Static s:Resources.ResetAvatarConfButton_Description}"
+                        IsEnabled="{Binding RiskySettings.Enabled}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <Button Content="{x:Static s:Resources.ResetButton_Content}" Click="ResetAvatarConfig_Click" />
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
+            <TextBlock Text="{x:Static s:Resources.About_Text}" FontSize="12" FontWeight="SemiBold" Opacity="0.6" Margin="0,16,0,6" />
+
+            <ui:SettingsExpander Header="{x:Static s:Resources.AppDisplayName}">
+                <TextBlock x:Name="VersionText" Opacity="0.6" FontSize="13" />
+
+                <ui:SettingsExpander.Items>
+                    <ui:SettingsExpanderItem Content="Contributors" Description="{x:Static s:Resources.Credits_Description}">
+                        <ui:SettingsExpanderItem.Footer>
+                            <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Contributors}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Margin="0,2"
+                                                Padding="10,6"
+                                                Tag="{Binding html_url}"
+                                                Click="ContributorButton_Click">
+                                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                                    <TextBlock Text="{Binding login}" FontSize="13" />
+                                                    <TextBlock
+                                                        Text="{Binding contributions, StringFormat='{}{0} commits'}"
+                                                        FontSize="12"
+                                                        Opacity="0.55"
+                                                        VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </ui:SettingsExpanderItem.Footer>
+                    </ui:SettingsExpanderItem>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

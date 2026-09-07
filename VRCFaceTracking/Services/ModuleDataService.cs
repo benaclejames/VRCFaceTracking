@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -7,11 +6,11 @@ using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Helpers;
 using VRCFaceTracking.Core.Models;
 
-namespace VRCFaceTracking.Core.Services;
+namespace VRCFaceTracking.Services;
 
 public class ModuleDataService : IModuleDataService
 {
-    private List<InstallableTrackingModule>? _remoteModules;
+    private IEnumerable<InstallableTrackingModule>? _remoteModules;
     private readonly Dictionary<Guid, int> _ratingCache = new();
 
     private readonly IIdentityService _identityService;
@@ -52,8 +51,8 @@ public class ModuleDataService : IModuleDataService
     public async Task<IEnumerable<InstallableTrackingModule>> GetRemoteModules()
     {
         _remoteModules ??= new List<InstallableTrackingModule>(await AllModules());
-
-        return _remoteModules;
+        
+        return new List<InstallableTrackingModule>(_remoteModules);
     }
 
     public async Task IncrementDownloadsAsync(TrackingModuleMetadata moduleMetadata)
@@ -74,18 +73,17 @@ public class ModuleDataService : IModuleDataService
 
     public IEnumerable<InstallableTrackingModule> GetLegacyModules()
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
+        if (!Directory.Exists(Core.Utils.CustomLibsDirectory))
         {
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+            Directory.CreateDirectory(Core.Utils.CustomLibsDirectory);
         }
 
-        var moduleDlls = Directory.GetFiles(Utils.CustomLibsDirectory, "*.dll");
+        var moduleDlls = Directory.GetFiles(Core.Utils.CustomLibsDirectory, "*.dll");
 
         return moduleDlls.Select(moduleDll => new InstallableTrackingModule
         {
             AssemblyLoadPath = moduleDll,
             DllFileName = Path.GetFileName(moduleDll),
-            InstallationState = InstallState.Installed,
             ModuleId = Guid.Empty,
             ModuleName = Path.GetFileNameWithoutExtension(moduleDll),
             ModuleDescription = "Legacy module",
@@ -167,15 +165,15 @@ public class ModuleDataService : IModuleDataService
 
     public IEnumerable<InstallableTrackingModule> GetInstalledModules()
     {
-        if (!Directory.Exists(Utils.CustomLibsDirectory))
+        if (!Directory.Exists(Core.Utils.CustomLibsDirectory))
         {
-            Directory.CreateDirectory(Utils.CustomLibsDirectory);
+            Directory.CreateDirectory(Core.Utils.CustomLibsDirectory);
         }
 
         // Check each folder in our CustomModulesDir folder and see if it has a module.json file.
         // If it does, deserialize it and add it to the list of installed modules.
         var installedModules = new List<InstallableTrackingModule>();
-        var moduleFolders = Directory.GetDirectories(Utils.CustomLibsDirectory);
+        var moduleFolders = Directory.GetDirectories(Core.Utils.CustomLibsDirectory);
         foreach (var moduleFolder in moduleFolders)
         {
             var moduleJsonPath = Path.Combine(moduleFolder, "module.json");

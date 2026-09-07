@@ -1,30 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>$(VftUiTargetFramework)</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TargetPlatformMinVersion>$(VftTargetPlatformMinVersion)</TargetPlatformMinVersion>
     <RootNamespace>VRCFaceTracking</RootNamespace>
     <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>Properties\PublishProfiles\win-$(Platform).pubxml</PublishProfile>
-    <UseWinUI>true</UseWinUI>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
-    <CreatePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreatePackageMakeAppxParameters>
-    <CreateResourcePackageMakeAppxParameters>/pb "BundleArtifacts/artifact.cat"</CreateResourcePackageMakeAppxParameters>
-    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
-    <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Auto</AppxBundle>
-    <AppInstallerUri>https://github.com/benaclejames/VRCFaceTracking/releases/latest/download/</AppInstallerUri>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
-    <AppxPackageDir>C:\Users\Ben\Downloads\Bruh\</AppxPackageDir>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,33 +22,32 @@
     <Content Remove="Assets\StoreLogo.scale-150.png" />
     <Compile Remove="VRCFaceTracking\MainPage.xaml.cs" />
     <Page Remove="VRCFaceTracking\MainPage.xaml" />
-    <None Remove="OpenVR\openvr_api.dll" />
-    <Content Include="OpenVR\openvr_api.dll" Link="openvr_api.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Remove="runtimes\**\*.*" />
     <Content Include="OpenVR\app.vrmanifest" Link="app.vrmanifest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Remove="solution-config.props.sample" />
     <None Remove="global.json" />
     <None Remove="VRCFaceTracking\ReadMe.md" />
+    <Compile Update="Views\MainWindow.axaml.cs">
+      <DependentUpon>MainWindow.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Diagnostics" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.RangeSelector" />
-    <PackageReference Include="CommunityToolkit.WinUI.Extensions" />
-    <PackageReference Include="CommunityToolkit.WinUI.UI" />
-    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Layout" />
+    <PackageReference Include="FluentAvaloniaUI" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
+    <PackageReference Include="ReactiveUI.Avalonia" />
     <PackageReference Include="Sentry" />
     <PackageReference Include="Sentry.Extensions.Logging" />
-    <PackageReference Include="WinUIEx" />
     <PackageReference Include="System.Net.Http" />
     <PackageReference Include="System.Private.Uri" />
     <PackageReference Include="System.Text.RegularExpressions" />
@@ -75,6 +55,21 @@
   <ItemGroup>
     <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" />
     <ProjectReference Include="..\VRCFaceTracking.ModuleProcess\VRCFaceTracking.ModuleProcess.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Windows')))">
+    <Content Include="runtimes\win64\openvr_api.dll" Link="openvr_api.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Linux')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'X64')">
+    <Content Include="runtimes\linux64\libopenvr_api.so" Link="libopenvr_api.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-arm64' Or ('$(RuntimeIdentifier)' == '' And $([MSBuild]::IsOSPlatform('Linux')) And '$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture)' == 'Arm64')">
+    <Content Include="runtimes\linuxarm64\libopenvr_api.so" Link="libopenvr_api.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\WindowIcon.ico">
@@ -89,15 +84,26 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Strings\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <StronglyTypedFileName>$(MSBuildProjectDirectory)\Strings\Resources.Designer.cs</StronglyTypedFileName>
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedNamespace>VRCFaceTracking.Strings</StronglyTypedNamespace>
+      <StronglyTypedClassName>Resources</StronglyTypedClassName>
+      <PublicClass>true</PublicClass>
+    </EmbeddedResource>
+    <Compile Update="Strings\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
-  <Target Name="_RemoveFrameworkReferences" BeforeTargets="_ConvertItems;_CalculateInputsForGenerateCurrentProjectAppxManifest">
-    <ItemGroup>
-      <FrameworkSdkReference Remove="@(FrameworkSdkReference)" Condition="$([System.String]::Copy('%(FrameworkSdkReference.SDKName)').StartsWith('Microsoft.WindowsAppRuntime.'))" />
-    </ItemGroup>
-  </Target>
-  <Target Name="CopyToMainProject" AfterTargets="Build">
-    <Copy SourceFiles="$(OutputPath)VRCFaceTracking.ModuleProcess.exe" DestinationFolder="..\VRCFaceTracking\bin\$(Platform)\$(Configuration)\$(TargetFramework)\win-$(Platform)\" SkipUnchangedFiles="true" />
-  </Target>
 </Project>

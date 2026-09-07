@@ -11,10 +11,8 @@ public class ModuleRuntimeInfo
 
 #if true
 
-    public ExtTrackingModule Module;
-    public AssemblyLoadContext AssemblyLoadContext;
-    public CancellationTokenSource UpdateCancellationToken;
-    public Thread UpdateThread;
+    public CancellationTokenSource? UpdateCancellationToken;
+    public Thread? UpdateThread;
 
 #endif
 

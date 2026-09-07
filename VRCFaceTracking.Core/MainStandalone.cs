@@ -34,7 +34,7 @@ public class MainStandalone : IMainService
         _logger.LogInformation("VRCFT Standalone Exiting!");
         await _mutator.Save();
 
-        _libManager.TeardownAllAndResetAsync();
+        await _libManager.TeardownAllModules();
 
         if (OperatingSystem.IsWindows())
         {
@@ -67,9 +67,6 @@ public class MainStandalone : IMainService
         }
 
         _mutator.Load();
-
-        // Begin main OSC update loop
-        _logger.LogDebug("Starting OSC update loop...");
 
         if (isWindows)
         {
