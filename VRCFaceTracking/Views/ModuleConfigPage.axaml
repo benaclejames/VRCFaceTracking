@@ -10,17 +10,47 @@
 
     <Grid RowDefinitions="Auto,*" Margin="0,12,0,0">
 
-        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,16">
-            <TextBlock FontSize="22" FontWeight="Bold"
-                       Text="{x:Static s:Resources.Shell_ModuleConfig_Content}" />
-            <TextBlock FontSize="13" Opacity="0.6"
-                       Text="{x:Static s:Resources.ModuleConfig_Description_Text}"
-                       TextWrapping="Wrap" />
-            <TextBlock FontSize="13" Opacity="0.6"
-                       Text="{x:Static s:Resources.ModuleConfig_SaveCondition_Text}"
-                       TextWrapping="Wrap" />
-            <Button Click="ReloadButton_OnClick">Save &amp; Reload</Button>
-        </StackPanel>
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+                <TextBlock FontSize="22" FontWeight="Bold"
+                           Text="{x:Static s:Resources.Shell_ModuleConfig_Content}" />
+                <TextBlock FontSize="13" Opacity="0.6"
+                           Text="{x:Static s:Resources.ModuleConfig_Description_Text}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
+                        VerticalAlignment="Center">
+
+                <Border CornerRadius="10" Padding="10,4"
+                        Background="{DynamicResource SystemFillColorCautionBackgroundBrush}"
+                        BorderBrush="{DynamicResource SystemFillColorCautionBrush}"
+                        BorderThickness="1"
+                        IsVisible="{Binding HasPendingChanges}"
+                        ToolTip.Tip="{x:Static s:Resources.ModuleConfig_PendingChanges_Tooltip}">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8"
+                                 Fill="{DynamicResource SystemFillColorCautionBrush}" />
+                        <TextBlock FontSize="12"
+                                   VerticalAlignment="Center"
+                                   Text="{x:Static s:Resources.ModuleConfig_PendingChanges_Text}" />
+                    </StackPanel>
+                </Border>
+
+                <Border CornerRadius="10" Padding="10,4"
+                        Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                        IsVisible="{Binding !HasPendingChanges}">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8"
+                                 Fill="{DynamicResource SystemFillColorSuccessBrush}" />
+                    </StackPanel>
+                </Border>
+
+                <Button Classes="accent"
+                        Click="ReloadButton_OnClick"
+                        Content="{x:Static s:Resources.ModuleConfig_Reload_Button}" />
+            </StackPanel>
+        </Grid>
 
         <Panel Grid.Row="1">
 

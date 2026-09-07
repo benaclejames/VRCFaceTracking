@@ -401,13 +401,19 @@
   <data name="ModuleConfig_Description_Text" xml:space="preserve">
     <value>Choose which tracking types each installed module is allowed to initialize.</value>
   </data>
-  <data name="ModuleConfig_SaveCondition_Text" xml:space="preserve">
-    <value>Settings are automatically saved. You should click the reload button once you're finished to re-initialize modules</value>
-  </data>
   <data name="ModuleConfig_Eye_Text" xml:space="preserve">
     <value>Eye</value>
   </data>
   <data name="ModuleConfig_Expression_Text" xml:space="preserve">
     <value>Expression</value>
+  </data>
+  <data name="ModuleConfig_Reload_Button" xml:space="preserve">
+    <value>Reload modules</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Text" xml:space="preserve">
+    <value>Reload to apply</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Tooltip" xml:space="preserve">
+    <value>You've changed module settings. Changes take effect after reload.</value>
   </data>
 </root>

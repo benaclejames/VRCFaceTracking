@@ -5,34 +5,35 @@ namespace VRCFaceTracking.Core.Models;
 
 public partial class ModuleConfigEntry : ObservableObject
 {
-    private readonly IModuleConfigurationService _configService;
-    private readonly Guid _moduleId;
+    private readonly IModuleConfigurationService? _configService;
 
-    public string ModuleName { get; }
-    public string AuthorName { get; }
-    public string Version { get; }
+    public Guid Id { get; init; }
+    public string ModuleName { get; init; } = string.Empty;
+    public string AuthorName { get; init; } = string.Empty;
+    public string Version { get; init; } = string.Empty;
 
-    [ObservableProperty] private bool _eyesEnabled;
-    [ObservableProperty] private bool _expressionEnabled;
+    [ObservableProperty]
+    [property: SavedSetting("EyesEnabled", true)]
+    private bool _eyesEnabled;
+
+    [ObservableProperty]
+    [property: SavedSetting("ExpressionEnabled", true)]
+    private bool _expressionEnabled;
 
     public ModuleConfigEntry(
-        InstallableTrackingModule module,
-        bool eyes,
-        bool expression,
+        TrackingModuleMetadata module,
         IModuleConfigurationService configService)
     {
         _configService = configService;
-        _moduleId = module.ModuleId;
+        Id = module.ModuleId;
         ModuleName = module.ModuleName;
         AuthorName = module.AuthorName;
         Version = module.Version;
-        _eyesEnabled = eyes;
-        _expressionEnabled = expression;
     }
 
     partial void OnEyesEnabledChanged(bool value) => _ = Persist();
     partial void OnExpressionEnabledChanged(bool value) => _ = Persist();
 
     private Task Persist() =>
-        _configService.SetInitializationConfig(_moduleId, EyesEnabled, ExpressionEnabled);
+        _configService?.SaveModule(this) ?? Task.CompletedTask;
 }

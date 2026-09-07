@@ -91,15 +91,15 @@ public partial class UnifiedLibManager
     private async void HandleReplyGetSupported(ReplySupportedPacket reply, int port, int moduleIndex)
     {
         var module = AvailableSandboxModules[moduleIndex];
-        var moduleConfig = await _moduleConfigurationService.GetInitializationConfig(module.ModuleMetadata.ModuleId);
+        var moduleConfig = await _moduleConfigurationService.LoadModule(module.ModuleMetadata.ModuleId);
         
         module.SupportsEyeTracking        = module.SupportsEyeTracking        && reply.eyeAvailable;
         module.SupportsExpressionTracking = module.SupportsExpressionTracking && reply.expressionAvailable;
 
         var initPacket = new EventInitPacket
         {
-            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized && moduleConfig.expression,
-            eyeAvailable        = EyeStatus == ModuleState.Uninitialized && moduleConfig.eyes,
+            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized && moduleConfig.ExpressionEnabled,
+            eyeAvailable        = EyeStatus == ModuleState.Uninitialized && moduleConfig.EyesEnabled,
         };
         _logger.LogInformation("Got supported for module {module}. Expr: {expr} Eye: {eye}...",
             module.ModuleClassName, initPacket.expressionAvailable, initPacket.eyeAvailable);
@@ -109,7 +109,7 @@ public partial class UnifiedLibManager
     private async void HandleReplyInit(ReplyInitPacket reply, int port, int moduleIndex)
     {
         var module = AvailableSandboxModules[moduleIndex];
-        var moduleConfig = await _moduleConfigurationService.GetInitializationConfig(module.ModuleMetadata.ModuleId);
+        var moduleConfig = await _moduleConfigurationService.LoadModule(module.ModuleMetadata.ModuleId);
 
         module.ModuleInformation.Name = reply.ModuleInformationName;
         module.SupportsEyeTracking = module.SupportsEyeTracking && reply.eyeSuccess;
@@ -153,8 +153,8 @@ public partial class UnifiedLibManager
 
         module.ModuleInformation.Active          = true;
         // I wouldn't otherwise check moduleConfig for this, but we can't trust modules for accuracy
-        module.ModuleInformation.UsingEye        = moduleConfig.eyes && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye)        && reply.eyeSuccess;
-        module.ModuleInformation.UsingExpression = moduleConfig.expression && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
+        module.ModuleInformation.UsingEye        = (moduleConfig?.EyesEnabled ?? true) && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye)        && reply.eyeSuccess;
+        module.ModuleInformation.UsingExpression = (moduleConfig?.ExpressionEnabled ?? true) && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
         module.ModuleInformation.StaticImages    = reply.IconDataStreams;
 
         _sendCoordinator.RegisterModule(port);
@@ -203,8 +203,8 @@ public partial class UnifiedLibManager
         foreach (var module in modules)
         {
             var dll = module.AssemblyLoadPath;
-            var config = await _moduleConfigurationService.GetInitializationConfig(module.ModuleId);
-            if (config is { expression: false, eyes: false }) continue;
+            var config = await _moduleConfigurationService.LoadModule(module.ModuleId);
+            if (config is { ExpressionEnabled: false, EyesEnabled: false }) continue;
             
             try
             {
