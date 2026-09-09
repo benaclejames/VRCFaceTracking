@@ -6,7 +6,7 @@ using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core.OSC.DataTypes;
 
-public class BaseParam<T> : Parameter where T : struct
+public class BaseParam<T> : Parameter, IDisposable where T : struct
 {
     private const string DefaultPrefix = "/avatar/parameters/";
     protected const string CurrentVersionPrefix = "v2/";
@@ -120,7 +120,18 @@ public class BaseParam<T> : Parameter where T : struct
 
     ~BaseParam()
     {
-        // Not sure if this is actually needed, but it's good practice
+        ReleaseUnmanagedResources();
+    }
+
+    private void ReleaseUnmanagedResources()
+    {
         UnifiedTracking.OnUnifiedDataUpdated -= Process;
+        OscMessage.Dispose();
+    }
+
+    public void Dispose()
+    {
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
     }
 }
