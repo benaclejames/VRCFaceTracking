@@ -17,8 +17,10 @@ public class BinaryFaceDataSender(OscQueryService oscqService) : IHostedService
         UnifiedTracking.OnUnifiedDataUpdated += OnDataUpdated;
         oscqService.PropertyChanged += (sender, args) =>
         {
-            if (args.PropertyName != nameof(OscQueryService.AvatarParameters)) return;
-            SubscribeConditional((sender as OscQueryService)!.AvatarParameters);
+            if (args.PropertyName != nameof(OscQueryService.AvatarInfo)) return;
+            
+            var avatarInfo = (sender as OscQueryService)!.AvatarInfo;
+            SubscribeConditional(avatarInfo.FullFaceTracking);
         };
         return Task.CompletedTask;
     }
@@ -29,9 +31,8 @@ public class BinaryFaceDataSender(OscQueryService oscqService) : IHostedService
         return Task.CompletedTask;
     }
 
-    private void SubscribeConditional(IEnumerable<Parameter> parameters)
+    private void SubscribeConditional(bool shouldBeSubscribed)
     {
-        var shouldBeSubscribed = !parameters.Any();
         var isAlreadySubscribed = UnifiedTracking.OnUnifiedDataUpdated.GetInvocationList().Any(x => x.Target == this);
         
         if (shouldBeSubscribed && !isAlreadySubscribed)

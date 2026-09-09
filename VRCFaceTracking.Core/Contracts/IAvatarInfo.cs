@@ -2,7 +2,8 @@
 
 public interface IAvatarInfo
 {
-    public string Name { get; }
-    public string Id { get; }
-    public IParameterDefinition[] Parameters { get; }
+    string Name { get; }
+    string Id { get; }
+    bool FullFaceTracking { get; }
+    IParameterDefinition[] Parameters { get; }
 }
