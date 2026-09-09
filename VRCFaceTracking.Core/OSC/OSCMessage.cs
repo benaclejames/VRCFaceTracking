@@ -4,7 +4,7 @@ using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscMessage
+public class OscMessage : IDisposable
 {
     public OscMessageMeta _meta;
     private IntPtr _metaPtr;
@@ -132,9 +132,22 @@ public class OscMessage
     
     ~OscMessage()
     {
+        ReleaseUnmanagedResources();
+    }
+
+    private void ReleaseUnmanagedResources()
+    {
         if (_metaPtr != IntPtr.Zero)
-            fti_osc.free_osc_message(_metaPtr);
+             fti_osc.free_osc_message(_metaPtr);
+        else if (_meta.Value != IntPtr.Zero)
+            Marshal.FreeHGlobal(_meta.Value);
         if (_blobHandle.IsAllocated)
             _blobHandle.Free();
+    }
+
+    public void Dispose()
+    {
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
     }
 }

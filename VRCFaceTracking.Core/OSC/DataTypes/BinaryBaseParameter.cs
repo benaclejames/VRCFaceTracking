@@ -43,7 +43,7 @@ public class BinaryBaseParameter : Parameter
      * Step 1) Find all valid parameters on the new avatar that start with the name of this binary param, and end with a number.
      * 
      * Step 2) Find the binary steps for that number. That's the number of shifts we need to do. That number could be 8, and it's steps would be 3 as it's 3 steps away from zero in binary
-     * This also makes sure the number is a valid base2-compatible number
+     * This also makes sure the number is a valid base2 number
      *
      * Step 3) Calculate the maximum possible value for the discovered binary steps, then subtract 1 since we count from 0.
      *
@@ -53,6 +53,12 @@ public class BinaryBaseParameter : Parameter
      */
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
+        foreach (var param in _params)
+        {
+            // Might not be needed but we were running into issues where params weren't being unsubbed from dataupdated
+            param.Dispose();
+        }
+
         _params.Clear();
         var negativeRelevancy = _negativeParam.ResetParam(newParams);
 
