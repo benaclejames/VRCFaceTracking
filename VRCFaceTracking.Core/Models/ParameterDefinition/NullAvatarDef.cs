@@ -19,6 +19,7 @@ public class NullAvatarDef : IAvatarInfo
     public string Name => _name;
 
     public string Id => _id;
+    public bool FullFaceTracking => false;
 
     public IParameterDefinition[] Parameters { get; }
 }
