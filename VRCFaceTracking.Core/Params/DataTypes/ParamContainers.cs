@@ -1,6 +1,8 @@
-﻿using VRCFaceTracking.Core.Contracts;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC.DataTypes;
 using VRCFaceTracking.Core.Params.Data;
+using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Core.Types;
 
 namespace VRCFaceTracking.Core.Params.DataTypes;
@@ -34,7 +36,8 @@ public class NativeParameter<T> : AlwaysRelevantParameter<T> where T : struct
         
     public override Parameter[] ResetParam(IParameterDefinition[] newParams)
     {
-        if (_condition.Invoke(newParams))
+        // If we're running FFT, we don't want native eye params doubling up. Normal param array will never be zero len
+        if (newParams.Length > 0 && _condition.Invoke(newParams))
         {
             return base.ResetParam(newParams);
         }

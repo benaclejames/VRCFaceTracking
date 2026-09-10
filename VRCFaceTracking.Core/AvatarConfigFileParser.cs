@@ -85,15 +85,6 @@ public class AvatarConfigParser
             return null;
         }
 
-        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
-        ParameterSenderService.Clear();
-        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
-
-        foreach (var parameter in UnifiedTracking.AllParameters)
-        {
-            paramList.AddRange(parameter.ResetParam(parameters));
-        }
-
         //_lastAvatarId = newId;
         return (avatarConfig, paramList);
     }

@@ -4,6 +4,7 @@ using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.OSC.Query;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core;
 
@@ -35,6 +36,8 @@ public class OscQueryConfigParser(
 
             var avatarConfig =
                 JsonConvert.DeserializeObject<OscQueryNode>(await response.Content.ReadAsStringAsync());
+            
+            ParameterSenderService.Clear();
             parserLogger.LogDebug(avatarConfig.ToString());
             var avatarInfo = new OscQueryAvatarInfo(avatarConfig);
 
@@ -42,6 +45,7 @@ public class OscQueryConfigParser(
             var paramList = new List<Parameter>();
             foreach (var parameter in UnifiedTracking.AllParameters)
             {
+                // We pass an empty array if we're using fft. This will never happen naturally so we can use it as confirmation of such an event
                 paramList.AddRange(parameter.ResetParam(avatarInfo.FullFaceTracking ? [] : avatarInfo.Parameters));
             }
 
