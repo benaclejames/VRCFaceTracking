@@ -18,7 +18,7 @@ public class AlwaysRelevantParameter<T> : BaseParam<T> where T : struct
         Relevant = true;
     }
         
-    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParam, IAvatarInfo avatarInfo)
     {
         Relevant = true;
         return new Parameter[] { this };
@@ -34,12 +34,11 @@ public class NativeParameter<T> : AlwaysRelevantParameter<T> where T : struct
         _condition = condition;
     }
         
-    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams, IAvatarInfo avatarInfo)
     {
-        // If we're running FFT, we don't want native eye params doubling up. Normal param array will never be zero len
-        if (newParams.Length > 0 && _condition.Invoke(newParams))
+        if (!avatarInfo.FullFaceTracking && _condition.Invoke(newParams))
         {
-            return base.ResetParam(newParams);
+            return base.ResetParam(newParams, avatarInfo);
         }
 
         Relevant = false;
@@ -113,7 +112,7 @@ public class EParam : Parameter
         };
     }
 
-    public override Parameter[] ResetParam(IParameterDefinition[] newParams) => _parameter.SelectMany(param => param.ResetParam(newParams)).ToArray();
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams, IAvatarInfo avatarInfo) => _parameter.SelectMany(param => param.ResetParam(newParams, avatarInfo)).ToArray();
 
     public override (string, Parameter)[] GetParamNames() => _parameter.SelectMany(param => param.GetParamNames()).ToArray();
 }

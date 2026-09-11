@@ -46,12 +46,12 @@ public class OscQueryConfigParser(
             foreach (var parameter in UnifiedTracking.AllParameters)
             {
                 // We pass an empty array if we're using fft. This will never happen naturally so we can use it as confirmation of such an event
-                paramList.AddRange(parameter.ResetParam(avatarInfo.FullFaceTracking ? [] : avatarInfo.Parameters));
+                paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters, avatarInfo));
             }
 
             // God help me why is this something I need to do to get the avatar name
             // this impl is really disappointing vrc
-            var configFileInfo = await configParser.ParseAvatar(avatarInfo.Id);
+            var configFileInfo = await configParser.ParseAvatar(avatarInfo.Id, true);
             parserLogger.LogInformation($"Attempting to resolve avatar config file for {avatarInfo.Id}");
             if (!string.IsNullOrEmpty(configFileInfo?.avatarInfo.Name))
             {

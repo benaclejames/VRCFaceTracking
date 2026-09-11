@@ -84,8 +84,16 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
         _sendOnLoad = sendOnLoad;
     }
 
-    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams, IAvatarInfo avatarInfo)
     {
+        if (avatarInfo.FullFaceTracking)
+        {
+            Relevant = false;
+            OscMessage.Address = DefaultPrefix + _paramName;
+
+            return [];
+        }
+        
         if (ParameterSenderService.AllParametersRelevantStatic)
         {
             Relevant = true;
@@ -109,7 +117,7 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
             OscMessage.Address = DefaultPrefix + _paramName;
         }
 
-        return Relevant ? new Parameter[] { this } : Array.Empty<Parameter>();
+        return Relevant ? [this] : [];
     }
 
     public override (string, Parameter)[] GetParamNames() => new[] { (_paramName, (Parameter)this) };

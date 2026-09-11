@@ -51,7 +51,7 @@ public class BinaryBaseParameter : Parameter
      * binary number since we can safely assume the highest possible input float will be 1.0. Then we bitwise shift by the binary steps discovered in step 2.
      * Finally, we use a combination of bitwise AND to get whether the designated index for this param is 1 or 0.
      */
-    public override Parameter[] ResetParam(IParameterDefinition[] newParams)
+    public override Parameter[] ResetParam(IParameterDefinition[] newParams, IAvatarInfo avatarInfo)
     {
         foreach (var param in _params)
         {
@@ -60,7 +60,7 @@ public class BinaryBaseParameter : Parameter
         }
 
         _params.Clear();
-        var negativeRelevancy = _negativeParam.ResetParam(newParams);
+        var negativeRelevancy = _negativeParam.ResetParam(newParams, avatarInfo);
 
         var boolParams = newParams.Where(p =>
             p.Type == typeof(bool) && _regex.IsMatch(p.Address));
@@ -88,7 +88,7 @@ public class BinaryBaseParameter : Parameter
                      .Select(param =>
                          new BaseParam<bool>(param.Key, data => ProcessBinary(data, param.Value), true)))
         {
-            parameters.AddRange(newBool.ResetParam(newParams));
+            parameters.AddRange(newBool.ResetParam(newParams, avatarInfo));
             _params.Add(newBool);
         }
 

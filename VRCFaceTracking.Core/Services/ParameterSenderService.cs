@@ -1,4 +1,5 @@
 using VRCFaceTracking.Core.Contracts;
+using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.Params.Data;
 
@@ -29,7 +30,7 @@ public class ParameterSenderService
             SendQueue.Clear();
             foreach (var parameter in UnifiedTracking.AllParameters)
             {
-                parameter.ResetParam(Array.Empty<IParameterDefinition>());
+                parameter.ResetParam(Array.Empty<IParameterDefinition>(), new NullAvatarDef("Always Relevant", "alwaysrelevant"));
             }
         }
     }
