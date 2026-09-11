@@ -23,10 +23,10 @@ namespace VRCFaceTracking.Core.Types
             Y = y;
         }
 
-        protected void ResetParams(IParameterDefinition[] newParams)
+        protected void ResetParams(IParameterDefinition[] newParams, IAvatarInfo avatarInfo)
         {
-            X.ResetParam(newParams);
-            Y.ResetParam(newParams);
+            X.ResetParam(newParams, avatarInfo);
+            Y.ResetParam(newParams, avatarInfo);
         }
     }
 }

@@ -10,16 +10,9 @@ namespace VRCFaceTracking.Core;
 /// <summary>
 /// ConfigParser is responsible for parsing the traditional JSON OSC config that VRChat produces
 /// </summary>
-public class AvatarConfigParser
+public class AvatarConfigParser(ILogger<AvatarConfigParser> parserLogger)
 {
-    private readonly ILogger<AvatarConfigParser> _logger;
-
-    public AvatarConfigParser(ILogger<AvatarConfigParser> parserLogger)
-    {
-        _logger = parserLogger;
-    }
-
-    public async Task<(IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?> ParseAvatar(string newId)
+    public async Task<(IAvatarInfo avatarInfo, List<Parameter> relevantParameters)?> ParseAvatar(string newId, bool skipParams = false)
     {
         if (string.IsNullOrEmpty(newId))
         {
@@ -63,7 +56,7 @@ public class AvatarConfigParser
                 {
                     // Malformed JSON file detected, rename it to .bak to prevent future parsing attempts
                     var backupFileName = Path.ChangeExtension(avatarFile, ".bak");
-                    _logger.LogWarning("Malformed JSON file detected: {fileName}. Renaming to {backupFileName}. Error: {error}", 
+                    parserLogger.LogWarning("Malformed JSON file detected: {fileName}. Renaming to {backupFileName}. Error: {error}", 
                         avatarFile, backupFileName, ex.Message);
                     
                     try
@@ -72,7 +65,7 @@ public class AvatarConfigParser
                     }
                     catch (Exception moveEx)
                     {
-                        _logger.LogError("Failed to rename malformed JSON file {fileName}: {error}", 
+                        parserLogger.LogError("Failed to rename malformed JSON file {fileName}: {error}", 
                             avatarFile, moveEx.Message);
                     }
                 }
@@ -81,17 +74,21 @@ public class AvatarConfigParser
 
         if (avatarConfig == null)
         {
-            _logger.LogError("Avatar config file for {avatarId} not found", newId);
+            parserLogger.LogError("Avatar config file for {avatarId} not found", newId);
             return null;
         }
 
-        _logger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
-        ParameterSenderService.Clear();
-        var parameters = avatarConfig.parameters.Where(param => param.input != null).ToArray<IParameterDefinition>();
-
-        foreach (var parameter in UnifiedTracking.AllParameters)
+        if (!skipParams)
         {
-            paramList.AddRange(parameter.ResetParam(parameters));
+            parserLogger.LogInformation("Parsing config file for avatar: {avatarName}", avatarConfig.name);
+            ParameterSenderService.Clear();
+            var parameters = avatarConfig.parameters.Where(param => param.input != null)
+                .ToArray<IParameterDefinition>();
+
+            foreach (var parameter in UnifiedTracking.AllParameters)
+            {
+                paramList.AddRange(parameter.ResetParam(parameters, avatarConfig));
+            }
         }
 
         //_lastAvatarId = newId;

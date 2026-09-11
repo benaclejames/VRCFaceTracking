@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.Params.DataTypes;
 using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
+using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Core.Types;
 
 namespace VRCFaceTracking.Core.Params.Expressions;
@@ -14,16 +16,6 @@ public class VRCNativeParameters
                 
         // Now we match parameters to the literals as a sort of sanity check (we use endswith since we don't know prefix. theres prob cases where binary can slip through the cracks)
         return allParams.Where(p => newParams.Any(pd => pd.Address.EndsWith(p.paramName))).ToArray();
-    }
-
-    private static bool HasAnyRecognizedParameterShape(IParameterDefinition[] newParams)
-    {
-        // This func mainly used to avoid doubling up when using native
-        var allShapeNames = UnifiedTracking.AllParameters_v2.Concat(UnifiedTracking.AllParameters_v1).ToList().SelectMany(p => p.GetParamNames());
-        
-        // Sure, this might not always catch binary parameters, but this isn't an issue right now since we only care about if there are ANY parameters from UE
-        // and legacy shapes, and most (if not all) binary params are instantiated by an EParam meaning this will still be true
-        return allShapeNames.Any(p => newParams.Any(pd => pd.Address.EndsWith(p.paramName)));
     }
 
     public static readonly Parameter[] NativeParameters =
@@ -50,7 +42,7 @@ public class VRCNativeParameters
                     exp.Eye.Right.Gaze.ToPitch(),
                     exp.Eye.Right.Gaze.ToYaw()),
             param =>
-                HasAnyRecognizedParameterShape(param) && IsEyeParameter(
+                IsEyeParameter(
                         param.Where(p =>
                             p.Name.Contains("Eye") &&
                             (p.Name.Contains('X') || p.Name.Contains('Y'))).ToArray())
@@ -61,7 +53,7 @@ public class VRCNativeParameters
 
         new NativeParameter<float>(
             exp => 1 - exp.Eye.Combined().Openness,
-            param => HasAnyRecognizedParameterShape(param) && IsEyeParameter(
+            param => IsEyeParameter(
                     param.Where(p =>
                         p.Name.Contains("Eye") &&
                         (p.Name.Contains("Open") || p.Name.Contains("Lid"))).ToArray())

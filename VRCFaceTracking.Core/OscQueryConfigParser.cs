@@ -4,6 +4,7 @@ using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.OSC.Query;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Services;
 
 namespace VRCFaceTracking.Core;
 
@@ -35,6 +36,8 @@ public class OscQueryConfigParser(
 
             var avatarConfig =
                 JsonConvert.DeserializeObject<OscQueryNode>(await response.Content.ReadAsStringAsync());
+            
+            ParameterSenderService.Clear();
             parserLogger.LogDebug(avatarConfig.ToString());
             var avatarInfo = new OscQueryAvatarInfo(avatarConfig);
 
@@ -42,12 +45,13 @@ public class OscQueryConfigParser(
             var paramList = new List<Parameter>();
             foreach (var parameter in UnifiedTracking.AllParameters)
             {
-                paramList.AddRange(parameter.ResetParam(avatarInfo.FullFaceTracking ? [] : avatarInfo.Parameters));
+                // We pass an empty array if we're using fft. This will never happen naturally so we can use it as confirmation of such an event
+                paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters, avatarInfo));
             }
 
             // God help me why is this something I need to do to get the avatar name
             // this impl is really disappointing vrc
-            var configFileInfo = await configParser.ParseAvatar(avatarInfo.Id);
+            var configFileInfo = await configParser.ParseAvatar(avatarInfo.Id, true);
             parserLogger.LogInformation($"Attempting to resolve avatar config file for {avatarInfo.Id}");
             if (!string.IsNullOrEmpty(configFileInfo?.avatarInfo.Name))
             {
