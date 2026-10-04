@@ -113,7 +113,7 @@
                                 Content="Uninstall" />
                             <ComboBox
                                 x:Name="ModuleStateComboBox"
-                                MinWidth="150"
+                                MinWidth="110"
                                 VerticalAlignment="Center"
                                 SelectionChanged="ModuleStateComboBox_SelectionChanged">
                                 <ComboBoxItem Content="{x:Static s:Resources.ModuleStateText_Enabled}" />
