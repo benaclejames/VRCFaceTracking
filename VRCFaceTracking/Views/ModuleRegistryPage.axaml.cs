@@ -33,8 +33,10 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
     private async void ModuleSelection_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {   
         if (ViewModel.Selected is not InstallTrackedTrackingModule module) return;
+        var isInstalled = module.InstallationState != InstallState.NotInstalled;
         InstallButton.IsVisible = module.InstallationState != InstallState.Installed;
         UninstallButton.IsVisible = module.InstallationState == InstallState.Installed;
+        ModuleStateComboBox.IsVisible = isInstalled;
         InstallButton.Content = "Install";
         InstallButton.IsEnabled = true;
         if (module.InstallationState != InstallState.AwaitingRestart)
