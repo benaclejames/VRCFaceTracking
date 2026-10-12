@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="Sentry.Extensions.Logging" />
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux'))" />
   </ItemGroup>
