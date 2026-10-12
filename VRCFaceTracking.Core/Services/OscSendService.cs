@@ -43,12 +43,13 @@ public class OscSendService
                 return;
             }
 
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
+            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress) || !IPAddress.TryParse(_oscTarget.DestinationAddress, out var ipAddress))
             {
                 _oscTarget.DestinationAddress = "127.0.0.1";
+                IPAddress.TryParse(_oscTarget.DestinationAddress, out ipAddress);
             }
 
-            UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.OutPort));
+            UpdateTarget(new IPEndPoint(ipAddress!, _oscTarget.OutPort));
         };
     }
 
@@ -84,7 +85,7 @@ public class OscSendService
             return;
         }
 
-        await _sendSocket?.SendAsync(_sendBuffer[..nextByteIndex])!;
+        await _sendSocket.SendAsync(_sendBuffer[..nextByteIndex]);
         OnMessagesDispatched(1);
     }
 
@@ -95,7 +96,7 @@ public class OscSendService
         while (index < cbt.Length)
         {
             var length = await Task.Run(() => fti_osc.create_osc_bundle(_sendBuffer, cbt, cbt.Length, ref index), ct);
-            await _sendSocket?.SendAsync(_sendBuffer[..length])!;
+            await _sendSocket.SendAsync(_sendBuffer[..length]);
         }
         OnMessagesDispatched(index);
     }
