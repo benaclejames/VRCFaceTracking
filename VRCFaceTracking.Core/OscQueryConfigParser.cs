@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.mDNS;
 using VRCFaceTracking.Core.OSC.Query;
@@ -24,18 +23,8 @@ public class OscQueryConfigParser(
                 return null;
             }
 
-            // Request on the endpoint + /avatar/parameters
-            var httpEndpoint = "http://" + multicastDnsService.VrchatClientEndpoint + "/avatar";
-
-            // Get the response
-            var response = await _httpClient.GetAsync(httpEndpoint);
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var avatarConfig =
-                JsonConvert.DeserializeObject<OscQueryNode>(await response.Content.ReadAsStringAsync());
+            var httpEndpoint = new Uri("http://" + multicastDnsService.VrchatClientEndpoint + "/avatar");
+            var avatarConfig = await OscQueryAvatarReader.ReadAsync(_httpClient, httpEndpoint);
             
             ParameterSenderService.Clear();
             parserLogger.LogDebug(avatarConfig.ToString());
