@@ -33,19 +33,14 @@ public class OscSendService
 
         _oscTarget.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName is not nameof(IOscTarget.OutPort))
+            if (args.PropertyName is not (nameof(IOscTarget.OutPort) or nameof(IOscTarget.DestinationAddress)))
             {
                 return;
             }
 
-            if (_oscTarget.OutPort == default)
+            if (_oscTarget.OutPort == default || string.IsNullOrEmpty(_oscTarget.DestinationAddress))
             {
                 return;
-            }
-
-            if (string.IsNullOrEmpty(_oscTarget.DestinationAddress))
-            {
-                _oscTarget.DestinationAddress = "127.0.0.1";
             }
 
             UpdateTarget(new IPEndPoint(IPAddress.Parse(_oscTarget.DestinationAddress), _oscTarget.OutPort));
