@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Contracts.Services;
+using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Services;
 using VRCFaceTracking.Services;
@@ -20,13 +21,20 @@ public static class ServiceCollectionExtensions
         services.AddLogging(logging =>
         {
             logging.ClearProviders();
-            
+
             logging.SetMinimumLevel(LogLevel.Debug);
             logging.AddConsole();
             logging.AddDebug();
             logging.AddProvider(new OutputPageLogProvider());
             logging.AddProvider(new LogFileProvider());
             logging.AddProvider(logBuffer);
+            logging.AddSentry(o =>
+            {
+                o.Dsn = VrcftSentry.Dsn;
+                o.MinimumBreadcrumbLevel = LogLevel.Error;
+                o.MinimumEventLevel = LogLevel.Critical;
+                o.MaxBreadcrumbs = 50;
+            });
 
             logging.AddFilter<OutputPageLogProvider>(null, LogLevel.Information);
         });

@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core;
 using VRCFaceTracking.Core.Params.Expressions;
 
 namespace VRCFaceTracking.ModuleProcess;
@@ -76,9 +77,13 @@ public partial class ModuleProcessMain
                 .ClearProviders()
                 .AddDebug()
                 .AddConsole()
-                // .AddSentry(o =>
-                //     o.Dsn =
-                //     "https://444b0799dd2b670efa85d866c8c12134@o4506152235237376.ingest.us.sentry.io/4506152246575104")
+                .AddSentry(o =>
+                {
+                    o.Dsn = VrcftSentry.Dsn;
+                    o.MinimumBreadcrumbLevel = LogLevel.Error;
+                    o.MinimumEventLevel = LogLevel.Critical;
+                    o.MaxBreadcrumbs = 50;
+                })
                 .AddProvider(new ProxyLoggerProvider())
             )
         .BuildServiceProvider();
