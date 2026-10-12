@@ -66,7 +66,6 @@ public class UdpFullDuplex : IDisposable
                         if ( ( ( IPEndPoint )_receivingUdpClient.Client.LocalEndPoint ).Port == reservedPorts[j] )
                         {
                             _receivingUdpClient.Close();
-                            continue;
                         }
                     }
                 }

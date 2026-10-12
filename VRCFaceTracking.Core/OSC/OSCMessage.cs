@@ -138,9 +138,16 @@ public class OscMessage : IDisposable
     private void ReleaseUnmanagedResources()
     {
         if (_metaPtr != IntPtr.Zero)
-             fti_osc.free_osc_message(_metaPtr);
+        {
+            fti_osc.free_osc_message(_metaPtr);
+            _metaPtr = IntPtr.Zero;
+        }
         else if (_meta.Value != IntPtr.Zero)
+        {
             Marshal.FreeHGlobal(_meta.Value);
+            _meta.Value = IntPtr.Zero;
+        }
+
         if (_blobHandle.IsAllocated)
             _blobHandle.Free();
     }
