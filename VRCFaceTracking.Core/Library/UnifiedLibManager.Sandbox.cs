@@ -11,33 +11,42 @@ public partial class UnifiedLibManager
 {
     private void OnSandboxPacketReceived(in IpcPacket packet, in int port)
     {
+        // Special cases for modules we don't know of yet
+        var packetType = packet.GetPacketType();
+        if (packetType == IpcPacket.PacketType.Handshake)
+        {
+            HandleHandshake((HandshakePacket)packet, port);
+            return;
+        }
+        if (packetType == IpcPacket.PacketType.EventLog)
+        {
+            _moduleLogger.Log(((EventLogPacket)packet).LogLevel, ((EventLogPacket)packet).Message);
+            return;
+        }
+        
         var moduleIndex = FindModuleIndexByPort(port);
+        if (moduleIndex == null)
+        {
+            return;
+        }
 
         switch (packet.GetPacketType())
         {
-            case IpcPacket.PacketType.Handshake:
-                HandleHandshake((HandshakePacket)packet, port);
-                break;
-
-            case IpcPacket.PacketType.EventLog:
-                _moduleLogger.Log(((EventLogPacket)packet).LogLevel, ((EventLogPacket)packet).Message);
-                break;
-
             case IpcPacket.PacketType.ReplyGetSupported:
-                HandleReplyGetSupported((ReplySupportedPacket)packet, port, moduleIndex);
+                HandleReplyGetSupported((ReplySupportedPacket)packet, port, moduleIndex.Value);
                 break;
 
             case IpcPacket.PacketType.ReplyInit:
-                HandleReplyInit((ReplyInitPacket)packet, port, moduleIndex);
+                HandleReplyInit((ReplyInitPacket)packet, port, moduleIndex.Value);
                 break;
 
             case IpcPacket.PacketType.ReplyUpdate:
-                HandleReplyUpdate((ReplyUpdatePacket)packet, moduleIndex);
+                HandleReplyUpdate((ReplyUpdatePacket)packet, moduleIndex.Value);
                 break;
         }
     }
 
-    private int FindModuleIndexByPort(int port)
+    private int? FindModuleIndexByPort(int port)
     {
         for (var i = 0; i < AvailableSandboxModules.Count; i++)
         {
@@ -46,7 +55,8 @@ public partial class UnifiedLibManager
                 return i;
             }
         }
-        return -1;
+        
+        return null;
     }
 
     private void HandleHandshake(HandshakePacket pkt, int port)
