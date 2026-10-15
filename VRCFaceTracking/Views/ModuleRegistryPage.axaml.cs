@@ -6,6 +6,7 @@ using VRCFaceTracking.Contracts;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Services;
+using VRCFaceTracking.Strings;
 using VRCFaceTracking.ViewModels;
 
 namespace VRCFaceTracking.Views;
@@ -15,6 +16,8 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
     private ModuleRegistryViewModel ViewModel => (ModuleRegistryViewModel)DataContext!;
     private readonly ModuleInstaller _moduleInstaller;
     private readonly ILibManager _libManager;
+    private readonly ILocalSettingsService _settingsService;
+    private bool _suppressStateChange;
 
     public ModuleRegistryPage()
     {
@@ -22,6 +25,7 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
         DataContext = Ioc.Default.GetRequiredService<ModuleRegistryViewModel>();
         _moduleInstaller = Ioc.Default.GetRequiredService<ModuleInstaller>();
         _libManager = Ioc.Default.GetRequiredService<ILibManager>();
+        _settingsService = Ioc.Default.GetRequiredService<ILocalSettingsService>();
     }
 
     public async void OnNavigatedTo() => await ViewModel.OnNavigatedTo();
@@ -29,8 +33,10 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
     private async void ModuleSelection_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {   
         if (ViewModel.Selected is not InstallTrackedTrackingModule module) return;
+        var isInstalled = module.InstallationState != InstallState.NotInstalled;
         InstallButton.IsVisible = module.InstallationState != InstallState.Installed;
         UninstallButton.IsVisible = module.InstallationState == InstallState.Installed;
+        ModuleStateComboBox.IsVisible = isInstalled;
         InstallButton.Content = "Install";
         InstallButton.IsEnabled = true;
         if (module.InstallationState != InstallState.AwaitingRestart)
@@ -38,6 +44,11 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
             UninstallButton.IsEnabled = true;
             UninstallButton.Content =  "Uninstall";
         }
+
+        _suppressStateChange = true;
+        ModuleStateComboBox.SelectedIndex = (int)module.State;
+        _suppressStateChange = false;
+        UpdateStateHint(module);
     }
     private async void InstallButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -122,4 +133,49 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
             await _libManager.Initialize();
         }
     }
+
+    private void UpdateStateHint(InstallTrackedTrackingModule module)
+    {
+        var applied = _libManager.AppliedModuleStates.TryGetValue(module.ModuleKey, out var a) ? a : (ModuleEnabledState?)null;
+        ModuleEnabledHint.IsVisible = applied.HasValue && applied.Value != module.State;
+    }
+
+    private async void ModuleStateComboBox_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
+    {
+        if (_suppressStateChange || ViewModel.Selected is not InstallTrackedTrackingModule module)
+        {
+            return;
+        }
+        if (ModuleStateComboBox.SelectedIndex < 0)
+        {
+            return;
+        }
+
+        var state = (ModuleEnabledState)ModuleStateComboBox.SelectedIndex;
+        module.State = state;
+
+        var applied = _libManager.AppliedModuleStates.TryGetValue(module.ModuleKey, out var a) ? a : (ModuleEnabledState?)null;
+        module.UpdateStateBadge(applied, Localize);
+        ModuleEnabledHint.IsVisible = applied.HasValue && applied.Value != state;
+
+        await SaveStateAsync(module, state);
+    }
+
+    private async Task SaveStateAsync(InstallTrackedTrackingModule module, ModuleEnabledState state)
+    {
+        var allSettings = await _settingsService.ReadSettingAsync(
+            VRCFaceTracking.Core.Utils.ModuleStateSettingsKey,
+            new Dictionary<string, ModuleEnabledState>());
+        allSettings[module.ModuleKey] = state;
+        await _settingsService.SaveSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, allSettings);
+    }
+
+    private static string Localize(ModuleEnabledState state) => state switch
+    {
+        ModuleEnabledState.Enabled => VRCFaceTracking.Strings.Resources.ModuleStateText_Enabled,
+        ModuleEnabledState.Disabled => VRCFaceTracking.Strings.Resources.ModuleStateText_Disabled,
+        ModuleEnabledState.EyesOnly => VRCFaceTracking.Strings.Resources.ModuleStateText_EyesOnly,
+        ModuleEnabledState.FaceOnly => VRCFaceTracking.Strings.Resources.ModuleStateText_FaceOnly,
+        _ => VRCFaceTracking.Strings.Resources.ModuleStateText_Enabled
+    };
 }

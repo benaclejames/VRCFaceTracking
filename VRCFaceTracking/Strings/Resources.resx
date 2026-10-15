@@ -395,4 +395,19 @@
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>Tracking Settings</value>
   </data>
+<data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>Eyes Only</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>Face Only</value>
+  </data>
+  <data name="ModuleEnabledHint" xml:space="preserve">
+    <value>Changes take effect after restarting VRCFT</value>
+  </data>
 </root>

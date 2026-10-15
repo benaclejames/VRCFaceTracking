@@ -281,4 +281,19 @@
   <data name="You_appear_to_have_no_modules_installed_Text" xml:space="preserve">
     <value>您似乎没有安装任何模块。</value>
   </data>
+<data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>已启用</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>已禁用</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>仅眼追</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>仅面捕</value>
+  </data>
+  <data name="ModuleEnabledHint" xml:space="preserve">
+    <value>更改将在重启 VRCFT 后生效</value>
+  </data>
 </root>

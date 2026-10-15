@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Sandboxing.IPC;
 
@@ -103,10 +104,15 @@ public partial class UnifiedLibManager
         module.SupportsEyeTracking        = module.SupportsEyeTracking        && reply.eyeAvailable;
         module.SupportsExpressionTracking = module.SupportsExpressionTracking && reply.expressionAvailable;
 
+        // Respect the user's per-module state. A module may only claim a slot it has been allowed to use.
+        _moduleSettingsByPath.TryGetValue(module.SandboxModulePath, out var state);
+        var allowEye = state is ModuleEnabledState.Enabled or ModuleEnabledState.EyesOnly;
+        var allowExpression = state is ModuleEnabledState.Enabled or ModuleEnabledState.FaceOnly;
+
         var initPacket = new EventInitPacket
         {
-            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized,
-            eyeAvailable        = EyeStatus == ModuleState.Uninitialized,
+            expressionAvailable = ExpressionStatus == ModuleState.Uninitialized && allowExpression,
+            eyeAvailable        = EyeStatus == ModuleState.Uninitialized && allowEye,
         };
         _logger.LogInformation("Got supported for module {module}. Expr: {expr} Eye: {eye}...",
             module.ModuleClassName, initPacket.expressionAvailable, initPacket.eyeAvailable);

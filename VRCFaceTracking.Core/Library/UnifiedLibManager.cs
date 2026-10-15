@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
+using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Services;
 
@@ -14,6 +15,7 @@ public partial class UnifiedLibManager : ILibManager
     private readonly ILoggerFactory _loggerFactory;
     private readonly IDispatcherService _dispatcherService;
     private readonly IModuleDataService _moduleDataService;
+    private readonly ILocalSettingsService _settingsService;
     private readonly SendCoordinator _sendCoordinator;
 
     public ObservableCollection<ModuleMetadataInternal> LoadedModulesMetadata { get; set; }
@@ -21,19 +23,23 @@ public partial class UnifiedLibManager : ILibManager
     public static ModuleState EyeStatus { get; private set; }
     public static ModuleState ExpressionStatus { get; private set; }
 
+    public IReadOnlyDictionary<string, ModuleEnabledState> AppliedModuleStates { get; private set; } = new Dictionary<string, ModuleEnabledState>();
+
     // Sandbox stuff
     private readonly string _sandboxProcessPath;
     private readonly List<ModuleRuntimeInfo> AvailableSandboxModules = new();
     private readonly List<ModuleRuntimeInfo> _moduleThreads = new();
     private static VrcftSandboxServer _sandboxServer;
+    private Dictionary<string, ModuleEnabledState> _moduleSettingsByPath = new();
 
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, SendCoordinator sendCoordinator)
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, ILocalSettingsService settingsService, SendCoordinator sendCoordinator)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
+        _settingsService = settingsService;
         _sendCoordinator = sendCoordinator;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
@@ -70,7 +76,32 @@ public partial class UnifiedLibManager : ILibManager
         await TeardownAllModules();
 
         var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
-        var modulePaths = modules.Select(m => m.AssemblyLoadPath);
+
+        // Load the per-module state settings. They are applied at startup, so changing a module's state
+        // only takes effect after a restart.
+        var allSettings = await _settingsService.ReadSettingAsync(Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>());
+        var modulesToLoad = new List<InstallableTrackingModule>();
+        var settingsByPath = new Dictionary<string, ModuleEnabledState>();
+        var appliedStates = new Dictionary<string, ModuleEnabledState>();
+        foreach (var m in modules)
+        {
+            var state = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : ModuleEnabledState.Enabled;
+            settingsByPath[m.AssemblyLoadPath] = state;
+            appliedStates[m.ModuleKey] = state;
+
+            // Skip modules that have been disabled by the user as a whole
+            if (state == ModuleEnabledState.Disabled)
+            {
+                continue;
+            }
+
+            modulesToLoad.Add(m);
+        }
+
+        _moduleSettingsByPath = settingsByPath;
+        AppliedModuleStates = appliedStates;
+
+        var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
 
         AvailableSandboxModules.Clear();
         InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());

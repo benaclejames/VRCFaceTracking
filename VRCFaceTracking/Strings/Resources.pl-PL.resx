@@ -390,4 +390,19 @@
   <data name="HardwareDebug_Description" xml:space="preserve">
     <value>Po prostu pooglądaj sobie swój język</value>
   </data>
+<data name="ModuleStateText_Enabled" xml:space="preserve">
+    <value>Włączony</value>
+  </data>
+  <data name="ModuleStateText_Disabled" xml:space="preserve">
+    <value>Wyłączony</value>
+  </data>
+  <data name="ModuleStateText_EyesOnly" xml:space="preserve">
+    <value>Tylko oczy</value>
+  </data>
+  <data name="ModuleStateText_FaceOnly" xml:space="preserve">
+    <value>Tylko twarz</value>
+  </data>
+  <data name="ModuleEnabledHint" xml:space="preserve">
+    <value>Zmiany zostaną zastosowane po ponownym uruchomieniu VRCFT</value>
+  </data>
 </root>
