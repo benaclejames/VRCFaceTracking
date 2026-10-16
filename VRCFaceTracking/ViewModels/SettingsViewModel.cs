@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Models;
+using VRCFaceTracking.Contracts.Services;
 using VRCFaceTracking.Services;
 
 namespace VRCFaceTracking.ViewModels;
@@ -12,31 +13,31 @@ public partial class SettingsViewModel : ObservableRecipient
     public IOscTarget OscTarget { get; }
     public RiskySettingsViewModel RiskySettings { get; }
 
-    private readonly OpenVRService _openVRService;
+    private readonly IVrRuntimeService _vrRuntimeService;
 
     public bool AutoStart
     {
-        get => _openVRService.AutoStart;
+        get => _vrRuntimeService.AutoStart;
         set
         {
-            _openVRService.AutoStart = value;
+            _vrRuntimeService.AutoStart = value;
             OnPropertyChanged();
         }
     }
 
-    public bool IsOpenVREnabled => _openVRService.IsInitialized;
+    public bool IsOpenVREnabled => _vrRuntimeService.IsInitialized;
 
     public SettingsViewModel(
         GithubService githubService,
-        OpenVRService openVRService,
+        IVrRuntimeService vrRuntimeService,
         IOscTarget oscTarget,
         RiskySettingsViewModel riskySettingsViewModel)
     {
-        _openVRService = openVRService;
+        _vrRuntimeService = vrRuntimeService;
         OscTarget = oscTarget;
         RiskySettings = riskySettingsViewModel;
 
-        _openVRService.InitIfNotAlready();
+        _vrRuntimeService.InitIfNotAlready();
         LoadContributors(githubService);
     }
 
