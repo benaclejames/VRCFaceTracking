@@ -510,6 +510,24 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} was updated to version {1}..
+        /// </summary>
+        public static string Notification_ModuleUpdated_Message {
+            get {
+                return ResourceManager.GetString("Notification_ModuleUpdated_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Module updated.
+        /// </summary>
+        public static string Notification_ModuleUpdated_Title {
+            get {
+                return ResourceManager.GetString("Notification_ModuleUpdated_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Local Storage.
         /// </summary>
         public static string OpenLocalStorageCard_Header {

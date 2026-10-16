@@ -395,4 +395,10 @@
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>Tracking Settings</value>
   </data>
+  <data name="Notification_ModuleUpdated_Title" xml:space="preserve">
+    <value>Module updated</value>
+  </data>
+  <data name="Notification_ModuleUpdated_Message" xml:space="preserve">
+    <value>{0} was updated to version {1}.</value>
+  </data>
 </root>

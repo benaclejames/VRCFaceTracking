@@ -46,7 +46,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IIdentityService, IdentityService>();
         
         services.AddSingleton<IActivationService, ActivationService>();
-        services.AddSingleton<OpenVRService>();
+        // Portable defaults for platform contracts; heads replace these in IPlatformServices.ConfigureServices
+        services.AddSingleton<IVrRuntimeService, NullVrRuntimeService>();
+        services.AddSingleton<INotificationService, LogNotificationService>();
         services.AddSingleton<IModuleDataService, ModuleDataService>();
 
         services.AddSingleton<MainViewModel>();

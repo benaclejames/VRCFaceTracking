@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Android head. Shared UI and logic live in ../VRCFaceTracking. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(VftTargetFramework)-android</TargetFramework>
+    <!-- 26 gives us notification channels without version checks; Quest and every supported phone is well above this -->
+    <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
+    <RootNamespace>VRCFaceTracking.Android</RootNamespace>
+    <ApplicationId>io.vrcft.vrcfacetracking</ApplicationId>
+    <ApplicationTitle>VRCFaceTracking</ApplicationTitle>
+    <ApplicationDisplayVersion>$(AssemblyVersion)</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <!-- Desktop-only platforms from Directory.Build.props don't apply to an Android head -->
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Android" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      The shared project and Core aren't RID-agnostic so desktop builds get the matching native fti_osc. Android would
+      otherwise flow its per-ABI RIDs into them, which they can't restore for and have no native binaries for, so build
+      them RID-less here. Core is listed explicitly because it is otherwise added as a transitive reference with the RID.
+    -->
+    <ProjectReference Include="..\VRCFaceTracking\VRCFaceTracking.csproj" GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained" />
+    <ProjectReference Include="..\VRCFaceTracking.Core\VRCFaceTracking.Core.csproj" GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained" />
+  </ItemGroup>
+</Project>

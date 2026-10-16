@@ -2,10 +2,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Valve.VR;
+using VRCFaceTracking.Contracts.Services;
 
-namespace VRCFaceTracking.Services;
+namespace VRCFaceTracking.Desktop.Services;
 
-public class OpenVRService(ILogger<OpenVRService> logger)
+public class OpenVRService(ILogger<OpenVRService> logger) : IVrRuntimeService
 {
     private CVRSystem? _system;
 

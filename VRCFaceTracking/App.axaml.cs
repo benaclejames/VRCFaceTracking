@@ -14,10 +14,19 @@ namespace VRCFaceTracking
 {
     public partial class App : Application
     {
+        private readonly IPlatformServices? _platformServices;
         private ILogger? _logger;
-
-        public static MainWindow? MainWindow { get; private set; }
         private IHost? _host;
+
+        // Parameterless constructor is required by the XAML previewer and AvaloniaMainActivity<App>
+        public App()
+        {
+        }
+
+        public App(IPlatformServices platformServices)
+        {
+            _platformServices = platformServices;
+        }
 
         public override void Initialize()
         {
@@ -51,33 +60,45 @@ namespace VRCFaceTracking
             BindingPlugins.DataValidators.RemoveAt(0);
 
             _host = Host.CreateDefaultBuilder()
-                .ConfigureServices((_, services) =>services.AddCommonServices())
+                .ConfigureServices((_, services) =>
+                {
+                    services.AddCommonServices();
+                    _platformServices?.ConfigureServices(services);
+                })
                 .Build();
             Ioc.Default.ConfigureServices(_host.Services);
 
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            switch (ApplicationLifetime)
             {
-                MainWindow = new MainWindow();
-                desktop.MainWindow = MainWindow;
-                desktop.Exit += (_, _) =>
-                {
-                    Task.Run(async () =>
-                    {
-                        await Ioc.Default.GetRequiredService<IMainService>().Teardown();
-                        await _host.StopAsync();
-                    }).GetAwaiter().GetResult();
-                };
+                case IClassicDesktopStyleApplicationLifetime desktop:
+                    desktop.MainWindow = new MainWindow();
+                    desktop.Exit += (_, _) => ShutdownAsync().GetAwaiter().GetResult();
+                    break;
+                case ISingleViewApplicationLifetime singleView:
+                    // Mobile has no window or exit event; the platform head calls ShutdownAsync when it is torn down.
+                    singleView.MainView = new ShellPage();
+                    break;
             }
 
             HandleResetFile();
-
-            Core.Utils.KillAllProcessesOfName("VRCFaceTracking");
-            Core.Utils.KillAllProcessesOfName("VRCFaceTracking.ModuleProcess");
 
             _ = Task.Run(() => _host.StartAsync());
             Ioc.Default.GetRequiredService<IActivationService>().ActivateAsync(null);
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        public Task ShutdownAsync()
+        {
+            if (_host is null)
+                return Task.CompletedTask;
+
+            // Run off the UI thread so teardown can't deadlock waiting on a dispatcher post
+            return Task.Run(async () =>
+            {
+                await Ioc.Default.GetRequiredService<IMainService>().Teardown();
+                await _host.StopAsync();
+            });
         }
 
         private void HandleResetFile()

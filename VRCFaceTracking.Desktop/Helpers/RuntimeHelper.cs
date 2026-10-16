@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VRCFaceTracking.Helpers;
+namespace VRCFaceTracking.Desktop.Helpers;
 
 public class RuntimeHelper
 {

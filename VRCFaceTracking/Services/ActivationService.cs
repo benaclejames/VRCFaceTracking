@@ -16,7 +16,8 @@ public class ActivationService(
     ModuleInstaller moduleInstaller,
     ILibManager libManager,
     ILogger<ActivationService> logger,
-    OpenVRService openVrService)
+    IVrRuntimeService vrRuntimeService,
+    INotificationService notificationService)
     : IActivationService
 {
     public async Task ActivateAsync(object activationArgs)
@@ -54,10 +55,10 @@ public class ActivationService(
         logger.LogInformation("Initializing main service...");
         await mainService.InitializeAsync();
         
-        logger.LogInformation("Initializing OpenVR...");
-        if (!openVrService.Initialize())
+        logger.LogInformation("Initializing VR runtime integration...");
+        if (!vrRuntimeService.Initialize())
         {
-            logger.LogWarning("Failed to initialize OpenVR during ActivationService startup. Skipping.");
+            logger.LogWarning("No VR runtime integration available during ActivationService startup. Skipping.");
         }
 
         logger.LogInformation("Checking for updates for installed modules...");
@@ -84,7 +85,13 @@ public class ActivationService(
         foreach (var outdatedModule in outdatedModules)
         {
             logger.LogInformation($"Updating {outdatedModule.ModuleName} from {localModules.First(rm => rm.ModuleId == outdatedModule.ModuleId).Version} to {outdatedModule.Version}");
-            await moduleInstaller.InstallRemoteModule(outdatedModule);
+            if (await moduleInstaller.InstallRemoteModule(outdatedModule) != null)
+            {
+                notificationService.Show(
+                    Strings.Resources.Notification_ModuleUpdated_Title,
+                    string.Format(Strings.Resources.Notification_ModuleUpdated_Message, outdatedModule.ModuleName, outdatedModule.Version),
+                    NotificationSeverity.Success);
+            }
         }
         
         logger.LogInformation("Initializing modules...");
