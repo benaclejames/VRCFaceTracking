@@ -43,17 +43,41 @@ public partial class UnifiedTrackingMutator : ObservableObject
             return input;
         }
 
-        _inputBuffer.CopyPropertiesOf(input);
-
         lock (_mutationsLock)
         {
-            foreach (var mutator in _mutations.Where(m => m.IsActive))
+            _inputBuffer.CopyPropertiesOf(input);
+            ApplyMutations(ref _inputBuffer);
+            return _inputBuffer;
+        }
+    }
+
+    internal void MutateSnapshot(UnifiedTrackingData data)
+    {
+        if (!Enabled) return;
+
+        var result = data;
+        lock (_mutationsLock)
+        {
+            ApplyMutations(ref result);
+            if (!ReferenceEquals(data, result))
             {
-                mutator.MutateData(ref _inputBuffer);
+                lock (UnifiedTracking.DataLock)
+                {
+                    data.CopyPropertiesOf(result);
+                }
             }
         }
+    }
 
-        return _inputBuffer;
+    private void ApplyMutations(ref UnifiedTrackingData data)
+    {
+        foreach (var mutator in _mutations)
+        {
+            if (mutator.IsActive)
+            {
+                mutator.MutateData(ref data);
+            }
+        }
     }
 
     public async Task Save()

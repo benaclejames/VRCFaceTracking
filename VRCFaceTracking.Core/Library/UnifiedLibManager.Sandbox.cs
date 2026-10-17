@@ -212,15 +212,18 @@ public partial class UnifiedLibManager
             return;
         }
 
-        if (module.ModuleInformation.UsingEye)
+        lock (UnifiedTracking.DataLock)
         {
-            reply.UpdateGlobalEyeState();
+            if (module.ModuleInformation.UsingEye)
+            {
+                reply.UpdateGlobalEyeState();
+            }
+            if (module.ModuleInformation.UsingExpression)
+            {
+                reply.UpdateGlobalExpressionState();
+            }
+            reply.UpdateHeadState();
         }
-        if (module.ModuleInformation.UsingExpression)
-        {
-            reply.UpdateGlobalExpressionState();
-        }
-        reply.UpdateHeadState();
 
         _sendCoordinator.NotifyReply(module.SandboxProcessPort);
     }
