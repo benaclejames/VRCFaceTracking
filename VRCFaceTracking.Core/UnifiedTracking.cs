@@ -1,4 +1,5 @@
-﻿using VRCFaceTracking.Core.Params;
+﻿using System.Collections.Concurrent;
+using VRCFaceTracking.Core.Params;
 using VRCFaceTracking.Core.Params.Data;
 using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.Core.Params.Expressions.Legacy.Eye;
@@ -12,6 +13,9 @@ namespace VRCFaceTracking;
 /// </summary>
 public class UnifiedTracking
 {
+    internal static readonly object DataLock = new();
+    private static readonly ConcurrentBag<UnifiedTrackingData> _outputBuffers = new();
+
     /// <summary>
     /// Eye image data sent from the loaded eye module.
     /// </summary>
@@ -66,11 +70,42 @@ public class UnifiedTracking
     /// <summary>
     /// Central update function that updates all output parameter data and pushes the latest expressions from VRCFaceTracking modules into the internal expressions buffer.
     /// </summary>
-    public static async Task UpdateData(CancellationToken ct) => OnUnifiedDataUpdated.Invoke(await Task.Run(() => Mutator.MutateData(Data), ct));
+    public static async Task UpdateData(CancellationToken ct) => PublishData(await Task.Run(PrepareData, ct));
 
     /// <summary>
     /// Synchronous alternative to UpdateData to avoid Task.Run overhead
     /// (might replace original with this in the future depending on results)
     /// </summary>
-    public static void UpdateDataSync() => OnUnifiedDataUpdated.Invoke(Mutator.MutateData(Data));
+    public static void UpdateDataSync() => PublishData(PrepareData());
+
+    private static void PublishData(UnifiedTrackingData data)
+    {
+        try
+        {
+            OnUnifiedDataUpdated.Invoke(data);
+        }
+        finally
+        {
+            _outputBuffers.Add(data);
+        }
+    }
+
+    private static UnifiedTrackingData PrepareData()
+    {
+        var data = _outputBuffers.TryTake(out var buffer) ? buffer : new UnifiedTrackingData();
+        try
+        {
+            lock (DataLock)
+            {
+                data.CopyPropertiesOf(Data);
+            }
+            Mutator.MutateSnapshot(data);
+            return data;
+        }
+        catch
+        {
+            _outputBuffers.Add(data);
+            throw;
+        }
+    }
 }

@@ -156,8 +156,7 @@ namespace VRCFaceTracking.Core.Params.Data
         public void CopyPropertiesOf(UnifiedTrackingData data)
         {
             Eye.CopyPropertiesOf(data.Eye);
-            for (int i = 0; i < Shapes.Length; i++)
-                Shapes[i].Weight = data.Shapes[i].Weight;
+            Array.Copy(data.Shapes, Shapes, Shapes.Length);
             
             Head.HeadYaw   = data.Head.HeadYaw;
             Head.HeadPitch = data.Head.HeadPitch;

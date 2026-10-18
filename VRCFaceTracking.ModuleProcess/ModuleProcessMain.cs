@@ -94,6 +94,7 @@ public partial class ModuleProcessMain
         StartParentWatchdog(parentPid);
 
         InitializeUnifiedTrackingToInvalidState();
+        _trackingSnapshot.Publish(UnifiedTracking.Data);
 
         ConnectSandboxClient(serverPortNumber, modulePath);
 
