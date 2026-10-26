@@ -14,6 +14,10 @@ public abstract class ExtTrackingModule
 
     public ModuleMetadata ModuleInformation;
 
+    public event Action ReinitializeRequested;
+
+    protected void RequestReinitialize() => ReinitializeRequested?.Invoke();
+
     public abstract (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable);
 
     public abstract void Update();
