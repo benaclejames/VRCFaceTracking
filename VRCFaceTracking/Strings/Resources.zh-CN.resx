@@ -294,6 +294,9 @@
     <value>仅面捕</value>
   </data>
   <data name="ModuleEnabledHint" xml:space="preserve">
-    <value>更改将在重启 VRCFT 后生效</value>
+    <value>更改将在重载模块后生效</value>
+  </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>重载模块</value>
   </data>
 </root>

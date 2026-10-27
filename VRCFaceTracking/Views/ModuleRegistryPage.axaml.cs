@@ -168,6 +168,8 @@ public partial class ModuleRegistryPage : UserControl, INotifyNavigated
             new Dictionary<string, ModuleEnabledState>());
         allSettings[module.ModuleKey] = state;
         await _settingsService.SaveSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, allSettings);
+
+        _libManager.NotifyModuleStateChanged(module.ModuleKey, state);
     }
 
     private static string Localize(ModuleEnabledState state) => state switch

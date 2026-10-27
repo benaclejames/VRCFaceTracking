@@ -297,6 +297,9 @@
     <value>Solo cara</value>
   </data>
   <data name="ModuleEnabledHint" xml:space="preserve">
-    <value>Los cambios se aplicarán al reiniciar VRCFT</value>
+    <value>Los cambios se aplicarán al recargar los módulos</value>
+  </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>Recargar módulos</value>
   </data>
 </root>

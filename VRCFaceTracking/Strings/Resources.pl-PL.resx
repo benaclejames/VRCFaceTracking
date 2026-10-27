@@ -403,6 +403,9 @@
     <value>Tylko twarz</value>
   </data>
   <data name="ModuleEnabledHint" xml:space="preserve">
-    <value>Zmiany zostaną zastosowane po ponownym uruchomieniu VRCFT</value>
+    <value>Zmiany zostaną zastosowane po przeładowaniu modułów</value>
+  </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>Przeładuj moduły</value>
   </data>
 </root>

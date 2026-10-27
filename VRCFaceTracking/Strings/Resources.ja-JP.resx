@@ -339,6 +339,9 @@
     <value>顔のみ</value>
   </data>
   <data name="ModuleEnabledHint" xml:space="preserve">
-    <value>変更はVRCFTの再起動後に有効になります</value>
+    <value>変更はモジュールの再読み込み後に有効になります</value>
+  </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>モジュールを再読み込み</value>
   </data>
 </root>

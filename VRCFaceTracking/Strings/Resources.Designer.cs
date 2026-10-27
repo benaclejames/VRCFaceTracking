@@ -447,7 +447,7 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Changes take effect after restarting VRCFT.
+        ///   Looks up a localized string similar to Changes take effect after reloading modules.
         /// </summary>
         public static string ModuleEnabledHint {
             get {
@@ -839,6 +839,15 @@ namespace VRCFaceTracking.Strings {
         public static string Shell_Parameters_Content {
             get {
                 return ResourceManager.GetString("Shell_Parameters_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload Modules.
+        /// </summary>
+        public static string Shell_ReloadModules_Content {
+            get {
+                return ResourceManager.GetString("Shell_ReloadModules_Content", resourceCulture);
             }
         }
         

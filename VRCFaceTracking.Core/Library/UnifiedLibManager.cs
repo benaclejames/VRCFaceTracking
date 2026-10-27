@@ -25,6 +25,38 @@ public partial class UnifiedLibManager : ILibManager
 
     public IReadOnlyDictionary<string, ModuleEnabledState> AppliedModuleStates { get; private set; } = new Dictionary<string, ModuleEnabledState>();
 
+    public bool IsReloadPending { get; private set; }
+    public event EventHandler? ReloadPendingChanged;
+
+    private readonly Dictionary<string, ModuleEnabledState> _pendingChanges = new();
+
+    public void NotifyModuleStateChanged(string moduleKey, ModuleEnabledState state)
+    {
+        var applied = AppliedModuleStates.TryGetValue(moduleKey, out var appliedState)
+            ? appliedState
+            : ModuleEnabledState.Enabled;
+
+        if (state == applied)
+        {
+            _pendingChanges.Remove(moduleKey);
+        }
+        else
+        {
+            _pendingChanges[moduleKey] = state;
+        }
+
+        var pending = _pendingChanges.Count > 0;
+        if (pending == IsReloadPending)
+        {
+            return;
+        }
+
+        IsReloadPending = pending;
+        ReloadPendingChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public Task ReloadModulesAsync() => Initialize();
+
     // Sandbox stuff
     private readonly string _sandboxProcessPath;
     private readonly List<ModuleRuntimeInfo> AvailableSandboxModules = new();
@@ -100,6 +132,13 @@ public partial class UnifiedLibManager : ILibManager
 
         _moduleSettingsByPath = settingsByPath;
         AppliedModuleStates = appliedStates;
+
+        _pendingChanges.Clear();
+        if (IsReloadPending)
+        {
+            IsReloadPending = false;
+            ReloadPendingChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
 

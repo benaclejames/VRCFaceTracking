@@ -408,6 +408,9 @@
     <value>Face Only</value>
   </data>
   <data name="ModuleEnabledHint" xml:space="preserve">
-    <value>Changes take effect after restarting VRCFT</value>
+    <value>Changes take effect after reloading modules</value>
+  </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>Reload Modules</value>
   </data>
 </root>
