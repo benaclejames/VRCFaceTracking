@@ -9,6 +9,7 @@ using VRCFaceTracking.Core.Models.ParameterDefinition;
 using VRCFaceTracking.Core.OSC;
 using VRCFaceTracking.Core.OSC.Query.mDNS;
 using VRCFaceTracking.Core.Params;
+using VRCFaceTracking.Core.Params.Data.Mutation;
 
 namespace VRCFaceTracking.Core.Services;
 
@@ -114,6 +115,12 @@ public partial class OscQueryService(
         {
             case "/avatar/change":
                 HandleNewAvatar(msg.Value as string);
+                break;
+            case "/avatar/parameters/AFK":
+                if (msg.Value is bool afk)
+                {
+                    DisableOnAfk.IsAfk = afk;
+                }
                 break;
             case "/vrcft/settings/forceRelevant":   // Endpoint for external tools to force vrcft to send all parameters
                 if (msg.Value is bool relevancy)
