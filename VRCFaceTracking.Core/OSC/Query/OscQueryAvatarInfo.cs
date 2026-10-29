@@ -19,8 +19,8 @@ public class OscQueryAvatarInfo : IAvatarInfo
             return;
         }
         
-        Name = "Unknown";
         Id = rootNode.Contents.TryGetValue("change", out var change) ? (string)change.Value[0] : "Unknown";
+        Name = rootNode.Contents.TryGetValue("name", out var name) ? (string)name.Value[0] : "Unknown";
         FullFaceTracking = rootNode.Contents.TryGetValue("avatarfullfacetracking", out var fullFaceTracking) && (bool)fullFaceTracking.Value[0];
         
         //TODO: Figure out a way to reconstruct the traditional address pattern instead of the whole thing.

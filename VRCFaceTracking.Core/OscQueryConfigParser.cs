@@ -38,20 +38,6 @@ public class OscQueryConfigParser(
                 paramList.AddRange(parameter.ResetParam(avatarInfo.Parameters, avatarInfo));
             }
 
-            // God help me why is this something I need to do to get the avatar name
-            // this impl is really disappointing vrc
-            var configFileInfo = await configParser.ParseAvatar(avatarInfo.Id, true);
-            parserLogger.LogInformation($"Attempting to resolve avatar config file for {avatarInfo.Id}");
-            if (!string.IsNullOrEmpty(configFileInfo?.avatarInfo.Name))
-            {
-                avatarInfo.Name = configFileInfo.Value.avatarInfo.Name;
-                parserLogger.LogInformation($"Successfully found config containing avatar name {avatarInfo.Name}");
-            }
-            else
-            {
-                parserLogger.LogWarning("Odd. Our attempt to find the legacy osc config json for this avatar failed.");
-            }
-
             return (avatarInfo, paramList);
         }
         catch (Exception e)
