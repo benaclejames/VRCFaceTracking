@@ -13,6 +13,7 @@ public partial class ModuleProcessMain
     public static VrcftSandboxClient Client;
 
     private static readonly Queue<IpcPacket> _packetsToSend = new();
+    private static readonly TrackingDataSnapshot _trackingSnapshot = new();
     private static Timer? _connectionTimer;
 
     private static readonly object _callbackLock = new();
@@ -66,7 +67,7 @@ public partial class ModuleProcessMain
                 break;
 
             case IpcPacket.PacketType.EventUpdate:
-                _packetsToSend.Enqueue(new ReplyUpdatePacket());
+                _packetsToSend.Enqueue(new ReplyUpdatePacket(_trackingSnapshot));
                 break;
 
             case IpcPacket.PacketType.EventUpdateStatus:
@@ -106,12 +107,14 @@ public partial class ModuleProcessMain
             return;
         }
 
+        _trackingSnapshot.Publish(UnifiedTracking.Data);
         DefModuleAssembly._updateCts = new CancellationTokenSource();
         var thread = new Thread(() =>
         {
             while (!DefModuleAssembly._updateCts.IsCancellationRequested)
             {
                 DefModuleAssembly.TrackingModule.Update();
+                _trackingSnapshot.Publish(UnifiedTracking.Data);
             }
         })
         {
