@@ -447,6 +447,15 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Changes take effect after reloading modules.
+        /// </summary>
+        public static string ModuleEnabledHint {
+            get {
+                return ResourceManager.GetString("ModuleEnabledHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Module Page.
         /// </summary>
         public static string ModulePage_Text {
@@ -461,6 +470,42 @@ namespace VRCFaceTracking.Strings {
         public static string ModuleRegistry_NoSelection_Text {
             get {
                 return ResourceManager.GetString("ModuleRegistry_NoSelection_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string ModuleStateText_Disabled {
+            get {
+                return ResourceManager.GetString("ModuleStateText_Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        public static string ModuleStateText_Enabled {
+            get {
+                return ResourceManager.GetString("ModuleStateText_Enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eyes Only.
+        /// </summary>
+        public static string ModuleStateText_EyesOnly {
+            get {
+                return ResourceManager.GetString("ModuleStateText_EyesOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Face Only.
+        /// </summary>
+        public static string ModuleStateText_FaceOnly {
+            get {
+                return ResourceManager.GetString("ModuleStateText_FaceOnly", resourceCulture);
             }
         }
         
@@ -794,6 +839,15 @@ namespace VRCFaceTracking.Strings {
         public static string Shell_Parameters_Content {
             get {
                 return ResourceManager.GetString("Shell_Parameters_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload Modules.
+        /// </summary>
+        public static string Shell_ReloadModules_Content {
+            get {
+                return ResourceManager.GetString("Shell_ReloadModules_Content", resourceCulture);
             }
         }
         
