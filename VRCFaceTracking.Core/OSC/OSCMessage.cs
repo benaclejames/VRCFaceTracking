@@ -1,160 +1,69 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
+﻿﻿using System.Reflection;
+using FastOSC;
 using VRCFaceTracking.OSC;
 
 namespace VRCFaceTracking.Core.OSC;
 
-public class OscMessage : IDisposable
+public class OscMessage
 {
-    public OscMessageMeta _meta;
-    private IntPtr _metaPtr;
-    private GCHandle _blobHandle;
-
-    public string Address
-    {
-        get => _meta.Address;
-        set => _meta.Address = value;
-    }
-
+    private readonly object[] _arguments;
     private readonly Action<object> _valueSetter;
+
+    public string Address { get; set; }
 
     public object Value
     {
-        get
-        {
-            if (_meta.ValueLength == 0)
-            {
-                return null;
-            }
-            
-            var values = new OscValue[_meta.ValueLength];
-            var ptr = _meta.Value;
-            for (var i = 0; i < _meta.ValueLength; i++)
-            {
-                values[i] = Marshal.PtrToStructure<OscValue>(ptr);
-                ptr += Marshal.SizeOf<OscValue>();
-            }
-
-            return values[0].Value;
-        }
+        get => _arguments.Length == 0 ? null : _arguments[0];
         set => _valueSetter?.Invoke(value);
     }
 
     public OscMessage(string address, Type type)
     {
         Address = address;
-        var oscType = OscUtils.TypeConversions.FirstOrDefault(conv => conv.Key.Item1 == type).Value;
-        
-        if (oscType != default)
+
+        if (OscUtils.TypeConversions.Any(conv => conv.Key.Item1 == type))
         {
-            _meta.ValueLength = 1;
-            _meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>() * _meta.ValueLength);
-            var oscValue = new OscValue
-            {
-                Type = oscType.oscType,
-            };
-            _valueSetter = value =>
-            {
-                oscValue.Value = value;
-                Marshal.StructureToPtr(oscValue, _meta.Value, false);
-            };
+            _arguments = [DefaultValue(type)];
+            _valueSetter = value => _arguments[0] = value;
         }
         else    // If we don't have the type, we assume it's a struct and serialize it using reflection
         {
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            _meta.ValueLength = fields.Length;
-            _meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>() * _meta.ValueLength);
-            var values = new OscValue[_meta.ValueLength];
-            for (var i = 0; i < _meta.ValueLength; i++)
-            {
-                values[i] = new OscValue
-                {
-                    Type = OscUtils.TypeConversions.First(conv => conv.Key.Item1 == fields[i].FieldType).Value.oscType,
-                };
-            }
+            _arguments = fields.Select(field => DefaultValue(field.FieldType)).ToArray();
             _valueSetter = value =>
             {
-                for (var j = 0; j < _meta.ValueLength; j++)
+                for (var j = 0; j < fields.Length; j++)
                 {
-                    values[j].Value = fields[j].GetValue(value);
-                    Marshal.StructureToPtr(values[j], _meta.Value + Marshal.SizeOf<OscValue>() * j, false);
+                    _arguments[j] = fields[j].GetValue(value);
                 }
             };
         }
     }
 
-    // Creates an OscMessage that references a caller-owned buffer. The buffer stays pinned for
-    // the lifetime of the message; the caller may rewrite its contents in place between sends.
-    public static OscMessage CreateBlob(string address, byte[] buffer, int length)
+    private OscMessage(string address, object[] arguments)
     {
-        var msg = new OscMessage(new OscMessageMeta { Address = address });
-        msg._blobHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-        msg._meta.ValueLength = 1;
-        msg._meta.Value = Marshal.AllocHGlobal(Marshal.SizeOf<OscValue>());
-        Marshal.StructureToPtr(new OscValue
-        {
-            Type = OscValueType.Blob,
-            Blob = msg._blobHandle.AddrOfPinnedObject(),
-            BlobLen = length,
-        }, msg._meta.Value, false);
-        return msg;
+        Address = address;
+        _arguments = arguments;
     }
 
-    public static OscMessage TryParseOsc(byte[] bytes, int len, ref int messageIndex)
-    {
-        var msg = new OscMessage(bytes, len, ref messageIndex);
-        if (msg._metaPtr == IntPtr.Zero)
-        {
-            return null;
-        }
-
-        return msg;
-    }
-    
-    public OscMessage(byte[] bytes, int len, ref int messageIndex)
-    {
-        _metaPtr = fti_osc.parse_osc(bytes, len, ref messageIndex);
-        if (_metaPtr != IntPtr.Zero)
-        {
-            _meta = Marshal.PtrToStructure<OscMessageMeta>(_metaPtr);
-        }
-    }
+    // Creates an OscMessage that references a caller-owned buffer. The caller may rewrite its contents
+    // in place between sends; the buffer is read when the message is encoded.
+    public static OscMessage CreateBlob(string address, byte[] buffer) => new(address, [buffer]);
 
     /// <summary>
-    /// Encodes stored osc meta into raw bytes using fti_osc lib
+    /// Flattens a decoded packet (a single message or a possibly nested bundle) into messages
     /// </summary>
-    /// <param name="buffer">Target byte buffer to serialize to, starting from index 0</param>
-    /// <param name="ct">Cancellation Token</param>
-    /// <returns>Length of serialized data</returns>
-    public async Task<int> Encode(byte[] buffer, CancellationToken ct) => await Task.Run(() => fti_osc.create_osc_message(buffer, ref _meta), ct);
-
-    public OscMessage(OscMessageMeta meta) => _meta = meta;
-    
-    ~OscMessage()
+    public static IEnumerable<OscMessage> FromPacket(IOSCPacket packet) => packet switch
     {
-        ReleaseUnmanagedResources();
-    }
+        OSCMessage message => [new OscMessage(message.Address, message.Arguments)],
+        OSCBundle bundle => bundle.Packets.SelectMany(FromPacket),
+        _ => []
+    };
 
-    private void ReleaseUnmanagedResources()
-    {
-        if (_metaPtr != IntPtr.Zero)
-        {
-            fti_osc.free_osc_message(_metaPtr);
-            _metaPtr = IntPtr.Zero;
-        }
-        else if (_meta.Value != IntPtr.Zero)
-        {
-            Marshal.FreeHGlobal(_meta.Value);
-            _meta.Value = IntPtr.Zero;
-        }
+    /// <summary>
+    /// Snapshots the current address and value(s) into a FastOSC message ready for encoding
+    /// </summary>
+    public OSCMessage ToPacket() => new(Address, (object[])_arguments.Clone());
 
-        if (_blobHandle.IsAllocated)
-            _blobHandle.Free();
-    }
-
-    public void Dispose()
-    {
-        ReleaseUnmanagedResources();
-        GC.SuppressFinalize(this);
-    }
+    private static object DefaultValue(Type type) => type == typeof(string) ? string.Empty : Activator.CreateInstance(type);
 }

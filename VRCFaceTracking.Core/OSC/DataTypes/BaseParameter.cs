@@ -134,7 +134,6 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
     private void ReleaseUnmanagedResources()
     {
         UnifiedTracking.OnUnifiedDataUpdated -= Process;
-        OscMessage.Dispose();
     }
 
     public void Dispose()
