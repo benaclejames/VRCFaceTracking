@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Sockets;
+using FastOSC;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
@@ -118,14 +119,21 @@ public class OscRecvService : BackgroundService
             {
                 var bytesReceived =
                     await _recvSocket.ReceiveAsync(_recvBuffer, SocketFlags.None, _linkedToken.Token);
-                var offset = 0;
-                var newMsg = OscMessage.TryParseOsc(_recvBuffer, bytesReceived, ref offset);
-                if (newMsg == null)
+                IOSCPacket packet;
+                try
                 {
+                    packet = OSCDecoder.Decode(_recvBuffer.AsSpan(0, bytesReceived));
+                }
+                catch (Exception e)
+                {
+                    _logger.LogDebug("Failed to decode OSC packet: {message}", e.Message);
                     continue;
                 }
 
-                OnMessageReceived(newMsg);
+                foreach (var newMsg in OscMessage.FromPacket(packet))
+                {
+                    OnMessageReceived(newMsg);
+                }
             }
             catch (Exception e)
             {
