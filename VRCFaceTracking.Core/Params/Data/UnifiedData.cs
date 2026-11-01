@@ -90,6 +90,27 @@ namespace VRCFaceTracking.Core.Params.Data
             bytes[6] = (byte)(Math.Clamp(Left.Gaze.y, 0f, 1f) * 255);
             bytes[7] = (byte)(Math.Clamp(Left.Gaze.y*-1, 0f, 1f) * 255);
             bytes[9] = (byte)(Math.Clamp((Left.Openness-1)*-1, 0f, 1f) * 255);
+
+            // Split the existing 0..10 mm pupil diameter scale around its midpoint.
+            // Native dilation and constriction are opposing weights, neutral at 5 mm.
+            var rightPupil = GetPupilWeight(Right.PupilDiameter_MM);
+            var leftPupil = GetPupilWeight(Left.PupilDiameter_MM);
+            bytes[10] = (byte)(Math.Max(rightPupil, 0f) * 255);
+            bytes[11] = (byte)(Math.Max(leftPupil, 0f) * 255);
+            bytes[12] = (byte)(Math.Max(-rightPupil, 0f) * 255);
+            bytes[13] = (byte)(Math.Max(-leftPupil, 0f) * 255);
+        }
+
+        private static float GetPupilWeight(float diameter)
+        {
+            // Zero is the default for sources without pupil tracking. Invalid samples
+            // must also return to neutral rather than leave stale values in the blob.
+            if (!float.IsFinite(diameter) || diameter <= 0f)
+            {
+                return 0f;
+            }
+
+            return Math.Clamp(diameter / 5f - 1f, -1f, 1f);
         }
     }
 
