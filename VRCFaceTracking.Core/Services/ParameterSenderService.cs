@@ -9,6 +9,7 @@ public class ParameterSenderService
 {
     // We probably don't need a queue since we use osc message bundles, but for now, we're keeping it as
     // we might want to allow a way for the user to specify bundle or single message sends in the future
+    private static readonly object QueueLock = new();
     private static readonly Queue<OscMessage> SendQueue = new();
 
     private readonly OscSendService _sendService;
@@ -27,7 +28,7 @@ public class ParameterSenderService
         {
             if (AllParametersRelevantStatic == value) return;
             AllParametersRelevantStatic = value;
-            SendQueue.Clear();
+            Clear();
             foreach (var parameter in UnifiedTracking.AllParameters)
             {
                 parameter.ResetParam(Array.Empty<IParameterDefinition>(), new NullAvatarDef("Always Relevant", "alwaysrelevant"));
@@ -41,19 +42,35 @@ public class ParameterSenderService
         _mutator = mutator;
     }
 
-    public static void Enqueue(OscMessage message) => SendQueue.Enqueue(message);
-    public static void Clear() => SendQueue.Clear();
+    public static void Enqueue(OscMessage message)
+    {
+        lock (QueueLock)
+        {
+            SendQueue.Enqueue(message);
+        }
+    }
+
+    public static void Clear()
+    {
+        lock (QueueLock)
+        {
+            SendQueue.Clear();
+        }
+    }
 
     public async Task FlushAsync(CancellationToken cancellationToken)
     {
-        if (SendQueue.Count == 0) return;
-
         await _flushLock.WaitAsync(cancellationToken);
         try
         {
-            if (SendQueue.Count == 0) return;
-            var messages = SendQueue.ToArray();
-            SendQueue.Clear();
+            OscMessage[] messages;
+            lock (QueueLock)
+            {
+                if (SendQueue.Count == 0) return;
+                messages = SendQueue.ToArray();
+                SendQueue.Clear();
+            }
+
             await _sendService.Send(messages, cancellationToken);
         }
         catch (Exception e)

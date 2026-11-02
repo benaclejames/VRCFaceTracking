@@ -28,6 +28,11 @@ public partial class OscQueryService(
     [ObservableProperty] private IAvatarInfo _avatarInfo = new NullAvatarDef("Loading...", "Loading...");
     [ObservableProperty] private List<Parameter> _avatarParameters;
 
+    // Avatar parsing mutates shared OSC parameter state and the send queue. Concurrent parses
+    // (FirstClientDiscovered + OnHostInfoQueried) can dispose messages that are already queued.
+    private readonly SemaphoreSlim _avatarParseLock = new(1, 1);
+    private int _avatarParseGeneration;
+
     public async Task InitializeAsync()
     {
         logger.LogDebug("OSC Service Initializing");
@@ -80,29 +85,44 @@ public partial class OscQueryService(
 
     private async void HandleNewAvatar(string newId = null)
     {
-        (IAvatarInfo avatarInfo, List<Parameter> relevantParameters)? newAvatar;
-        if (multicastDnsService.VrchatClientEndpoint != null)
+        var generation = Interlocked.Increment(ref _avatarParseGeneration);
+        await _avatarParseLock.WaitAsync();
+        try
         {
-            newAvatar = await oscQueryConfigParser.ParseAvatar("");
-        }
-        else
-        {
-            // handle normal osc
-            newAvatar = await avatarConfigParser.ParseAvatar(newId);
-        }
+            // A newer avatar-change request arrived while we were waiting; drop this one.
+            if (generation != Volatile.Read(ref _avatarParseGeneration))
+            {
+                return;
+            }
 
-        if (!newAvatar.HasValue)
-        {
-            return;
-        }
+            (IAvatarInfo avatarInfo, List<Parameter> relevantParameters)? newAvatar;
+            if (multicastDnsService.VrchatClientEndpoint != null)
+            {
+                newAvatar = await oscQueryConfigParser.ParseAvatar("");
+            }
+            else
+            {
+                // handle normal osc
+                newAvatar = await avatarConfigParser.ParseAvatar(newId);
+            }
 
-        // Parsing success. Deregister callback and update values
-        httpHandler.OnHostInfoQueried -= HandleNewAvatarWrapper;
-        dispatcherService.Run(() =>
+            if (!newAvatar.HasValue)
+            {
+                return;
+            }
+
+            // Parsing success. Deregister callback and update values
+            httpHandler.OnHostInfoQueried -= HandleNewAvatarWrapper;
+            dispatcherService.Run(() =>
+            {
+                AvatarInfo = newAvatar.Value.avatarInfo;
+                AvatarParameters = newAvatar.Value.relevantParameters;
+            });
+        }
+        finally
         {
-            AvatarInfo = newAvatar.Value.avatarInfo;
-            AvatarParameters = newAvatar.Value.relevantParameters;
-        });
+            _avatarParseLock.Release();
+        }
     }
 
     private void HandleNewAvatarWrapper() => HandleNewAvatar(); // Helper func used in callbacks

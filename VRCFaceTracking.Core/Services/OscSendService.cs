@@ -91,7 +91,20 @@ public class OscSendService
 
     public async Task Send(IReadOnlyList<OscMessage> messages, CancellationToken ct)
     {
-        var cbt = messages.Select(m => m._meta).ToArray();
+        // Skip disposed / incomplete messages. Leaving a freed Value pointer with ValueLength > 0
+        // (or a null Address) in the native bundle path causes an Access Violation in fti_osc.
+        var cbt = messages
+            .Where(static m =>
+                m is { IsDisposed: false, Address: not null } &&
+                !(m._meta.ValueLength > 0 && m._meta.Value == IntPtr.Zero))
+            .Select(static m => m._meta)
+            .ToArray();
+
+        if (cbt.Length == 0)
+        {
+            return;
+        }
+
         var index = 0;
         while (index < cbt.Length)
         {
