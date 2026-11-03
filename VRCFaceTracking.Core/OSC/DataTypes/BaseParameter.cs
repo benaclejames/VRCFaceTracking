@@ -18,12 +18,18 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
 
     private bool _relevant;
     private readonly bool _sendOnLoad;
+    private bool _disposed;
 
     public bool Relevant
     {
         get => _relevant;
         protected set
         {
+            if (_disposed)
+            {
+                return;
+            }
+
             if (_sendOnLoad && value)
             {
                 Enqueue();
@@ -133,6 +139,13 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
 
     private void ReleaseUnmanagedResources()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _relevant = false;
         UnifiedTracking.OnUnifiedDataUpdated -= Process;
         OscMessage.Dispose();
     }

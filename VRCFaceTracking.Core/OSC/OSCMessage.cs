@@ -9,6 +9,9 @@ public class OscMessage : IDisposable
     public OscMessageMeta _meta;
     private IntPtr _metaPtr;
     private GCHandle _blobHandle;
+    private bool _disposed;
+
+    public bool IsDisposed => _disposed;
 
     public string Address
     {
@@ -22,7 +25,7 @@ public class OscMessage : IDisposable
     {
         get
         {
-            if (_meta.ValueLength == 0)
+            if (_disposed || _meta.ValueLength == 0 || _meta.Value == IntPtr.Zero)
             {
                 return null;
             }
@@ -37,7 +40,15 @@ public class OscMessage : IDisposable
 
             return values[0].Value;
         }
-        set => _valueSetter?.Invoke(value);
+        set
+        {
+            if (_disposed || _meta.Value == IntPtr.Zero)
+            {
+                return;
+            }
+
+            _valueSetter?.Invoke(value);
+        }
     }
 
     public OscMessage(string address, Type type)
@@ -137,6 +148,13 @@ public class OscMessage : IDisposable
 
     private void ReleaseUnmanagedResources()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+
         if (_metaPtr != IntPtr.Zero)
         {
             fti_osc.free_osc_message(_metaPtr);
@@ -145,8 +163,12 @@ public class OscMessage : IDisposable
         else if (_meta.Value != IntPtr.Zero)
         {
             Marshal.FreeHGlobal(_meta.Value);
-            _meta.Value = IntPtr.Zero;
         }
+
+        // Keep native bundle construction from reading a freed Value pointer or null Address.
+        _meta.Value = IntPtr.Zero;
+        _meta.ValueLength = 0;
+        _meta.Address = null;
 
         if (_blobHandle.IsAllocated)
             _blobHandle.Free();
