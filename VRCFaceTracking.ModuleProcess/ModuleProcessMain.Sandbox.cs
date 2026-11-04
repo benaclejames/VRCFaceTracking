@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Sandboxing;
@@ -12,7 +13,7 @@ public partial class ModuleProcessMain
 
     public static VrcftSandboxClient Client;
 
-    private static readonly Queue<IpcPacket> _packetsToSend = new();
+    private static readonly ConcurrentQueue<IpcPacket> _packetsToSend = new();
     private static Timer? _connectionTimer;
 
     private static readonly object _callbackLock = new();
