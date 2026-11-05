@@ -144,7 +144,10 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+                        <TextBlock FontSize="12" Text="{x:Static s:Resources.NativeFaceTracking_Text}"
+                                   IsVisible="{Binding ParameterOutputService.AvatarInfo.FullFaceTracking, Mode=OneWay}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6"
+                                    IsVisible="{Binding !ParameterOutputService.AvatarInfo.FullFaceTracking}">
                             <TextBlock FontSize="12" Text="{Binding ParameterOutputService.AvatarParameters.Count, Mode=OneWay}" />
                             <TextBlock FontSize="12" Opacity="0.6" Text="{x:Static s:Resources.Parameters_Text}" />
                         </StackPanel>

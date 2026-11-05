@@ -272,6 +272,9 @@
   <data name="OSCStatus_Text" xml:space="preserve">
     <value>OSC Status</value>
   </data>
+  <data name="NativeFaceTracking_Text" xml:space="preserve">
+    <value>Native VRC Face Tracking</value>
+  </data>
   <data name="Parameters_Text" xml:space="preserve">
     <value>Parameters</value>
   </data>

@@ -528,6 +528,15 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Native VRC Face Tracking.
+        /// </summary>
+        public static string NativeFaceTracking_Text {
+            get {
+                return ResourceManager.GetString("NativeFaceTracking_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Install some from here!.
         /// </summary>
         public static string no_modules_installed_warning_ButtonText {
