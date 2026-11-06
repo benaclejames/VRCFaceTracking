@@ -41,6 +41,12 @@ public class VrcftPacketDecoder
                 break;
 
 
+            // MetadataUpdate
+            case IpcPacket.PacketType.MetadataUpdate:
+                packet = new MetadataUpdatePacket();
+                packet.Decode(data);
+                break;
+
             // EventGetSupported
             case IpcPacket.PacketType.EventGetSupported:
                 packet = new EventInitGetSupported();

@@ -42,7 +42,40 @@ public partial class UnifiedLibManager
             case IpcPacket.PacketType.ReplyUpdate:
                 HandleReplyUpdate((ReplyUpdatePacket)packet, moduleIndex.Value);
                 break;
+
+            case IpcPacket.PacketType.MetadataUpdate:
+                HandleMetadataUpdate(moduleIndex.Value);
+                break;
         }
+    }
+
+    // A module asked for every loaded module to be reinitialized. Initialize tears down all module processes (the
+    // requester included) and respawns them, so run it on the UI thread like a manual reload, never on this receive thread.
+    private void HandleMetadataUpdate(int moduleIndex)
+    {
+        if (Interlocked.CompareExchange(ref _reinitializing, 1, 0) != 0)
+        {
+            return; // One is already underway; it covers this request too.
+        }
+
+        _logger.LogInformation("{module} requested a reinitialization. Reinitializing all modules...",
+            AvailableSandboxModules[moduleIndex].ModuleClassName);
+
+        _dispatcherService.Run(async () =>
+        {
+            try
+            {
+                await Initialize();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to reinitialize modules: {error}", e);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _reinitializing, 0);
+            }
+        });
     }
 
     private int? FindModuleIndexByPort(int port)
