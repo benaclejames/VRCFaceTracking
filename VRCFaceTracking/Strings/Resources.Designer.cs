@@ -474,11 +474,29 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Settings are automatically saved. You should click the reload button once you&apos;re finished to re-initialize modules.
+        ///   Looks up a localized string similar to Reload to apply.
         /// </summary>
-        public static string ModuleConfig_SaveCondition_Text {
+        public static string ModuleConfig_PendingChanges_Text {
             get {
-                return ResourceManager.GetString("ModuleConfig_SaveCondition_Text", resourceCulture);
+                return ResourceManager.GetString("ModuleConfig_PendingChanges_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;ve changed module settings. Changes take effect after reload..
+        /// </summary>
+        public static string ModuleConfig_PendingChanges_Tooltip {
+            get {
+                return ResourceManager.GetString("ModuleConfig_PendingChanges_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload modules.
+        /// </summary>
+        public static string ModuleConfig_Reload_Button {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Reload_Button", resourceCulture);
             }
         }
         
