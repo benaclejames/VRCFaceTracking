@@ -36,7 +36,19 @@
             </ui:NavigationViewItem>
         </ui:NavigationView.MenuItems>
 
+        <ui:NavigationView.FooterMenuItems>
+            <ui:NavigationViewItem
+                x:Name="ReloadNavItem"
+                Tag="ReloadModules"
+                Content="{x:Static s:Resources.Shell_ReloadModules_Content}">
+                <ui:NavigationViewItem.IconSource>
+                    <ui:SymbolIconSource Symbol="Refresh" />
+                </ui:NavigationViewItem.IconSource>
+            </ui:NavigationViewItem>
+        </ui:NavigationView.FooterMenuItems>
+
         <Panel x:Name="PageContainer" Margin="20,0,20,20" />
 
     </ui:NavigationView>
 </UserControl>
+

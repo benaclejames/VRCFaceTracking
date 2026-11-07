@@ -395,4 +395,10 @@
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>추적 설정</value>
   </data>
+  <data name="Shell_ReloadModules_Content" xml:space="preserve">
+    <value>모듈 다시 로드</value>
+  </data>
+  <data name="ModuleEnabledHint" xml:space="preserve">
+    <value>변경 사항은 모듈을 다시 로드한 후 적용됩니다</value>
+  </data>
 </root>
