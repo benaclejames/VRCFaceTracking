@@ -4,21 +4,26 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 using VRCFaceTracking.Core.Contracts.Services;
 using VRCFaceTracking.Core.Models;
+using VRCFaceTracking.Strings;
 
 namespace VRCFaceTracking.ViewModels;
 
 public partial class ModuleRegistryViewModel : ObservableRecipient
 {
     private readonly IModuleDataService _moduleDataService;
+    private readonly ILocalSettingsService _settingsService;
+    private readonly ILibManager _libManager;
     [ObservableProperty] private InstallTrackedTrackingModule? _selected;
     [ObservableProperty] private string _searchQuery = string.Empty;
 
     public ObservableCollection<InstallTrackedTrackingModule> ModuleInfos { get; } = new();
     public ObservableCollection<InstallTrackedTrackingModule> FilteredModuleInfos { get; } = new();
 
-    public ModuleRegistryViewModel(IModuleDataService moduleDataService)
+    public ModuleRegistryViewModel(IModuleDataService moduleDataService, ILocalSettingsService settingsService, ILibManager libManager)
     {
         _moduleDataService = moduleDataService;
+        _settingsService = settingsService;
+        _libManager = libManager;
         ModuleInfos.CollectionChanged += (_, _) => ApplyFilter();
     }
 
@@ -52,13 +57,25 @@ public partial class ModuleRegistryViewModel : ObservableRecipient
         // If any of the IDs match a remote module and the other data contained within does not match,
         // then we need to set the local module install state to outdated. If everything matches then we need to set the install state to installed.
         var installedModules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
+        var moduleSettings = await _settingsService.ReadSettingAsync(VRCFaceTracking.Core.Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>());
+        var appliedStates = _libManager.AppliedModuleStates;
         foreach (var installedModule in installedModules)
         {
+            var state = moduleSettings.TryGetValue(installedModule.ModuleKey, out var s) ? s : ModuleEnabledState.Enabled;
+            var applied = appliedStates.TryGetValue(installedModule.ModuleKey, out var a) ? a : (ModuleEnabledState?)null;
+
             var remoteModule = ModuleInfos.FirstOrDefault(x => x.TrackingModuleMetadata.ModuleId == installedModule.ModuleId);
             if (remoteModule == null)   // If this module is completely missing from the remote list, then we need to add it to the list.
             {
                 // This module is installed but not in the remote list, so we need to add it to the list at the top
-                ModuleInfos.Insert(0, new InstallTrackedTrackingModule {TrackingModuleMetadata = installedModule, InstallationState = InstallState.Installed});
+                var wrapper = new InstallTrackedTrackingModule
+                {
+                    TrackingModuleMetadata = installedModule,
+                    InstallationState = InstallState.Installed,
+                    State = state,
+                };
+                wrapper.UpdateStateBadge(applied, Localize);
+                ModuleInfos.Insert(0, wrapper);
             }
             else
             {
@@ -66,8 +83,19 @@ public partial class ModuleRegistryViewModel : ObservableRecipient
                 remoteModule.InstallationState = remoteModule.TrackingModuleMetadata.Version != installedModule.Version
                     ? InstallState.Outdated
                     : InstallState.Installed;
+                remoteModule.State = state;
+                remoteModule.UpdateStateBadge(applied, Localize);
                 ModuleInfos.Move(ModuleInfos.IndexOf(remoteModule), 0);
             }
         }
     }
+
+    private static string Localize(ModuleEnabledState state) => state switch
+    {
+        ModuleEnabledState.Enabled => Resources.ModuleStateText_Enabled,
+        ModuleEnabledState.Disabled => Resources.ModuleStateText_Disabled,
+        ModuleEnabledState.EyesOnly => Resources.ModuleStateText_EyesOnly,
+        ModuleEnabledState.FaceOnly => Resources.ModuleStateText_FaceOnly,
+        _ => Resources.ModuleStateText_Enabled
+    };
 }
