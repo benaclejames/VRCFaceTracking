@@ -492,6 +492,15 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Priority.
+        /// </summary>
+        public static string ModuleConfig_Priority_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Priority_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reload modules.
         /// </summary>
         public static string ModuleConfig_Reload_Button {

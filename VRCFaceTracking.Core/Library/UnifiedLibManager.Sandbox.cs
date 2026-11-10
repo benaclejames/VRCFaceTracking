@@ -161,17 +161,31 @@ public partial class UnifiedLibManager
                 port);
         };
 
+        module.ModuleInformation.InitializedEye = (moduleConfig?.EyesEnabled ?? true) && reply.eyeSuccess;
+        module.ModuleInformation.InitializedExpression = (moduleConfig?.ExpressionEnabled ?? true) && reply.expressionSuccess;
         module.ModuleInformation.Active          = true;
-        // I wouldn't otherwise check moduleConfig for this, but we can't trust modules for accuracy
-        module.ModuleInformation.UsingEye        = (moduleConfig?.EyesEnabled ?? true) && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingEye)        && reply.eyeSuccess;
-        module.ModuleInformation.UsingExpression = (moduleConfig?.ExpressionEnabled ?? true) && !AvailableSandboxModules.Any(m => m.ModuleInformation.UsingExpression) && reply.expressionSuccess;
         module.ModuleInformation.StaticImages    = reply.IconDataStreams;
-
+        ReassessPriorityUsings();
+        
         _sendCoordinator.RegisterModule(port);
         EnsureModuleThreadStartedSandboxed(module);
 
-        _logger.LogInformation("Tracking initialized via {module}", module.ModuleClassName);
+        _logger.LogInformation("Tracking initialized via {module}. Reasessing priorities", module.ModuleClassName);
         RefreshLoadedModulesUi();
+    }
+
+    private void ReassessPriorityUsings()
+    {
+        foreach (var module in AvailableSandboxModules)
+        {
+            // I wouldn't otherwise check moduleConfig for this, but we can't trust modules for accuracy
+            module.ModuleInformation.UsingEye = AvailableSandboxModules.All(x => !x.ModuleInformation.UsingEye) && !AvailableSandboxModules.Any(x =>
+                    x.ModuleInformation.Priority > module.ModuleInformation.Priority &&
+                    module.ModuleInformation.InitializedEye);
+            module.ModuleInformation.UsingExpression = AvailableSandboxModules.All(x => !x.ModuleInformation.UsingExpression) && !AvailableSandboxModules.Any(x =>
+                x.ModuleInformation.Priority > module.ModuleInformation.Priority &&
+                module.ModuleInformation.InitializedExpression);
+        }
     }
 
     private void NoteInitReply()
@@ -181,7 +195,7 @@ public partial class UnifiedLibManager
             _pendingInits--;
         }
 
-        if (_pendingInits == 0)
+        if (_pendingInits <= 0)
         {
             _isInitializing = false;
         }
@@ -249,7 +263,7 @@ public partial class UnifiedLibManager
                     IsActive           = true,
                     Process            = sandboxProcess,
                     ModuleClassName    = Path.GetFileNameWithoutExtension(dll),
-                    ModuleInformation  = new(),
+                    ModuleInformation  = new() {Priority = config.Priority},
                     ModuleMetadata     = module,
                     EventBus           = new(),
                 };

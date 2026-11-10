@@ -404,6 +404,9 @@
   <data name="ModuleConfig_Description_Text" xml:space="preserve">
     <value>Choose which tracking types each installed module is allowed to initialize.</value>
   </data>
+    <data name="ModuleConfig_Priority_Text" xml:space="preserve">
+    <value>Priority</value>
+  </data>
   <data name="ModuleConfig_Eye_Text" xml:space="preserve">
     <value>Eye</value>
   </data>
