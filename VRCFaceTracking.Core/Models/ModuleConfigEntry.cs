@@ -13,6 +13,10 @@ public partial class ModuleConfigEntry : ObservableObject
     public string Version { get; init; } = string.Empty;
 
     [ObservableProperty]
+    [property: SavedSetting("Priority", 0)]
+    private int _priority;  //TODO: Deal with the mess that is the current system for module initialization
+    
+    [ObservableProperty]
     [property: SavedSetting("EyesEnabled", true)]
     private bool _eyesEnabled;
 
