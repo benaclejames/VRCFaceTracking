@@ -178,13 +178,18 @@ public partial class UnifiedLibManager
     {
         foreach (var module in AvailableSandboxModules)
         {
+            module.ModuleInformation.UsingEye = false;
+            module.ModuleInformation.UsingExpression = false;
+        }
+
+        foreach (var module in AvailableSandboxModules.OrderBy(x => x.ModuleInformation.Priority))
+        {
             // I wouldn't otherwise check moduleConfig for this, but we can't trust modules for accuracy
-            module.ModuleInformation.UsingEye = AvailableSandboxModules.All(x => !x.ModuleInformation.UsingEye) && !AvailableSandboxModules.Any(x =>
-                    x.ModuleInformation.Priority > module.ModuleInformation.Priority &&
-                    module.ModuleInformation.InitializedEye);
-            module.ModuleInformation.UsingExpression = AvailableSandboxModules.All(x => !x.ModuleInformation.UsingExpression) && !AvailableSandboxModules.Any(x =>
-                x.ModuleInformation.Priority > module.ModuleInformation.Priority &&
-                module.ModuleInformation.InitializedExpression);
+            module.ModuleInformation.UsingEye = module.ModuleInformation.InitializedEye &&
+                                                AvailableSandboxModules.All(x => !x.ModuleInformation.UsingEye);
+            module.ModuleInformation.UsingExpression = module.ModuleInformation.InitializedExpression &&
+                                                       AvailableSandboxModules.All(x =>
+                                                           !x.ModuleInformation.UsingExpression);
         }
     }
 
