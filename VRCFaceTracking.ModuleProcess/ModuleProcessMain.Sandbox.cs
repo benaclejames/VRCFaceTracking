@@ -91,6 +91,10 @@ public partial class ModuleProcessMain
     private static void HandleInit(EventInitPacket pkt)
     {
         bool eyeSuccess, expressionSuccess;
+
+        DefModuleAssembly.TrackingModule.ReinitializeRequested -= SendReinitializeRequest;
+        DefModuleAssembly.TrackingModule.ReinitializeRequested += SendReinitializeRequest;
+
         try
         {
             (eyeSuccess, expressionSuccess) = DefModuleAssembly.TrackingModule.Initialize(pkt.eyeAvailable, pkt.expressionAvailable);
@@ -127,6 +131,12 @@ public partial class ModuleProcessMain
             ModuleInformationName = DefModuleAssembly.TrackingModule.ModuleInformation.Name,
             IconDataStreams       = DefModuleAssembly.TrackingModule.ModuleInformation.StaticImages,
         });
+    }
+
+    private static void SendReinitializeRequest()
+    {
+        Logger.LogInformation("Module requested a reinitialization of all modules");
+        Client.SendData(new MetadataUpdatePacket());
     }
 
     private static void HandleTeardown()

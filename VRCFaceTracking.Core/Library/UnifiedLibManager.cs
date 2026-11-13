@@ -27,6 +27,7 @@ public partial class UnifiedLibManager : ILibManager
     private readonly List<ModuleRuntimeInfo> AvailableSandboxModules = new();
     private readonly List<ModuleRuntimeInfo> _moduleThreads = new();
     private static VrcftSandboxServer _sandboxServer;
+    private int _reinitializing; // 1 while a module-requested reinitialization runs
 
     private bool _isInitializing;
     private int _pendingInits;
