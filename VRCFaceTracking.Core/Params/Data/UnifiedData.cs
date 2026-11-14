@@ -1,4 +1,5 @@
-﻿using VRCFaceTracking.Core.Params.Expressions;
+﻿using VRCFaceTracking.Core.Params.Data.Mutation;
+using VRCFaceTracking.Core.Params.Expressions;
 using VRCFaceTracking.Core.Types;
 
 namespace VRCFaceTracking.Core.Params.Data
@@ -78,17 +79,17 @@ namespace VRCFaceTracking.Core.Params.Data
             // I would put a helper func in the struct but we need to invert for left eye anyway
             
             // Right
-            bytes[0] = (byte)(Math.Clamp(Right.Gaze.x, 0f, 1f) * 255);
-            bytes[1] = (byte)(Math.Clamp(Right.Gaze.x*-1, 0f, 1f) * 255);
-            bytes[2] = (byte)(Math.Clamp(Right.Gaze.y, 0f, 1f) * 255);
-            bytes[3] = (byte)(Math.Clamp(Right.Gaze.y*-1, 0f, 1f) * 255);
+            bytes[0] = (byte)(GazeWeight(Right.Gaze.x) * 255);
+            bytes[1] = (byte)(GazeWeight(Right.Gaze.x*-1) * 255);
+            bytes[2] = (byte)(GazeWeight(Right.Gaze.y) * 255);
+            bytes[3] = (byte)(GazeWeight(Right.Gaze.y*-1) * 255);
             bytes[8] = (byte)(Math.Clamp((Right.Openness-1)*-1, 0f, 1f) * 255);
             
             // Left
-            bytes[4] = (byte)(Math.Clamp(Left.Gaze.x*-1, 0f, 1f) * 255);
-            bytes[5] = (byte)(Math.Clamp(Left.Gaze.x, 0f, 1f) * 255);
-            bytes[6] = (byte)(Math.Clamp(Left.Gaze.y, 0f, 1f) * 255);
-            bytes[7] = (byte)(Math.Clamp(Left.Gaze.y*-1, 0f, 1f) * 255);
+            bytes[4] = (byte)(GazeWeight(Left.Gaze.x*-1) * 255);
+            bytes[5] = (byte)(GazeWeight(Left.Gaze.x) * 255);
+            bytes[6] = (byte)(GazeWeight(Left.Gaze.y) * 255);
+            bytes[7] = (byte)(GazeWeight(Left.Gaze.y*-1) * 255);
             bytes[9] = (byte)(Math.Clamp((Left.Openness-1)*-1, 0f, 1f) * 255);
 
             // Split the existing 0..10 mm pupil diameter scale around its midpoint.
@@ -100,6 +101,9 @@ namespace VRCFaceTracking.Core.Params.Data
             bytes[12] = (byte)(Math.Max(-rightPupil, 0f) * 255);
             bytes[13] = (byte)(Math.Max(-leftPupil, 0f) * 255);
         }
+
+        // Gaze is tan(angle) (see Vector2.ToYaw/ToPitch); EyeLook 1 is the avatar's full Eye Look rotation, reached at NativeGazeRange.MaxAngle.
+        private static float GazeWeight(float g) => Math.Clamp(MathF.Atan(g) * (180f / MathF.PI) / NativeGazeRange.MaxAngle, 0f, 1f);
 
         private static float GetPupilWeight(float diameter)
         {
