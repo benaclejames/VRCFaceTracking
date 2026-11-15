@@ -12,7 +12,7 @@ public class BinaryFaceDataSender(OscQueryService oscqService) : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _blobMessage = OscMessage.CreateBlob("/tracking/face/v1", _blobBuffer, _blobBuffer.Length);
+        _blobMessage = OscMessage.CreateBlob("/tracking/face/v1", _blobBuffer);
         
         UnifiedTracking.OnUnifiedDataUpdated += OnDataUpdated;
         oscqService.PropertyChanged += (sender, args) =>

@@ -147,7 +147,6 @@ public class BaseParam<T> : Parameter, IDisposable where T : struct
         _disposed = true;
         _relevant = false;
         UnifiedTracking.OnUnifiedDataUpdated -= Process;
-        OscMessage.Dispose();
     }
 
     public void Dispose()

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Sockets;
+using FastOSC;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts;
 using VRCFaceTracking.Core.OSC;
@@ -17,6 +18,9 @@ public class OscSendService
 
     private Socket _sendSocket;
     private readonly byte[] _sendBuffer = new byte[4096];
+
+    private const int BundleHeaderLength = 16; // "#bundle\0" + time tag
+    private const ulong ImmediateTimeTag = 1;
 
     private CancellationTokenSource _cts;
     public Action<int> OnMessagesDispatched = _ => { };
@@ -78,39 +82,61 @@ public class OscSendService
 
     public async Task Send(OscMessage message, CancellationToken ct)
     {
-        var nextByteIndex =await  message.Encode(_sendBuffer, ct);
-        if (nextByteIndex > 4096)
+        var packet = message.ToPacket();
+        var length = OSCEncoder.GetEncodedLength(packet);
+        if (length > _sendBuffer.Length)
         {
             _logger.LogError("OSC message too large to send! Skipping this batch of messages.");
             return;
         }
 
-        await _sendSocket.SendAsync(_sendBuffer[..nextByteIndex]);
+        OSCEncoder.Encode(packet, _sendBuffer);
+        await _sendSocket.SendAsync(_sendBuffer.AsMemory(0, length));
         OnMessagesDispatched(1);
     }
 
     public async Task Send(IReadOnlyList<OscMessage> messages, CancellationToken ct)
     {
-        // Skip disposed / incomplete messages. Leaving a freed Value pointer with ValueLength > 0
-        // (or a null Address) in the native bundle path causes an Access Violation in fti_osc.
-        var cbt = messages
-            .Where(static m =>
-                m is { IsDisposed: false, Address: not null } &&
-                !(m._meta.ValueLength > 0 && m._meta.Value == IntPtr.Zero))
-            .Select(static m => m._meta)
-            .ToArray();
+        // Pack messages into as few bundles as possible, each fitting in a single send buffer
+        var batch = new List<IOSCPacket>();
+        var batchLength = BundleHeaderLength;
+        var sent = 0;
 
-        if (cbt.Length == 0)
+        foreach (var message in messages)
         {
-            return;
+            var packet = message.ToPacket();
+            var elementLength = OSCEncoder.GetEncodedLength(packet) + 4; // +4 for bundle element length
+            if (BundleHeaderLength + elementLength > _sendBuffer.Length)
+            {
+                _logger.LogError($"OSC message {packet.Address} too large to send! Skipping it.");
+                continue;
+            }
+
+            if (batchLength + elementLength > _sendBuffer.Length)
+            {
+                sent += await SendBundle(batch);
+                batch.Clear();
+                batchLength = BundleHeaderLength;
+            }
+
+            batch.Add(packet);
+            batchLength += elementLength;
         }
 
-        var index = 0;
-        while (index < cbt.Length)
+        if (batch.Count > 0)
         {
-            var length = await Task.Run(() => fti_osc.create_osc_bundle(_sendBuffer, cbt, cbt.Length, ref index), ct);
-            await _sendSocket.SendAsync(_sendBuffer[..length]);
+            sent += await SendBundle(batch);
         }
-        OnMessagesDispatched(index);
+
+        OnMessagesDispatched(sent);
+    }
+
+    private async Task<int> SendBundle(List<IOSCPacket> packets)
+    {
+        var bundle = new OSCBundle(new OSCTimeTag(ImmediateTimeTag), packets.ToArray());
+        var length = OSCEncoder.GetEncodedLength(bundle);
+        OSCEncoder.Encode(bundle, _sendBuffer);
+        await _sendSocket.SendAsync(_sendBuffer.AsMemory(0, length));
+        return packets.Count;
     }
 }
