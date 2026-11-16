@@ -6,8 +6,8 @@
     Title="VRCFaceTracking"
     Width="1280"
     Height="800"
-    MinWidth="900"
-    MinHeight="600"
+    MinWidth="100"
+    MinHeight="100"
     WindowStartupLocation="CenterScreen">
 
     <views:ShellPage />

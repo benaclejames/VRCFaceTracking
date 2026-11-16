@@ -24,6 +24,9 @@ public class ModuleMetadataInternal : INotifyPropertyChanged
     //Temporary for the menu display
     private bool _usingEye;
     private bool _usingExpression;
+    public bool InitializedEye { get; set; }
+    public bool InitializedExpression { get; set; }
+    public int Priority { get; set; }
 
 
     public bool UsingEye

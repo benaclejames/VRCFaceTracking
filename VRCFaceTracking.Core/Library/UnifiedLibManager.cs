@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using VRCFaceTracking.Core.Contracts.Services;
-using VRCFaceTracking.Core.Models;
 using VRCFaceTracking.Core.Sandboxing;
 using VRCFaceTracking.Core.Services;
 
@@ -15,7 +14,7 @@ public partial class UnifiedLibManager : ILibManager
     private readonly ILoggerFactory _loggerFactory;
     private readonly IDispatcherService _dispatcherService;
     private readonly IModuleDataService _moduleDataService;
-    private readonly ILocalSettingsService _settingsService;
+    private readonly IModuleConfigurationService _moduleConfigurationService;
     private readonly SendCoordinator _sendCoordinator;
 
     public ObservableCollection<ModuleMetadataInternal> LoadedModulesMetadata { get; set; }
@@ -23,55 +22,29 @@ public partial class UnifiedLibManager : ILibManager
     public static ModuleState EyeStatus { get; private set; }
     public static ModuleState ExpressionStatus { get; private set; }
 
-    public IReadOnlyDictionary<string, ModuleEnabledState> AppliedModuleStates { get; private set; } = new Dictionary<string, ModuleEnabledState>();
-
-    public bool IsReloadPending { get; private set; }
-    public event EventHandler? ReloadPendingChanged;
-
-    private readonly Dictionary<string, ModuleEnabledState> _pendingChanges = new();
-
-    public void NotifyModuleStateChanged(string moduleKey, ModuleEnabledState state)
-    {
-        var applied = AppliedModuleStates.TryGetValue(moduleKey, out var appliedState)
-            ? appliedState
-            : ModuleEnabledState.Enabled;
-
-        if (state == applied)
-        {
-            _pendingChanges.Remove(moduleKey);
-        }
-        else
-        {
-            _pendingChanges[moduleKey] = state;
-        }
-
-        var pending = _pendingChanges.Count > 0;
-        if (pending == IsReloadPending)
-        {
-            return;
-        }
-
-        IsReloadPending = pending;
-        ReloadPendingChanged?.Invoke(this, EventArgs.Empty);
-    }
-
-    public Task ReloadModulesAsync() => Initialize();
-
     // Sandbox stuff
     private readonly string _sandboxProcessPath;
     private readonly List<ModuleRuntimeInfo> AvailableSandboxModules = new();
     private readonly List<ModuleRuntimeInfo> _moduleThreads = new();
     private static VrcftSandboxServer _sandboxServer;
-    private Dictionary<string, ModuleEnabledState> _moduleSettingsByPath = new();
 
-    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, ILocalSettingsService settingsService, SendCoordinator sendCoordinator)
+    private bool _isInitializing;
+    private int _pendingInits;
+
+    private static readonly ModuleMetadataInternal InitializingPlaceholder =
+        new() { Active = false, Name = "Initializing Modules..." };
+
+    private static readonly ModuleMetadataInternal NoModulesPlaceholder =
+        new() { Active = false, Name = "No Modules Loaded" };
+
+    public UnifiedLibManager(ILoggerFactory factory, IDispatcherService dispatcherService, IModuleDataService moduleDataService, IModuleConfigurationService moduleConfigurationService, SendCoordinator sendCoordinator)
     {
         _loggerFactory = factory;
         _logger = factory.CreateLogger<UnifiedLibManager>();
         _moduleLogger = factory.CreateLogger("\0VRCFT\0");
         _dispatcherService = dispatcherService;
         _moduleDataService = moduleDataService;
-        _settingsService = settingsService;
+        _moduleConfigurationService = moduleConfigurationService;
         _sendCoordinator = sendCoordinator;
 
         LoadedModulesMetadata = new ObservableCollection<ModuleMetadataInternal>();
@@ -87,12 +60,9 @@ public partial class UnifiedLibManager : ILibManager
 
     public async Task Initialize()
     {
-        LoadedModulesMetadata.Clear();
-        LoadedModulesMetadata.Add(new ModuleMetadataInternal
-        { 
-            Active = false,
-            Name = "Initializing Modules..."
-        });
+        _isInitializing = true;
+        _pendingInits = 0;
+        RefreshLoadedModulesUi();
 
         // Spawn sandbox server if it's null
         if (_sandboxServer == null )
@@ -109,58 +79,43 @@ public partial class UnifiedLibManager : ILibManager
 
         var modules = _moduleDataService.GetInstalledModules().Concat(_moduleDataService.GetLegacyModules());
 
-        // Load the per-module state settings. They are applied at startup, so changing a module's state
-        // only takes effect after a restart.
-        var allSettings = await _settingsService.ReadSettingAsync(Utils.ModuleStateSettingsKey, new Dictionary<string, ModuleEnabledState>());
-        var modulesToLoad = new List<InstallableTrackingModule>();
-        var settingsByPath = new Dictionary<string, ModuleEnabledState>();
-        var appliedStates = new Dictionary<string, ModuleEnabledState>();
-        foreach (var m in modules)
-        {
-            var state = allSettings.TryGetValue(m.ModuleKey, out var s) ? s : ModuleEnabledState.Enabled;
-            settingsByPath[m.AssemblyLoadPath] = state;
-            appliedStates[m.ModuleKey] = state;
-
-            // Skip modules that have been disabled by the user as a whole
-            if (state == ModuleEnabledState.Disabled)
-            {
-                continue;
-            }
-
-            modulesToLoad.Add(m);
-        }
-
-        _moduleSettingsByPath = settingsByPath;
-        AppliedModuleStates = appliedStates;
-
-        _pendingChanges.Clear();
-        if (IsReloadPending)
-        {
-            IsReloadPending = false;
-            ReloadPendingChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        var modulePaths = modulesToLoad.Select(m => m.AssemblyLoadPath);
-
         AvailableSandboxModules.Clear();
-        InitialiseSandboxesBaseOnPaths(modulePaths.ToArray());
+        await InitialiseSandboxesBase(modules);
 
-        if (AvailableSandboxModules.Count > 0)
+        _pendingInits = AvailableSandboxModules.Count;
+
+        if (_pendingInits > 0)
         {
             _logger.LogDebug("Initializing requested runtimes...");
             return;
         }
 
+        _isInitializing = false;
+        _logger.LogWarning("No modules loaded.");
+        RefreshLoadedModulesUi();
+    }
+
+    private void RefreshLoadedModulesUi()
+    {
         _dispatcherService.Run(() =>
         {
             LoadedModulesMetadata.Clear();
-            LoadedModulesMetadata.Add(new ModuleMetadataInternal
+
+            foreach (var module in AvailableSandboxModules)
             {
-                Active = false,
-                Name = "No Modules Loaded",
-            });
+                if (module.ModuleInformation?.Active == true)
+                {
+                    LoadedModulesMetadata.Add(module.ModuleInformation);
+                }
+            }
+
+            if (LoadedModulesMetadata.Count > 0)
+            {
+                return;
+            }
+
+            LoadedModulesMetadata.Add(_isInitializing ? InitializingPlaceholder : NoModulesPlaceholder);
         });
-        _logger.LogWarning("No modules loaded.");
     }
 
     // Signal all active modules to gracefully shut down their respective runtimes.
@@ -182,6 +137,12 @@ public partial class UnifiedLibManager : ILibManager
 
         EyeStatus = ModuleState.Uninitialized;
         ExpressionStatus = ModuleState.Uninitialized;
+
+        _pendingInits = 0;
+        if (!_isInitializing)
+        {
+            RefreshLoadedModulesUi();
+        }
     }
 
     private async Task TryTeardownModule(ModuleRuntimeInfo module)

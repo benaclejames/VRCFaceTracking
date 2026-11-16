@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<MutatorViewModel>();
         services.AddSingleton<RiskySettingsViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<ModuleConfigViewModel>();
 
         services.AddTransient<ParameterViewModel>();
         services.AddTransient<ParametersViewModel>(); 
