@@ -12,11 +12,11 @@ namespace VRCFaceTracking.Core.Params.Data.Mutation;
 public class Filter : TrackingMutation
 {
     [MutationProperty("Minimum Cutoff", true, 0f, 2f)]
-    public static float minCutoff = 1f;
+    public float minCutoff = 1f;
     [MutationProperty("Beta", true)]
-    public static float beta = 0.5f;
+    public float beta = 0.5f;
     [MutationProperty("Derivative Cutoff", true)]
-    public static float dCutoff = 0.1f;
+    public float dCutoff = 0.1f;
     private const float hz = 10f;
 
     public class EuroFilter
@@ -26,7 +26,7 @@ public class Filter : TrackingMutation
         float xPrev;
         float dxPrev;
 
-        public float Filter(float x)
+        public float Filter(float x, float minCutoff, float beta, float dCutoff)
         {
             if (float.IsNaN(x))
             {
@@ -108,23 +108,25 @@ public class Filter : TrackingMutation
     public override void MutateData(ref UnifiedTrackingData data)
     {
         for (int i = 0; i < (int)UnifiedExpressions.Max; i++)
-            data.Shapes[i].Weight = shapes[i].Filter(data.Shapes[i].Weight);
+            data.Shapes[i].Weight = ApplyFilter(shapes[i], data.Shapes[i].Weight);
 
-        data.Eye.Left.Openness = opennessLeft.Filter(data.Eye.Left.Openness);
-        data.Eye.Left.PupilDiameter_MM = pupilLeft.Filter(data.Eye.Left.PupilDiameter_MM);
-        data.Eye.Left.Gaze.x = gazeLeftX.Filter(data.Eye.Left.Gaze.x);
-        data.Eye.Left.Gaze.y = gazeLeftY.Filter(data.Eye.Left.Gaze.y);
+        data.Eye.Left.Openness = ApplyFilter(opennessLeft, data.Eye.Left.Openness);
+        data.Eye.Left.PupilDiameter_MM = ApplyFilter(pupilLeft, data.Eye.Left.PupilDiameter_MM);
+        data.Eye.Left.Gaze.x = ApplyFilter(gazeLeftX, data.Eye.Left.Gaze.x);
+        data.Eye.Left.Gaze.y = ApplyFilter(gazeLeftY, data.Eye.Left.Gaze.y);
 
-        data.Eye.Right.Openness = opennessRight.Filter(data.Eye.Right.Openness);
-        data.Eye.Right.PupilDiameter_MM = pupilRight.Filter(data.Eye.Right.PupilDiameter_MM);
-        data.Eye.Right.Gaze.x = gazeRightX.Filter(data.Eye.Right.Gaze.x);
-        data.Eye.Right.Gaze.y = gazeRightY.Filter(data.Eye.Right.Gaze.y);
+        data.Eye.Right.Openness = ApplyFilter(opennessRight, data.Eye.Right.Openness);
+        data.Eye.Right.PupilDiameter_MM = ApplyFilter(pupilRight, data.Eye.Right.PupilDiameter_MM);
+        data.Eye.Right.Gaze.x = ApplyFilter(gazeRightX, data.Eye.Right.Gaze.x);
+        data.Eye.Right.Gaze.y = ApplyFilter(gazeRightY, data.Eye.Right.Gaze.y);
 
-        data.Head.HeadYaw = headYaw.Filter(data.Head.HeadYaw);
-        data.Head.HeadPitch = headPitch.Filter(data.Head.HeadPitch);
-        data.Head.HeadRoll = headRoll.Filter(data.Head.HeadRoll);
-        data.Head.HeadPosX = headPosX.Filter(data.Head.HeadPosX);
-        data.Head.HeadPosY = headPosY.Filter(data.Head.HeadPosY);
-        data.Head.HeadPosZ = headPosZ.Filter(data.Head.HeadPosZ);
+        data.Head.HeadYaw = ApplyFilter(headYaw, data.Head.HeadYaw);
+        data.Head.HeadPitch = ApplyFilter(headPitch, data.Head.HeadPitch);
+        data.Head.HeadRoll = ApplyFilter(headRoll, data.Head.HeadRoll);
+        data.Head.HeadPosX = ApplyFilter(headPosX, data.Head.HeadPosX);
+        data.Head.HeadPosY = ApplyFilter(headPosY, data.Head.HeadPosY);
+        data.Head.HeadPosZ = ApplyFilter(headPosZ, data.Head.HeadPosZ);
     }
+
+    private float ApplyFilter(EuroFilter filter, float x) => filter.Filter(x, minCutoff, beta, dCutoff);
 }
