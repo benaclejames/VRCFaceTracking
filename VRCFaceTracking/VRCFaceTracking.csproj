@@ -6,6 +6,7 @@
     <RootNamespace>VRCFaceTracking</RootNamespace>
     <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <TargetPlatformMinVersion>$(VftTargetPlatformMinVersion)</TargetPlatformMinVersion>
     <RootNamespace>VRCFaceTracking.ModuleProcess</RootNamespace>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.CommandLine" />

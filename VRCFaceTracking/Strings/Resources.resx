@@ -185,6 +185,9 @@
   <data name="Shell_ModuleRegistry_Content" xml:space="preserve">
     <value>Module Registry</value>
   </data>
+  <data name="Shell_ModuleConfig_Content" xml:space="preserve">
+    <value>Module Configuration</value>
+  </data>
   <data name="About_Text" xml:space="preserve">
     <value>About</value>
   </data>
@@ -397,5 +400,26 @@
   </data>
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>Tracking Settings</value>
+  </data>
+  <data name="ModuleConfig_Description_Text" xml:space="preserve">
+    <value>Choose which tracking types each installed module is allowed to initialize.</value>
+  </data>
+    <data name="ModuleConfig_Priority_Text" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="ModuleConfig_Eye_Text" xml:space="preserve">
+    <value>Eye</value>
+  </data>
+  <data name="ModuleConfig_Expression_Text" xml:space="preserve">
+    <value>Expression</value>
+  </data>
+  <data name="ModuleConfig_Reload_Button" xml:space="preserve">
+    <value>Reload modules</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Text" xml:space="preserve">
+    <value>Reload to apply</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Tooltip" xml:space="preserve">
+    <value>You've changed module settings. Changes take effect after reload.</value>
   </data>
 </root>

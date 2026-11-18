@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<AvatarConfigParser>();
         services.AddTransient<OscQueryConfigParser>();
         services.AddSingleton<ModuleInstaller>();
+        services.AddSingleton<IModuleConfigurationService, ModuleConfigurationService>();
         services.AddSingleton<OscQueryService>();
         services.AddSingleton<MulticastDnsService>();
         services.AddSingleton<IMainService, MainStandalone>();

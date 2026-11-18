@@ -447,6 +447,69 @@ namespace VRCFaceTracking.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose which tracking types each installed module is allowed to initialize..
+        /// </summary>
+        public static string ModuleConfig_Description_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Description_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expression.
+        /// </summary>
+        public static string ModuleConfig_Expression_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Expression_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eye.
+        /// </summary>
+        public static string ModuleConfig_Eye_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Eye_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload to apply.
+        /// </summary>
+        public static string ModuleConfig_PendingChanges_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_PendingChanges_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You&apos;ve changed module settings. Changes take effect after reload..
+        /// </summary>
+        public static string ModuleConfig_PendingChanges_Tooltip {
+            get {
+                return ResourceManager.GetString("ModuleConfig_PendingChanges_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Priority.
+        /// </summary>
+        public static string ModuleConfig_Priority_Text {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Priority_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reload modules.
+        /// </summary>
+        public static string ModuleConfig_Reload_Button {
+            get {
+                return ResourceManager.GetString("ModuleConfig_Reload_Button", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Module Page.
         /// </summary>
         public static string ModulePage_Text {
@@ -776,6 +839,15 @@ namespace VRCFaceTracking.Strings {
         public static string Shell_Main_Content {
             get {
                 return ResourceManager.GetString("Shell_Main_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Module Configuration.
+        /// </summary>
+        public static string Shell_ModuleConfig_Content {
+            get {
+                return ResourceManager.GetString("Shell_ModuleConfig_Content", resourceCulture);
             }
         }
         

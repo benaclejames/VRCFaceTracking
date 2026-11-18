@@ -31,13 +31,13 @@ jobs:
 
       - name: Publish Windows (x64)
         run: |
-          dotnet publish VRCFaceTracking/VRCFaceTracking.csproj --configuration Release -r win-x64 --self-contained false --output ./publish/windows
-          dotnet publish VRCFaceTracking.ModuleProcess/VRCFaceTracking.ModuleProcess.csproj --configuration Release -r win-x64 --self-contained false --output ./publish/windows
+          dotnet publish VRCFaceTracking/VRCFaceTracking.csproj --configuration Release -r win-x64 --output ./publish/windows
+          dotnet publish VRCFaceTracking.ModuleProcess/VRCFaceTracking.ModuleProcess.csproj --configuration Release -r win-x64 --output ./publish/windows
 
       - name: Publish Linux (x64)
         run: |
-          dotnet publish VRCFaceTracking/VRCFaceTracking.csproj --configuration Release -r linux-x64 --self-contained true --output ./publish/linux
-          dotnet publish VRCFaceTracking.ModuleProcess/VRCFaceTracking.ModuleProcess.csproj --configuration Release -r linux-x64 --self-contained true --output ./publish/linux
+          dotnet publish VRCFaceTracking/VRCFaceTracking.csproj --configuration Release -r linux-x64 --output ./publish/linux
+          dotnet publish VRCFaceTracking.ModuleProcess/VRCFaceTracking.ModuleProcess.csproj --configuration Release -r linux-x64 --output ./publish/linux
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
