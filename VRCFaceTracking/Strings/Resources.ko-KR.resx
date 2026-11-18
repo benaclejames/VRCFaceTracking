@@ -185,6 +185,9 @@
   <data name="Shell_ModuleRegistry_Content" xml:space="preserve">
     <value>모듈 레지스트리</value>
   </data>
+  <data name="Shell_ModuleConfig_Content" xml:space="preserve">
+    <value>모듈 설정</value>
+  </data>
   <data name="About_Text" xml:space="preserve">
     <value>정보</value>
   </data>
@@ -271,6 +274,9 @@
   </data>
   <data name="OSCStatus_Text" xml:space="preserve">
     <value>OSC 상태</value>
+  </data>
+  <data name="NativeFaceTracking_Text" xml:space="preserve">
+    <value>VRChat 내장 얼굴 트래킹</value>
   </data>
   <data name="Parameters_Text" xml:space="preserve">
     <value>파라미터</value>
@@ -394,5 +400,26 @@
   </data>
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>추적 설정</value>
+  </data>
+  <data name="ModuleConfig_Description_Text" xml:space="preserve">
+    <value>설치된 모듈별로 사용할 추적 기능을 선택하세요.</value>
+  </data>
+  <data name="ModuleConfig_Priority_Text" xml:space="preserve">
+    <value>우선순위</value>
+  </data>
+  <data name="ModuleConfig_Eye_Text" xml:space="preserve">
+    <value>시선</value>
+  </data>
+  <data name="ModuleConfig_Expression_Text" xml:space="preserve">
+    <value>표정</value>
+  </data>
+  <data name="ModuleConfig_Reload_Button" xml:space="preserve">
+    <value>모듈 다시 불러오기</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Text" xml:space="preserve">
+    <value>다시 불러오기 필요</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Tooltip" xml:space="preserve">
+    <value>변경한 설정은 모듈을 다시 불러오면 적용됩니다.</value>
   </data>
 </root>
