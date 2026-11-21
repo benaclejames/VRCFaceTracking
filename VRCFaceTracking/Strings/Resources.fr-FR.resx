@@ -185,6 +185,9 @@
   <data name="Shell_ModuleRegistry_Content" xml:space="preserve">
     <value>Registre des modules</value>
   </data>
+  <data name="Shell_ModuleConfig_Content" xml:space="preserve">
+    <value>Configuration des modules</value>
+  </data>
   <data name="About_Text" xml:space="preserve">
     <value>À propos</value>
   </data>
@@ -271,6 +274,9 @@
   </data>
   <data name="OSCStatus_Text" xml:space="preserve">
     <value>Status OSC</value>
+  </data>
+  <data name="NativeFaceTracking_Text" xml:space="preserve">
+    <value>Face Tracking Natif VRChat</value>
   </data>
   <data name="Parameters_Text" xml:space="preserve">
     <value>Paramètres</value>
@@ -394,5 +400,26 @@
   </data>
   <data name="Shell_TrackingSettings_Content" xml:space="preserve">
     <value>Options de Tracking</value>
+  </data>
+  <data name="ModuleConfig_Description_Text" xml:space="preserve">
+    <value>Choisis quel type de tracking chaque module controles et si il à le droit de s'Initialiser.</value>
+  </data>
+  <data name="ModuleConfig_Priority_Text" xml:space="preserve">
+    <value>Priorité</value>
+  </data>
+  <data name="ModuleConfig_Eye_Text" xml:space="preserve">
+    <value>Yeux</value>
+  </data>
+  <data name="ModuleConfig_Expression_Text" xml:space="preserve">
+    <value>Expressions</value>
+  </data>
+  <data name="ModuleConfig_Reload_Button" xml:space="preserve">
+    <value>Recharger le module</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Text" xml:space="preserve">
+    <value>Rechargement requis</value>
+  </data>
+  <data name="ModuleConfig_PendingChanges_Tooltip" xml:space="preserve">
+    <value>Le changement des options se fera lorsque le module sera rechargé</value>
   </data>
 </root>
